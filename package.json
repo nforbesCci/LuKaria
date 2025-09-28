@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "yarn@1.22.0",
   "dependencies": {
+    "@auth0/auth0-react": "^2.5.0",
     "@auth0/nextjs-auth0": "^3.8.0",
     "@emotion/cache": "^11.13.1",
     "@emotion/react": "^11.13.3",
