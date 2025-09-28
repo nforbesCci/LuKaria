@@ -1,0 +1,48 @@
+/* Minimal global styles - Material-UI handles most styling */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Ensure proper font loading */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Svelte logo styling */
+.Svelte_logo {
+  font-weight: 0 !important;
+  color: #D4AF37 !important;
+  font-family: "Alex Brush", cursive !important;
+  font-size: 2.8em !important;
+}
+
+/* Large Svelte text for panels */
+.Svelte_large {
+  font-weight: 0 !important;
+  color: #D4AF37 !important;
+  font-family: "Alex Brush", cursive !important;
+  font-size: 5.6em !important;
+}
+
+/* Override MUI Typography h1 font weight for Svelte_large */
+.MuiTypography-h1.Svelte_large {
+  font-weight: 0 !important;
+}
+
+/* Override any other MUI Typography font weights */
+.MuiTypography-root.Svelte_large {
+  font-weight: 0 !important;
+}
+
+/* Specific override for css-14vokww-MuiTypography-root */
+.css-14vokww-MuiTypography-root {
+  font-weight: 0 !important;
+}
+
+/* Svelte post script styling */
+.svelte_post_script {
+  font-weight: 0 !important;
+  color: #D4AF37 !important;
+  font-size: 0.9rem !important;
+  margin-top: 20px !important;
+}

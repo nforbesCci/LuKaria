@@ -1,0 +1,41 @@
+{
+  "name": "lukaria-auth0-app",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "yarn@1.22.0",
+  "dependencies": {
+    "@auth0/nextjs-auth0": "^3.8.0",
+    "@emotion/cache": "^11.13.1",
+    "@emotion/react": "^11.13.3",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "@reduxjs/toolkit": "^2.9.0",
+    "auth0": "^5.0.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.3",
+    "next": "^15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
+    "recharts": "^2.12.7",
+    "redux-saga": "^1.3.0"
+  },
+  "scripts": {
+    "dev": "npx next dev",
+    "dev:https": "node server.js",
+    "build": "npx next build",
+    "start": "npx next start",
+    "start:https": "NODE_ENV=production node server.js",
+    "lint": "npx next lint"
+  },
+  "engines": {
+    "yarn": ">=1.22.0",
+    "node": ">=18.18.0"
+  },
+  "devDependencies": {
+    "https": "^1.0.0",
+    "mkcert": "^3.2.0"
+  }
+}
