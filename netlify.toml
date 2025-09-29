@@ -4,19 +4,3 @@
 
 [build.environment]
   NODE_VERSION = "20.19.0"
-
-# Enable Next.js plugin
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-# Handle API routes
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# Handle all other routes
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
