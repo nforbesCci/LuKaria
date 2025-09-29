@@ -33,7 +33,7 @@
   },
   "engines": {
     "yarn": ">=1.22.0",
-    "node": ">=18.18.0"
+    "node": ">=20.19.0"
   },
   "devDependencies": {
     "https": "^1.0.0",
