@@ -6,6 +6,7 @@ import {
   setBookingStatus,
   setBookingError,
 } from '../slices/appointmentSlice';
+import { checkAppointmentConfiguration, getAppointmentDetails } from '../../lib/api/appointmentService';
 
 // Handle appointment booking
 function* bookAppointment(action) {
@@ -78,6 +79,48 @@ function* loadAppointmentData() {
   }
 }
 
+// Handle checking appointment configuration from server
+function* checkAppointmentConfig() {
+  try {
+    yield put(setBookingStatus(true));
+    yield put(setBookingError(null));
+    
+    // Call the API to check appointment configuration
+    const response = yield call(checkAppointmentConfiguration);
+    
+    if (response.success && response.data.isScheduled) {
+      // If appointment is scheduled according to server config
+      const appointmentData = response.data.appointmentDetails;
+      const serverAppointmentData = {
+        ...appointmentData,
+        scheduledAt: response.data.scheduledAt,
+        source: 'server_config',
+        checkedAt: response.data.checkedAt
+      };
+      
+      yield put(setCurrentAppointment(serverAppointmentData));
+      yield put(setScheduleCompleted(true));
+      
+      // Store in localStorage for persistence
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('appointmentData', JSON.stringify(serverAppointmentData));
+        localStorage.setItem('scheduleCompleted', 'true');
+      }
+      
+      console.log('✅ Appointment configuration loaded from server:', serverAppointmentData);
+    } else {
+      console.log('ℹ️ No appointment scheduled according to server configuration');
+    }
+    
+    yield put(setBookingStatus(false));
+    
+  } catch (error) {
+    console.error('❌ Error checking appointment configuration:', error);
+    yield put(setBookingStatus(false));
+    yield put(setBookingError(error.message));
+  }
+}
+
 // Utility function to create delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -86,5 +129,6 @@ export default function* appointmentSaga() {
   yield takeEvery('appointment/bookAppointment', bookAppointment);
   yield takeEvery('appointment/completeSchedule', completeSchedule);
   yield takeEvery('appointment/loadAppointmentData', loadAppointmentData);
+  yield takeEvery('appointment/checkAppointmentConfig', checkAppointmentConfig);
 }
 

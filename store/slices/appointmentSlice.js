@@ -90,4 +90,8 @@ export const loadAppointmentData = () => ({
   type: 'appointment/loadAppointmentData',
 });
 
+export const checkAppointmentConfig = () => ({
+  type: 'appointment/checkAppointmentConfig',
+});
+
 export default appointmentSlice.reducer;
