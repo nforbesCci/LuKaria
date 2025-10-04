@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask, loadQuestions } from '../../store/slices/appointmentSlice';
 import { useScheduleProtection } from '../../hooks/useScheduleProtection';
 import {
   Container,
@@ -58,7 +58,9 @@ export default function Dashboard() {
   // Redux state
   const currentAppointment = useAppSelector((state) => state.appointment.currentAppointment);
   const isScheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
+  const isScheduled = useAppSelector((state) => state.user.isScheduled);
   const preAppointmentTasks = useAppSelector((state) => state.appointment.preAppointmentTasks);
+  const questions = useAppSelector((state) => state.appointment.questions);
 
   // Schedule protection - prevent access to dashboard if schedule not completed
   useScheduleProtection();
@@ -66,8 +68,38 @@ export default function Dashboard() {
   useEffect(() => {
     setMounted(true);
     // Load appointment data using saga
+    console.log('📊 Dashboard: Loading appointment data...');
     dispatch(loadAppointmentData());
+    
+    // Load questions data using saga
+    console.log('📊 Dashboard: Loading questions data...');
+    dispatch(loadQuestions());
   }, [dispatch]);
+
+  // Debug: Log appointment data when it changes
+  useEffect(() => {
+    if (currentAppointment) {
+      console.log('📅 Dashboard: Current appointment data:', currentAppointment);
+      console.log('✅ Dashboard: isScheduled =', isScheduled);
+      console.log('✅ Dashboard: isScheduleCompleted =', isScheduleCompleted);
+    }
+  }, [currentAppointment, isScheduled, isScheduleCompleted]);
+
+  // Debug: Log questions data when it changes
+  useEffect(() => {
+    if (questions) {
+      console.log('❓ Dashboard: Questions data:', questions);
+    }
+  }, [questions]);
+
+  // Function to determine if prepareQuestions task is completed
+  const isPrepareQuestionsCompleted = () => {
+    if (!questions) return false;
+    
+    // Check if user has questions or explicitly marked "no questions"
+    return (questions.questions && questions.questions.trim().length > 0) || 
+           questions.noQuestions === true;
+  };
 
   // Handler for weight/height entry completion
   const handleWeightHeightComplete = (data) => {
@@ -91,17 +123,15 @@ export default function Dashboard() {
 
   // Handler for prepare questions completion
   const handlePrepareQuestionsComplete = (data) => {
-    // Mark the task as complete
-    dispatch(updatePreAppointmentTask({ 
-      taskKey: 'prepareQuestions', 
-      completed: true 
-    }));
+    // Note: Task completion is now determined by store state, not manually set
+    // The isPrepareQuestionsCompleted() function will check if questions exist in store
     
     // Hide the prepare questions component
     setShowPrepareQuestions(false);
     
-    // In a real app, you might want to save the data to the backend
+    // Log the completion
     console.log('Prepare Questions data saved:', data);
+    console.log('Task completion will be determined by store state');
   };
 
   // Handler for going back from prepare questions
@@ -223,39 +253,110 @@ export default function Dashboard() {
                 </Box>
               </Box>
 
-              <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                  <Typography variant="h6">
-                    Consultation Scheduled
+              {/* Show appointment details if scheduled, otherwise show "not scheduled" message */}
+              {isScheduled && currentAppointment ? (
+                <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="h6">
+                      {currentAppointment.type ? 
+                        `${currentAppointment.type.toUpperCase()} Scheduled` : 
+                        'CONSULTATION Scheduled'}
+                    </Typography>
+                    <Chip label="Confirmed" color="success" size="small" />
+                  </Box>
+                  
+                  {/* Appointment Date & Time */}
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    <strong>Date:</strong> {currentAppointment.date ? 
+                      new Date(currentAppointment.date).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      }) : 
+                      currentAppointment.startDate ?
+                      new Date(currentAppointment.startDate).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      }) :
+                      'To be confirmed'}
                   </Typography>
-                  <Chip label="Confirmed" color="success" size="small" />
-                </Box>
-                <Typography variant="body2" sx={{ mb: 2 }}>
-                  <strong>Date & Time:</strong> {currentAppointment.startDate ? 
-                    new Date(currentAppointment.startDate).toLocaleString() + 
-                    (currentAppointment.endDate ? 
-                      ' (' + Math.round((new Date(currentAppointment.endDate) - new Date(currentAppointment.startDate)) / (1000 * 60)) + ' Minutes)' : 
-                      ' (30 Minutes)') : 
-                    'To be confirmed'}
-                </Typography>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      textTransform: 'none',
-                      borderColor: '#D4AF37',
-                      color: '#D4AF37',
-                      '&:hover': {
+                  
+                  {/* Appointment Time */}
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    <strong>Time:</strong> {currentAppointment.time || 
+                      (currentAppointment.startDate ? 
+                        new Date(currentAppointment.startDate).toLocaleTimeString('en-US', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        }) : 
+                        'To be confirmed')}
+                  </Typography>
+                  
+                  {/* Appointment Length */}
+                  <Typography variant="body2" sx={{ mb: 2 }}>
+                    <strong>Duration:</strong> {currentAppointment.length ? 
+                      `${currentAppointment.length} minutes` : 
+                      currentAppointment.endDate && currentAppointment.startDate ? 
+                        `${Math.round((new Date(currentAppointment.endDate) - new Date(currentAppointment.startDate)) / (1000 * 60))} minutes` : 
+                        '30 minutes'}
+                  </Typography>
+                  
+                  {/* Scheduled At */}
+                  {currentAppointment.scheduledAt && (
+                    <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 2 }}>
+                      Booked on: {new Date(currentAppointment.scheduledAt).toLocaleString()}
+                    </Typography>
+                  )}
+                  
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        textTransform: 'none',
                         borderColor: '#D4AF37',
-                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                      }
-                    }}
-                  >
-                    Reschedule
-                  </Button>
-                </Box>
-              </Paper>
+                        color: '#D4AF37',
+                        '&:hover': {
+                          borderColor: '#D4AF37',
+                          backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        }
+                      }}
+                    >
+                      Reschedule
+                    </Button>
+                  </Box>
+                </Paper>
+              ) : (
+                <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
+                  <Box sx={{ textAlign: 'center', py: 2 }}>
+                    <CalendarToday sx={{ fontSize: 48, color: '#D4AF37', mb: 2 }} />
+                    <Typography variant="h6" sx={{ mb: 1 }}>
+                      No Appointment Scheduled
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      You don't have any upcoming appointments
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      component={Link}
+                      href="/schedule"
+                      sx={{
+                        textTransform: 'none',
+                        backgroundColor: '#D4AF37',
+                        color: '#000',
+                        '&:hover': {
+                          backgroundColor: '#B8941F',
+                        }
+                      }}
+                    >
+                      Schedule Appointment
+                    </Button>
+                  </Box>
+                </Paper>
+              )}
 
               <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
                 <Assignment sx={{ mr: 1, verticalAlign: 'middle' }} />
@@ -359,7 +460,7 @@ export default function Dashboard() {
                         }}
                       >
                         <Box sx={{ mr: 2 }}>
-                          {preAppointmentTasks[task.key] ? (
+                          {isPrepareQuestionsCompleted() ? (
                             <CheckCircle sx={{ color: 'success.main' }} />
                           ) : (
                             <Close sx={{ color: 'error.main' }} />
@@ -370,8 +471,8 @@ export default function Dashboard() {
                             variant="subtitle1"
                             component="div"
                             sx={{
-                              color: preAppointmentTasks[task.key] ? 'success.main' : 'error.main',
-                              fontWeight: preAppointmentTasks[task.key] ? 'bold' : 'normal',
+                              color: isPrepareQuestionsCompleted() ? 'success.main' : 'error.main',
+                              fontWeight: isPrepareQuestionsCompleted() ? 'bold' : 'normal',
                               mb: 0.5
                             }}
                           >
@@ -381,7 +482,7 @@ export default function Dashboard() {
                             variant="body2"
                             component="div"
                             sx={{
-                              color: preAppointmentTasks[task.key] ? 'success.dark' : 'error.dark'
+                              color: isPrepareQuestionsCompleted() ? 'success.dark' : 'error.dark'
                             }}
                           >
                             {task.description}

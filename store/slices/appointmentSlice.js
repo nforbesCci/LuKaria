@@ -12,6 +12,14 @@ const initialState = {
     testTechnology: false,
     enterWeightHeight: false,
   },
+  questions: {
+    questions: '',
+    noQuestions: false,
+    savedAt: null,
+    updatedAt: null,
+    isLoading: false,
+    error: null,
+  },
 };
 
 const appointmentSlice = createSlice({
@@ -60,6 +68,30 @@ const appointmentSlice = createSlice({
         enterWeightHeight: false,
       };
     },
+    setQuestions: (state, action) => {
+      state.questions.questions = action.payload.questions || '';
+      state.questions.noQuestions = action.payload.noQuestions || false;
+      state.questions.savedAt = action.payload.savedAt || null;
+      state.questions.updatedAt = action.payload.updatedAt || null;
+      state.questions.error = null;
+    },
+    setQuestionsLoading: (state, action) => {
+      state.questions.isLoading = action.payload;
+    },
+    setQuestionsError: (state, action) => {
+      state.questions.error = action.payload;
+      state.questions.isLoading = false;
+    },
+    clearQuestions: (state) => {
+      state.questions = {
+        questions: '',
+        noQuestions: false,
+        savedAt: null,
+        updatedAt: null,
+        isLoading: false,
+        error: null,
+      };
+    },
   },
 });
 
@@ -73,6 +105,10 @@ export const {
   clearAppointments,
   updatePreAppointmentTask,
   resetPreAppointmentTasks,
+  setQuestions,
+  setQuestionsLoading,
+  setQuestionsError,
+  clearQuestions,
 } = appointmentSlice.actions;
 
 // Action creators for sagas
@@ -92,6 +128,15 @@ export const loadAppointmentData = () => ({
 
 export const checkAppointmentConfig = () => ({
   type: 'appointment/checkAppointmentConfig',
+});
+
+export const loadQuestions = () => ({
+  type: 'appointment/loadQuestions',
+});
+
+export const saveQuestions = (questionsData) => ({
+  type: 'appointment/saveQuestions',
+  payload: questionsData,
 });
 
 export default appointmentSlice.reducer;

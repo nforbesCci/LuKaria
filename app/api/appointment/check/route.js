@@ -1,38 +1,63 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import { NextResponse } from 'next/server';
+import { getCollection } from '../../../../lib/mongodb';
 
 // GET /api/appointment/check - Check if appointment is configured and get details
 export async function GET(request) {
+  console.log('🔍 API Route Called: GET /api/appointment/check');
+  
   try {
     const session = await getSession(request);
     
+    console.log('👤 Session:', session ? 'Found' : 'Not found');
+    console.log('👤 User:', session?.user?.sub || 'No user');
+    
     if (!session || !session.user) {
+      console.log('❌ Unauthorized access attempt');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get appointment configuration from environment variables
-    const isScheduled = process.env.APPOINTMENT_SCHEDULED === 'true';
-    const appointmentTime = process.env.APPOINTMENT_TIME;
-    const appointmentLength = process.env.APPOINTMENT_LENGTH;
-    const appointmentDate = process.env.APPOINTMENT_DATE;
-    const appointmentProvider = process.env.APPOINTMENT_PROVIDER;
-    const appointmentType = process.env.APPOINTMENT_TYPE;
+    const userId = session.user.sub;
+    console.log('✅ User ID:', userId);
 
-    // Validate required environment variables
-    if (isScheduled && (!appointmentTime || !appointmentLength)) {
-      return NextResponse.json({
-        success: false,
-        error: 'Appointment is marked as scheduled but required environment variables are missing',
-        details: {
-          APPOINTMENT_TIME: appointmentTime || 'missing',
-          APPOINTMENT_LENGTH: appointmentLength || 'missing'
-        }
-      }, { status: 400 });
+    // Get appointments collection from MongoDB
+    console.log('📊 Connecting to MongoDB...');
+    const appointmentsCollection = await getCollection('appointments');
+    console.log('✅ Connected to appointments collection');
+    
+    // Find the user's appointment in the database
+    console.log('🔍 Searching for appointment with userId:', userId);
+    const userAppointment = await appointmentsCollection.findOne({ userId });
+    console.log('📋 Appointment found:', userAppointment ? 'Yes' : 'No');
+    
+    if (userAppointment) {
+      console.log('📄 Appointment data:', JSON.stringify(userAppointment, null, 2));
+    }
+
+    // Extract appointment data from database or use defaults
+    const appointmentTime = userAppointment?.time || null;
+    const appointmentLength = (userAppointment?.rawData?.startDate && userAppointment?.rawData?.endDate)? userAppointment?.rawData?.endDate - userAppointment?.rawData?.startDate : null;
+    const appointmentDate = userAppointment?.rawData?.startDate || null;
+    const appointmentEndDate = userAppointment?.rawData?.endDate || null;
+    const appointmentProvider = userAppointment?.provider || null;
+    const appointmentType = userAppointment?.type || null;
+   
+    // Determine if appointment is actually scheduled based on data completeness
+    // Only consider scheduled if we have both time and length
+    const isScheduled = userAppointment?.isScheduled;
+   
+    // Log warning if data is incomplete
+    if (userAppointment?.isScheduled && (!appointmentTime || !appointmentLength)) {
+      console.warn('⚠️ Appointment marked as scheduled but missing required fields:', {
+        userId,
+        time: appointmentTime || 'missing',
+        length: appointmentLength || 'missing'
+      });
     }
 
     const appointmentData = {
       isScheduled,
-      scheduledAt: isScheduled ? (appointmentDate || new Date().toISOString()) : null,
+      scheduledAt: isScheduled ? (appointmentDate || userAppointment?.scheduledAt || new Date().toISOString()) : null,
       appointmentDetails: isScheduled ? {
         time: appointmentTime,
         length: appointmentLength,
@@ -42,16 +67,20 @@ export async function GET(request) {
       } : null,
       status: isScheduled ? 'scheduled' : 'not_scheduled',
       checkedAt: new Date().toISOString(),
-      userId: session.user.sub
+      userId,
+      source: userAppointment ? 'database' : 'not_found'
     };
 
+    console.log('✅ Returning appointment data:', JSON.stringify(appointmentData, null, 2));
+    
     return NextResponse.json({
       success: true,
       data: appointmentData
     });
 
   } catch (error) {
-    console.error('Error checking appointment configuration:', error);
+    console.error('❌ Error checking appointment configuration:', error);
+    console.error('❌ Error stack:', error.stack);
     return NextResponse.json(
       { 
         success: false,
@@ -73,28 +102,59 @@ export async function POST(request) {
     }
 
     const { isScheduled, appointmentTime, appointmentLength, appointmentDate, appointmentProvider, appointmentType } = await request.json();
+    const userId = session.user.sub;
 
-    // Note: In a real application, you would update a database or external service
-    // For now, we'll just return the updated configuration
-    const updatedAppointmentData = {
+    // Get appointments collection from MongoDB
+    const appointmentsCollection = await getCollection('appointments');
+    
+    // Prepare appointment document for database
+    const appointmentDocument = {
+      userId,
       isScheduled: isScheduled || false,
+      time: appointmentTime,
+      length: appointmentLength,
+      date: appointmentDate,
+      provider: appointmentProvider || 'Default Provider',
+      type: appointmentType || 'consultation',
       scheduledAt: isScheduled ? (appointmentDate || new Date().toISOString()) : null,
-      appointmentDetails: isScheduled ? {
-        time: appointmentTime,
-        length: appointmentLength,
-        date: appointmentDate,
-        provider: appointmentProvider || 'Default Provider',
-        type: appointmentType || 'consultation'
-      } : null,
       status: isScheduled ? 'scheduled' : 'not_scheduled',
       updatedAt: new Date().toISOString(),
-      userId: session.user.sub
+      userEmail: session.user.email,
+      userName: session.user.name
+    };
+
+    // Upsert (update or insert) the appointment in MongoDB
+    const result = await appointmentsCollection.updateOne(
+      { userId },
+      { 
+        $set: appointmentDocument,
+        $setOnInsert: { createdAt: new Date().toISOString() }
+      },
+      { upsert: true }
+    );
+
+    const updatedAppointmentData = {
+      isScheduled: appointmentDocument.isScheduled,
+      scheduledAt: appointmentDocument.scheduledAt,
+      appointmentDetails: {
+        time: appointmentDocument.time,
+        length: appointmentDocument.length,
+        date: appointmentDocument.date,
+        provider: appointmentDocument.provider,
+        type: appointmentDocument.type
+      },
+      status: appointmentDocument.status,
+      updatedAt: appointmentDocument.updatedAt,
+      userId,
+      dbOperation: result.upsertedCount > 0 ? 'inserted' : 'updated'
     };
 
     return NextResponse.json({
       success: true,
       data: updatedAppointmentData,
-      message: 'Appointment configuration updated successfully'
+      message: result.upsertedCount > 0 
+        ? 'Appointment created successfully' 
+        : 'Appointment updated successfully'
     });
 
   } catch (error) {

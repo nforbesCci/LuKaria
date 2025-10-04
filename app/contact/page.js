@@ -1,0 +1,264 @@
+'use client';
+
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  Container,
+  Typography,
+  Box,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
+import {
+  Login,
+  Email,
+  Phone,
+} from '@mui/icons-material';
+
+export default function Contact() {
+  const { user, isLoading, error } = useUser();
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Handle redirect after component is mounted to prevent hydration issues
+  useEffect(() => {
+    if (mounted && user && !user) {
+      // Redirect to schedule page if user is logged in
+      router.push('/schedule');
+    }
+  }, [mounted, user, router]);
+
+  if (!mounted) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
+        <Alert severity="error">
+          Error loading user information: {error.message}
+        </Alert>
+      </Container>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <>
+      {/* Navigation Menu */}
+      <Box
+        sx={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 48,
+          backgroundColor: '#D4AF37',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 3,
+          zIndex: 1001,
+          borderBottom: '1px solid rgba(0,0,0,0.1)'
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/'}
+          >
+            Home
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/faq'}
+          >
+            FAQ
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+          >
+            Contact
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Top Navigation Bar */}
+      <Box
+        sx={{ 
+          position: 'fixed',
+          top: 48,
+          left: 0,
+          right: 0,
+          height: 64,
+          backgroundColor: '#000000',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 3,
+          zIndex: 1000,
+          borderBottom: '1px solid rgba(255,255,255,0.1)'
+        }}
+      >
+        {/* Logo and Title on the left */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            component="img"
+            src="/images/Lukaria_logo_small.png"
+            alt="Lukaria Logo"
+            sx={{
+              width: 48,
+              height: 48,
+              objectFit: 'contain',
+              display: { xs: 'none', sm: 'block' }
+            }}
+          />
+          <Typography variant="h5" component="span" className="Svelte_logo">
+            Svelte
+          </Typography>
+          <Typography variant="body1" component="span" className="svelte_post_script">
+            by LuKaria
+          </Typography>
+        </Box>
+
+        {/* Login Button on the right */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {!user && (
+            <Box
+              onClick={() => window.location.href = '/api/auth/login'}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 2,
+                py: 1,
+                backgroundColor: '#36454F',
+                color: '#D4AF37',
+                borderRadius: 1,
+                cursor: 'pointer',
+                textTransform: 'none',
+                minWidth: { xs: 'auto', sm: '64px' },
+                '&:hover': {
+                  backgroundColor: '#2C3E50',
+                }
+              }}
+            >
+              <Login sx={{ fontSize: 20 }} />
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                Login
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </Box>
+
+      {/* Main Content */}
+      <Box sx={{ backgroundColor: '#000000', minHeight: '100vh', py: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 16, mb: 4 }}>
+          <Typography 
+            variant="h3" 
+            component="h1" 
+            gutterBottom 
+            textAlign="center" 
+            sx={{ 
+              color: '#D4AF37',
+              fontWeight: 'bold',
+              fontFamily: 'Alex Brush, cursive',
+              mb: 4
+            }}
+          >
+            Contact Us
+          </Typography>
+
+          <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center' }}>
+            <Box sx={{ 
+              backgroundColor: '#36454F', 
+              p: 4, 
+              borderRadius: 2,
+              mb: 3
+            }}>
+              <Email sx={{ 
+                fontSize: 48, 
+                color: '#D4AF37', 
+                mb: 2 
+              }} />
+              <Typography variant="h5" sx={{ 
+                color: '#D4AF37', 
+                fontWeight: 600, 
+                mb: 2 
+              }}>
+                Email Us
+              </Typography>
+              <Typography variant="h6" sx={{ 
+                color: 'white',
+                fontFamily: 'monospace'
+              }}>
+                info@lukariagroup.com
+              </Typography>
+            </Box>
+
+            <Box sx={{ 
+              backgroundColor: '#36454F', 
+              p: 4, 
+              borderRadius: 2
+            }}>
+              <Phone sx={{ 
+                fontSize: 48, 
+                color: '#D4AF37', 
+                mb: 2 
+              }} />
+              <Typography variant="h5" sx={{ 
+                color: '#D4AF37', 
+                fontWeight: 600, 
+                mb: 2 
+              }}>
+                Call Us
+              </Typography>
+              <Typography variant="h6" sx={{ 
+                color: 'white',
+                fontFamily: 'monospace'
+              }}>
+                876-469-2677
+              </Typography>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+    </>
+  );
+}

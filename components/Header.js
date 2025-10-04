@@ -28,11 +28,8 @@ export default function Header() {
     if (!mounted || isLoading) return false;
     if (pathname === '/' && !user) return false;
     if (pathname === '/schedule') {
-      if (typeof window !== 'undefined') {
-        const scheduleCompleted = localStorage.getItem('scheduleCompleted');
-        return scheduleCompleted === 'true';
-      }
-      return false;
+      // Check Redux store instead of localStorage
+      return false; // Navigation hidden on schedule page until completion
     }
     return true;
   };

@@ -5,8 +5,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '../../components/Header';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, setScheduleCompleted, completeSchedule, updatePreAppointmentTask } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, setScheduleCompleted, completeSchedule, updatePreAppointmentTask, checkAppointmentConfig } from '../../store/slices/appointmentSlice';
 import { useScheduleRedirect } from '../../hooks/useScheduleProtection';
+import { getSchedule } from '../../lib/api/appointmentService';
 import {
   Container,
   Typography,
@@ -21,12 +22,14 @@ import { CalendarToday } from '@mui/icons-material';
 export default function Schedule() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
   
   // Redux state
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
   const currentAppointment = useAppSelector((state) => state.appointment.currentAppointment);
+  const isScheduled = useAppSelector((state) => state.user.isScheduled);
 
   // Schedule redirect - prevent re-access to schedule page when already completed
   useScheduleRedirect();
@@ -34,8 +37,8 @@ export default function Schedule() {
   useEffect(() => {
     setMounted(true);
     
-    // Check if schedule is already completed - redirect if so
-    if (scheduleCompleted) {
+    // Check if schedule is already completed or user is scheduled - redirect if so
+    if (scheduleCompleted || isScheduled) {
       router.push('/dashboard');
       return;
     }
@@ -45,7 +48,38 @@ export default function Schedule() {
       taskKey: 'testTechnology', 
       completed: true 
     }));
-  }, [router, dispatch, scheduleCompleted]);
+  }, [router, dispatch, scheduleCompleted, isScheduled]);
+
+  // Load schedule data from database when page loads
+  useEffect(() => {
+    const loadScheduleFromDatabase = async () => {
+      console.log('🔄 Schedule Page: useEffect triggered', { mounted, hasUser: !!user });
+      
+      if (!mounted || !user) {
+        console.log('⏸️ Schedule Page: Skipping - not ready', { mounted, hasUser: !!user });
+        return;
+      }
+      
+      console.log('✅ Schedule Page: Starting database load');
+      setLoadingSchedule(true);
+      
+      try {
+        // Call the saga to check appointment configuration from database
+        console.log('📤 Schedule Page: Dispatching checkAppointmentConfig');
+        dispatch(checkAppointmentConfig());
+        
+        console.log('✅ Schedule Page: Dispatch successful');
+      } catch (error) {
+        console.error('❌ Schedule Page: Error loading schedule from database:', error);
+      } finally {
+        setTimeout(() => {
+          setLoadingSchedule(false);
+        }, 1000); // Give saga time to execute
+      }
+    };
+
+    loadScheduleFromDatabase();
+  }, [mounted, user, dispatch]);
 
   // Carepatron event listener
   useEffect(() => {
@@ -84,10 +118,9 @@ export default function Schedule() {
           if (e.data.event === 'carepatron.date_and_time_selected') {
             // Perform actions when date and time are selected
           } else if (e.data.event === 'carepatron.completed') {
-            // Mark schedule as completed and store in localStorage
+            // Mark schedule as completed
             console.log('Schedule completed - marking as done');
             setScheduleCompleted(true);
-            localStorage.setItem('scheduleCompleted', 'true');
           }
         }
       });
@@ -135,14 +168,29 @@ export default function Schedule() {
   }, [scheduleCompleted, router]);
 
   // Don't render until mounted to prevent hydration mismatch
-  if (!mounted || isLoading) {
+  if (!mounted || isLoading || loadingSchedule) {
     return (
       <>
         <Header />
         <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
           <CircularProgress />
           <Typography variant="h6" sx={{ mt: 2 }}>
-            Loading schedule...
+            {loadingSchedule ? 'Loading schedule data from database...' : 'Loading schedule...'}
+          </Typography>
+        </Container>
+      </>
+    );
+  }
+
+  // Redirect if user is already scheduled
+  if (isScheduled || scheduleCompleted) {
+    return (
+      <>
+        <Header />
+        <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
+          <CircularProgress />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            You already have an appointment scheduled. Redirecting to dashboard...
           </Typography>
         </Container>
       </>

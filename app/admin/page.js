@@ -3,7 +3,19 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSelector, useDispatch } from 'react-redux';
 import Header from '../../components/Header';
+import UserDebug from '../../components/UserDebug';
+import {
+  setSearchTerm,
+  setStatusFilter,
+  setPage,
+  setRowsPerPage,
+  setSort,
+  setSelectedUser,
+  setEditDialogOpen,
+  resetFilters,
+} from '../../store/slices/adminSlice';
 import {
   Container,
   Typography,
@@ -57,81 +69,48 @@ import {
 export default function AdminPage() {
   const { user, isLoading, error } = useUser();
   const router = useRouter();
+  const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
 
-  // Dummy user data for demonstration
-  const dummyUsers = [
-    {
-      user_id: 'auth0|507f1f77bcf86cd799439011',
-      email: 'john.doe@example.com',
-      name: 'John Doe',
-      nickname: 'johndoe',
-      picture: 'https://via.placeholder.com/40x40/1976d2/ffffff?text=JD',
-      email_verified: true,
-      blocked: false,
-      created_at: '2024-01-15T10:30:00.000Z',
-      last_login: '2024-01-20T14:22:00.000Z',
-      user_metadata: {
-        role: 'user',
-        phone_number: '+1-555-0123'
-      }
-    },
-    {
-      user_id: 'auth0|507f1f77bcf86cd799439012',
-      email: 'jane.smith@example.com',
-      name: 'Jane Smith',
-      nickname: 'janesmith',
-      picture: 'https://via.placeholder.com/40x40/dc004e/ffffff?text=JS',
-      email_verified: false,
-      blocked: false,
-      created_at: '2024-01-18T09:15:00.000Z',
-      last_login: null,
-      user_metadata: {
-        role: 'user',
-        phone_number: '+1-555-0124'
-      }
-    },
-    {
-      user_id: 'auth0|507f1f77bcf86cd799439013',
-      email: 'admin@svelte.com',
-      name: 'Admin User',
-      nickname: 'admin',
-      picture: 'https://via.placeholder.com/40x40/2e7d32/ffffff?text=AD',
-      email_verified: true,
-      blocked: false,
-      created_at: '2024-01-10T08:00:00.000Z',
-      last_login: '2024-01-20T16:45:00.000Z',
-      user_metadata: {
-        role: 'admin',
-        phone_number: '+1-555-0125'
-      }
-    },
-    {
-      user_id: 'auth0|507f1f77bcf86cd799439014',
-      email: 'blocked.user@example.com',
-      name: 'Blocked User',
-      nickname: 'blockeduser',
-      picture: 'https://via.placeholder.com/40x40/f57c00/ffffff?text=BU',
-      email_verified: true,
-      blocked: true,
-      created_at: '2024-01-12T11:20:00.000Z',
-      last_login: '2024-01-19T12:30:00.000Z',
-      user_metadata: {
-        role: 'user',
-        phone_number: '+1-555-0126'
-      }
+  // Debug: Log user object to see what's available
+  useEffect(() => {
+    if (user) {
+      console.log('User object:', user);
+      console.log('User groups (https://lukaria.com/groups):', user['https://lukaria.com/groups']);
+      console.log('User groups (groups):', user.groups);
+      console.log('User roles:', user.roles);
+      console.log('All user properties:', Object.keys(user));
     }
-  ];
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  }, [user]);
+
+  // Check if user is in doctor or admin group
+  const isAuthorized = user && (
+    (user['https://lukaria.com/groups'] && 
+     (user['https://lukaria.com/groups'].includes('doctor') || 
+      user['https://lukaria.com/groups'].includes('admin'))) ||
+    (user.groups && 
+     (user.groups.includes('doctor') || user.groups.includes('admin'))) ||
+    (user.roles && 
+     (user.roles.includes('doctor') || user.roles.includes('admin')))
+  );
+  
+  // Get state from Redux store
+  const {
+    users,
+    totalUsers,
+    start,
+    limit,
+    length,
+    loading,
+    error: errorMessage,
+    searchTerm,
+    statusFilter,
+    page,
+    rowsPerPage,
+    sort,
+    selectedUser,
+    editDialogOpen,
+  } = useSelector((state) => state.admin);
 
   useEffect(() => {
     setMounted(true);
@@ -142,108 +121,43 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user && isAdmin) {
-      fetchUsers();
+      dispatch({ type: 'admin/fetchUsers' });
     }
-  }, [user, isAdmin, page, rowsPerPage, searchTerm]);
+  }, [user, isAdmin, page, rowsPerPage, searchTerm, statusFilter, sort, dispatch]);
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    setErrorMessage('');
-    
-    try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Filter dummy users based on search term
-      let filteredUsers = dummyUsers;
-      if (searchTerm) {
-        filteredUsers = dummyUsers.filter(user => 
-          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-
-      // Apply status filter
-      if (statusFilter !== 'all') {
-        filteredUsers = filteredUsers.filter(user => {
-          switch (statusFilter) {
-            case 'verified':
-              return user.email_verified && !user.blocked;
-            case 'pending':
-              return !user.email_verified && !user.blocked;
-            case 'blocked':
-              return user.blocked;
-            default:
-              return true;
-          }
-        });
-      }
-
-      // Apply pagination
-      const startIndex = page * rowsPerPage;
-      const endIndex = startIndex + rowsPerPage;
-      const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-      setUsers(paginatedUsers);
-      setTotalUsers(filteredUsers.length);
-    } catch (err) {
-      console.error('Error fetching users:', err);
-      setErrorMessage(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const fetchUsers = () => {
+    dispatch({ type: 'admin/fetchUsers' });
   };
 
   const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    setPage(0); // Reset to first page when searching
+    dispatch(setSearchTerm(event.target.value));
   };
 
   const handleStatusFilterChange = (event) => {
-    setStatusFilter(event.target.value);
-    setPage(0);
+    dispatch(setStatusFilter(event.target.value));
   };
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+    dispatch(setPage(newPage));
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    dispatch(setRowsPerPage(parseInt(event.target.value, 10)));
   };
 
   const handleEditUser = (user) => {
-    setSelectedUser(user);
-    setEditDialogOpen(true);
+    dispatch(setSelectedUser(user));
+    dispatch(setEditDialogOpen(true));
   };
 
   const handleUpdateUser = async (updates) => {
-    try {
-      const response = await fetch(`/api/admin/users`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: selectedUser.user_id,
-          updates,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
-
-      // Refresh the users list
-      await fetchUsers();
-      setEditDialogOpen(false);
-      setSelectedUser(null);
-    } catch (err) {
-      console.error('Error updating user:', err);
-      setErrorMessage(err.message);
-    }
+    dispatch({
+      type: 'admin/updateUser',
+      payload: {
+        userId: selectedUser.user_id,
+        updates,
+      },
+    });
   };
 
   const formatDate = (dateString) => {
@@ -271,6 +185,33 @@ export default function AdminPage() {
           <Typography variant="h6" sx={{ mt: 2 }}>
             Loading admin panel...
           </Typography>
+        </Container>
+      </>
+    );
+  }
+
+  // Check authorization after loading
+  if (!isAuthorized) {
+    return (
+      <>
+        <Header />
+        <Container maxWidth="lg" sx={{ mt: 8, textAlign: 'center' }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Access Denied
+            </Typography>
+            <Typography variant="body1">
+              You do not have permission to access the administration panel. 
+              This area is restricted to doctors and administrators only.
+            </Typography>
+          </Alert>
+          <Button 
+            variant="contained" 
+            onClick={() => router.push('/dashboard')}
+            sx={{ mt: 2 }}
+          >
+            Return to Dashboard
+          </Button>
         </Container>
       </>
     );
@@ -335,6 +276,7 @@ export default function AdminPage() {
   return (
     <>
       <Header />
+      <UserDebug />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Header Section */}
         <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
@@ -363,7 +305,7 @@ export default function AdminPage() {
                   Administrative Panel
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  User Management • Total Users: {dummyUsers.length}
+                  User Management • Total Users: {totalUsers} • Start: {start} • Limit: {limit} • Length: {length}
                 </Typography>
               </Box>
             </Box>
@@ -549,12 +491,25 @@ export default function AdminPage() {
               rowsPerPage={rowsPerPage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               rowsPerPageOptions={[5, 10, 25, 50]}
+              labelDisplayedRows={({ from, to, count }) => {
+                console.log('📊 Pagination display:', { 
+                  from, 
+                  to, 
+                  count, 
+                  totalUsers, 
+                  start, 
+                  limit, 
+                  length,
+                  usersLength: users.length 
+                });
+                return `${from}-${to} of ${count}`;
+              }}
             />
           </CardContent>
         </Card>
 
         {/* Edit User Dialog */}
-        <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+        <Dialog open={editDialogOpen} onClose={() => dispatch(setEditDialogOpen(false))} maxWidth="sm" fullWidth>
           <DialogTitle>Edit User</DialogTitle>
           <DialogContent>
             {selectedUser && (
@@ -601,7 +556,7 @@ export default function AdminPage() {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setEditDialogOpen(false)}>Close</Button>
+            <Button onClick={() => dispatch(setEditDialogOpen(false))}>Close</Button>
           </DialogActions>
         </Dialog>
       </Container>

@@ -98,11 +98,67 @@ export default function Home() {
 
   return (
     <>
+      {/* Navigation Menu */}
+      <Box
+        sx={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 48,
+          backgroundColor: '#D4AF37',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 3,
+          zIndex: 1001,
+          borderBottom: '1px solid rgba(0,0,0,0.1)'
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+          >
+            Home
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/faq'}
+          >
+            FAQ
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/contact'}
+          >
+            Contact
+          </Typography>
+        </Box>
+      </Box>
+
       {/* Top Navigation Bar */}
       <Box
                   sx={{ 
           position: 'fixed',
-                      top: 0,
+                      top: 48,
                       left: 0,
                       right: 0,
           height: 64,
@@ -188,7 +244,7 @@ export default function Home() {
       {/* Heading under top bar - Full width */}
       <Box
         sx={{
-          mt: 8,
+          mt: 14,
           mb: 0,
           textAlign: 'center',
           backgroundColor: '#ffffff',
@@ -286,7 +342,7 @@ export default function Home() {
                       by LuKaria
                     </span>
                   </Box>
-                  <Box sx={{ position: 'relative', zIndex: 1 }}>
+                  <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span 
                       className="MuiTypography-root MuiTypography-body1 svelte_post_script css-1r5vudv-MuiTypography-root" 
                       style={{ 
@@ -343,6 +399,7 @@ export default function Home() {
                         mt: 2,
                         width: 'auto',
                         alignSelf: 'center',
+                        display: { xs: 'none', md: 'block' },
                         '&:hover': {
                           borderColor: '#D4AF37',
                           backgroundColor: 'rgba(212, 175, 55, 0.2)',
@@ -436,22 +493,22 @@ export default function Home() {
                   <Box sx={{ mb: 4, color: '#D4AF37', textAlign: 'left', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
                  <Box component="ul" sx={{ pl: 2, mb: 0 }}>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Convenient virtual platform.</strong>
+                     <strong>Convenient virtual platform</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Physician guidance and monitoring.</strong>
+                     <strong>Physician guidance and monitoring</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Familiar and trusted brands: Wegovy and Mounjaro.</strong>
+                     <strong>Familiar and trusted brands: Wegovy and Mounjaro</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Medications delivered to convenient pickup locations in your parish.</strong>
+                     <strong>Medications delivered to convenient pickup locations in your parish</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Flat monthly fee.</strong>
+                     <strong>Flat monthly fee</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Exclusive membership with premium benefits at partner locations.</strong>
+                     <strong>Exclusive membership with premium benefits at partner locations</strong>
                    </Typography>
                  </Box>
                   </Box>
@@ -558,17 +615,24 @@ export default function Home() {
                     </Typography>
                   </Box>
                   
+                  {/* Limited time offer text */}
+                  <Box sx={{ mb: 2, color: '#D4AF37', textAlign: 'center', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
+                    <Typography variant="h6" sx={{ color: '#D4AF37', fontWeight: '600', fontSize: '1.1rem' }}>
+                      Limited Time Introductory Offers
+                    </Typography>
+                  </Box>
+                  
                   {/* Exclusive offers bullet points */}
-                  <Box sx={{ mb: 3, color: '#D4AF37', textAlign: 'left', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
+                  <Box sx={{ mb: 3, color: '#D4AF37', textAlign: 'left', maxWidth: '600px', mx: 'auto', position: 'relative', zIndex: 1 }}>
                     <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-                      <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                        <strong>Get a free consult with a licensed physician</strong>
+                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#D4AF37', lineHeight: 1.6 }}>
+                        <strong>Get a free weight loss consult with our expert physician</strong>
                       </Typography>
-                      <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
+                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#D4AF37', lineHeight: 1.6 }}>
                         <strong>Receive a discount on your first 4 week supply of medication</strong>
                       </Typography>
-                      <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                        <strong>Join our referral plan and get discounts when you refer a friend who starts the program</strong>
+                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#D4AF37', lineHeight: 1.6 }}>
+                        <strong>Svelte referral program- receive premium benefits just for referring others</strong>
                       </Typography>
                     </Box>
                   </Box>
@@ -585,6 +649,7 @@ export default function Home() {
                         py: 1,
                         fontWeight: '600',
                         width: 'auto',
+                        display: { xs: 'none', md: 'block' },
                         '&:hover': {
                           borderColor: '#D4AF37',
                           backgroundColor: 'rgba(212, 175, 55, 0.1)',
@@ -672,15 +737,16 @@ export default function Home() {
                 left: 20,
                 top: '50%',
                 transform: 'translateY(-50%)',
-                minWidth: 50,
-                height: 50,
+                minWidth: 40,
+                width: 40,
+                height: 40,
                 borderRadius: '50%',
-                backgroundColor: 'rgba(0,0,0,0.1)',
-                color: '#333',
+                backgroundColor: 'white',
+                color: '#D4AF37',
                 zIndex: 10,
                 fontSize: '1.2rem',
                     '&:hover': {
-                  backgroundColor: 'rgba(0,0,0,0.2)'
+                  backgroundColor: 'white'
                 }
               }}
             >
@@ -696,15 +762,16 @@ export default function Home() {
                 right: 20,
                 top: '50%',
                 transform: 'translateY(-50%)',
-                minWidth: 50,
-                height: 50,
+                minWidth: 40,
+                width: 40,
+                height: 40,
                 borderRadius: '50%',
-                backgroundColor: 'rgba(0,0,0,0.1)',
-                color: '#333',
+                backgroundColor: '#2b2b2b',
+                color: 'white',
                 zIndex: 10,
                 fontSize: '1.2rem',
                 '&:hover': {
-                  backgroundColor: 'rgba(0,0,0,0.2)'
+                  backgroundColor: '#2b2b2b'
                 }
               }}
             >

@@ -977,343 +977,349 @@ export default function LabRequisition() {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Routine
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hematologyTests.CBC}
-                                onChange={() => handleHematologyTestChange('CBC')}
-                                color="primary"
+                  <Grid container spacing={3}>
+                    {/* Left Column - Routine and Special Tests */}
+                    <Grid item xs={12} md={6}>
+                      {/* Routine Tests */}
+                      <Box sx={{ mb: 3 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Routine
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hematologyTests.CBC}
+                                    onChange={() => handleHematologyTestChange('CBC')}
+                                    color="primary"
+                                  />
+                                }
+                                label="CBC"
                               />
-                            }
-                            label="CBC"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hematologyTests.RETIC}
-                                onChange={() => handleHematologyTestChange('RETIC')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hematologyTests.RETIC}
+                                    onChange={() => handleHematologyTestChange('RETIC')}
+                                    color="primary"
+                                  />
+                                }
+                                label="RETIC"
                               />
-                            }
-                            label="RETIC"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hematologyTests.ESR}
-                                onChange={() => handleHematologyTestChange('ESR')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hematologyTests.ESR}
+                                    onChange={() => handleHematologyTestChange('ESR')}
+                                    color="primary"
+                                  />
+                                }
+                                label="ESR"
                               />
-                            }
-                            label="ESR"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hematologyTests['Info Mono']}
-                                onChange={() => handleHematologyTestChange('Info Mono')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hematologyTests['Info Mono']}
+                                    onChange={() => handleHematologyTestChange('Info Mono')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Info Mono"
                               />
-                            }
-                            label="Info Mono"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hematologyTests['CSF/Fluid']}
-                                onChange={() => handleHematologyTestChange('CSF/Fluid')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hematologyTests['CSF/Fluid']}
+                                    onChange={() => handleHematologyTestChange('CSF/Fluid')}
+                                    color="primary"
+                                  />
+                                }
+                                label="CSF/Fluid"
                               />
-                            }
-                            label="CSF/Fluid"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hematologyTests['Hb Electrophonesis']}
-                                onChange={() => handleHematologyTestChange('Hb Electrophonesis')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hematologyTests['Hb Electrophonesis']}
+                                    onChange={() => handleHematologyTestChange('Hb Electrophonesis')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Hb Electrophonesis"
                               />
-                            }
-                            label="Hb Electrophonesis"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
 
-                  {/* Coagulation Tests Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Coagulation Tests
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests.PT}
-                                onChange={() => handleCoagulationTestChange('PT')}
-                                color="primary"
+                      {/* Special Tests - Under Routine */}
+                      <Box sx={{ mb: 3 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Special Tests
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={specialTests['HbA2']}
+                                    onChange={() => handleSpecialTestChange('HbA2')}
+                                    color="primary"
+                                  />
+                                }
+                                label={
+                                  <Typography component="span">
+                                    HbA<sub>2</sub>
+                                  </Typography>
+                                }
                               />
-                            }
-                            label="PT"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests.PTT}
-                                onChange={() => handleCoagulationTestChange('PTT')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={specialTests["Ham's"]}
+                                    onChange={() => handleSpecialTestChange("Ham's")}
+                                    color="primary"
+                                  />
+                                }
+                                label="Ham's"
                               />
-                            }
-                            label="PTT"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests.INR}
-                                onChange={() => handleCoagulationTestChange('INR')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={specialTests['LAP Score']}
+                                    onChange={() => handleSpecialTestChange('LAP Score')}
+                                    color="primary"
+                                  />
+                                }
+                                label="LAP Score"
                               />
-                            }
-                            label="INR"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests.Fibrinogen}
-                                onChange={() => handleCoagulationTestChange('Fibrinogen')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={specialTests['Osmotic Fragility']}
+                                    onChange={() => handleSpecialTestChange('Osmotic Fragility')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Osmotic Fragility"
                               />
-                            }
-                            label="Fibrinogen"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Thrombin Time']}
-                                onChange={() => handleCoagulationTestChange('Thrombin Time')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={specialTests['Urine Haemosiderin']}
+                                    onChange={() => handleSpecialTestChange('Urine Haemosiderin')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Urine Haemosiderin"
                               />
-                            }
-                            label="Thrombin Time"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Bleeding Time']}
-                                onChange={() => handleCoagulationTestChange('Bleeding Time')}
-                                color="primary"
-                              />
-                            }
-                            label="Bleeding Time"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests.Ristocetin}
-                                onChange={() => handleCoagulationTestChange('Ristocetin')}
-                                color="primary"
-                              />
-                            }
-                            label="Ristocetin"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests.FDP}
-                                onChange={() => handleCoagulationTestChange('FDP')}
-                                color="primary"
-                              />
-                            }
-                            label="FDP"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Mixing Studies']}
-                                onChange={() => handleCoagulationTestChange('Mixing Studies')}
-                                color="primary"
-                              />
-                            }
-                            label="Mixing Studies"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Lupus Anticoagulant']}
-                                onChange={() => handleCoagulationTestChange('Lupus Anticoagulant')}
-                                color="primary"
-                              />
-                            }
-                            label="Lupus Anticoagulant"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Platelet Aggregation']}
-                                onChange={() => handleCoagulationTestChange('Platelet Aggregation')}
-                                color="primary"
-                              />
-                            }
-                            label="Platelet Aggregation"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Factor Assay XIII']}
-                                onChange={() => handleCoagulationTestChange('Factor Assay XIII')}
-                                color="primary"
-                              />
-                            }
-                            label="Factor Assay XIII"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Factor Assay IX']}
-                                onChange={() => handleCoagulationTestChange('Factor Assay IX')}
-                                color="primary"
-                              />
-                            }
-                            label="Factor Assay IX"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={coagulationTests['Factor Assay XI']}
-                                onChange={() => handleCoagulationTestChange('Factor Assay XI')}
-                                color="primary"
-                              />
-                            }
-                            label="Factor Assay XI"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
+                    </Grid>
 
-                  {/* Special Tests Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Special Tests
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={specialTests['HbA2']}
-                                onChange={() => handleSpecialTestChange('HbA2')}
-                                color="primary"
+                    {/* Right Column - Coagulation Tests */}
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ mb: 3 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Coagulation Tests
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests.PT}
+                                    onChange={() => handleCoagulationTestChange('PT')}
+                                    color="primary"
+                                  />
+                                }
+                                label="PT"
                               />
-                            }
-                            label={
-                              <Typography component="span">
-                                HbA<sub>2</sub>
-                              </Typography>
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={specialTests["Ham's"]}
-                                onChange={() => handleSpecialTestChange("Ham's")}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests.PTT}
+                                    onChange={() => handleCoagulationTestChange('PTT')}
+                                    color="primary"
+                                  />
+                                }
+                                label="PTT"
                               />
-                            }
-                            label="Ham's"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={specialTests['LAP Score']}
-                                onChange={() => handleSpecialTestChange('LAP Score')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests.INR}
+                                    onChange={() => handleCoagulationTestChange('INR')}
+                                    color="primary"
+                                  />
+                                }
+                                label="INR"
                               />
-                            }
-                            label="LAP Score"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={specialTests['Osmotic Fragility']}
-                                onChange={() => handleSpecialTestChange('Osmotic Fragility')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests.Fibrinogen}
+                                    onChange={() => handleCoagulationTestChange('Fibrinogen')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Fibrinogen"
                               />
-                            }
-                            label="Osmotic Fragility"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={specialTests['Urine Haemosiderin']}
-                                onChange={() => handleSpecialTestChange('Urine Haemosiderin')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Thrombin Time']}
+                                    onChange={() => handleCoagulationTestChange('Thrombin Time')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Thrombin Time"
                               />
-                            }
-                            label="Urine Haemosiderin"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Bleeding Time']}
+                                    onChange={() => handleCoagulationTestChange('Bleeding Time')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Bleeding Time"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests.Ristocetin}
+                                    onChange={() => handleCoagulationTestChange('Ristocetin')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Ristocetin"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests.FDP}
+                                    onChange={() => handleCoagulationTestChange('FDP')}
+                                    color="primary"
+                                  />
+                                }
+                                label="FDP"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Mixing Studies']}
+                                    onChange={() => handleCoagulationTestChange('Mixing Studies')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Mixing Studies"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Lupus Anticoagulant']}
+                                    onChange={() => handleCoagulationTestChange('Lupus Anticoagulant')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Lupus Anticoagulant"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Platelet Aggregation']}
+                                    onChange={() => handleCoagulationTestChange('Platelet Aggregation')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Platelet Aggregation"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Factor Assay XIII']}
+                                    onChange={() => handleCoagulationTestChange('Factor Assay XIII')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Factor Assay XIII"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Factor Assay IX']}
+                                    onChange={() => handleCoagulationTestChange('Factor Assay IX')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Factor Assay IX"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={coagulationTests['Factor Assay XI']}
+                                    onChange={() => handleCoagulationTestChange('Factor Assay XI')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Factor Assay XI"
+                              />
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </AccordionDetails>
               </Accordion>
             </Paper>
@@ -1321,7 +1327,7 @@ export default function LabRequisition() {
 
           {/* Clinical Chemistry */}
           <Box sx={{ mt: 4 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+            <Paper elevation={2} sx={{ p: 0, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}

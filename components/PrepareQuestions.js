@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { loadQuestions, saveQuestions } from '../store/slices/appointmentSlice';
 import {
   Box,
   Typography,
@@ -19,24 +21,19 @@ import {
 } from '@mui/icons-material';
 
 export default function PrepareQuestions({ onComplete, onBack }) {
+  const dispatch = useAppDispatch();
+  const storeQuestions = useAppSelector((state) => state.appointment.questions);
   const [questions, setQuestions] = useState('');
   const [noQuestions, setNoQuestions] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load saved questions from user metadata
+  // Sync with Redux store
   useEffect(() => {
-    // In a real app, this would load from the backend
-    // For now, we'll use localStorage as a placeholder
-    const savedQuestions = localStorage.getItem('appointmentQuestions');
-    const savedNoQuestions = localStorage.getItem('noQuestionsFlag');
-    
-    if (savedQuestions) {
-      setQuestions(savedQuestions);
+    if (storeQuestions) {
+      setQuestions(storeQuestions.questions || '');
+      setNoQuestions(storeQuestions.noQuestions || false);
     }
-    if (savedNoQuestions === 'true') {
-      setNoQuestions(true);
-    }
-  }, []);
+  }, [storeQuestions]);
 
   const handleNoQuestionsChange = (event) => {
     const checked = event.target.checked;
@@ -67,24 +64,16 @@ export default function PrepareQuestions({ onComplete, onBack }) {
     setIsSaving(true);
     
     try {
-      // In a real app, this would save to the backend
-      console.log('Saving questions:', { 
-        questions: noQuestions ? null : questions.trim(), 
+      const questionsData = {
+        questions: noQuestions ? null : questions.trim(),
         noQuestions,
         timestamp: new Date().toISOString()
-      });
+      };
+
+      console.log('Saving questions via Redux saga:', questionsData);
       
-      // Save to localStorage as placeholder
-      if (noQuestions) {
-        localStorage.setItem('noQuestionsFlag', 'true');
-        localStorage.removeItem('appointmentQuestions');
-      } else {
-        localStorage.setItem('appointmentQuestions', questions.trim());
-        localStorage.removeItem('noQuestionsFlag');
-      }
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Dispatch the save action to the saga
+      dispatch(saveQuestions(questionsData));
       
       // Mark task as complete
       onComplete({
@@ -118,7 +107,6 @@ export default function PrepareQuestions({ onComplete, onBack }) {
           <Stack spacing={3}>
             <TextField
               fullWidth
-              label="Questions for your appointment"
               multiline
               rows={8}
               value={questions}

@@ -18,11 +18,6 @@ function* loginUser(action) {
     // In a real app, you'd make an API call here
     yield put(loginSuccess(user));
     
-    // Store user data in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userData', JSON.stringify(user));
-    }
-    
   } catch (error) {
     yield put(loginFailure(error.message));
   }
@@ -31,13 +26,6 @@ function* loginUser(action) {
 // Handle logout
 function* logoutUser() {
   try {
-    // Clear localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('userData');
-      localStorage.removeItem('appointmentData');
-      localStorage.removeItem('scheduleCompleted');
-    }
-    
     // Dispatch logout action
     yield put(logout());
     

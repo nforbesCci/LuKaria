@@ -21,6 +21,7 @@ const initialState = {
     allergies: [],
   },
   isProfileComplete: false,
+  isScheduled: false,
   isLoading: false,
   error: null,
 };
@@ -67,6 +68,9 @@ const userSlice = createSlice({
     setProfileComplete: (state, action) => {
       state.isProfileComplete = action.payload;
     },
+    setIsScheduled: (state, action) => {
+      state.isScheduled = action.payload;
+    },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
     },
@@ -79,6 +83,7 @@ const userSlice = createSlice({
     resetProfile: (state) => {
       state.profile = initialState.profile;
       state.isProfileComplete = false;
+      state.isScheduled = false;
       state.error = null;
     },
   },
@@ -92,6 +97,7 @@ export const {
   updateCurrentMedications,
   updateAllergies,
   setProfileComplete,
+  setIsScheduled,
   setLoading,
   setError,
   clearError,

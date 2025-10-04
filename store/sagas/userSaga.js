@@ -30,15 +30,6 @@ function* updatePersonalInfoSaga(action) {
     const isComplete = checkProfileCompleteness(state.user.profile, personalData);
     yield put(setProfileComplete(isComplete));
     
-    // Store in localStorage
-    if (typeof window !== 'undefined') {
-      const currentProfile = state.user.profile;
-      localStorage.setItem('userProfile', JSON.stringify({
-        ...currentProfile,
-        ...personalData
-      }));
-    }
-    
     yield put(setLoading(false));
     
   } catch (error) {
@@ -61,16 +52,6 @@ function* updateHealthInfoSaga(action) {
     // Update the profile
     yield put(updateHealthInfo(healthData));
     
-    // Store in localStorage
-    if (typeof window !== 'undefined') {
-      const state = yield select();
-      const currentProfile = state.user.profile;
-      localStorage.setItem('userProfile', JSON.stringify({
-        ...currentProfile,
-        ...healthData
-      }));
-    }
-    
     yield put(setLoading(false));
     
   } catch (error) {
@@ -79,21 +60,12 @@ function* updateHealthInfoSaga(action) {
   }
 }
 
-// Handle loading user profile from localStorage
+// Handle loading user profile from database
 function* loadUserProfile() {
   try {
-    if (typeof window !== 'undefined') {
-      const storedProfile = localStorage.getItem('userProfile');
-      
-      if (storedProfile) {
-        const profile = JSON.parse(storedProfile);
-        yield put(setProfile(profile));
-        
-        // Check if profile is complete
-        const isComplete = checkProfileCompleteness(profile);
-        yield put(setProfileComplete(isComplete));
-      }
-    }
+    // TODO: Load user profile from database instead of localStorage
+    // For now, this is a placeholder
+    console.log('Loading user profile from database...');
   } catch (error) {
     console.error('Error loading user profile:', error);
     yield put(setError(error.message));

@@ -3,6 +3,7 @@ import createSagaMiddleware from 'redux-saga';
 import authSlice from './slices/authSlice';
 import appointmentSlice from './slices/appointmentSlice';
 import userSlice from './slices/userSlice';
+import adminSlice from './slices/adminSlice';
 import rootSaga from './sagas';
 
 // Create the saga middleware
@@ -13,6 +14,7 @@ export const store = configureStore({
     auth: authSlice,
     appointment: appointmentSlice,
     user: userSlice,
+    admin: adminSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

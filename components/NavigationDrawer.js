@@ -44,17 +44,29 @@ export default function NavigationDrawer() {
   // Redux state
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
 
-  // Allow all authenticated users to see admin page
-  const isAdmin = true;
+  // Debug: Log user object to see what's available
+  useEffect(() => {
+    if (user) {
+      console.log('NavigationDrawer - User object:', user);
+      console.log('NavigationDrawer - User groups (https://lukaria.com/groups):', user['https://lukaria.com/groups']);
+      console.log('NavigationDrawer - User groups (groups):', user.groups);
+      console.log('NavigationDrawer - User roles:', user.roles);
+    }
+  }, [user]);
+
+  // Check if user is in doctor or admin group
+  const isAdmin = user && (
+    (user['https://lukaria.com/groups'] && 
+     (user['https://lukaria.com/groups'].includes('doctor') || 
+      user['https://lukaria.com/groups'].includes('admin'))) ||
+    (user.groups && 
+     (user.groups.includes('doctor') || user.groups.includes('admin'))) ||
+    (user.roles && 
+     (user.roles.includes('doctor') || user.roles.includes('admin')))
+  );
 
   useEffect(() => {
     setMounted(true);
-    // Load pinned state from localStorage
-    const savedPinnedState = localStorage.getItem('navigationDrawerPinned');
-    if (savedPinnedState === 'true') {
-      setPinned(true);
-      setOpen(true);
-    }
   }, []);
 
   const handleDrawerToggle = () => {
@@ -64,7 +76,6 @@ export default function NavigationDrawer() {
   const handlePinToggle = () => {
     const newPinnedState = !pinned;
     setPinned(newPinnedState);
-    localStorage.setItem('navigationDrawerPinned', newPinnedState.toString());
     
     if (newPinnedState) {
       setOpen(true);
@@ -124,6 +135,7 @@ export default function NavigationDrawer() {
 
   // Hide navigation drawer on login page (home page when user is not authenticated)
   // Hide on schedule page unless schedule is completed
+  // Hide on FAQ page
   // Also hide during loading to prevent hydration mismatch
   if ((pathname === '/' && !user) || isLoading) {
     return null;
@@ -132,6 +144,16 @@ export default function NavigationDrawer() {
   // Hide navigation drawer on schedule page unless completed
   if (pathname === '/schedule' && !scheduleCompleted) {
     return null; // Hide navigation drawer
+  }
+
+  // Hide navigation drawer on FAQ page
+  if (pathname === '/faq') {
+    return null;
+  }
+
+  // Hide navigation drawer on Contact page
+  if (pathname === '/contact') {
+    return null;
   }
 
   return (

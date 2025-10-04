@@ -5,8 +5,12 @@ import {
   addAppointment,
   setBookingStatus,
   setBookingError,
+  setQuestions,
+  setQuestionsLoading,
+  setQuestionsError,
 } from '../slices/appointmentSlice';
-import { checkAppointmentConfiguration, getAppointmentDetails } from '../../lib/api/appointmentService';
+import { checkAppointmentConfiguration, getAppointmentDetails, saveAppointment } from '../../lib/api/appointmentService';
+import { setIsScheduled } from '../slices/userSlice';
 
 // Handle appointment booking
 function* bookAppointment(action) {
@@ -16,23 +20,27 @@ function* bookAppointment(action) {
     yield put(setBookingStatus(true));
     yield put(setBookingError(null));
     
-    // Simulate API call for booking
-    yield call(delay, 2000);
+    // Call API to save appointment to MongoDB
+    const response = yield call(saveAppointment, appointmentData);
     
-    // Dispatch success actions
-    yield put(setCurrentAppointment(appointmentData));
-    yield put(setScheduleCompleted(true));
-    yield put(addAppointment(appointmentData));
-    
-    // Store in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('appointmentData', JSON.stringify(appointmentData));
-      localStorage.setItem('scheduleCompleted', 'true');
+    if (response.success) {
+      console.log('✅ Appointment booked and saved to database:', response.data);
+      
+      // Dispatch success actions
+      yield put(setCurrentAppointment(response.data.appointmentDetails));
+      yield put(setScheduleCompleted(true));
+      yield put(setIsScheduled(true));
+      yield put(addAppointment(response.data.appointmentDetails));
+      
+      console.log('✅ Appointment booking completed successfully');
+    } else {
+      throw new Error('Failed to save appointment to database');
     }
     
     yield put(setBookingStatus(false));
     
   } catch (error) {
+    console.error('❌ Appointment booking error:', error);
     yield put(setBookingStatus(false));
     yield put(setBookingError(error.message));
   }
@@ -43,37 +51,39 @@ function* completeSchedule(action) {
   try {
     const { appointmentData } = action.payload;
     
-    yield put(setCurrentAppointment(appointmentData));
-    yield put(setScheduleCompleted(true));
+    yield put(setBookingStatus(true));
+    yield put(setBookingError(null));
     
-    // Store in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('appointmentData', JSON.stringify(appointmentData));
-      localStorage.setItem('scheduleCompleted', 'true');
+    // Call API to save appointment to MongoDB
+    const response = yield call(saveAppointment, appointmentData);
+    
+    if (response.success) {
+      console.log('✅ Appointment saved to database:', response.data);
+      
+      // Update Redux store with saved data
+      yield put(setCurrentAppointment(response.data.appointmentDetails));
+      yield put(setScheduleCompleted(true));
+      yield put(setIsScheduled(true));
+      
+      console.log('✅ Schedule completed and saved successfully');
+    } else {
+      throw new Error('Failed to save appointment to database');
     }
     
+    yield put(setBookingStatus(false));
+    
   } catch (error) {
-    console.error('Schedule completion error:', error);
+    console.error('❌ Schedule completion error:', error);
+    yield put(setBookingStatus(false));
     yield put(setBookingError(error.message));
   }
 }
 
-// Handle loading appointment data from localStorage
+// Handle loading appointment data from database
 function* loadAppointmentData() {
   try {
-    if (typeof window !== 'undefined') {
-      const storedData = localStorage.getItem('appointmentData');
-      const scheduleCompleted = localStorage.getItem('scheduleCompleted');
-      
-      if (storedData) {
-        const appointmentData = JSON.parse(storedData);
-        yield put(setCurrentAppointment(appointmentData));
-      }
-      
-      if (scheduleCompleted === 'true') {
-        yield put(setScheduleCompleted(true));
-      }
-    }
+    // Load appointment data from database instead of localStorage
+    yield call(checkAppointmentConfig);
   } catch (error) {
     console.error('Error loading appointment data:', error);
   }
@@ -82,34 +92,43 @@ function* loadAppointmentData() {
 // Handle checking appointment configuration from server
 function* checkAppointmentConfig() {
   try {
+    console.log('🚀 Saga: checkAppointmentConfig started');
     yield put(setBookingStatus(true));
     yield put(setBookingError(null));
     
     // Call the API to check appointment configuration
+    console.log('📞 Calling API: checkAppointmentConfiguration');
     const response = yield call(checkAppointmentConfiguration);
+    console.log('📨 API Response received:', response);
     
-    if (response.success && response.data.isScheduled) {
-      // If appointment is scheduled according to server config
-      const appointmentData = response.data.appointmentDetails;
-      const serverAppointmentData = {
-        ...appointmentData,
-        scheduledAt: response.data.scheduledAt,
-        source: 'server_config',
-        checkedAt: response.data.checkedAt
-      };
-      
-      yield put(setCurrentAppointment(serverAppointmentData));
-      yield put(setScheduleCompleted(true));
-      
-      // Store in localStorage for persistence
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('appointmentData', JSON.stringify(serverAppointmentData));
-        localStorage.setItem('scheduleCompleted', 'true');
+    if (response.success) {
+      if (response.data.isScheduled) {
+        // If appointment is scheduled according to server config
+        const appointmentData = response.data.appointmentDetails;
+        const serverAppointmentData = {
+          ...appointmentData,
+          scheduledAt: response.data.scheduledAt,
+          source: 'server_config',
+          checkedAt: response.data.checkedAt
+        };
+        
+        yield put(setCurrentAppointment(serverAppointmentData));
+        yield put(setScheduleCompleted(true));
+        yield put(setIsScheduled(true));
+        
+        console.log('✅ Appointment IS scheduled - data loaded from server:', serverAppointmentData);
+        console.log('🏪 Store updated: isScheduled = true, scheduleCompleted = true');
+      } else {
+        // No appointment scheduled - set flags to false
+        yield put(setCurrentAppointment(null));
+        yield put(setScheduleCompleted(false));
+        yield put(setIsScheduled(false));
+        
+        console.log('ℹ️ No appointment scheduled - flags set to false');
+        console.log('🏪 Store updated: isScheduled = false, scheduleCompleted = false');
       }
-      
-      console.log('✅ Appointment configuration loaded from server:', serverAppointmentData);
     } else {
-      console.log('ℹ️ No appointment scheduled according to server configuration');
+      console.log('⚠️ API response was not successful:', response);
     }
     
     yield put(setBookingStatus(false));
@@ -118,6 +137,82 @@ function* checkAppointmentConfig() {
     console.error('❌ Error checking appointment configuration:', error);
     yield put(setBookingStatus(false));
     yield put(setBookingError(error.message));
+  }
+}
+
+// Handle loading questions from database
+function* loadQuestions() {
+  try {
+    console.log('🚀 Saga: loadQuestions started');
+    yield put(setQuestionsLoading(true));
+    yield put(setQuestionsError(null));
+    
+    // Call the API to load questions
+    console.log('📞 Calling API: GET /api/questions/save');
+    const response = yield call(fetch, '/api/questions/save');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = yield call([response, 'json']);
+    console.log('📨 API Response received:', data);
+    
+    if (data.success) {
+      yield put(setQuestions(data.data));
+      console.log('✅ Questions loaded successfully:', data.data);
+    } else {
+      throw new Error(data.error || 'Failed to load questions');
+    }
+    
+    yield put(setQuestionsLoading(false));
+    
+  } catch (error) {
+    console.error('❌ Error loading questions:', error);
+    yield put(setQuestionsLoading(false));
+    yield put(setQuestionsError(error.message));
+  }
+}
+
+// Handle saving questions to database
+function* saveQuestions(action) {
+  try {
+    console.log('🚀 Saga: saveQuestions started');
+    const questionsData = action.payload;
+    
+    yield put(setQuestionsLoading(true));
+    yield put(setQuestionsError(null));
+    
+    // Call the API to save questions
+    console.log('📞 Calling API: POST /api/questions/save');
+    const response = yield call(fetch, '/api/questions/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(questionsData),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = yield call([response, 'json']);
+    console.log('📨 API Response received:', data);
+    
+    if (data.success) {
+      yield put(setQuestions(data.data));
+      console.log('✅ Questions saved successfully:', data.data);
+    } else {
+      throw new Error(data.error || 'Failed to save questions');
+    }
+    
+    yield put(setQuestionsLoading(false));
+    
+  } catch (error) {
+    console.error('❌ Error saving questions:', error);
+    yield put(setQuestionsLoading(false));
+    yield put(setQuestionsError(error.message));
   }
 }
 
@@ -130,5 +225,7 @@ export default function* appointmentSaga() {
   yield takeEvery('appointment/completeSchedule', completeSchedule);
   yield takeEvery('appointment/loadAppointmentData', loadAppointmentData);
   yield takeEvery('appointment/checkAppointmentConfig', checkAppointmentConfig);
+  yield takeEvery('appointment/loadQuestions', loadQuestions);
+  yield takeEvery('appointment/saveQuestions', saveQuestions);
 }
 

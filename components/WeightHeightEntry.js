@@ -29,21 +29,7 @@ export default function WeightHeightEntry({ onComplete, onBack }) {
 
   // Load saved measurements when component mounts
   useEffect(() => {
-    // In a real app, this would load from the backend
-    // For now, we'll use localStorage as a placeholder
-    const savedWeight = localStorage.getItem('appointmentWeight');
-    const savedHeightFeet = localStorage.getItem('appointmentHeightFeet');
-    const savedHeightInches = localStorage.getItem('appointmentHeightInches');
-    
-    if (savedWeight) {
-      setWeight(savedWeight);
-    }
-    if (savedHeightFeet) {
-      setHeightFeet(savedHeightFeet);
-    }
-    if (savedHeightInches) {
-      setHeightInches(savedHeightInches);
-    }
+    // Component mounted - data will be loaded from database if needed
   }, []);
 
   // Calculate BMI from pounds and feet/inches
@@ -90,13 +76,7 @@ export default function WeightHeightEntry({ onComplete, onBack }) {
     
     try {
       // In a real app, this would save to the backend
-      // For now, we'll save to localStorage as a placeholder
       console.log('Saving weight and height:', { weight, heightFeet, heightInches, bmi: currentBMI });
-      
-      // Save to localStorage for persistence
-      localStorage.setItem('appointmentWeight', weight);
-      localStorage.setItem('appointmentHeightFeet', heightFeet);
-      localStorage.setItem('appointmentHeightInches', heightInches || '');
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
