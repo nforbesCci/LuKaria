@@ -90,7 +90,7 @@ export default function Header() {
               <Button
                 variant="outlined"
                 startIcon={<LogoutOutlined />}
-                href="https://localhost:3000/api/auth/logout"
+                href={`${process.env.AUTH0_BASE_URL}/api/auth/logout`}
                 sx={{ 
                   textTransform: 'none',
                   borderColor: '#D4AF37',

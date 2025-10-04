@@ -219,7 +219,7 @@ export default function Home() {
           
           {user && (
                       <Button
-              onClick={() => window.location.href = 'https://localhost:3000/api/auth/logout'}
+              onClick={() => window.location.href = `${process.env.AUTH0_BASE_URL}/api/auth/logout`}
                         variant="outlined"
                         sx={{ 
                           textTransform: 'none',
