@@ -658,9 +658,9 @@ export default function LabRequisition() {
     return (
       <>
         <Header />
-        <Container maxWidth="lg" sx={{ mt: 8, textAlign: 'center' }}>
+        <Container maxWidth="lg" sx={{ mt: 4, textAlign: 'center' }}>
           <CircularProgress />
-          <Typography variant="h6" sx={{ mt: 2 }}>
+          <Typography variant="h6" sx={{ mt: 1 }}>
             Loading...
           </Typography>
         </Container>
@@ -672,7 +672,7 @@ export default function LabRequisition() {
     return (
       <>
         <Header />
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 2 }}>
           <Alert severity="error">
             Error loading user: {error.message}
           </Alert>
@@ -685,11 +685,11 @@ export default function LabRequisition() {
     return (
       <>
         <Header />
-        <Container maxWidth="lg" sx={{ mt: 8, textAlign: 'center' }}>
+        <Container maxWidth="lg" sx={{ mt: 4, textAlign: 'center' }}>
           <Typography variant="h2" component="h1" gutterBottom color="primary">
             Access Denied
           </Typography>
-          <Typography variant="h5" color="text.secondary" sx={{ mb: 4 }}>
+          <Typography variant="h5" color="text.secondary" sx={{ mb: 2 }}>
             Please log in to access the lab requisition.
           </Typography>
           <Button
@@ -708,9 +708,9 @@ export default function LabRequisition() {
   return (
     <>
       <Header />
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
         {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
           <Button
             variant="outlined"
             startIcon={<ArrowBack />}
@@ -749,36 +749,36 @@ export default function LabRequisition() {
 
         {/* Main Content - 3 Column Layout */}
         <div id="lab-requisition-content">
-        <Paper elevation={2} sx={{ p: 3 }}>
+        <Paper elevation={2} sx={{ p: 1.5, '& .MuiInputBase-input': { fontSize: '0.875rem' }, '& .MuiFormControlLabel-root': { fontSize: '0.75rem', lineHeight: 0.8 }, '& .MuiFormControlLabel-root .MuiFormControlLabel-label': { fontSize: '0.75rem' }, '& .MuiFormControlLabel-root .MuiTypography-root': { fontSize: '0.75rem' } }}>
           <Grid container spacing={3}>
             {/* Column 1 - Patient Information */}
-            <Grid item xs={12} md={4}>
-              <Card variant="outlined">
+            <Grid item xs={12} md={3}>
+              <Card variant="outlined" sx={{ mb: 0 }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
                     Patient Information
                   </Typography>
-                  <Box sx={{ mt: 2 }}>
+                  <Box sx={{ mt: 1 }}>
                     <TextField
                       fullWidth
                       label="Patient Name"
                       value={user.name || ''}
                       variant="standard"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
                       fullWidth
                       label="Date of Birth"
                       variant="standard"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
                       fullWidth
                       label="Patient ID"
                       variant="standard"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
@@ -787,14 +787,14 @@ export default function LabRequisition() {
                       multiline
                       rows={3}
                       variant="standard"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                       InputProps={{ readOnly: true }}
                     />
                     <TextField
                       fullWidth
                       label="Phone Number"
                       variant="standard"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                       InputProps={{ readOnly: true }}
                     />
                   </Box>
@@ -803,19 +803,19 @@ export default function LabRequisition() {
             </Grid>
 
             {/* Column 2 - Section A: Requisition Physician */}
-            <Grid item xs={12} md={4}>
-              <Card variant="outlined">
+            <Grid item xs={12} md={3}>
+              <Card variant="outlined" sx={{ mb: 0 }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
                     A. Requisition Physician
                   </Typography>
-                  <Box sx={{ mt: 2 }}>
+                  <Box sx={{ mt: 1 }}>
                     <TextField
                       fullWidth
                       label="Doctor's Name"
                       variant="standard"
                       defaultValue="Dr. Sarah Johnson"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
@@ -824,28 +824,28 @@ export default function LabRequisition() {
                       rows={3}
                       variant="standard"
                       defaultValue="123 Medical Plaza\nSuite 456\nKingston, Jamaica"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
                       label="Telephone Number"
                       variant="standard"
                       defaultValue="(876) 555-0123"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
                       label="Fax Number"
                       variant="standard"
                       defaultValue="(876) 555-0124"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
                       label="Registration Number"
                       variant="standard"
                       defaultValue="JM12345"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
@@ -854,10 +854,10 @@ export default function LabRequisition() {
                       variant="standard"
                       defaultValue={new Date().toISOString().split('T')[0]}
                       InputLabelProps={{ shrink: true }}
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
-                    <Box sx={{ mt: 3, textAlign: 'center' }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <Box sx={{ mt: 1.5, textAlign: 'center' }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                         Signature
                       </Typography>
                       <Box
@@ -881,19 +881,19 @@ export default function LabRequisition() {
             </Grid>
 
             {/* Column 3 - Section B: Copies of Result */}
-            <Grid item xs={12} md={4}>
-              <Card variant="outlined">
+            <Grid item xs={12} md={3}>
+              <Card variant="outlined" sx={{ mb: 0 }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
                     B. Copies of Result
                   </Typography>
-                  <Box sx={{ mt: 2 }}>
+                  <Box sx={{ mt: 1 }}>
                     <TextField
                       fullWidth
                       label="Doctor's Name"
                       variant="standard"
                       defaultValue="Dr. Sarah Johnson"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
@@ -902,28 +902,28 @@ export default function LabRequisition() {
                       rows={3}
                       variant="standard"
                       defaultValue="123 Medical Plaza\nSuite 456\nKingston, Jamaica"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
                       label="Telephone Number"
                       variant="standard"
                       defaultValue="(876) 555-0123"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
                       label="Fax Number"
                       variant="standard"
                       defaultValue="(876) 555-0124"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
                       label="Registration Number"
                       variant="standard"
                       defaultValue="JM12345"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     <TextField
                       fullWidth
@@ -932,10 +932,10 @@ export default function LabRequisition() {
                       variant="standard"
                       defaultValue={new Date().toISOString().split('T')[0]}
                       InputLabelProps={{ shrink: true }}
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
-                    <Box sx={{ mt: 3, textAlign: 'center' }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <Box sx={{ mt: 1.5, textAlign: 'center' }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                         Signature
                       </Typography>
                       <Box
@@ -960,11 +960,11 @@ export default function LabRequisition() {
           </Grid>
 
           {/* Lab Tests Section */}
-          <Box sx={{ mt: 4 }}>
+          <Box sx={{ mt: 2 }}>
             <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
               Laboratory Tests Requested
             </Typography>
-            <Paper variant="outlined" sx={{ mt: 2 }}>
+            <Paper variant="outlined" sx={{ mt: 1 }}>
               {/* Hematology Section */}
               <Accordion defaultExpanded>
                 <AccordionSummary
@@ -981,13 +981,13 @@ export default function LabRequisition() {
                     {/* Left Column - Routine and Special Tests */}
                     <Grid item xs={12} md={6}>
                       {/* Routine Tests */}
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
                           Routine
                         </Typography>
                         <FormGroup>
                           <Grid container spacing={1}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -999,7 +999,7 @@ export default function LabRequisition() {
                                 label="CBC"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1011,7 +1011,7 @@ export default function LabRequisition() {
                                 label="RETIC"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1023,7 +1023,7 @@ export default function LabRequisition() {
                                 label="ESR"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1035,7 +1035,7 @@ export default function LabRequisition() {
                                 label="Info Mono"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1047,7 +1047,7 @@ export default function LabRequisition() {
                                 label="CSF/Fluid"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1064,13 +1064,13 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Special Tests - Under Routine */}
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
                           Special Tests
                         </Typography>
                         <FormGroup>
                           <Grid container spacing={1}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1086,7 +1086,7 @@ export default function LabRequisition() {
                                 }
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1098,7 +1098,7 @@ export default function LabRequisition() {
                                 label="Ham's"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1110,7 +1110,7 @@ export default function LabRequisition() {
                                 label="LAP Score"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1122,7 +1122,7 @@ export default function LabRequisition() {
                                 label="Osmotic Fragility"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1141,13 +1141,13 @@ export default function LabRequisition() {
 
                     {/* Right Column - Coagulation Tests */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
                           Coagulation Tests
                         </Typography>
                         <FormGroup>
                           <Grid container spacing={1}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1159,7 +1159,7 @@ export default function LabRequisition() {
                                 label="PT"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1171,7 +1171,7 @@ export default function LabRequisition() {
                                 label="PTT"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1183,7 +1183,7 @@ export default function LabRequisition() {
                                 label="INR"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1195,7 +1195,7 @@ export default function LabRequisition() {
                                 label="Fibrinogen"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1207,7 +1207,7 @@ export default function LabRequisition() {
                                 label="Thrombin Time"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1219,7 +1219,7 @@ export default function LabRequisition() {
                                 label="Bleeding Time"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1231,7 +1231,7 @@ export default function LabRequisition() {
                                 label="Ristocetin"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1243,7 +1243,7 @@ export default function LabRequisition() {
                                 label="FDP"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1255,7 +1255,7 @@ export default function LabRequisition() {
                                 label="Mixing Studies"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1267,7 +1267,7 @@ export default function LabRequisition() {
                                 label="Lupus Anticoagulant"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1279,7 +1279,7 @@ export default function LabRequisition() {
                                 label="Platelet Aggregation"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1291,7 +1291,7 @@ export default function LabRequisition() {
                                 label="Factor Assay XIII"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1303,7 +1303,7 @@ export default function LabRequisition() {
                                 label="Factor Assay IX"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1326,7 +1326,7 @@ export default function LabRequisition() {
           </Box>
 
           {/* Clinical Chemistry */}
-          <Box sx={{ mt: 4 }}>
+          <Box sx={{ mt: 2 }}>
             <Paper elevation={2} sx={{ p: 0, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
@@ -1339,14 +1339,17 @@ export default function LabRequisition() {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {/* Electrolytes and Renal Function Tests */}
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Electrolytes and Renal Function Tests
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                  {/* Electrolytes and Blood Sugar - Two Column Layout */}
+                  <Grid container spacing={3}>
+                    {/* Left Column - Electrolytes and Renal Function Tests */}
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Electrolytes and Renal Function Tests
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1358,7 +1361,7 @@ export default function LabRequisition() {
                             label="Na"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1370,7 +1373,7 @@ export default function LabRequisition() {
                             label="K"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1382,7 +1385,7 @@ export default function LabRequisition() {
                             label="Cl"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1394,7 +1397,7 @@ export default function LabRequisition() {
                             label="HCO3"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1406,7 +1409,7 @@ export default function LabRequisition() {
                             label="Urea"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1418,7 +1421,7 @@ export default function LabRequisition() {
                             label="BUN"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1430,7 +1433,7 @@ export default function LabRequisition() {
                             label="Creatinine"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1442,7 +1445,7 @@ export default function LabRequisition() {
                             label="Phosphorus"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1454,7 +1457,7 @@ export default function LabRequisition() {
                             label="Calcium"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1466,811 +1469,820 @@ export default function LabRequisition() {
                             label="Uric Acid"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={electrolytesTests.Magnesium}
-                                onChange={() => handleElectrolytesTestChange('Magnesium')}
-                                color="primary"
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={electrolytesTests.Magnesium}
+                                    onChange={() => handleElectrolytesTestChange('Magnesium')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Magnesium"
                               />
-                            }
-                            label="Magnesium"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
+                    </Grid>
 
-                  {/* Blood Sugar Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Blood Sugar
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={bloodSugarTests['Random Glucose']}
-                                onChange={() => handleBloodSugarTestChange('Random Glucose')}
-                                color="primary"
+                    {/* Right Column - Blood Sugar */}
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Blood Sugar
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={bloodSugarTests['Random Glucose']}
+                                    onChange={() => handleBloodSugarTestChange('Random Glucose')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Random Glucose"
                               />
-                            }
-                            label="Random Glucose"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={bloodSugarTests['Fasting Glucose']}
-                                onChange={() => handleBloodSugarTestChange('Fasting Glucose')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={bloodSugarTests['Fasting Glucose']}
+                                    onChange={() => handleBloodSugarTestChange('Fasting Glucose')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Fasting Glucose"
                               />
-                            }
-                            label="Fasting Glucose"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={bloodSugarTests['2h PPG']}
-                                onChange={() => handleBloodSugarTestChange('2h PPG')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={bloodSugarTests['2h PPG']}
+                                    onChange={() => handleBloodSugarTestChange('2h PPG')}
+                                    color="primary"
+                                  />
+                                }
+                                label="2h PPG"
                               />
-                            }
-                            label="2h PPG"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={bloodSugarTests['OGTT']}
-                                onChange={() => handleBloodSugarTestChange('OGTT')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={bloodSugarTests['OGTT']}
+                                    onChange={() => handleBloodSugarTestChange('OGTT')}
+                                    color="primary"
+                                  />
+                                }
+                                label="OGTT"
                               />
-                            }
-                            label="OGTT"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={bloodSugarTests['HbA1c']}
-                                onChange={() => handleBloodSugarTestChange('HbA1c')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={bloodSugarTests['HbA1c']}
+                                    onChange={() => handleBloodSugarTestChange('HbA1c')}
+                                    color="primary"
+                                  />
+                                }
+                                label="HbA1c"
                               />
-                            }
-                            label="HbA1c"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
 
-                  {/* Tumor Markers Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Tumor Markers
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={tumorMarkers['AFP']}
-                                onChange={() => handleTumorMarkerChange('AFP')}
-                                color="primary"
+                      {/* Tumor Markers - Under Blood Sugar */}
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Tumor Markers
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={tumorMarkers['AFP']}
+                                    onChange={() => handleTumorMarkerChange('AFP')}
+                                    color="primary"
+                                  />
+                                }
+                                label="AFP"
                               />
-                            }
-                            label="AFP"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={tumorMarkers['CEA']}
-                                onChange={() => handleTumorMarkerChange('CEA')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={tumorMarkers['CEA']}
+                                    onChange={() => handleTumorMarkerChange('CEA')}
+                                    color="primary"
+                                  />
+                                }
+                                label="CEA"
                               />
-                            }
-                            label="CEA"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={tumorMarkers['CA-125']}
-                                onChange={() => handleTumorMarkerChange('CA-125')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={tumorMarkers['CA-125']}
+                                    onChange={() => handleTumorMarkerChange('CA-125')}
+                                    color="primary"
+                                  />
+                                }
+                                label="CA-125"
                               />
-                            }
-                            label="CA-125"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={tumorMarkers['CA-15-3']}
-                                onChange={() => handleTumorMarkerChange('CA-15-3')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={tumorMarkers['CA-15-3']}
+                                    onChange={() => handleTumorMarkerChange('CA-15-3')}
+                                    color="primary"
+                                  />
+                                }
+                                label="CA-15-3"
                               />
-                            }
-                            label="CA-15-3"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={tumorMarkers['Total PSA']}
-                                onChange={() => handleTumorMarkerChange('Total PSA')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={tumorMarkers['Total PSA']}
+                                    onChange={() => handleTumorMarkerChange('Total PSA')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Total PSA"
                               />
-                            }
-                            label="Total PSA"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
+                    </Grid>
+                  </Grid>
 
-                  {/* Serum Protein and Lipids Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Serum Protein and Lipids
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['Total Protein']}
-                                onChange={() => handleSerumProteinLipidsChange('Total Protein')}
-                                color="primary"
-                              />
-                            }
-                            label="Total Protein"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['Albumin']}
-                                onChange={() => handleSerumProteinLipidsChange('Albumin')}
-                                color="primary"
-                              />
-                            }
-                            label="Albumin"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['Globulin']}
-                                onChange={() => handleSerumProteinLipidsChange('Globulin')}
-                                color="primary"
-                              />
-                            }
-                            label="Globulin"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['Total Cholesterol']}
-                                onChange={() => handleSerumProteinLipidsChange('Total Cholesterol')}
-                                color="primary"
-                              />
-                            }
-                            label="Total Cholesterol"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['LDL']}
-                                onChange={() => handleSerumProteinLipidsChange('LDL')}
-                                color="primary"
-                              />
-                            }
-                            label="LDL"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['HDL']}
-                                onChange={() => handleSerumProteinLipidsChange('HDL')}
-                                color="primary"
-                              />
-                            }
-                            label="HDL"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['Triglyceride']}
-                                onChange={() => handleSerumProteinLipidsChange('Triglyceride')}
-                                color="primary"
-                              />
-                            }
-                            label="Triglyceride"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['Protein Electrophoresis']}
-                                onChange={() => handleSerumProteinLipidsChange('Protein Electrophoresis')}
-                                color="primary"
-                              />
-                            }
-                            label="Protein Electrophoresis"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={serumProteinLipids['Lipoprotein Electrophoresis']}
-                                onChange={() => handleSerumProteinLipidsChange('Lipoprotein Electrophoresis')}
-                                color="primary"
-                              />
-                            }
-                            label="Lipoprotein Electrophoresis"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
 
-                  {/* Urine Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Urine
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Na']}
-                                onChange={() => handleUrineTestChange('Na')}
-                                color="primary"
+                  {/* Serum Protein and Lipids and Urine - Two Column Layout */}
+                  <Grid container spacing={3}>
+                    {/* Left Column - Serum Protein and Lipids */}
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Serum Protein and Lipids
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['Total Protein']}
+                                    onChange={() => handleSerumProteinLipidsChange('Total Protein')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Total Protein"
                               />
-                            }
-                            label="Na"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Urinalysis']}
-                                onChange={() => handleUrineTestChange('Urinalysis')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['Albumin']}
+                                    onChange={() => handleSerumProteinLipidsChange('Albumin')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Albumin"
                               />
-                            }
-                            label="Urinalysis"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['K']}
-                                onChange={() => handleUrineTestChange('K')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['Globulin']}
+                                    onChange={() => handleSerumProteinLipidsChange('Globulin')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Globulin"
                               />
-                            }
-                            label="K"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Microscopy']}
-                                onChange={() => handleUrineTestChange('Microscopy')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['Total Cholesterol']}
+                                    onChange={() => handleSerumProteinLipidsChange('Total Cholesterol')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Total Cholesterol"
                               />
-                            }
-                            label="Microscopy"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Urea']}
-                                onChange={() => handleUrineTestChange('Urea')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['LDL']}
+                                    onChange={() => handleSerumProteinLipidsChange('LDL')}
+                                    color="primary"
+                                  />
+                                }
+                                label="LDL"
                               />
-                            }
-                            label="Urea"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['VMA']}
-                                onChange={() => handleUrineTestChange('VMA')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['HDL']}
+                                    onChange={() => handleSerumProteinLipidsChange('HDL')}
+                                    color="primary"
+                                  />
+                                }
+                                label="HDL"
                               />
-                            }
-                            label="VMA"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Creatinine']}
-                                onChange={() => handleUrineTestChange('Creatinine')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['Triglyceride']}
+                                    onChange={() => handleSerumProteinLipidsChange('Triglyceride')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Triglyceride"
                               />
-                            }
-                            label="Creatinine"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Uric Acid']}
-                                onChange={() => handleUrineTestChange('Uric Acid')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['Protein Electrophoresis']}
+                                    onChange={() => handleSerumProteinLipidsChange('Protein Electrophoresis')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Protein Electrophoresis"
                               />
-                            }
-                            label="Uric Acid"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Creatinine Clearance']}
-                                onChange={() => handleUrineTestChange('Creatinine Clearance')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={serumProteinLipids['Lipoprotein Electrophoresis']}
+                                    onChange={() => handleSerumProteinLipidsChange('Lipoprotein Electrophoresis')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Lipoprotein Electrophoresis"
                               />
-                            }
-                            label="Creatinine Clearance"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Calcium']}
-                                onChange={() => handleUrineTestChange('Calcium')}
-                                color="primary"
-                              />
-                            }
-                            label="Calcium"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Phosphorus']}
-                                onChange={() => handleUrineTestChange('Phosphorus')}
-                                color="primary"
-                              />
-                            }
-                            label="Phosphorus"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Protein']}
-                                onChange={() => handleUrineTestChange('Protein')}
-                                color="primary"
-                              />
-                            }
-                            label="Protein"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['17-KS']}
-                                onChange={() => handleUrineTestChange('17-KS')}
-                                color="primary"
-                              />
-                            }
-                            label="17-KS"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['17-KGS']}
-                                onChange={() => handleUrineTestChange('17-KGS')}
-                                color="primary"
-                              />
-                            }
-                            label="17-KGS"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Protein Electrophoresis']}
-                                onChange={() => handleUrineTestChange('Protein Electrophoresis')}
-                                color="primary"
-                              />
-                            }
-                            label="Protein Electrophoresis"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Cortisol']}
-                                onChange={() => handleUrineTestChange('Cortisol')}
-                                color="primary"
-                              />
-                            }
-                            label="Cortisol"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={urineTests['Microalbumin']}
-                                onChange={() => handleUrineTestChange('Microalbumin')}
-                                color="primary"
-                              />
-                            }
-                            label="Microalbumin"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
 
-                  {/* Hormones Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Hormones
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['FSH']}
-                                onChange={() => handleHormoneTestChange('FSH')}
-                                color="primary"
+                      {/* Hormones - Under Serum Protein and Lipids */}
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Hormones
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['FSH']}
+                                    onChange={() => handleHormoneTestChange('FSH')}
+                                    color="primary"
+                                  />
+                                }
+                                label="FSH"
                               />
-                            }
-                            label="FSH"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['TSH']}
-                                onChange={() => handleHormoneTestChange('TSH')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['TSH']}
+                                    onChange={() => handleHormoneTestChange('TSH')}
+                                    color="primary"
+                                  />
+                                }
+                                label="TSH"
                               />
-                            }
-                            label="TSH"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['FT3']}
-                                onChange={() => handleHormoneTestChange('FT3')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['FT3']}
+                                    onChange={() => handleHormoneTestChange('FT3')}
+                                    color="primary"
+                                  />
+                                }
+                                label="FT3"
                               />
-                            }
-                            label="FT3"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['DHEA-S']}
-                                onChange={() => handleHormoneTestChange('DHEA-S')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['DHEA-S']}
+                                    onChange={() => handleHormoneTestChange('DHEA-S')}
+                                    color="primary"
+                                  />
+                                }
+                                label="DHEA-S"
                               />
-                            }
-                            label="DHEA-S"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['FT4']}
-                                onChange={() => handleHormoneTestChange('FT4')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['FT4']}
+                                    onChange={() => handleHormoneTestChange('FT4')}
+                                    color="primary"
+                                  />
+                                }
+                                label="FT4"
                               />
-                            }
-                            label="FT4"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['Cortisol']}
-                                onChange={() => handleHormoneTestChange('Cortisol')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['Cortisol']}
+                                    onChange={() => handleHormoneTestChange('Cortisol')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Cortisol"
                               />
-                            }
-                            label="Cortisol"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['ACTH']}
-                                onChange={() => handleHormoneTestChange('ACTH')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['ACTH']}
+                                    onChange={() => handleHormoneTestChange('ACTH')}
+                                    color="primary"
+                                  />
+                                }
+                                label="ACTH"
                               />
-                            }
-                            label="ACTH"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['Prolactin']}
-                                onChange={() => handleHormoneTestChange('Prolactin')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['Prolactin']}
+                                    onChange={() => handleHormoneTestChange('Prolactin')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Prolactin"
                               />
-                            }
-                            label="Prolactin"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['LH']}
-                                onChange={() => handleHormoneTestChange('LH')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['LH']}
+                                    onChange={() => handleHormoneTestChange('LH')}
+                                    color="primary"
+                                  />
+                                }
+                                label="LH"
                               />
-                            }
-                            label="LH"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['Beta-HCG']}
-                                onChange={() => handleHormoneTestChange('Beta-HCG')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['Beta-HCG']}
+                                    onChange={() => handleHormoneTestChange('Beta-HCG')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Beta-HCG"
                               />
-                            }
-                            label="Beta-HCG"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['Oestradiol']}
-                                onChange={() => handleHormoneTestChange('Oestradiol')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['Oestradiol']}
+                                    onChange={() => handleHormoneTestChange('Oestradiol')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Oestradiol"
                               />
-                            }
-                            label="Oestradiol"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['Progesterone']}
-                                onChange={() => handleHormoneTestChange('Progesterone')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['Progesterone']}
+                                    onChange={() => handleHormoneTestChange('Progesterone')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Progesterone"
                               />
-                            }
-                            label="Progesterone"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['Testosterone']}
-                                onChange={() => handleHormoneTestChange('Testosterone')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['Testosterone']}
+                                    onChange={() => handleHormoneTestChange('Testosterone')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Testosterone"
                               />
-                            }
-                            label="Testosterone"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={hormoneTests['Growth Hormone']}
-                                onChange={() => handleHormoneTestChange('Growth Hormone')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={hormoneTests['Growth Hormone']}
+                                    onChange={() => handleHormoneTestChange('Growth Hormone')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Growth Hormone"
                               />
-                            }
-                            label="Growth Hormone"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
+                    </Grid>
 
-                  {/* Cardiac and Liver Function Test Subsection */}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-                      Cardiac and Liver Function Test
-                    </Typography>
-                    <FormGroup>
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['CPK']}
-                                onChange={() => handleCardiacLiverTestChange('CPK')}
-                                color="primary"
+                    {/* Right Column - Urine */}
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Urine
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Na']}
+                                    onChange={() => handleUrineTestChange('Na')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Na"
                               />
-                            }
-                            label="CPK"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['ALT']}
-                                onChange={() => handleCardiacLiverTestChange('ALT')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Urinalysis']}
+                                    onChange={() => handleUrineTestChange('Urinalysis')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Urinalysis"
                               />
-                            }
-                            label="ALT"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['Bili D']}
-                                onChange={() => handleCardiacLiverTestChange('Bili D')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['K']}
+                                    onChange={() => handleUrineTestChange('K')}
+                                    color="primary"
+                                  />
+                                }
+                                label="K"
                               />
-                            }
-                            label="Bili D"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['Troponin I']}
-                                onChange={() => handleCardiacLiverTestChange('Troponin I')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Microscopy']}
+                                    onChange={() => handleUrineTestChange('Microscopy')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Microscopy"
                               />
-                            }
-                            label="Troponin I"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['AST']}
-                                onChange={() => handleCardiacLiverTestChange('AST')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Urea']}
+                                    onChange={() => handleUrineTestChange('Urea')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Urea"
                               />
-                            }
-                            label="AST"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['Bili T']}
-                                onChange={() => handleCardiacLiverTestChange('Bili T')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['VMA']}
+                                    onChange={() => handleUrineTestChange('VMA')}
+                                    color="primary"
+                                  />
+                                }
+                                label="VMA"
                               />
-                            }
-                            label="Bili T"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['LDH']}
-                                onChange={() => handleCardiacLiverTestChange('LDH')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Creatinine']}
+                                    onChange={() => handleUrineTestChange('Creatinine')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Creatinine"
                               />
-                            }
-                            label="LDH"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['ALP']}
-                                onChange={() => handleCardiacLiverTestChange('ALP')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Uric Acid']}
+                                    onChange={() => handleUrineTestChange('Uric Acid')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Uric Acid"
                               />
-                            }
-                            label="ALP"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={cardiacLiverTests['GGT']}
-                                onChange={() => handleCardiacLiverTestChange('GGT')}
-                                color="primary"
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Creatinine Clearance']}
+                                    onChange={() => handleUrineTestChange('Creatinine Clearance')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Creatinine Clearance"
                               />
-                            }
-                            label="GGT"
-                          />
-                        </Grid>
-                      </Grid>
-                    </FormGroup>
-                  </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Calcium']}
+                                    onChange={() => handleUrineTestChange('Calcium')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Calcium"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Phosphorus']}
+                                    onChange={() => handleUrineTestChange('Phosphorus')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Phosphorus"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Protein']}
+                                    onChange={() => handleUrineTestChange('Protein')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Protein"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['17-KS']}
+                                    onChange={() => handleUrineTestChange('17-KS')}
+                                    color="primary"
+                                  />
+                                }
+                                label="17-KS"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['17-KGS']}
+                                    onChange={() => handleUrineTestChange('17-KGS')}
+                                    color="primary"
+                                  />
+                                }
+                                label="17-KGS"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Protein Electrophoresis']}
+                                    onChange={() => handleUrineTestChange('Protein Electrophoresis')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Protein Electrophoresis"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Cortisol']}
+                                    onChange={() => handleUrineTestChange('Cortisol')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Cortisol"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={urineTests['Microalbumin']}
+                                    onChange={() => handleUrineTestChange('Microalbumin')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Microalbumin"
+                              />
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
+
+                      {/* Cardiac and Liver Function Test - Under Urine */}
+                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                          Cardiac and Liver Function Test
+                        </Typography>
+                        <FormGroup>
+                          <Grid container spacing={1}>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['CPK']}
+                                    onChange={() => handleCardiacLiverTestChange('CPK')}
+                                    color="primary"
+                                  />
+                                }
+                                label="CPK"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['ALT']}
+                                    onChange={() => handleCardiacLiverTestChange('ALT')}
+                                    color="primary"
+                                  />
+                                }
+                                label="ALT"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['Bili D']}
+                                    onChange={() => handleCardiacLiverTestChange('Bili D')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Bili D"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['Troponin I']}
+                                    onChange={() => handleCardiacLiverTestChange('Troponin I')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Troponin I"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['AST']}
+                                    onChange={() => handleCardiacLiverTestChange('AST')}
+                                    color="primary"
+                                  />
+                                }
+                                label="AST"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['Bili T']}
+                                    onChange={() => handleCardiacLiverTestChange('Bili T')}
+                                    color="primary"
+                                  />
+                                }
+                                label="Bili T"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['LDH']}
+                                    onChange={() => handleCardiacLiverTestChange('LDH')}
+                                    color="primary"
+                                  />
+                                }
+                                label="LDH"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['ALP']}
+                                    onChange={() => handleCardiacLiverTestChange('ALP')}
+                                    color="primary"
+                                  />
+                                }
+                                label="ALP"
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={cardiacLiverTests['GGT']}
+                                    onChange={() => handleCardiacLiverTestChange('GGT')}
+                                    color="primary"
+                                  />
+                                }
+                                label="GGT"
+                              />
+                            </Grid>
+                          </Grid>
+                        </FormGroup>
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+
+
 
                   {/* Other Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Other
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2282,7 +2294,7 @@ export default function LabRequisition() {
                             label="Amylase"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2294,7 +2306,7 @@ export default function LabRequisition() {
                             label="Insulin (F)"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2306,7 +2318,7 @@ export default function LabRequisition() {
                             label="CSF glucose"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2318,7 +2330,7 @@ export default function LabRequisition() {
                             label="Vitamin B12/Folic acid"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2330,7 +2342,7 @@ export default function LabRequisition() {
                             label="Serum Iron/TIBC"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2342,7 +2354,7 @@ export default function LabRequisition() {
                             label="PTH"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2354,7 +2366,7 @@ export default function LabRequisition() {
                             label="Ferritin"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2366,7 +2378,7 @@ export default function LabRequisition() {
                             label="Lithium"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2378,7 +2390,7 @@ export default function LabRequisition() {
                             label="CSF Protein"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2390,7 +2402,7 @@ export default function LabRequisition() {
                             label="Beta-Microglubulin"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2402,7 +2414,7 @@ export default function LabRequisition() {
                             label="Salicylate"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2414,7 +2426,7 @@ export default function LabRequisition() {
                             label="Lipase"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2426,7 +2438,7 @@ export default function LabRequisition() {
                             label="Digoxin"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2438,7 +2450,7 @@ export default function LabRequisition() {
                             label="C-peptide"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2450,7 +2462,7 @@ export default function LabRequisition() {
                             label="Dilantin"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={1.5}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2466,7 +2478,7 @@ export default function LabRequisition() {
                       
                       {/* Other Test Text Input */}
                       {otherTests['Other'] && (
-                        <Box sx={{ mt: 2 }}>
+                        <Box sx={{ mt: 1 }}>
                           <TextField
                             fullWidth
                             label="Specify other test"
@@ -2487,8 +2499,8 @@ export default function LabRequisition() {
           </Box>
 
           {/* Immunology */}
-          <Box sx={{ mt: 4 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+          <Box sx={{ mt: 2 }}>
+            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -2501,13 +2513,13 @@ export default function LabRequisition() {
                 </AccordionSummary>
                 <AccordionDetails>
                   {/* Serology Subsection */}
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Serology
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2519,7 +2531,7 @@ export default function LabRequisition() {
                             label="VDRL"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2531,7 +2543,7 @@ export default function LabRequisition() {
                             label="FTA"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2543,7 +2555,7 @@ export default function LabRequisition() {
                             label="Widal"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2555,7 +2567,7 @@ export default function LabRequisition() {
                             label="ASTO"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2573,13 +2585,13 @@ export default function LabRequisition() {
 
                   {/* Autoantibodies Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Autoantibodies
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2591,7 +2603,7 @@ export default function LabRequisition() {
                             label="RF"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2603,7 +2615,7 @@ export default function LabRequisition() {
                             label="ANA"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2615,7 +2627,7 @@ export default function LabRequisition() {
                             label="ENA"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2627,7 +2639,7 @@ export default function LabRequisition() {
                             label="Anti-CCP"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2639,7 +2651,7 @@ export default function LabRequisition() {
                             label="Thyroglobulin"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2651,7 +2663,7 @@ export default function LabRequisition() {
                             label="ANCA"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2663,7 +2675,7 @@ export default function LabRequisition() {
                             label="cardiolipin"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2675,7 +2687,7 @@ export default function LabRequisition() {
                             label="Anti-Beta2GPI"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2687,7 +2699,7 @@ export default function LabRequisition() {
                             label="Mitochondrial"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2699,7 +2711,7 @@ export default function LabRequisition() {
                             label="Gastric Parietal Cell"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2711,7 +2723,7 @@ export default function LabRequisition() {
                             label="dsDNA"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2729,13 +2741,13 @@ export default function LabRequisition() {
 
                   {/* Serum Protein Concentrate Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Serum Protein Concentrate
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2751,7 +2763,7 @@ export default function LabRequisition() {
                             }
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2767,7 +2779,7 @@ export default function LabRequisition() {
                             }
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2779,7 +2791,7 @@ export default function LabRequisition() {
                             label="CRP"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2791,7 +2803,7 @@ export default function LabRequisition() {
                             label="IgA"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2803,7 +2815,7 @@ export default function LabRequisition() {
                             label="IgG"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2821,13 +2833,13 @@ export default function LabRequisition() {
 
                   {/* Lymphocyte Enumeration Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Lymphocyte Enumeration
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2839,7 +2851,7 @@ export default function LabRequisition() {
                             label="Viral load"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2851,7 +2863,7 @@ export default function LabRequisition() {
                             label="CD4"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2863,7 +2875,7 @@ export default function LabRequisition() {
                             label="CD8"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2875,7 +2887,7 @@ export default function LabRequisition() {
                             label="T lymphocytes"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2887,7 +2899,7 @@ export default function LabRequisition() {
                             label="B lymphocytes (CD19/20)"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2905,13 +2917,13 @@ export default function LabRequisition() {
 
                   {/* Other Tests Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Other Tests
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2923,7 +2935,7 @@ export default function LabRequisition() {
                             label="H. pylori"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -2939,7 +2951,7 @@ export default function LabRequisition() {
                       
                       {/* Other Test Text Input */}
                       {immunologyOtherTests['Other'] && (
-                        <Box sx={{ mt: 2 }}>
+                        <Box sx={{ mt: 1 }}>
                           <TextField
                             fullWidth
                             label="Specify other immunology test"
@@ -2960,8 +2972,8 @@ export default function LabRequisition() {
           </Box>
 
           {/* Blood Bank */}
-          <Box sx={{ mt: 4 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+          <Box sx={{ mt: 2 }}>
+            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -3031,8 +3043,8 @@ export default function LabRequisition() {
           </Box>
 
           {/* Bacteriology */}
-          <Box sx={{ mt: 4 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+          <Box sx={{ mt: 2 }}>
+            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -3045,7 +3057,7 @@ export default function LabRequisition() {
                 </AccordionSummary>
                 <AccordionDetails>
                   {/* Antibiotic Treatment Question */}
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Please state any current antibiotic treatment:
                     </Typography>
@@ -3063,13 +3075,13 @@ export default function LabRequisition() {
 
                   {/* Microscopy Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Microscopy
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3081,7 +3093,7 @@ export default function LabRequisition() {
                             label="Gram stain"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3093,7 +3105,7 @@ export default function LabRequisition() {
                             label="AFB/ZN"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3111,13 +3123,13 @@ export default function LabRequisition() {
 
                   {/* Toxin Detection Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Toxin Detection
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3135,13 +3147,13 @@ export default function LabRequisition() {
 
                   {/* Other Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Other
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3153,7 +3165,7 @@ export default function LabRequisition() {
                             label="Culture and sensitivity"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3169,7 +3181,7 @@ export default function LabRequisition() {
                       
                       {/* Other Test Text Input */}
                       {bacteriologyOtherTests['Other'] && (
-                        <Box sx={{ mt: 2 }}>
+                        <Box sx={{ mt: 1 }}>
                           <TextField
                             fullWidth
                             label="Specify other bacteriology test"
@@ -3190,8 +3202,8 @@ export default function LabRequisition() {
           </Box>
 
           {/* Parasitology */}
-          <Box sx={{ mt: 4 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+          <Box sx={{ mt: 2 }}>
+            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -3204,10 +3216,10 @@ export default function LabRequisition() {
                 </AccordionSummary>
                 <AccordionDetails>
                   {/* General Parasitology Tests */}
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3219,7 +3231,7 @@ export default function LabRequisition() {
                             label="Ova and parasites (O & P)"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3235,7 +3247,7 @@ export default function LabRequisition() {
                       
                       {/* Other Test Text Input */}
                       {parasitologyOtherTests['Other'] && (
-                        <Box sx={{ mt: 2 }}>
+                        <Box sx={{ mt: 1 }}>
                           <TextField
                             fullWidth
                             label="Specify other parasitology test"
@@ -3253,13 +3265,13 @@ export default function LabRequisition() {
 
                   {/* EIA Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       EIA
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3271,7 +3283,7 @@ export default function LabRequisition() {
                             label="E. histolytica"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3283,7 +3295,7 @@ export default function LabRequisition() {
                             label="malaria"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3295,7 +3307,7 @@ export default function LabRequisition() {
                             label="cryptosporidia"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3307,7 +3319,7 @@ export default function LabRequisition() {
                             label="Giardia"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3319,7 +3331,7 @@ export default function LabRequisition() {
                             label="Toxocara"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3340,8 +3352,8 @@ export default function LabRequisition() {
           </Box>
 
           {/* Mycology */}
-          <Box sx={{ mt: 4 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+          <Box sx={{ mt: 2 }}>
+            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -3354,7 +3366,7 @@ export default function LabRequisition() {
                 </AccordionSummary>
                 <AccordionDetails>
                   {/* Current Treatment Question */}
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Please state any current treatment:
                     </Typography>
@@ -3367,7 +3379,7 @@ export default function LabRequisition() {
                         />
                       }
                       label="Enter treatment"
-                      sx={{ mb: 2 }}
+                      sx={{ mb: 1 }}
                     />
                     {enterTreatment && (
                       <TextField
@@ -3385,7 +3397,7 @@ export default function LabRequisition() {
 
                   {/* General Mycology Tests */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <FormGroup>
                       <Grid container spacing={1}>
                         <Grid item xs={12} sm={6} md={3}>
@@ -3442,13 +3454,13 @@ export default function LabRequisition() {
 
                   {/* Microscopy Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Microscopy
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3460,7 +3472,7 @@ export default function LabRequisition() {
                             label="KOH"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3481,8 +3493,8 @@ export default function LabRequisition() {
           </Box>
 
           {/* Virology */}
-          <Box sx={{ mt: 4 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+          <Box sx={{ mt: 2 }}>
+            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
               <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -3495,13 +3507,13 @@ export default function LabRequisition() {
                 </AccordionSummary>
                 <AccordionDetails>
                   {/* Fever and Rash Subsection */}
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Fever and Rash
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3513,7 +3525,7 @@ export default function LabRequisition() {
                             label="Dengue"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3525,7 +3537,7 @@ export default function LabRequisition() {
                             label="Rubella"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3537,7 +3549,7 @@ export default function LabRequisition() {
                             label="Measles"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3549,7 +3561,7 @@ export default function LabRequisition() {
                             label="Varicella"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3567,13 +3579,13 @@ export default function LabRequisition() {
 
                   {/* Hepatitis Screening Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Hepatitis Screening
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3585,7 +3597,7 @@ export default function LabRequisition() {
                             label="HBsAg"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3597,7 +3609,7 @@ export default function LabRequisition() {
                             label="HBeAg"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3609,7 +3621,7 @@ export default function LabRequisition() {
                             label="Anti-HAV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3621,7 +3633,7 @@ export default function LabRequisition() {
                             label="Anti-HCV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3633,7 +3645,7 @@ export default function LabRequisition() {
                             label="Anti-HB core"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3651,13 +3663,13 @@ export default function LabRequisition() {
 
                   {/* Vaccine Status Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Vaccine Status
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3669,7 +3681,7 @@ export default function LabRequisition() {
                             label="MMR"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3681,7 +3693,7 @@ export default function LabRequisition() {
                             label="Varicella"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3699,7 +3711,7 @@ export default function LabRequisition() {
 
                   {/* STI Screening Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       STI Screening
                     </Typography>
@@ -3759,13 +3771,13 @@ export default function LabRequisition() {
 
                   {/* Other Tests Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Other Tests
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3777,7 +3789,7 @@ export default function LabRequisition() {
                             label="CMV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3789,7 +3801,7 @@ export default function LabRequisition() {
                             label="EBV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3801,7 +3813,7 @@ export default function LabRequisition() {
                             label="TORCH"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3813,7 +3825,7 @@ export default function LabRequisition() {
                             label="Viral Culture"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3825,7 +3837,7 @@ export default function LabRequisition() {
                             label="HTLV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3837,7 +3849,7 @@ export default function LabRequisition() {
                             label="Western Blot"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3849,7 +3861,7 @@ export default function LabRequisition() {
                             label="Toxoplasma gondii"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3861,7 +3873,7 @@ export default function LabRequisition() {
                             label="Stool Rotavirus"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3873,7 +3885,7 @@ export default function LabRequisition() {
                             label="Mumps"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3885,7 +3897,7 @@ export default function LabRequisition() {
                             label="Influenza"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3901,7 +3913,7 @@ export default function LabRequisition() {
                       
                       {/* Other Test Text Input */}
                       {virologyOtherTests['Other'] && (
-                        <Box sx={{ mt: 2 }}>
+                        <Box sx={{ mt: 1 }}>
                           <TextField
                             fullWidth
                             label="Specify other virology test"
@@ -3919,11 +3931,11 @@ export default function LabRequisition() {
 
                   {/* Virology Grid Tests */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Advanced Virology Testing
                     </Typography>
-                    <Paper elevation={1} sx={{ p: 2, backgroundColor: '#f8f9fa' }}>
+                    <Paper elevation={1} sx={{ p: 1, backgroundColor: '#f8f9fa' }}>
                       <Grid container spacing={1}>
                         {/* Header Row */}
                         <Grid item xs={3}>
@@ -4011,7 +4023,7 @@ export default function LabRequisition() {
           </Box>
 
           {/* Clinical Information */}
-          <Box sx={{ mt: 4 }}>
+          <Box sx={{ mt: 2 }}>
             <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
               Clinical Information
             </Typography>
@@ -4026,7 +4038,7 @@ export default function LabRequisition() {
           </Box>
 
           {/* Urgency */}
-          <Box sx={{ mt: 4 }}>
+          <Box sx={{ mt: 2 }}>
             <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
               Urgency
             </Typography>
