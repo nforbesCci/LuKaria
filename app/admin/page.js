@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from '../../components/Header';
-import UserDebug from '../../components/UserDebug';
 import {
   setSearchTerm,
   setStatusFilter,
@@ -85,20 +84,10 @@ export default function AdminPage() {
   }, [user]);
 
   // Check if user is in doctor or admin group using processed custom claims
-  const isAuthorized = user && (
-    // Check processed custom claims first
-    (user.customClaims?.groups && 
-     (user.customClaims.groups.includes('doctor') || 
-      user.customClaims.groups.includes('admin'))) ||
-    // Fallback to original checks
-    (user['https://lukaria.com/groups'] && 
-     (user['https://lukaria.com/groups'].includes('doctor') || 
-      user['https://lukaria.com/groups'].includes('admin'))) ||
-    (user.groups && 
-     (user.groups.includes('doctor') || user.groups.includes('admin'))) ||
-    (user.roles && 
-     (user.roles.includes('doctor') || user.roles.includes('admin')))
-  );
+  const isAuthorized = user && 
+  // Check processed custom claims first
+  (user?.groups && user.groups.some(item => item.toLowerCase() === "doctor" || item.toLowerCase() === "admin"));
+  
   
   // Get state from Redux store
   const {
@@ -282,7 +271,6 @@ export default function AdminPage() {
   return (
     <>
       <Header />
-      <UserDebug />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Header Section */}
         <Paper elevation={2} sx={{ p: 3, mb: 4 }}>

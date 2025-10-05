@@ -48,28 +48,15 @@ export default function NavigationDrawer() {
   useEffect(() => {
     if (user) {
       console.log('NavigationDrawer - User object:', user);
-      console.log('NavigationDrawer - User groups (https://lukaria.com/groups):', user['https://lukaria.com/groups']);
+      console.log('NavigationDrawer - User groups (https://lukariagroup.com/roles):', user['https://lukariagroup.com/roles']);
       console.log('NavigationDrawer - User groups (groups):', user.groups);
-      console.log('NavigationDrawer - User roles:', user.roles);
-      console.log('NavigationDrawer - Custom claims:', user.customClaims);
     }
   }, [user]);
 
   // Check if user is in doctor or admin group using processed custom claims
-  const isAdmin = user && (
+  const isAdmin = user && 
     // Check processed custom claims first
-    (user.customClaims?.groups && 
-     (user.customClaims.groups.includes('doctor') || 
-      user.customClaims.groups.includes('admin'))) ||
-    // Fallback to original checks
-    (user['https://lukaria.com/groups'] && 
-     (user['https://lukaria.com/groups'].includes('doctor') || 
-      user['https://lukaria.com/groups'].includes('admin'))) ||
-    (user.groups && 
-     (user.groups.includes('doctor') || user.groups.includes('admin'))) ||
-    (user.roles && 
-     (user.roles.includes('doctor') || user.roles.includes('admin')))
-  );
+    (user?.groups && user.groups.some(item => item.toLowerCase() === "doctor" || item.toLowerCase() === "admin"));
 
   useEffect(() => {
     setMounted(true);
