@@ -51,11 +51,17 @@ export default function NavigationDrawer() {
       console.log('NavigationDrawer - User groups (https://lukaria.com/groups):', user['https://lukaria.com/groups']);
       console.log('NavigationDrawer - User groups (groups):', user.groups);
       console.log('NavigationDrawer - User roles:', user.roles);
+      console.log('NavigationDrawer - Custom claims:', user.customClaims);
     }
   }, [user]);
 
-  // Check if user is in doctor or admin group
+  // Check if user is in doctor or admin group using processed custom claims
   const isAdmin = user && (
+    // Check processed custom claims first
+    (user.customClaims?.groups && 
+     (user.customClaims.groups.includes('doctor') || 
+      user.customClaims.groups.includes('admin'))) ||
+    // Fallback to original checks
     (user['https://lukaria.com/groups'] && 
      (user['https://lukaria.com/groups'].includes('doctor') || 
       user['https://lukaria.com/groups'].includes('admin'))) ||

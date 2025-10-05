@@ -79,12 +79,18 @@ export default function AdminPage() {
       console.log('User groups (https://lukaria.com/groups):', user['https://lukaria.com/groups']);
       console.log('User groups (groups):', user.groups);
       console.log('User roles:', user.roles);
+      console.log('Custom claims:', user.customClaims);
       console.log('All user properties:', Object.keys(user));
     }
   }, [user]);
 
-  // Check if user is in doctor or admin group
+  // Check if user is in doctor or admin group using processed custom claims
   const isAuthorized = user && (
+    // Check processed custom claims first
+    (user.customClaims?.groups && 
+     (user.customClaims.groups.includes('doctor') || 
+      user.customClaims.groups.includes('admin'))) ||
+    // Fallback to original checks
     (user['https://lukaria.com/groups'] && 
      (user['https://lukaria.com/groups'].includes('doctor') || 
       user['https://lukaria.com/groups'].includes('admin'))) ||
