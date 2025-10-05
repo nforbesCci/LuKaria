@@ -58,6 +58,7 @@ export default function Dashboard() {
   const preAppointmentTasks = useAppSelector((state) => state.appointment.preAppointmentTasks);
   const questions = useAppSelector((state) => state.appointment.questions);
 
+  
   // Schedule protection - prevent access to dashboard if schedule not completed
   useScheduleProtection();
 
