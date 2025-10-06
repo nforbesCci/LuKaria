@@ -499,16 +499,16 @@ export default function Home() {
                      <strong>Physician guidance and monitoring</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Familiar and trusted brands: Wegovy and Mounjaro</strong>
+                     <strong>Familiar and trusted brands: Mounjaro</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Medications delivered to convenient pickup locations in your parish</strong>
+                     <strong>Medications delivered to you</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
                      <strong>Flat monthly fee</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
-                     <strong>Exclusive membership with premium benefits at partner locations</strong>
+                     <strong>Exclusive Svelte membership with special offers and premium benefits</strong>
                    </Typography>
                  </Box>
                   </Box>
@@ -525,6 +525,7 @@ export default function Home() {
                         py: 1,
                         fontWeight: '600',
                         width: 'auto',
+                        display: { xs: 'none', sm: 'block' },
                         '&:hover': {
                           borderColor: '#D4AF37',
                           backgroundColor: 'rgba(212, 175, 55, 0.1)',
