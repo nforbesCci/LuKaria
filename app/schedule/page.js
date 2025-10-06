@@ -305,7 +305,7 @@ export default function Schedule() {
                 onClick={() => window.location.href = '/dashboard'}
                 sx={{
                   textTransform: 'none',
-                  backgroundColor: '#D4AF37',
+                  backgroundColor: '#877449',
                   '&:hover': {
                     backgroundColor: '#B8941F',
                   }

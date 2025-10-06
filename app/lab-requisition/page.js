@@ -940,7 +940,7 @@ export default function LabRequisition() {
                     {/* Left Column - Routine and Special Tests */}
                     <Grid item xs={12} md={6}>
                       {/* Routine Tests */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
                           Routine
                         </Typography>
@@ -1026,7 +1026,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Coagulation Tests */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
                           Coagulation Tests
                         </Typography>
@@ -1228,7 +1228,7 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Electrolytes and Renal Function Tests */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Electrolytes and Renal Function Tests
                         </Typography>
@@ -1373,7 +1373,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Blood Sugar */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Blood Sugar
                         </Typography>
@@ -1444,7 +1444,7 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Tumor Markers - Under Blood Sugar */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Tumor Markers
                         </Typography>
@@ -1521,7 +1521,7 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Serum Protein and Lipids */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Serum Protein and Lipids
                         </Typography>
@@ -1640,7 +1640,7 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Hormones - Under Serum Protein and Lipids */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Hormones
                         </Typography>
@@ -1821,7 +1821,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Urine */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Urine
                         </Typography>
@@ -2036,7 +2036,7 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Cardiac and Liver Function Test - Under Urine */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Cardiac and Liver Function Test
                         </Typography>
@@ -2402,7 +2402,7 @@ export default function LabRequisition() {
                     {/* Left Column - Serology and Serum Protein Concentrate */}
                     <Grid item xs={12} md={6}>
                       {/* Serology */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Serology
                         </Typography>
@@ -2473,7 +2473,7 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Serum Protein Concentrate */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Serum Protein Concentrate
                         </Typography>
@@ -2566,7 +2566,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Autoantibodies */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Autoantibodies
                         </Typography>
@@ -2729,7 +2729,7 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Lymphocyte Enumeration (80%) */}
                     <Grid item xs={12} md={9.6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Lymphocyte Enumeration
                         </Typography>
@@ -2814,7 +2814,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Other Tests (20%) */}
                     <Grid item xs={12} md={2.4}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Other Tests
                         </Typography>
@@ -2908,7 +2908,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Other Tests */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Other
                         </Typography>
@@ -2982,7 +2982,7 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - General Parasitology Tests (30%) */}
                     <Grid item xs={12} md={3.6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           General Parasitology Tests
                         </Typography>
@@ -3035,7 +3035,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - EIA (70%) */}
                     <Grid item xs={12} md={8.4}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           EIA
                         </Typography>
@@ -3142,7 +3142,7 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Fever and Rash */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Fever and Rash
                         </Typography>
@@ -3215,7 +3215,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Hepatitis Screening */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Hepatitis Screening
                         </Typography>
@@ -3307,7 +3307,7 @@ export default function LabRequisition() {
                     {/* Left Column - Vaccine Status and STI Screening */}
                     <Grid item xs={12} md={6}>
                       {/* Vaccine Status */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Vaccine Status
                         </Typography>
@@ -3354,7 +3354,7 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* STI Screening */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           STI Screening
                         </Typography>
@@ -3415,7 +3415,7 @@ export default function LabRequisition() {
 
                     {/* Right Column - Advanced Virology Testing */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                           Advanced Virology Testing
                         </Typography>
@@ -3505,7 +3505,7 @@ export default function LabRequisition() {
                   </Grid>
 
                   {/* Other Tests Subsection */}
-                  <Box sx={{ mb: 1.5, border: '1px solid #D4AF37', borderRadius: 1, p: 1.5 }}>
+                  <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Other Tests
                     </Typography>

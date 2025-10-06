@@ -106,7 +106,7 @@ export default function Home() {
           left: 0,
           right: 0,
           height: 48,
-          backgroundColor: '#D4AF37',
+          backgroundColor: '#877449',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -203,7 +203,7 @@ export default function Home() {
                         sx={{ 
                           textTransform: 'none',
                 backgroundColor: '#36454F',
-                color: '#D4AF37',
+                color: '#877449',
                 minWidth: { xs: 'auto', sm: '64px' },
                 px: { xs: 1, sm: 2 },
                           '&:hover': {
@@ -223,12 +223,12 @@ export default function Home() {
                         variant="outlined"
                         sx={{ 
                           textTransform: 'none',
-                borderColor: '#D4AF37',
-                color: '#D4AF37',
+                borderColor: '#877449',
+                color: '#877449',
                 minWidth: { xs: 'auto', sm: '64px' },
                 px: { xs: 1, sm: 2 },
                           '&:hover': {
-                  borderColor: '#D4AF37',
+                  borderColor: '#877449',
                   backgroundColor: 'rgba(212, 175, 55, 0.1)',
                           }
                         }}
@@ -284,7 +284,7 @@ export default function Home() {
                   width: 12,
                   height: 12,
                   borderRadius: '50%',
-                  backgroundColor: currentPage === page ? '#D4AF37' : '#ddd',
+                  backgroundColor: currentPage === page ? '#877449' : '#ddd',
                   cursor: 'pointer',
                   transition: 'background-color 0.3s ease'
                 }}
@@ -388,8 +388,8 @@ export default function Home() {
                     <Button
                       variant="outlined"
                       sx={{
-                        color: '#D4AF37',
-                        borderColor: '#D4AF37',
+                        color: '#877449',
+                        borderColor: '#877449',
                         backgroundColor: 'rgba(0, 0, 0, 0.7)',
                         textTransform: 'none',
                         fontSize: '1rem',
@@ -401,9 +401,9 @@ export default function Home() {
                         alignSelf: 'center',
                         display: { xs: 'none', md: 'block' },
                         '&:hover': {
-                          borderColor: '#D4AF37',
+                          borderColor: '#877449',
                           backgroundColor: 'rgba(212, 175, 55, 0.2)',
-                          color: '#D4AF37'
+                          color: '#877449'
                         }
                       }}
                       onClick={() => setCurrentPage(1)}
@@ -484,30 +484,30 @@ export default function Home() {
                   }
                 }}>
                   {/* Header */}
-                  <Box sx={{ position: 'absolute', top: 20, left: 20, right: 20, height: 60, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #D4AF37', zIndex: 1 }}>
-                    <Typography variant="h6" className="Svelte_logo" sx={{ color: '#D4AF37', fontWeight: '600' }}>
+                  <Box sx={{ position: 'absolute', top: 20, left: 20, right: 20, height: 60, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #877449', zIndex: 1 }}>
+                    <Typography variant="h6" className="Svelte_logo" sx={{ color: '#877449', fontWeight: '600' }}>
                       Why Svelte?
                   </Typography>
                 </Box>
                   
-                  <Box sx={{ mb: 4, color: '#D4AF37', textAlign: 'left', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
+                  <Box sx={{ mb: 4, color: '#877449', textAlign: 'left', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
                  <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
+                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Convenient virtual platform</strong>
                    </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
+                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Physician guidance and monitoring</strong>
                    </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
+                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Familiar and trusted brands: Mounjaro</strong>
                    </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
+                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Medications delivered to you</strong>
                    </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
+                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Flat monthly fee</strong>
                    </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#D4AF37', lineHeight: 1.6 }}>
+                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Exclusive Svelte membership with special offers and premium benefits</strong>
                    </Typography>
                  </Box>
@@ -518,8 +518,8 @@ export default function Home() {
                     <Button
                       variant="outlined"
                       sx={{
-                        color: '#D4AF37',
-                        borderColor: '#D4AF37',
+                        color: '#877449',
+                        borderColor: '#877449',
                         textTransform: 'none',
                         px: 2,
                         py: 1,
@@ -527,9 +527,9 @@ export default function Home() {
                         width: 'auto',
                         display: { xs: 'none', sm: 'block' },
                         '&:hover': {
-                          borderColor: '#D4AF37',
+                          borderColor: '#877449',
                           backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                          color: '#D4AF37'
+                          color: '#877449'
                         }
                       }}
                       onClick={() => setCurrentPage(2)}
@@ -610,29 +610,29 @@ export default function Home() {
                   }
                 }}>
                   {/* Header */}
-                  <Box sx={{ position: 'absolute', top: 20, left: 20, right: 20, height: 60, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #D4AF37', zIndex: 1 }}>
-                    <Typography variant="h6" className="Svelte_logo" sx={{ color: '#D4AF37', fontWeight: '600' }}>
+                  <Box sx={{ position: 'absolute', top: 20, left: 20, right: 20, height: 60, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #877449', zIndex: 1 }}>
+                    <Typography variant="h6" className="Svelte_logo" sx={{ color: '#877449', fontWeight: '600' }}>
                       Exclusive Offers
                     </Typography>
                   </Box>
                   
                   {/* Limited time offer text */}
-                  <Box sx={{ mb: 2, color: '#D4AF37', textAlign: 'center', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
-                    <Typography variant="h6" sx={{ color: '#D4AF37', fontWeight: '600', fontSize: '1.1rem' }}>
+                  <Box sx={{ mb: 2, color: '#877449', textAlign: 'center', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
+                    <Typography variant="h6" sx={{ color: '#877449', fontWeight: '600', fontSize: '1.1rem' }}>
                       Limited Time Introductory Offers
                     </Typography>
                   </Box>
                   
                   {/* Exclusive offers bullet points */}
-                  <Box sx={{ mb: 3, color: '#D4AF37', textAlign: 'left', maxWidth: '600px', mx: 'auto', position: 'relative', zIndex: 1 }}>
+                  <Box sx={{ mb: 3, color: '#877449', textAlign: 'left', maxWidth: '600px', mx: 'auto', position: 'relative', zIndex: 1 }}>
                     <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#D4AF37', lineHeight: 1.6 }}>
+                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
                         <strong>Get a free weight loss consult with our expert physician</strong>
                       </Typography>
-                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#D4AF37', lineHeight: 1.6 }}>
+                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
                         <strong>Receive a discount on your first 4 week supply of medication</strong>
                       </Typography>
-                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#D4AF37', lineHeight: 1.6 }}>
+                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
                         <strong>Svelte referral program- receive premium benefits just for referring others</strong>
                       </Typography>
                     </Box>
@@ -643,8 +643,8 @@ export default function Home() {
                     <Button
                       variant="outlined"
                       sx={{
-                        color: '#D4AF37',
-                        borderColor: '#D4AF37',
+                        color: '#877449',
+                        borderColor: '#877449',
                         textTransform: 'none',
                         px: 2,
                         py: 1,
@@ -652,9 +652,9 @@ export default function Home() {
                         width: 'auto',
                         display: { xs: 'none', md: 'block' },
                         '&:hover': {
-                          borderColor: '#D4AF37',
+                          borderColor: '#877449',
                           backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                          color: '#D4AF37'
+                          color: '#877449'
                         }
                       }}
                       onClick={() => setCurrentPage(1)}
@@ -666,7 +666,7 @@ export default function Home() {
                       onClick={() => window.location.href = '/api/auth/login'}
                       variant="contained"
                       sx={{
-                        backgroundColor: '#D4AF37',
+                        backgroundColor: '#877449',
                         color: '#000000',
                         textTransform: 'none',
                         px: 2,
@@ -743,7 +743,7 @@ export default function Home() {
                 height: 40,
                 borderRadius: '50%',
                 backgroundColor: 'white',
-                color: '#D4AF37',
+                color: '#877449',
                 zIndex: 10,
                 fontSize: '1.2rem',
                     '&:hover': {

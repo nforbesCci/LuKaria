@@ -163,7 +163,7 @@ export default function NavigationDrawer() {
           left: 16,
           zIndex: (theme) => theme.zIndex.drawer + 1,
           backgroundColor: '#000000',
-          color: '#D4AF37',
+          color: '#877449',
           boxShadow: 2,
           '&:hover': {
             backgroundColor: 'rgba(212, 175, 55, 0.1)',
@@ -196,7 +196,7 @@ export default function NavigationDrawer() {
         <Box sx={{ 
           p: 2, 
           backgroundColor: '#000000', 
-          color: '#D4AF37',
+          color: '#877449',
           minHeight: 64,
           display: 'flex',
           alignItems: 'center',
@@ -228,12 +228,12 @@ export default function NavigationDrawer() {
                   borderRadius: 1,
                   '&.Mui-selected': {
                     backgroundColor: 'rgba(212, 175, 55, 0.2)',
-                    color: '#D4AF37',
+                    color: '#877449',
                     '&:hover': {
                       backgroundColor: 'rgba(212, 175, 55, 0.3)',
                     },
                     '& .MuiListItemIcon-root': {
-                      color: '#D4AF37',
+                      color: '#877449',
                     },
                   },
                   '&:hover': {
@@ -244,7 +244,7 @@ export default function NavigationDrawer() {
                 <ListItemIcon
                   sx={{
                     minWidth: 40,
-                    color: '#D4AF37',
+                    color: '#877449',
                   }}
                 >
                   {item.icon}
@@ -253,7 +253,7 @@ export default function NavigationDrawer() {
                   primary={item.text}
                   primaryTypographyProps={{
                     fontWeight: pathname === item.path ? 'bold' : 'normal',
-                    color: '#D4AF37',
+                    color: '#877449',
                   }}
                 />
               </ListItemButton>

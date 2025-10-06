@@ -74,7 +74,7 @@ export default function Header() {
         {/* User info on the right - always render container, content varies */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minHeight: 32 }}>
           {!mounted || isLoading ? (
-            <CircularProgress size={24} sx={{ color: '#D4AF37' }} />
+            <CircularProgress size={24} sx={{ color: '#877449' }} />
           ) : user ? (
             <>
               <Avatar
@@ -84,7 +84,7 @@ export default function Header() {
               >
                 <Person />
               </Avatar>
-              <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' }, color: '#D4AF37' }}>
+              <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' }, color: '#877449' }}>
                 {user.name}
               </Typography>
               <Button
@@ -93,12 +93,12 @@ export default function Header() {
                 href={`${process.env.AUTH0_BASE_URL}/api/auth/logout`}
                 sx={{ 
                   textTransform: 'none',
-                  borderColor: '#D4AF37',
-                  color: '#D4AF37',
+                  borderColor: '#877449',
+                  color: '#877449',
                   minWidth: { xs: 'auto', sm: '64px' },
                   px: { xs: 1, sm: 2 },
                   '&:hover': {
-                    borderColor: '#D4AF37',
+                    borderColor: '#877449',
                     backgroundColor: 'rgba(212, 175, 55, 0.1)',
                   }
                 }}
@@ -109,7 +109,7 @@ export default function Header() {
               </Button>
             </>
           ) : (
-            <CircularProgress size={24} sx={{ color: '#D4AF37' }} />
+            <CircularProgress size={24} sx={{ color: '#877449' }} />
           )}
         </Box>
       </Toolbar>

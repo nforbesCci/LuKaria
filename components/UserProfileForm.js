@@ -179,7 +179,7 @@ export default function UserProfileForm() {
             disabled={isLoading}
             sx={{
               textTransform: 'none',
-              backgroundColor: '#D4AF37',
+              backgroundColor: '#877449',
               '&:hover': {
                 backgroundColor: '#B8941F',
               }

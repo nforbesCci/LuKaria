@@ -84,7 +84,7 @@ export default function FAQ() {
           left: 0,
           right: 0,
           height: 48,
-          backgroundColor: '#D4AF37',
+          backgroundColor: '#877449',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -183,7 +183,7 @@ export default function FAQ() {
                 px: 2,
                 py: 1,
                 backgroundColor: '#36454F',
-                color: '#D4AF37',
+                color: '#877449',
                 borderRadius: 1,
                 cursor: 'pointer',
                 textTransform: 'none',
@@ -215,7 +215,7 @@ export default function FAQ() {
               fontSize: { xs: '1.5rem', sm: '2.5rem' },
               fontWeight: 600,
               mb: 4,
-              color: '#D4AF37'
+              color: '#877449'
             }}
           >
             Frequently Asked Questions
@@ -229,13 +229,13 @@ export default function FAQ() {
               centered
               sx={{
                 '& .MuiTabs-indicator': {
-                  backgroundColor: '#D4AF37',
+                  backgroundColor: '#877449',
                 },
                 '& .MuiTab-root': {
-                  color: '#D4AF37',
+                  color: '#877449',
                   fontWeight: 600,
                   '&.Mui-selected': {
-                    color: '#D4AF37',
+                    color: '#877449',
                   },
                 },
               }}
@@ -259,7 +259,7 @@ export default function FAQ() {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMore sx={{ color: '#D4AF37' }} />}
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
                     aria-controls="mounjaro-what-content"
                     id="mounjaro-what-header"
                     sx={{ 
@@ -268,7 +268,7 @@ export default function FAQ() {
                       '&:hover': { backgroundColor: '#2C3E50' }
                     }}
                   >
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#D4AF37' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
                       What is Mounjaro?
                     </Typography>
                   </AccordionSummary>
@@ -290,7 +290,7 @@ export default function FAQ() {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMore sx={{ color: '#D4AF37' }} />}
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
                     aria-controls="mounjaro-how-works-content"
                     id="mounjaro-how-works-header"
                     sx={{ 
@@ -299,7 +299,7 @@ export default function FAQ() {
                       '&:hover': { backgroundColor: '#2C3E50' }
                     }}
                   >
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#D4AF37' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
                       How does Mounjaro Work?
                     </Typography>
                   </AccordionSummary>
@@ -321,7 +321,7 @@ export default function FAQ() {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMore sx={{ color: '#D4AF37' }} />}
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
                     aria-controls="mounjaro-how-take-content"
                     id="mounjaro-how-take-header"
                     sx={{ 
@@ -330,7 +330,7 @@ export default function FAQ() {
                       '&:hover': { backgroundColor: '#2C3E50' }
                     }}
                   >
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#D4AF37' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
                       How Do I Take Mounjaro?
                     </Typography>
                   </AccordionSummary>
@@ -352,7 +352,7 @@ export default function FAQ() {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMore sx={{ color: '#D4AF37' }} />}
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
                     aria-controls="mounjaro-weight-loss-content"
                     id="mounjaro-weight-loss-header"
                     sx={{ 
@@ -361,7 +361,7 @@ export default function FAQ() {
                       '&:hover': { backgroundColor: '#2C3E50' }
                     }}
                   >
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#D4AF37' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
                       How much weight can I lose while taking Mounjaro?
                     </Typography>
                   </AccordionSummary>
@@ -383,7 +383,7 @@ export default function FAQ() {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMore sx={{ color: '#D4AF37' }} />}
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
                     aria-controls="mounjaro-side-effects-content"
                     id="mounjaro-side-effects-header"
                     sx={{ 
@@ -392,7 +392,7 @@ export default function FAQ() {
                       '&:hover': { backgroundColor: '#2C3E50' }
                     }}
                   >
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#D4AF37' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
                       What are the possible side effects of taking Mounjaro?
                     </Typography>
                   </AccordionSummary>
@@ -410,7 +410,7 @@ export default function FAQ() {
                 </Accordion>
                 
                 <Box sx={{ mt: 3, p: 2, backgroundColor: '#2C3E50', borderRadius: 1 }}>
-                  <Typography variant="body1" sx={{ color: '#D4AF37', fontWeight: 600, textAlign: 'center' }}>
+                  <Typography variant="body1" sx={{ color: '#877449', fontWeight: 600, textAlign: 'center' }}>
                     Let your doctor know if you take birth control pills or are having a surgery or other procedure involving anaesthesia.
                   </Typography>
                 </Box>

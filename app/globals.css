@@ -11,7 +11,7 @@ body {
 /* Svelte logo styling */
 .Svelte_logo {
   font-weight: 0 !important;
-  color: #D4AF37 !important;
+  color: #877449 !important;
   font-family: "Alex Brush", cursive !important;
   font-size: 2.8em !important;
 }
@@ -19,7 +19,7 @@ body {
 /* Large Svelte text for panels */
 .Svelte_large {
   font-weight: 0 !important;
-  color: #D4AF37 !important;
+  color: #877449 !important;
   font-family: "Alex Brush", cursive !important;
   font-size: 5.6em !important;
 }
@@ -42,7 +42,7 @@ body {
 /* Svelte post script styling */
 .svelte_post_script {
   font-weight: 0 !important;
-  color: #D4AF37 !important;
+  color: #877449 !important;
   font-size: 0.9rem !important;
   margin-top: 20px !important;
 }

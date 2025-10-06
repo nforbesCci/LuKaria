@@ -71,7 +71,7 @@ export default function Contact() {
           left: 0,
           right: 0,
           height: 48,
-          backgroundColor: '#D4AF37',
+          backgroundColor: '#877449',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -169,7 +169,7 @@ export default function Contact() {
                 px: 2,
                 py: 1,
                 backgroundColor: '#36454F',
-                color: '#D4AF37',
+                color: '#877449',
                 borderRadius: 1,
                 cursor: 'pointer',
                 textTransform: 'none',
@@ -197,7 +197,7 @@ export default function Contact() {
             gutterBottom 
             textAlign="center" 
             sx={{ 
-              color: '#D4AF37',
+              color: '#877449',
               fontSize: '2rem',
               fontWeight: 400,
               fontFamily: 'Tahoma, sans-serif',
@@ -216,11 +216,11 @@ export default function Contact() {
             }}>
               <Email sx={{ 
                 fontSize: 48, 
-                color: '#D4AF37', 
+                color: '#877449', 
                 mb: 2 
               }} />
               <Typography variant="h5" sx={{ 
-                color: '#D4AF37', 
+                color: '#877449', 
                 fontWeight: 600, 
                 mb: 2 
               }}>
@@ -237,7 +237,7 @@ export default function Contact() {
                   cursor: 'pointer',
                   display: 'block',
                   '&:hover': {
-                    color: '#D4AF37',
+                    color: '#877449',
                     textDecoration: 'underline'
                   }
                 }}
@@ -254,11 +254,11 @@ export default function Contact() {
             }}>
               <Phone sx={{ 
                 fontSize: 48, 
-                color: '#D4AF37', 
+                color: '#877449', 
                 mb: 2 
               }} />
               <Typography variant="h5" sx={{ 
-                color: '#D4AF37', 
+                color: '#877449', 
                 fontWeight: 600, 
                 mb: 2 
               }}>
@@ -275,7 +275,7 @@ export default function Contact() {
                   cursor: 'pointer',
                   display: 'block',
                   '&:hover': {
-                    color: '#D4AF37',
+                    color: '#877449',
                     textDecoration: 'underline'
                   }
                 }}
@@ -322,7 +322,7 @@ export default function Contact() {
                 876-290-3659
               </Typography>
               <Typography variant="body2" sx={{ 
-                color: '#D4AF37', 
+                color: '#877449', 
                 mt: 2,
                 fontStyle: 'italic'
               }}>

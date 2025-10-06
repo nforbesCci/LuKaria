@@ -314,10 +314,10 @@ export default function Dashboard() {
                       size="small"
                       sx={{
                         textTransform: 'none',
-                        borderColor: '#D4AF37',
-                        color: '#D4AF37',
+                        borderColor: '#877449',
+                        color: '#877449',
                         '&:hover': {
-                          borderColor: '#D4AF37',
+                          borderColor: '#877449',
                           backgroundColor: 'rgba(212, 175, 55, 0.1)',
                         }
                       }}
@@ -329,7 +329,7 @@ export default function Dashboard() {
               ) : (
                 <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
                   <Box sx={{ textAlign: 'center', py: 2 }}>
-                    <CalendarToday sx={{ fontSize: 48, color: '#D4AF37', mb: 2 }} />
+                    <CalendarToday sx={{ fontSize: 48, color: '#877449', mb: 2 }} />
                     <Typography variant="h6" sx={{ mb: 1 }}>
                       No Appointment Scheduled
                     </Typography>
@@ -342,7 +342,7 @@ export default function Dashboard() {
                       href="/schedule"
                       sx={{
                         textTransform: 'none',
-                        backgroundColor: '#D4AF37',
+                        backgroundColor: '#877449',
                         color: '#000',
                         '&:hover': {
                           backgroundColor: '#B8941F',
@@ -405,7 +405,7 @@ export default function Dashboard() {
                           borderColor: 'divider',
                           '&:hover': {
                             backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                            borderColor: '#D4AF37'
+                            borderColor: '#877449'
                           }
                         }}
                       >
@@ -452,7 +452,7 @@ export default function Dashboard() {
                           borderColor: 'divider',
                           '&:hover': {
                             backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                            borderColor: '#D4AF37'
+                            borderColor: '#877449'
                           }
                         }}
                       >
@@ -499,7 +499,7 @@ export default function Dashboard() {
                             borderColor: 'divider',
                             '&:hover': {
                               backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                              borderColor: '#D4AF37'
+                              borderColor: '#877449'
                             }
                           }}
                         >
