@@ -1,9 +1,7 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   Container,
   Typography,
@@ -36,28 +34,16 @@ import {
 } from '@mui/icons-material';
 
 export default function Home() {
-  const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0); // Start with page 0
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
       setMounted(true);
   }, []);
 
-  // Handle redirect after component is mounted to prevent hydration issues
-  useEffect(() => {
-    if (mounted && user && !shouldRedirect) {
-      setShouldRedirect(true);
-      
-      // Redirect to schedule page
-      router.push('/schedule');
-    }
-  }, [user, mounted, router, shouldRedirect]);
 
   // Don't render until mounted to prevent hydration mismatch
-  if (!mounted || isLoading) {
+  if (!mounted) {
     return (
       <>
         <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
@@ -70,31 +56,7 @@ export default function Home() {
     );
   }
 
-  if (error) {
-    return (
-      <>
-        <Container maxWidth="xl" sx={{ mt: 4 }}>
-          <Alert severity="error">
-            Error loading user: {error.message}
-          </Alert>
-        </Container>
-      </>
-    );
-  }
 
-  // Show redirect message for logged-in users
-  if (user || shouldRedirect) {
-    return (
-      <>
-        <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Redirecting to dashboard...
-          </Typography>
-        </Container>
-      </>
-    );
-  }
 
   return (
     <>
@@ -499,7 +461,7 @@ export default function Home() {
                      <strong>Physician guidance and monitoring</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Familiar and trusted brands: Mounjaro</strong>
+                     <strong>Familiar and trusted brands like Mounjaro</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Medications delivered to you</strong>

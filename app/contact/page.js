@@ -1,9 +1,6 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   Container,
   Typography,
@@ -19,21 +16,12 @@ import {
 } from '@mui/icons-material';
 
 export default function Contact() {
-  const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Handle redirect after component is mounted to prevent hydration issues
-  useEffect(() => {
-    if (mounted && user && !user) {
-      // Redirect to schedule page if user is logged in
-      router.push('/schedule');
-    }
-  }, [mounted, user, router]);
 
   if (!mounted) {
     return (
@@ -43,23 +31,6 @@ export default function Contact() {
     );
   }
 
-  if (error) {
-    return (
-      <Container maxWidth="sm" sx={{ mt: 4 }}>
-        <Alert severity="error">
-          Error loading user information: {error.message}
-        </Alert>
-      </Container>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
     <>

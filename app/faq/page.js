@@ -1,9 +1,6 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   Container,
   Typography,
@@ -22,11 +19,9 @@ import {
 } from '@mui/icons-material';
 
 export default function FAQ() {
-  const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
   const [expandedPanel, setExpandedPanel] = useState('ozempic');
   const [activeTab, setActiveTab] = useState(0); // Default to Mounjaro (index 0)
-  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -40,16 +35,9 @@ export default function FAQ() {
     setActiveTab(newValue);
   };
 
-  // Handle redirect after component is mounted to prevent hydration issues
-  useEffect(() => {
-    if (mounted && user && !user) {
-      // Redirect to schedule page if user is logged in
-      router.push('/schedule');
-    }
-  }, [user, mounted, router]);
 
   // Don't render until mounted to prevent hydration mismatch
-  if (!mounted || isLoading) {
+  if (!mounted) {
     return (
       <>
         <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
@@ -57,18 +45,6 @@ export default function FAQ() {
           <Typography variant="h6" sx={{ mt: 2 }}>
             Loading...
           </Typography>
-        </Container>
-      </>
-    );
-  }
-
-  if (error) {
-    return (
-      <>
-        <Container maxWidth="xl" sx={{ mt: 4 }}>
-          <Alert severity="error">
-            Error loading user: {error.message}
-          </Alert>
         </Container>
       </>
     );
