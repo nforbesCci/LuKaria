@@ -1,7 +1,9 @@
 'use client';
 
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Container,
   Typography,
@@ -34,22 +36,76 @@ import {
 } from '@mui/icons-material';
 
 export default function Home() {
+  const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(0); // Start with page 0
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
       setMounted(true);
   }, []);
 
+  // Handle redirect after component is mounted to prevent hydration issues
+  useEffect(() => {
+    if (mounted && user && !shouldRedirect) {
+      setShouldRedirect(true);
+      // Redirect to dashboard for authenticated users
+      router.push('/dashboard');
+    }
+  }, [user, mounted, router, shouldRedirect]);
+
 
   // Don't render until mounted to prevent hydration mismatch
-  if (!mounted) {
+  if (!mounted || isLoading) {
     return (
       <>
         <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
           <CircularProgress />
           <Typography variant="h6" sx={{ mt: 2 }}>
             Loading...
+          </Typography>
+        </Container>
+      </>
+    );
+  }
+
+  if (error) {
+    console.error('Auth0 Error:', error);
+    return (
+      <>
+        <Container maxWidth="xl" sx={{ mt: 4 }}>
+          <Alert severity="error">
+            Authentication error: {error.message}
+          </Alert>
+          <Box sx={{ mt: 2, textAlign: 'center' }}>
+            <Button
+              variant="contained"
+              onClick={() => window.location.href = '/api/auth/login'}
+              sx={{
+                backgroundColor: '#877449',
+                color: '#000000',
+                '&:hover': {
+                  backgroundColor: '#6b5d3a',
+                }
+              }}
+            >
+              Try Login Again
+            </Button>
+          </Box>
+        </Container>
+      </>
+    );
+  }
+
+  // Show redirect message for logged-in users
+  if (user || shouldRedirect) {
+    return (
+      <>
+        <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
+          <CircularProgress />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Redirecting to Dashboard...
           </Typography>
         </Container>
       </>
