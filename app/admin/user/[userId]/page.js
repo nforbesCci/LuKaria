@@ -72,6 +72,7 @@ export default function UserDetailPage() {
   const [tabValue, setTabValue] = useState(0);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -86,64 +87,31 @@ export default function UserDetailPage() {
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      // Simulate API call with dummy data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('🔍 Fetching user data for ID:', params.userId);
       
-      // Mock user data - in real app, this would come from API
-      const mockUserData = {
-        user_id: params.userId,
-        email: 'john.doe@example.com',
-        name: 'John Doe',
-        nickname: 'johndoe',
-        picture: 'https://via.placeholder.com/80x80/1976d2/ffffff?text=JD',
-        email_verified: true,
-        blocked: false,
-        created_at: '2024-01-15T10:30:00.000Z',
-        last_login: '2024-01-20T14:22:00.000Z',
-        user_metadata: {
-          role: 'user',
-          phone_number: '+1-555-0123',
-          address: '123 Main St, Kingston, Jamaica',
-          parish: 'Kingston',
-          birthdate: '1985-06-15',
-          gender: 'male',
-          // Profile completion
-          profile_completed: true,
-          medical_profile_completed: true,
-          emergency_contact_completed: true,
-          // Medical data
-          weight_history: [
-            { date: '2024-01-01', weight: 85, waistCircumference: 95 },
-            { date: '2024-01-08', weight: 83, waistCircumference: 93 },
-            { date: '2024-01-15', weight: 81, waistCircumference: 91 },
-            { date: '2024-01-22', weight: 79, waistCircumference: 89 },
-          ],
-          height: 175,
-          current_medications: ['Metformin', 'Multivitamin'],
-          medication_history: [
-            { date: '2024-01-20', time: '08:00', medication: 'Metformin', dosage: '500mg' },
-            { date: '2024-01-20', time: '20:00', medication: 'Metformin', dosage: '500mg' },
-            { date: '2024-01-21', time: '08:00', medication: 'Metformin', dosage: '500mg' },
-          ],
-          meal_history: [
-            { date: '2024-01-20', meal: 'Breakfast', calories: 350, description: 'Oatmeal with berries' },
-            { date: '2024-01-20', meal: 'Lunch', calories: 450, description: 'Grilled chicken salad' },
-            { date: '2024-01-20', meal: 'Dinner', calories: 550, description: 'Baked fish with vegetables' },
-          ],
-          side_effects: ['Nausea', 'Fatigue'],
-          appointment_data: {
-            scheduled: true,
-            date: '2024-01-25',
-            time: '14:00',
-            type: 'Telemedicine Consultation',
-            status: 'Confirmed'
-          }
-        }
-      };
+      // Fetch real user data from API
+      const response = await fetch(`/api/admin/users/${params.userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ User data fetched successfully:', data.user);
       
-      setUserData(mockUserData);
+      setUserData(data.user);
     } catch (err) {
-      console.error('Error fetching user data:', err);
+      console.error('❌ Error fetching user data:', err);
+      console.error('❌ Error details:', err.message);
+      // Set error state or show error message
+      setUserData(null);
+      setFetchError(err);
     } finally {
       setLoading(false);
     }
@@ -201,29 +169,37 @@ export default function UserDetailPage() {
     );
   }
 
-  if (error || !userData) {
+  if (error || fetchError || (!loading && !userData)) {
     return (
       <>
         <Header />
         <Container maxWidth="lg" sx={{ mt: 4 }}>
           <Alert severity="error">
-            Error loading user details
+            Error loading user details: {error?.message || fetchError?.message || 'User not found'}
           </Alert>
+          <Button 
+            variant="contained" 
+            onClick={() => router.push('/admin')}
+            sx={{ mt: 2 }}
+          >
+            Back to Admin Panel
+          </Button>
         </Container>
       </>
     );
   }
 
-  // Prepare chart data
-  const weightChartData = userData.user_metadata.weight_history?.map(entry => ({
+  // Prepare chart data - handle cases where user_metadata might not exist
+  const userMetadata = userData?.user_metadata || {};
+  const weightChartData = userMetadata.weight_history?.map(entry => ({
     date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     weight: entry.weight,
     waistCircumference: entry.waistCircumference,
-    bmi: calculateBMI(entry.weight, userData.user_metadata.height)
+    bmi: calculateBMI(entry.weight, userMetadata.height)
   })) || [];
 
-  const latestWeight = userData.user_metadata.weight_history?.[userData.user_metadata.weight_history.length - 1];
-  const currentBMI = latestWeight ? calculateBMI(latestWeight.weight, userData.user_metadata.height) : null;
+  const latestWeight = userMetadata.weight_history?.[userMetadata.weight_history.length - 1];
+  const currentBMI = latestWeight ? calculateBMI(latestWeight.weight, userMetadata.height) : null;
 
   return (
     <>
@@ -240,7 +216,7 @@ export default function UserDetailPage() {
                 <ArrowBack />
               </IconButton>
               <Avatar
-                src={userData.picture}
+                src={userData?.picture}
                 sx={{ 
                   width: 60, 
                   height: 60, 
@@ -251,10 +227,10 @@ export default function UserDetailPage() {
               </Avatar>
               <Box>
                 <Typography variant="h4" gutterBottom color="primary">
-                  {userData.name}
+                  {userData?.name}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  {userData.email} • User ID: {userData.user_id.slice(0, 8)}...
+                  {userData?.email} • User ID: {userData?.user_id?.slice(0, 8)}...
                 </Typography>
               </Box>
             </Box>
@@ -288,37 +264,37 @@ export default function UserDetailPage() {
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {userData.user_metadata.profile_completed ? (
+                  {userMetadata.profile_completed ? (
                     <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
                   ) : (
                     <Cancel sx={{ color: 'error.main', mr: 1 }} />
                   )}
                   <Typography variant="body2">
-                    Personal Information: {userData.user_metadata.profile_completed ? 'Complete' : 'Incomplete'}
+                    Personal Information: {userMetadata.profile_completed ? 'Complete' : 'Incomplete'}
                   </Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} md={4}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {userData.user_metadata.medical_profile_completed ? (
+                  {userMetadata.medical_profile_completed ? (
                     <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
                   ) : (
                     <Cancel sx={{ color: 'error.main', mr: 1 }} />
                   )}
                   <Typography variant="body2">
-                    Medical Profile: {userData.user_metadata.medical_profile_completed ? 'Complete' : 'Incomplete'}
+                    Medical Profile: {userMetadata.medical_profile_completed ? 'Complete' : 'Incomplete'}
                   </Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} md={4}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {userData.user_metadata.emergency_contact_completed ? (
+                  {userMetadata.emergency_contact_completed ? (
                     <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
                   ) : (
                     <Cancel sx={{ color: 'error.main', mr: 1 }} />
                   )}
                   <Typography variant="body2">
-                    Emergency Contact: {userData.user_metadata.emergency_contact_completed ? 'Complete' : 'Incomplete'}
+                    Emergency Contact: {userMetadata.emergency_contact_completed ? 'Complete' : 'Incomplete'}
                   </Typography>
                 </Box>
               </Grid>
@@ -348,20 +324,20 @@ export default function UserDetailPage() {
                     <Stack spacing={2}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Email sx={{ mr: 1, color: 'text.secondary' }} />
-                        <Typography variant="body2">{userData.email}</Typography>
+                        <Typography variant="body2">{userData?.email}</Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Phone sx={{ mr: 1, color: 'text.secondary' }} />
-                        <Typography variant="body2">{userData.user_metadata.phone_number}</Typography>
+                        <Typography variant="body2">{userMetadata.phone_number || 'Not provided'}</Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
-                        <Typography variant="body2">{userData.user_metadata.address}</Typography>
+                        <Typography variant="body2">{userMetadata.address || 'Not provided'}</Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <CalendarToday sx={{ mr: 1, color: 'text.secondary' }} />
                         <Typography variant="body2">
-                          Born: {formatDate(userData.user_metadata.birthdate)}
+                          Born: {userMetadata.birthdate ? formatDate(userMetadata.birthdate) : 'Not provided'}
                         </Typography>
                       </Box>
                     </Stack>
@@ -374,19 +350,19 @@ export default function UserDetailPage() {
                     <Typography variant="h6" gutterBottom>
                       Appointment Information
                     </Typography>
-                    {userData.user_metadata.appointment_data?.scheduled ? (
+                    {userMetadata.appointment_data?.scheduled ? (
                       <Stack spacing={2}>
                         <Typography variant="body2">
-                          <strong>Date:</strong> {formatDate(userData.user_metadata.appointment_data.date)}
+                          <strong>Date:</strong> {formatDate(userMetadata.appointment_data.date)}
                         </Typography>
                         <Typography variant="body2">
-                          <strong>Time:</strong> {userData.user_metadata.appointment_data.time}
+                          <strong>Time:</strong> {userMetadata.appointment_data.time}
                         </Typography>
                         <Typography variant="body2">
-                          <strong>Type:</strong> {userData.user_metadata.appointment_data.type}
+                          <strong>Type:</strong> {userMetadata.appointment_data.type}
                         </Typography>
                         <Chip
-                          label={userData.user_metadata.appointment_data.status}
+                          label={userMetadata.appointment_data.status}
                           color="success"
                           size="small"
                         />
@@ -410,9 +386,9 @@ export default function UserDetailPage() {
                     <Typography variant="h6" gutterBottom>
                       Current Medications
                     </Typography>
-                    {userData.user_metadata.current_medications?.length > 0 ? (
+                    {userMetadata.current_medications?.length > 0 ? (
                       <Stack spacing={1}>
-                        {userData.user_metadata.current_medications.map((medication, index) => (
+                        {userMetadata.current_medications.map((medication, index) => (
                           <Chip
                             key={index}
                             label={medication}
@@ -435,9 +411,9 @@ export default function UserDetailPage() {
                     <Typography variant="h6" gutterBottom>
                       Recent Medication Logs
                     </Typography>
-                    {userData.user_metadata.medication_history?.length > 0 ? (
+                    {userMetadata.medication_history?.length > 0 ? (
                       <Stack spacing={1}>
-                        {userData.user_metadata.medication_history.slice(0, 5).map((entry, index) => (
+                        {userMetadata.medication_history.slice(0, 5).map((entry, index) => (
                           <Box key={index} sx={{ p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                             <Typography variant="body2" fontWeight="medium">
                               {entry.medication} - {entry.dosage}
@@ -531,9 +507,9 @@ export default function UserDetailPage() {
                     <Typography variant="h6" gutterBottom>
                       Recent Meal Logs
                     </Typography>
-                    {userData.user_metadata.meal_history?.length > 0 ? (
+                    {userMetadata.meal_history?.length > 0 ? (
                       <Stack spacing={2}>
-                        {userData.user_metadata.meal_history.map((meal, index) => (
+                        {userMetadata.meal_history.map((meal, index) => (
                           <Box key={index} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                               <Typography variant="subtitle1" fontWeight="medium">

@@ -15,6 +15,7 @@ import {
   Login,
   Email,
   Phone,
+  WhatsApp,
 } from '@mui/icons-material';
 
 export default function Contact() {
@@ -197,8 +198,9 @@ export default function Contact() {
             textAlign="center" 
             sx={{ 
               color: '#D4AF37',
-              fontWeight: 'bold',
-              fontFamily: 'Alex Brush, cursive',
+              fontSize: '2rem',
+              fontWeight: 400,
+              fontFamily: 'Tahoma, sans-serif',
               mb: 4
             }}
           >
@@ -208,7 +210,7 @@ export default function Contact() {
           <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center' }}>
             <Box sx={{ 
               backgroundColor: '#36454F', 
-              p: 4, 
+              p: 0.625, 
               borderRadius: 2,
               mb: 3
             }}>
@@ -224,18 +226,31 @@ export default function Contact() {
               }}>
                 Email Us
               </Typography>
-              <Typography variant="h6" sx={{ 
-                color: 'white',
-                fontFamily: 'monospace'
-              }}>
-                info@lukariagroup.com
+              <Typography 
+                variant="h6" 
+                component="a"
+                href="mailto:svelte@lukariagroup.com"
+                sx={{ 
+                  color: 'white',
+                  fontFamily: 'monospace',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  display: 'block',
+                  '&:hover': {
+                    color: '#D4AF37',
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                svelte@lukariagroup.com
               </Typography>
             </Box>
 
             <Box sx={{ 
               backgroundColor: '#36454F', 
-              p: 4, 
-              borderRadius: 2
+              p: 0.625, 
+              borderRadius: 2,
+              mb: 3
             }}>
               <Phone sx={{ 
                 fontSize: 48, 
@@ -249,11 +264,69 @@ export default function Contact() {
               }}>
                 Call Us
               </Typography>
-              <Typography variant="h6" sx={{ 
-                color: 'white',
-                fontFamily: 'monospace'
+              <Typography 
+                variant="h6" 
+                component="a"
+                href="tel:+18762903659"
+                sx={{ 
+                  color: 'white',
+                  fontFamily: 'monospace',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  display: 'block',
+                  '&:hover': {
+                    color: '#D4AF37',
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                876-290-3659
+              </Typography>
+            </Box>
+
+            <Box sx={{ 
+              backgroundColor: '#36454F', 
+              p: 0.625, 
+              borderRadius: 2
+            }}>
+              <WhatsApp sx={{ 
+                fontSize: 48, 
+                color: '#25D366', 
+                mb: 2 
+              }} />
+              <Typography variant="h5" sx={{ 
+                color: '#25D366', 
+                fontWeight: 600, 
+                mb: 2 
               }}>
-                876-469-2677
+                WhatsApp Us
+              </Typography>
+              <Typography 
+                variant="h6" 
+                component="a"
+                href="https://wa.me/18762903659"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  color: 'white',
+                  fontFamily: 'monospace',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  display: 'block',
+                  '&:hover': {
+                    color: '#25D366',
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                876-290-3659
+              </Typography>
+              <Typography variant="body2" sx={{ 
+                color: '#D4AF37', 
+                mt: 2,
+                fontStyle: 'italic'
+              }}>
+                Click to send a WhatsApp message
               </Typography>
             </Box>
           </Box>
