@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { saveMeasurements, fetchMeasurements } from '../store/slices/measurementsSlice';
 import {
   Box,
   Typography,
@@ -25,12 +27,41 @@ export default function WeightHeightEntry({ onComplete, onBack }) {
   const [weight, setWeight] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
   const [heightInches, setHeightInches] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  
+  const dispatch = useAppDispatch();
+  const measurementsState = useAppSelector((state) => state.measurements);
 
   // Load saved measurements when component mounts
   useEffect(() => {
-    // Component mounted - data will be loaded from database if needed
-  }, []);
+    console.log('📊 Measurements: Loading measurements data...');
+    dispatch(fetchMeasurements());
+  }, [dispatch]);
+
+  // Handle measurements save success/failure
+  useEffect(() => {
+    if (measurementsState.isSaved && measurementsState.measurements) {
+      console.log('✅ Measurements: Measurements saved successfully');
+      onComplete(measurementsState.measurements);
+    }
+    if (measurementsState.error) {
+      console.error('❌ Measurements: Error saving measurements:', measurementsState.error);
+      alert(`Error saving measurements: ${measurementsState.error}`);
+    }
+  }, [measurementsState.isSaved, measurementsState.measurements, measurementsState.error, onComplete]);
+
+  // Load existing measurements data when fetched
+  useEffect(() => {
+    if (measurementsState.isLoaded && measurementsState.measurements && measurementsState.measurements.exists) {
+      console.log('👤 Measurements: Loading existing measurements data from store:', measurementsState.measurements);
+      
+      const measurementsData = measurementsState.measurements.measurements;
+      setWeight(measurementsData.weight?.toString() || '');
+      setHeightFeet(measurementsData.heightFeet?.toString() || '');
+      setHeightInches(measurementsData.heightInches?.toString() || '');
+      
+      console.log('✅ Measurements: Form data updated with existing measurements');
+    }
+  }, [measurementsState.isLoaded, measurementsState.measurements]);
 
   // Calculate BMI from pounds and feet/inches
   const calculateBMI = (weightLbs, feet, inches) => {
@@ -66,36 +97,34 @@ export default function WeightHeightEntry({ onComplete, onBack }) {
   const currentBMI = calculateBMI(weight, heightFeet, heightInches);
   const bmiInfo = getBMICategory(currentBMI);
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!weight || !heightFeet) {
       alert('Please enter both weight and height');
       return;
     }
 
-    setIsSaving(true);
-    
-    try {
-      // In a real app, this would save to the backend
-      console.log('Saving weight and height:', { weight, heightFeet, heightInches, bmi: currentBMI });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mark task as complete
-      onComplete({
-        weight: parseFloat(weight),
-        heightFeet: parseInt(heightFeet),
-        heightInches: parseInt(heightInches) || 0,
-        bmi: currentBMI,
-        bmiCategory: bmiInfo?.category,
-        date: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error saving measurements:', error);
-      alert('Error saving measurements. Please try again.');
-    } finally {
-      setIsSaving(false);
+    // Check if already saving
+    if (measurementsState.isLoading) {
+      console.log('⏳ Measurements: Already saving, please wait...');
+      return;
     }
+
+    console.log('🔄 Measurements: Dispatching save measurements saga with data:', {
+      weight: parseFloat(weight),
+      heightFeet: parseInt(heightFeet),
+      heightInches: parseInt(heightInches) || 0,
+      bmi: currentBMI,
+      bmiCategory: bmiInfo?.category
+    });
+    
+    // Dispatch the saga to save measurements to MongoDB
+    dispatch(saveMeasurements({
+      weight: parseFloat(weight),
+      heightFeet: parseInt(heightFeet),
+      heightInches: parseInt(heightInches) || 0,
+      bmi: currentBMI,
+      bmiCategory: bmiInfo?.category
+    }));
   };
 
   return (
@@ -226,12 +255,12 @@ export default function WeightHeightEntry({ onComplete, onBack }) {
               <Button
                 variant="contained"
                 onClick={handleSave}
-                disabled={!weight || !heightFeet || isSaving}
+                disabled={!weight || !heightFeet || measurementsState.isLoading}
                 startIcon={<Save />}
                 sx={{ textTransform: 'none', minWidth: 200 }}
                 size="large"
               >
-                {isSaving ? 'Saving...' : 'Save Measurements'}
+                {measurementsState.isLoading ? 'Saving...' : 'Save Measurements'}
               </Button>
             </Box>
           </Stack>

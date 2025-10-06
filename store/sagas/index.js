@@ -3,6 +3,8 @@ import authSaga from './authSaga';
 import appointmentSaga from './appointmentSaga';
 import userSaga from './userSaga';
 import { adminSaga } from './adminSaga';
+import profileSaga from './profileSaga';
+import measurementsSaga from './measurementsSaga';
 
 // Root saga that combines all sagas
 export default function* rootSaga() {
@@ -11,6 +13,8 @@ export default function* rootSaga() {
     fork(appointmentSaga),
     fork(userSaga),
     fork(adminSaga),
+    fork(profileSaga),
+    fork(measurementsSaga),
   ]);
 }
 

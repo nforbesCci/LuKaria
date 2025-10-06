@@ -4,9 +4,10 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Link from 'next/link';
-import { useAppDispatch } from '../../store/hooks';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updatePreAppointmentTask } from '../../store/slices/appointmentSlice';
-import { useScheduleProtection } from '../../hooks/useScheduleProtection';
+import { saveProfile, fetchProfile } from '../../store/slices/profileSlice';
 import {
   Container,
   Typography,
@@ -52,34 +53,147 @@ import {
   NavigateNext,
   NavigateBefore,
   Check,
+  Lock,
 } from '@mui/icons-material';
 
 export default function Profile() {
   const { user, isLoading, error } = useUser();
-  const [isEditing, setIsEditing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  
+  // Redux state
+  const profileState = useAppSelector((state) => state.profile);
 
-  // Schedule protection - prevent access to profile if schedule not completed
-  useScheduleProtection();
+  // Form data state
+  const [formData, setFormData] = useState({
+    // Personal Information
+    name: '',
+    dateOfBirth: '',
+    sex: '',
+    preferredPhone: '',
+    preferredEmail: '',
+    homeAddress: '',
+    parish: '',
+    
+    // Emergency Contact
+    nextOfKinName: '',
+    nextOfKinPhone: '',
+    nextOfKinRelationship: '',
+    
+    
+    // Medical Conditions
+    medicalConditions: [],
+    otherMedicalCondition: '',
+    hasAllergies: false,
+    allergicMedications: '',
+    currentMedications: '',
+  });
+
+  // Track which fields are from Auth0 and should be disabled
+  const [auth0Fields, setAuth0Fields] = useState({
+    name: false,
+    preferredEmail: false
+  });
+
+  // Track if any edits were made to determine button text
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Fetch profile data when component mounts
+    console.log('📊 Profile: Loading profile data...');
+    dispatch(fetchProfile());
+  }, [dispatch]);
+
+  // Handle profile save success/failure
+  useEffect(() => {
+    if (profileState.isSaved) {
+      console.log('✅ Profile: Profile saved successfully, redirecting to dashboard...');
+      // Reset unsaved changes flag
+      setHasUnsavedChanges(false);
+      // Redirect to dashboard after successful save
+      router.push('/dashboard');
+    }
+    if (profileState.error) {
+      alert(`Error saving profile: ${profileState.error}`);
+    }
+  }, [profileState.isSaved, profileState.error, router]);
+
+  // Prevent leaving page if required fields are not filled
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      // Check if any required fields are empty
+      const hasEmptyRequiredFields = !formData.name || 
+                                   !formData.preferredEmail || 
+                                   !formData.preferredPhone || 
+                                   !formData.dateOfBirth || 
+                                   !formData.sex || 
+                                   !formData.parish;
+      
+      if (hasEmptyRequiredFields) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return 'You have unsaved changes. Are you sure you want to leave?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [formData]);
 
   // Mark medical profile task as complete when profile is saved
   const handleProfileSave = () => {
+    // Check if already saving
+    if (profileState.isLoading) {
+      console.log('⏳ Profile: Already saving, please wait...');
+      return;
+    }
+    
+    // Check if all required fields are filled before saving
+    const hasEmptyRequiredFields = !formData.name || 
+                                 !formData.preferredEmail || 
+                                 !formData.preferredPhone || 
+                                 !formData.dateOfBirth || 
+                                 !formData.sex || 
+                                 !formData.parish;
+    
+    if (hasEmptyRequiredFields) {
+      alert('Please fill in all required fields before saving.');
+      return;
+    }
+    
+    // If no changes were made, just redirect to dashboard
+    if (!hasUnsavedChanges) {
+      console.log('🔄 Profile: No changes made, redirecting to dashboard...');
+      router.push('/dashboard');
+      return;
+    }
+    
+    console.log('🔄 Profile: Dispatching save profile saga with data:', formData);
+    
+    // Dispatch the saga to save profile to MongoDB
+    dispatch(saveProfile(formData));
+    
+    // Mark medical profile task as complete
     dispatch(updatePreAppointmentTask({ 
       taskKey: 'completeMedicalProfile', 
       completed: true 
     }));
-    setIsEditing(false);
   };
 
   // Pre-populate form with Auth0 user data when available
   useEffect(() => {
     if (user) {
+      const hasAuth0Name = !!(user.name || user.nickname);
+      const hasAuth0Email = !!user.email;
+      
       setFormData(prev => ({
         ...prev,
         name: user.name || user.nickname || '',
@@ -106,31 +220,60 @@ export default function Profile() {
           phone: '(555) 123-4567'
         },
       }));
+      
+      // Set which fields are from Auth0 and should be disabled
+      setAuth0Fields({
+        name: hasAuth0Name,
+        preferredEmail: hasAuth0Email
+      });
+      
+      console.log('🔐 Profile: Auth0 fields detected:', {
+        name: hasAuth0Name,
+        preferredEmail: hasAuth0Email
+      });
     }
   }, [user]);
-  const [formData, setFormData] = useState({
-    // Personal Information
-    name: '',
-    dateOfBirth: '',
-    sex: '',
-    preferredPhone: '',
-    preferredEmail: '',
-    homeAddress: '',
-    parish: '',
-    
-    // Emergency Contact
-    nextOfKinName: '',
-    nextOfKinPhone: '',
-    nextOfKinRelationship: '',
-    
-    
-    // Medical Conditions
-    medicalConditions: [],
-    otherMedicalCondition: '',
-    hasAllergies: false,
-    allergicMedications: '',
-    currentMedications: '',
-  });
+
+  // Load profile data from Redux store if it exists
+  useEffect(() => {
+    if (profileState.isLoaded && profileState.profile && profileState.profile.exists) {
+      console.log('👤 Profile: Loading existing profile data from store:', profileState.profile);
+      
+      const profileData = profileState.profile.profile;
+      setFormData(prev => ({
+        ...prev,
+        // Personal Information - Don't override Auth0 data for name and email
+        name: prev.name, // Keep Auth0 name if available
+        preferredEmail: prev.preferredEmail, // Keep Auth0 email if available
+        preferredPhone: profileData.preferredPhone || prev.preferredPhone,
+        dateOfBirth: profileData.dateOfBirth || prev.dateOfBirth,
+        sex: profileData.sex || prev.sex,
+        homeAddress: profileData.homeAddress || prev.homeAddress,
+        parish: profileData.parish || prev.parish,
+        
+        // Emergency Contact
+        nextOfKinName: profileData.nextOfKinName || prev.nextOfKinName,
+        nextOfKinPhone: profileData.nextOfKinPhone || prev.nextOfKinPhone,
+        nextOfKinRelationship: profileData.nextOfKinRelationship || prev.nextOfKinRelationship,
+        
+        // Medical History
+        medicalConditions: profileData.medicalConditions || prev.medicalConditions,
+        otherMedicalCondition: profileData.otherMedicalCondition || prev.otherMedicalCondition,
+        hasAllergies: profileData.hasAllergies || prev.hasAllergies,
+        allergicMedications: profileData.allergicMedications || prev.allergicMedications,
+        
+        // Current Medications
+        currentMedications: profileData.currentMedications || prev.currentMedications,
+        
+        // Doctor assignment
+        assignedDoctor: profileData.assignedDoctor || prev.assignedDoctor,
+      }));
+      
+      console.log('✅ Profile: Form data updated with existing profile');
+    } else if (profileState.isLoaded && !profileState.profile?.exists) {
+      console.log('📝 Profile: No existing profile found, using Auth0 data only');
+    }
+  }, [profileState.isLoaded, profileState.profile]);
 
   const medicalConditionsList = [
     'Hypertension',
@@ -190,6 +333,8 @@ export default function Profile() {
       ...prev,
       [field]: value
     }));
+    // Mark that changes have been made
+    setHasUnsavedChanges(true);
   };
 
   const handleMedicalConditionChange = (condition, checked) => {
@@ -199,6 +344,8 @@ export default function Profile() {
         ? [...prev.medicalConditions, condition]
         : prev.medicalConditions.filter(c => c !== condition)
     }));
+    // Mark that changes have been made
+    setHasUnsavedChanges(true);
   };
 
   const handleSave = () => {
@@ -240,19 +387,18 @@ export default function Profile() {
     //   return response.json();
     // };
     
-    setIsEditing(false);
     // Show success message - you could add a snackbar or alert here
     alert('Profile saved successfully!');
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-    setActiveStep(0);
-    // Reset form data if needed
-  };
 
   // Wizard navigation functions
   const handleNext = () => {
+    // Check if current step is valid before allowing next
+    if (!isStepValid(activeStep)) {
+      alert('Please fill in all required fields before proceeding.');
+      return;
+    }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -261,14 +407,29 @@ export default function Profile() {
   };
 
   const handleStepClick = (step) => {
+    // Check if current step is valid before allowing navigation to other steps
+    if (step > activeStep && !isStepValid(activeStep)) {
+      alert('Please fill in all required fields before proceeding to the next step.');
+      return;
+    }
     setActiveStep(step);
+  };
+
+  // Check if all required fields are filled
+  const areAllRequiredFieldsFilled = () => {
+    return formData.name && 
+           formData.preferredEmail && 
+           formData.preferredPhone && 
+           formData.dateOfBirth && 
+           formData.sex && 
+           formData.parish;
   };
 
   // Check if current step is valid
   const isStepValid = (stepIndex) => {
     switch (stepIndex) {
       case 0: // Personal Info
-        return formData.name && formData.preferredEmail;
+        return formData.name && formData.preferredEmail && formData.preferredPhone && formData.dateOfBirth && formData.sex && formData.parish;
       case 1: // Emergency Contact
         return true; // Emergency contact is optional
       case 2: // Medical History
@@ -363,10 +524,13 @@ export default function Profile() {
                     label="Full Name *"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    disabled={!isEditing}
                     variant="outlined"
-                    error={!formData.name && isEditing}
-                    helperText={!formData.name && isEditing ? 'Name is required' : ''}
+                    error={!formData.name}
+                    helperText={auth0Fields.name ? 'This field is managed by your account settings' : (!formData.name ? 'Name is required' : '')}
+                    disabled={auth0Fields.name}
+                    InputProps={{
+                      startAdornment: auth0Fields.name ? <Lock sx={{ mr: 1, color: 'text.secondary' }} /> : null
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
@@ -376,15 +540,14 @@ export default function Profile() {
                     type="date"
                     value={formData.dateOfBirth}
                     onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                    disabled={!isEditing}
-                    error={!formData.dateOfBirth && isEditing}
-                    helperText={!formData.dateOfBirth && isEditing ? 'Date of birth is required' : ''}
+                    error={!formData.dateOfBirth}
+                    helperText={!formData.dateOfBirth ? 'Date of birth is required' : ''}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
-                  <FormControl component="fieldset" disabled={!isEditing}>
-                    <FormLabel component="legend">Sex</FormLabel>
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">Sex *</FormLabel>
                     <RadioGroup
                       row
                       value={formData.sex}
@@ -403,9 +566,8 @@ export default function Profile() {
                     type="tel"
                     value={formData.preferredPhone}
                     onChange={(e) => handleInputChange('preferredPhone', e.target.value)}
-                    disabled={!isEditing}
-                    error={!formData.preferredPhone && isEditing}
-                    helperText={!formData.preferredPhone && isEditing ? 'Phone number is required' : ''}
+                    error={!formData.preferredPhone}
+                    helperText={!formData.preferredPhone ? 'Phone number is required' : ''}
                     InputProps={{
                       startAdornment: <Phone sx={{ mr: 1, color: 'text.secondary' }} />
                     }}
@@ -418,11 +580,11 @@ export default function Profile() {
                     type="email"
                     value={formData.preferredEmail}
                     onChange={(e) => handleInputChange('preferredEmail', e.target.value)}
-                    disabled={!isEditing}
-                    error={!formData.preferredEmail && isEditing}
-                    helperText={!formData.preferredEmail && isEditing ? 'Email is required' : ''}
+                    error={!formData.preferredEmail}
+                    helperText={auth0Fields.preferredEmail ? 'This field is managed by your account settings' : (!formData.preferredEmail ? 'Email is required' : '')}
+                    disabled={auth0Fields.preferredEmail}
                     InputProps={{
-                      startAdornment: <Email sx={{ mr: 1, color: 'text.secondary' }} />
+                      startAdornment: auth0Fields.preferredEmail ? <Lock sx={{ mr: 1, color: 'text.secondary' }} /> : <Email sx={{ mr: 1, color: 'text.secondary' }} />
                     }}
                   />
                 </Grid>
@@ -434,14 +596,13 @@ export default function Profile() {
                     rows={3}
                     value={formData.homeAddress}
                     onChange={(e) => handleInputChange('homeAddress', e.target.value)}
-                    disabled={!isEditing}
                     InputProps={{
                       startAdornment: <HomeIcon sx={{ mr: 1, color: 'text.secondary', alignSelf: 'flex-start', mt: 1 }} />
                     }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  <FormControl fullWidth disabled={!isEditing} error={!formData.parish && isEditing}>
+                  <FormControl fullWidth error={!formData.parish}>
                     <InputLabel>Parish *</InputLabel>
                     <Select
                       value={formData.parish}
@@ -457,7 +618,7 @@ export default function Profile() {
                         </MenuItem>
                       ))}
                     </Select>
-                    {!formData.parish && isEditing && (
+                    {!formData.parish && (
                       <Typography variant="caption" color="error" sx={{ mt: 1, ml: 2 }}>
                         Parish is required
                       </Typography>
@@ -480,7 +641,6 @@ export default function Profile() {
                     label="Name"
                     value={formData.nextOfKinName}
                     onChange={(e) => handleInputChange('nextOfKinName', e.target.value)}
-                    disabled={!isEditing}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -490,7 +650,6 @@ export default function Profile() {
                     type="tel"
                     value={formData.nextOfKinPhone}
                     onChange={(e) => handleInputChange('nextOfKinPhone', e.target.value)}
-                    disabled={!isEditing}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -499,7 +658,6 @@ export default function Profile() {
                     label="Relationship"
                     value={formData.nextOfKinRelationship}
                     onChange={(e) => handleInputChange('nextOfKinRelationship', e.target.value)}
-                    disabled={!isEditing}
                   />
                 </Grid>
               </Grid>
@@ -523,7 +681,6 @@ export default function Profile() {
                           <Checkbox
                             checked={formData.medicalConditions.includes(condition)}
                             onChange={(e) => handleMedicalConditionChange(condition, e.target.checked)}
-                            disabled={!isEditing}
                           />
                         }
                         label={condition}
@@ -542,7 +699,6 @@ export default function Profile() {
                     rows={3}
                     value={formData.otherMedicalCondition}
                     onChange={(e) => handleInputChange('otherMedicalCondition', e.target.value)}
-                    disabled={!isEditing}
                     placeholder="Please describe your other medical illnesses..."
                   />
                 </Box>
@@ -557,7 +713,7 @@ export default function Profile() {
             <CardContent sx={{ p: 4 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <FormControl component="fieldset" disabled={!isEditing}>
+                  <FormControl component="fieldset">
                     <FormLabel component="legend">Are you allergic to any medications?</FormLabel>
                     <RadioGroup
                       row
@@ -579,7 +735,6 @@ export default function Profile() {
                       rows={3}
                       value={formData.allergicMedications}
                       onChange={(e) => handleInputChange('allergicMedications', e.target.value)}
-                      disabled={!isEditing}
                       placeholder="List all medications you are allergic to..."
                     />
                   </Grid>
@@ -593,7 +748,6 @@ export default function Profile() {
                     rows={4}
                     value={formData.currentMedications}
                     onChange={(e) => handleInputChange('currentMedications', e.target.value)}
-                    disabled={!isEditing}
                     placeholder="List all current medications, dosages, and frequency..."
                   />
                 </Grid>
@@ -637,53 +791,6 @@ export default function Profile() {
               </Box>
             </Box>
             <Box>
-              {!isEditing ? (
-                <Button
-                  variant="contained"
-                  startIcon={<Edit />}
-                  onClick={() => setIsEditing(true)}
-                  sx={{ 
-                    textTransform: 'none',
-                    minWidth: { xs: 'auto', sm: '64px' },
-                    px: { xs: 1, sm: 2 }
-                  }}
-                >
-                  <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                    Edit Profile
-                  </Box>
-                </Button>
-              ) : (
-                <Stack direction="row" spacing={2}>
-                  <Button
-                    variant="contained"
-                    startIcon={<Save />}
-                    onClick={handleSave}
-                    sx={{ 
-                      textTransform: 'none',
-                      minWidth: { xs: 'auto', sm: '64px' },
-                      px: { xs: 1, sm: 2 }
-                    }}
-                  >
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                      Save Profile
-                    </Box>
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Cancel />}
-                    onClick={handleCancel}
-                    sx={{ 
-                      textTransform: 'none',
-                      minWidth: { xs: 'auto', sm: '64px' },
-                      px: { xs: 1, sm: 2 }
-                    }}
-                  >
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                      Cancel
-                    </Box>
-                  </Button>
-                </Stack>
-              )}
             </Box>
           </Box>
         </Paper>
@@ -840,7 +947,7 @@ export default function Profile() {
               onClick={handleBack}
               startIcon={<NavigateBefore />}
               sx={{ textTransform: 'none' }}
-              variant={isEditing ? 'contained' : 'outlined'}
+              variant="outlined"
             >
               Previous
             </Button>
@@ -851,7 +958,7 @@ export default function Profile() {
                 color="primary"
                 variant="outlined"
               />
-              {isEditing && isStepValid(activeStep) && (
+              {isStepValid(activeStep) && (
                 <Chip
                   icon={<Check />}
                   label="Valid"
@@ -863,28 +970,29 @@ export default function Profile() {
             </Box>
 
             {activeStep === steps.length - 1 ? (
-              isEditing ? (
-                <Button
-                  variant="contained"
-                  onClick={handleSave}
-                  startIcon={<Save />}
-                  sx={{ textTransform: 'none' }}
-                >
-                  Save Profile
-                </Button>
-              ) : (
-                <Button
-                  variant="outlined"
-                  startIcon={<Edit />}
-                  onClick={() => setIsEditing(true)}
-                  sx={{ textTransform: 'none' }}
-                >
-                  Edit Profile
-                </Button>
-              )
+              <Button
+                variant="contained"
+                onClick={handleProfileSave}
+                startIcon={<Save />}
+                disabled={!areAllRequiredFieldsFilled() || profileState.isLoading}
+                sx={{ 
+                  textTransform: 'none',
+                  backgroundColor: areAllRequiredFieldsFilled() && !profileState.isLoading ? '#877449' : '#ccc',
+                  color: areAllRequiredFieldsFilled() && !profileState.isLoading ? '#000000' : '#666',
+                  '&:hover': {
+                    backgroundColor: areAllRequiredFieldsFilled() && !profileState.isLoading ? '#6b5d3a' : '#ccc',
+                  },
+                  '&:disabled': {
+                    backgroundColor: '#ccc',
+                    color: '#666',
+                  }
+                }}
+              >
+                {profileState.isLoading ? 'Saving...' : areAllRequiredFieldsFilled() ? (hasUnsavedChanges ? 'Save Profile' : 'To Dashboard') : 'Fill Required Fields'}
+              </Button>
             ) : (
               <Button
-                variant={isEditing ? 'contained' : 'outlined'}
+                variant="outlined"
                 onClick={handleNext}
                 endIcon={<NavigateNext />}
                 sx={{ textTransform: 'none' }}

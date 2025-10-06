@@ -4,6 +4,8 @@ import authSlice from './slices/authSlice';
 import appointmentSlice from './slices/appointmentSlice';
 import userSlice from './slices/userSlice';
 import adminSlice from './slices/adminSlice';
+import profileSlice from './slices/profileSlice';
+import measurementsSlice from './slices/measurementsSlice';
 import rootSaga from './sagas';
 
 // Create the saga middleware
@@ -15,6 +17,8 @@ export const store = configureStore({
     appointment: appointmentSlice,
     user: userSlice,
     admin: adminSlice,
+    profile: profileSlice,
+    measurements: measurementsSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

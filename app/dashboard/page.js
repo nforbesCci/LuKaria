@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask, loadQuestions } from '../../store/slices/appointmentSlice';
+import { fetchProfile } from '../../store/slices/profileSlice';
+import { fetchMeasurements } from '../../store/slices/measurementsSlice';
 import { useScheduleProtection } from '../../hooks/useScheduleProtection';
 import {
   Container,
@@ -57,6 +59,8 @@ export default function Dashboard() {
   const isScheduled = useAppSelector((state) => state.user.isScheduled);
   const preAppointmentTasks = useAppSelector((state) => state.appointment.preAppointmentTasks);
   const questions = useAppSelector((state) => state.appointment.questions);
+  const profileState = useAppSelector((state) => state.profile);
+  const measurementsState = useAppSelector((state) => state.measurements);
 
 
   // Schedule protection - prevent access to dashboard if schedule not completed
@@ -71,6 +75,14 @@ export default function Dashboard() {
     // Load questions data using saga
     console.log('📊 Dashboard: Loading questions data...');
     dispatch(loadQuestions());
+    
+    // Load profile data using saga
+    console.log('📊 Dashboard: Loading profile data...');
+    dispatch(fetchProfile());
+    
+    // Load measurements data using saga
+    console.log('📊 Dashboard: Loading measurements data...');
+    dispatch(fetchMeasurements());
   }, [dispatch]);
 
   // Debug: Log appointment data when it changes
@@ -82,12 +94,55 @@ export default function Dashboard() {
     }
   }, [currentAppointment, isScheduled, isScheduleCompleted]);
 
+  // Debug: Log profile data when it changes
+  useEffect(() => {
+    if (profileState.isLoaded && profileState.profile) {
+      console.log('👤 Dashboard: Profile loaded successfully:', profileState.profile);
+      
+      // If profile exists, mark medical profile task as complete
+      if (profileState.profile && profileState.profile.exists) {
+        console.log('✅ Dashboard: Profile exists, marking medical profile task as complete');
+        dispatch(updatePreAppointmentTask({ 
+          taskKey: 'completeMedicalProfile', 
+          completed: true 
+        }));
+      }
+    }
+    if (profileState.error) {
+      console.log('❌ Dashboard: Profile load error:', profileState.error);
+    }
+  }, [profileState.isLoaded, profileState.profile, profileState.error, dispatch]);
+
+  // Debug: Log measurements data when it changes
+  useEffect(() => {
+    if (measurementsState.isLoaded && measurementsState.measurements) {
+      console.log('📏 Dashboard: Measurements loaded successfully:', measurementsState.measurements);
+      
+      // If measurements exist, mark weight/height task as complete
+      if (measurementsState.measurements && measurementsState.measurements.exists) {
+        console.log('✅ Dashboard: Measurements exist, marking weight/height task as complete');
+        dispatch(updatePreAppointmentTask({ 
+          taskKey: 'enterWeightHeight', 
+          completed: true 
+        }));
+      }
+    }
+    if (measurementsState.error) {
+      console.log('❌ Dashboard: Measurements load error:', measurementsState.error);
+    }
+  }, [measurementsState.isLoaded, measurementsState.measurements, measurementsState.error, dispatch]);
+
   // Debug: Log questions data when it changes
   useEffect(() => {
     if (questions) {
       console.log('❓ Dashboard: Questions data:', questions);
     }
   }, [questions]);
+
+  // Debug: Log preAppointmentTasks state
+  useEffect(() => {
+    console.log('📋 Dashboard: Pre-appointment tasks state:', preAppointmentTasks);
+  }, [preAppointmentTasks]);
 
   // Function to determine if prepareQuestions task is completed
   const isPrepareQuestionsCompleted = () => {
