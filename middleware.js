@@ -1,6 +1,20 @@
 import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
+import { NextResponse } from 'next/server';
 
-export default withMiddlewareAuthRequired();
+// Public paths that don't require authentication
+const publicPaths = ['/', '/faq', '/contact'];
+
+export default function middleware(req) {
+  const { pathname } = req.nextUrl;
+  
+  // Allow public paths without authentication
+  if (publicPaths.includes(pathname)) {
+    return NextResponse.next();
+  }
+  
+  // Apply authentication to all other routes
+  return withMiddlewareAuthRequired()(req);
+}
 
 export const config = {
   matcher: [
@@ -10,7 +24,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - images (public images folder)
      */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|images).*)',
   ],
 };
