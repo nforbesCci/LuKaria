@@ -6,7 +6,7 @@ const getManagementClient = async () => {
   console.log('🔧 Initializing Auth0 Management Client for user fetch...');
   
   // Validate environment variables
-  const domain = process.env.AUTH0_ISSUER_BASE_URL;
+  const domain = process.env.AUTH0_MANAGEMENT_ISSUER_BASE_URL;
   const clientId = process.env.MANAGEMENT_AUTH0_CLIENT_ID;
   const clientSecret = process.env.MANAGEMENT_AUTH0_CLIENT_SECRET;
   
@@ -16,7 +16,7 @@ const getManagementClient = async () => {
   
   // Check for missing environment variables
   if (!domain) {
-    throw new Error('AUTH0_ISSUER_BASE_URL is not set');
+    throw new Error('AUTH0_MANAGEMENT_ISSUER_BASE_URL is not set');
   }
   if (!clientId) {
     throw new Error('MANAGEMENT_AUTH0_CLIENT_ID is not set');
