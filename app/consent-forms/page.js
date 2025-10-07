@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '../../components/Header';
 import { useRouter } from 'next/navigation';
 import {
@@ -72,7 +72,7 @@ export default function ConsentForms() {
   const [signedDates, setSignedDates] = useState({});
 
   // Signature pad state
-  const canvasRef = useState(null)[0];
+  const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [signatureData, setSignatureData] = useState(null);
 
@@ -724,10 +724,7 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                               <Button
                                 size="small"
                                 variant="outlined"
-                                onClick={(e) => {
-                                  const canvas = e.target.closest('.signature-container')?.querySelector('canvas');
-                                  clearSignature(canvas);
-                                }}
+                                onClick={() => clearSignature(canvasRef.current)}
                                 sx={{ 
                                   textTransform: 'none',
                                   fontSize: '0.75rem'
@@ -751,6 +748,7 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                               <canvas
                                 ref={(canvas) => {
                                   if (canvas && !canvas.dataset.initialized) {
+                                    canvasRef.current = canvas;
                                     canvas.width = canvas.offsetWidth;
                                     canvas.height = 150;
                                     canvas.dataset.initialized = 'true';
@@ -838,7 +836,7 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                         disabled={activeTab === 0}
                         sx={{ textTransform: 'none' }}
                       >
-                        Previous Form
+                        Save
                       </Button>
                       <Button
                         variant="contained"
@@ -852,7 +850,7 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                           }
                         }}
                       >
-                        Next Form
+                        Complete
                       </Button>
                     </Box>
                   </Box>
@@ -860,33 +858,6 @@ Svelte by LuKaria will only use your photographs if you have given permission to
               </Box>
             ))}
           </Box>
-        </Box>
-
-        {/* Action Buttons */}
-        <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={() => router.push('/dashboard')}
-            sx={{ textTransform: 'none' }}
-          >
-            Back to Dashboard
-          </Button>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={handleSaveConsents}
-            disabled={completedForms === 0}
-            sx={{
-              textTransform: 'none',
-              backgroundColor: '#877449',
-              '&:hover': {
-                backgroundColor: '#B8941F',
-              }
-            }}
-          >
-            Save Consent Forms ({completedForms})
-          </Button>
         </Box>
       </Container>
     </>
