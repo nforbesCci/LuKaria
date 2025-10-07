@@ -52,6 +52,9 @@ const profileSlice = createSlice({
       state.error = null;
       state.isSaved = false;
     },
+    resetSaveFlag: (state) => {
+      state.isSaved = false;
+    },
   },
 });
 
@@ -64,6 +67,7 @@ export const {
   fetchProfileFailure,
   clearProfileError,
   resetProfile,
+  resetSaveFlag,
 } = profileSlice.actions;
 
 export default profileSlice.reducer;

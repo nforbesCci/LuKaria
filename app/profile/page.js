@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updatePreAppointmentTask } from '../../store/slices/appointmentSlice';
-import { saveProfile, fetchProfile } from '../../store/slices/profileSlice';
+import { saveProfile, fetchProfile, resetSaveFlag } from '../../store/slices/profileSlice';
 import {
   Container,
   Typography,
@@ -104,14 +104,23 @@ export default function Profile() {
   useEffect(() => {
     setMounted(true);
     
+    // Reset the isSaved flag when component mounts to prevent unwanted redirects
+    if (profileState.isSaved) {
+      console.log('🔄 Profile: Resetting isSaved flag to prevent unwanted redirect');
+      dispatch(resetSaveFlag());
+    }
+    
     // Fetch profile data when component mounts
     console.log('📊 Profile: Loading profile data...');
+    console.log('👤 Profile: User object:', user);
+    console.log('🔐 Profile: Auth0 loading state:', isLoading);
+    console.log('❌ Profile: Auth0 error:', error);
     dispatch(fetchProfile());
-  }, [dispatch]);
+  }, [dispatch, user, isLoading, error]);
 
   // Handle profile save success/failure
   useEffect(() => {
-    if (profileState.isSaved) {
+    if (profileState.isSaved && hasUnsavedChanges) {
       console.log('✅ Profile: Profile saved successfully, redirecting to dashboard...');
       // Reset unsaved changes flag
       setHasUnsavedChanges(false);
@@ -119,9 +128,20 @@ export default function Profile() {
       router.push('/dashboard');
     }
     if (profileState.error) {
-      alert(`Error saving profile: ${profileState.error}`);
+      console.error('❌ Profile: Error in profile state:', profileState.error);
+      alert(`Error with profile: ${profileState.error}`);
     }
-  }, [profileState.isSaved, profileState.error, router]);
+  }, [profileState.isSaved, profileState.error, router, hasUnsavedChanges]);
+
+  // Debug profile state changes
+  useEffect(() => {
+    console.log('📊 Profile: Profile state changed:', {
+      isLoading: profileState.isLoading,
+      isLoaded: profileState.isLoaded,
+      error: profileState.error,
+      profile: profileState.profile
+    });
+  }, [profileState]);
 
   // Prevent leaving page if required fields are not filled
   useEffect(() => {
@@ -713,6 +733,21 @@ export default function Profile() {
             <CardContent sx={{ p: 4 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                    List your current medications
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    label="Current Medications"
+                    multiline
+                    rows={4}
+                    value={formData.currentMedications}
+                    onChange={(e) => handleInputChange('currentMedications', e.target.value)}
+                    placeholder="List all current medications, dosages, and frequency..."
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
                   <FormControl component="fieldset">
                     <FormLabel component="legend">Are you allergic to any medications?</FormLabel>
                     <RadioGroup
@@ -730,27 +765,15 @@ export default function Profile() {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Allergic Medications (please list)"
+                      label="Medication and other allergies"
                       multiline
                       rows={3}
                       value={formData.allergicMedications}
                       onChange={(e) => handleInputChange('allergicMedications', e.target.value)}
-                      placeholder="List all medications you are allergic to..."
+                      placeholder="List all medications and other allergies..."
                     />
                   </Grid>
                 )}
-                
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Current Medications"
-                    multiline
-                    rows={4}
-                    value={formData.currentMedications}
-                    onChange={(e) => handleInputChange('currentMedications', e.target.value)}
-                    placeholder="List all current medications, dosages, and frequency..."
-                  />
-                </Grid>
               </Grid>
             </CardContent>
           </Card>
