@@ -71,8 +71,82 @@ export default function ConsentForms() {
   // Track signed date
   const [signedDates, setSignedDates] = useState({});
 
+  // Signature pad state
+  const canvasRef = useState(null)[0];
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [signatureData, setSignatureData] = useState(null);
+
+  // Initialize canvas
+  const initCanvas = (canvas) => {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  };
+
+  // Start drawing
+  const startDrawing = (e, canvas) => {
+    if (!canvas) return;
+    setIsDrawing(true);
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  // Draw
+  const draw = (e, canvas) => {
+    if (!isDrawing || !canvas) return;
+    e.preventDefault();
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  // Stop drawing
+  const stopDrawing = (canvas) => {
+    if (!canvas) return;
+    setIsDrawing(false);
+    const ctx = canvas.getContext('2d');
+    ctx.closePath();
+    // Save signature data
+    setSignatureData(canvas.toDataURL());
+  };
+
+  // Clear signature
+  const clearSignature = (canvas) => {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setSignatureData(null);
+  };
+
+  // Track window size for responsive tabs
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+    
+    // Check if mobile on mount
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 900);
+    };
+    
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   const handleTabChange = (event, newValue) => {
@@ -107,7 +181,8 @@ export default function ConsentForms() {
     console.log('Patient information:', {
       name: patientName,
       dob: patientDOB,
-      date: consentDate
+      date: consentDate,
+      signature: signatureData
     });
     // TODO: Save to database
     alert('Consent forms saved successfully!');
@@ -148,6 +223,12 @@ export default function ConsentForms() {
         /* Hide navigation buttons */
         .MuiButton-root {
           display: none !important;
+        }
+        
+        /* Page break before declaration */
+        .print-page-break {
+          page-break-before: always !important;
+          break-before: page !important;
         }
       }
     `;
@@ -310,27 +391,36 @@ Svelte by LuKaria will only use your photographs if you have given permission to
 
         {/* Instructions */}
         <Alert severity="info" sx={{ mb: 3 }}>
-          Please review each consent form carefully. Use the tabs on the left to navigate between forms. 
+          Please review each consent form carefully. Use the tabs to navigate between forms. 
           Check the box on each tab when you complete the form.
         </Alert>
 
-        {/* Vertical Tabs Layout */}
-        <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', minHeight: 600 }}>
-          {/* Vertical Tabs */}
+        {/* Responsive Tabs Layout */}
+        <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: 600 }}>
+          {/* Tabs - Horizontal scrollable on mobile, Vertical standard on desktop */}
           <Tabs
-            orientation="vertical"
-            variant="scrollable"
+            orientation={isMobile ? 'horizontal' : 'vertical'}
+            variant={isMobile ? 'scrollable' : 'standard'}
+            scrollButtons={isMobile ? 'auto' : false}
+            allowScrollButtonsMobile
             value={activeTab}
             onChange={handleTabChange}
             sx={{
-              borderRight: 1,
+              borderRight: { xs: 0, md: 1 },
+              borderBottom: { xs: 1, md: 0 },
               borderColor: 'divider',
-              minWidth: 280,
+              minWidth: { xs: '100%', md: 280 },
+              maxWidth: { xs: '100%', md: 280 },
               '& .MuiTab-root': {
-                alignItems: 'flex-start',
-                textAlign: 'left',
+                alignItems: { xs: 'center', md: 'flex-start' },
+                textAlign: { xs: 'center', md: 'left' },
                 py: 2,
                 px: 2,
+                minHeight: { xs: 48, md: 'auto' },
+              },
+              '& .MuiTabs-scroller': {
+                overflowX: { xs: 'auto !important', md: 'hidden !important' },
+                overflowY: 'visible',
               }
             }}
           >
@@ -343,8 +433,9 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                       variant="body2" 
                       sx={{ 
                         fontWeight: activeTab === index ? 600 : 400,
-                        textAlign: 'left',
-                        flex: 1
+                        textAlign: { xs: 'center', md: 'left' },
+                        flex: 1,
+                        fontSize: { xs: '0.75rem', md: '0.875rem' },
                       }}
                     >
                       {form.title}
@@ -353,14 +444,15 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                       <CheckCircle 
                         sx={{ 
                           color: 'success.main',
-                          fontSize: '1.2rem'
+                          fontSize: { xs: '1rem', md: '1.2rem' }
                         }} 
                       />
                     )}
                   </Box>
                 }
                 sx={{
-                  borderLeft: activeTab === index ? 3 : 0,
+                  borderLeft: { xs: 0, md: activeTab === index ? 3 : 0 },
+                  borderBottom: { xs: activeTab === index ? 3 : 0, md: 0 },
                   borderColor: 'primary.main',
                   backgroundColor: activeTab === index ? 'rgba(135, 116, 73, 0.1)' : 'transparent',
                   '&:hover': {
@@ -372,7 +464,7 @@ Svelte by LuKaria will only use your photographs if you have given permission to
           </Tabs>
 
           {/* Tab Content */}
-          <Box sx={{ flex: 1, p: 3 }}>
+          <Box sx={{ flex: 1, p: { xs: 2, md: 3 } }}>
             {forms.map((form, index) => (
               <Box
                 key={form.id}
@@ -530,7 +622,7 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                           </Grid>
 
                           {/* Declaration Section */}
-                          <Grid item xs={12}>
+                          <Grid item xs={12} className="print-page-break">
                             <Divider sx={{ my: 2 }} />
                             <Box sx={{ p: 2, backgroundColor: '#f9f9f9', borderRadius: 1, mb: 2 }}>
                               <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
@@ -571,9 +663,7 @@ Svelte by LuKaria will only use your photographs if you have given permission to
 
                       {/* Patient Information Card */}
                       <Card elevation={1} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                          Patient Information
-                        </Typography>
+                        
                         
                         <Grid container spacing={3}>
                           <Grid item xs={12} md={6}>
@@ -622,6 +712,78 @@ Svelte by LuKaria will only use your photographs if you have given permission to
                               >
                                 Today's Date
                               </Button>
+                            </Box>
+                          </Grid>
+                          
+                          {/* Signature Area */}
+                          <Grid item xs={12}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
+                                Patient's Signature
+                              </Typography>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={(e) => {
+                                  const canvas = e.target.closest('.signature-container')?.querySelector('canvas');
+                                  clearSignature(canvas);
+                                }}
+                                sx={{ 
+                                  textTransform: 'none',
+                                  fontSize: '0.75rem'
+                                }}
+                              >
+                                Clear
+                              </Button>
+                            </Box>
+                            <Box 
+                              className="signature-container"
+                              sx={{ 
+                                border: '2px solid',
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                                backgroundColor: '#ffffff',
+                                position: 'relative',
+                                cursor: 'crosshair',
+                                touchAction: 'none'
+                              }}
+                            >
+                              <canvas
+                                ref={(canvas) => {
+                                  if (canvas && !canvas.dataset.initialized) {
+                                    canvas.width = canvas.offsetWidth;
+                                    canvas.height = 150;
+                                    canvas.dataset.initialized = 'true';
+                                    initCanvas(canvas);
+                                  }
+                                }}
+                                onMouseDown={(e) => startDrawing(e, e.target)}
+                                onMouseMove={(e) => draw(e, e.target)}
+                                onMouseUp={(e) => stopDrawing(e.target)}
+                                onMouseLeave={(e) => stopDrawing(e.target)}
+                                onTouchStart={(e) => startDrawing(e, e.target)}
+                                onTouchMove={(e) => draw(e, e.target)}
+                                onTouchEnd={(e) => stopDrawing(e.target)}
+                                style={{
+                                  width: '100%',
+                                  height: '150px',
+                                  display: 'block'
+                                }}
+                              />
+                              <Typography 
+                                variant="caption" 
+                                sx={{ 
+                                  position: 'absolute',
+                                  bottom: 8,
+                                  left: 0,
+                                  right: 0,
+                                  textAlign: 'center',
+                                  color: 'text.secondary',
+                                  pointerEvents: 'none'
+                                }}
+                              >
+                                Sign above
+                              </Typography>
                             </Box>
                           </Grid>
                         </Grid>
