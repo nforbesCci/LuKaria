@@ -28,6 +28,7 @@ import {
   AdminPanelSettings,
   PushPin,
   PushPinOutlined,
+  Description,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -85,6 +86,11 @@ export default function NavigationDrawer() {
       text: 'Profile',
       icon: <Person />,
       path: '/profile',
+    },
+    {
+      text: 'Consent Forms',
+      icon: <Description />,
+      path: '/consent-forms',
     },
     {
       text: 'Side Effects',

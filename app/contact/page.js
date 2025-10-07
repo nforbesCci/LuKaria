@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import {
   Container,
   Typography,
@@ -16,6 +17,7 @@ import {
 } from '@mui/icons-material';
 
 export default function Contact() {
+  const { user } = useUser();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
