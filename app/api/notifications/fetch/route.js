@@ -1,0 +1,51 @@
+import { NextResponse } from 'next/server';
+import { getSession } from '@auth0/nextjs-auth0';
+import clientPromise from '../../../../lib/mongodb';
+
+export async function GET(request) {
+  try {
+    console.log('📥 API: Received notification fetch request');
+    
+    // Get user session
+    const session = await getSession();
+    
+    if (!session || !session.user) {
+      console.error('❌ API: User not authenticated');
+      return NextResponse.json(
+        { success: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    const userId = session.user.sub;
+    console.log('👤 API: User ID:', userId);
+
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db('LukariaDB');
+    const collection = db.collection('NotificationCollection');
+
+    console.log('🔍 API: Fetching notifications for user:', userId);
+
+    // Fetch notifications for the user, sorted by timestamp (newest first)
+    const notifications = await collection
+      .find({ userId })
+      .sort({ timestamp: -1 })
+      .toArray();
+
+    console.log(`✅ API: Found ${notifications.length} notifications`);
+
+    return NextResponse.json({
+      success: true,
+      notifications,
+    });
+
+  } catch (error) {
+    console.error('❌ API: Error fetching notifications:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to fetch notifications' },
+      { status: 500 }
+    );
+  }
+}
+

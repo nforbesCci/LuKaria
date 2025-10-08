@@ -8,9 +8,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask, loadQuestions } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask, loadQuestions, requestReschedule } from '../../store/slices/appointmentSlice';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { fetchMeasurements } from '../../store/slices/measurementsSlice';
+import { fetchPhotographConsent, fetchMounjaroConsent, fetchTelehealthConsent } from '../../store/slices/consentSlice';
 import { useScheduleProtection } from '../../hooks/useScheduleProtection';
 import {
   Container,
@@ -43,6 +44,7 @@ import {
   Schedule,
   MedicalServices,
   Close,
+  Description,
 } from '@mui/icons-material';
 
 export default function Dashboard() {
@@ -61,6 +63,7 @@ export default function Dashboard() {
   const questions = useAppSelector((state) => state.appointment.questions);
   const profileState = useAppSelector((state) => state.profile);
   const measurementsState = useAppSelector((state) => state.measurements);
+  const consentState = useAppSelector((state) => state.consent);
 
 
   // Schedule protection - prevent access to dashboard if schedule not completed
@@ -83,6 +86,12 @@ export default function Dashboard() {
     // Load measurements data using saga
     console.log('📊 Dashboard: Loading measurements data...');
     dispatch(fetchMeasurements());
+    
+    // Load consent forms data using saga
+    console.log('📊 Dashboard: Loading consent forms data...');
+    dispatch(fetchPhotographConsent());
+    dispatch(fetchMounjaroConsent());
+    dispatch(fetchTelehealthConsent());
   }, [dispatch]);
 
   // Debug: Log appointment data when it changes
@@ -144,6 +153,31 @@ export default function Dashboard() {
     console.log('📋 Dashboard: Pre-appointment tasks state:', preAppointmentTasks);
   }, [preAppointmentTasks]);
 
+  // Update consent forms task based on completion status
+  useEffect(() => {
+    if (consentState.isLoaded) {
+      const photographComplete = consentState.photographConsent?.data?.complete === true;
+      const mounjaroComplete = consentState.mounjaroConsent?.data?.complete === true;
+      const telehealthComplete = consentState.telehealthConsent?.data?.complete === true;
+      const allComplete = photographComplete && mounjaroComplete && telehealthComplete;
+      
+      console.log('✅ Dashboard: Consent forms completion status:', {
+        photograph: photographComplete,
+        mounjaro: mounjaroComplete,
+        telehealth: telehealthComplete,
+        allComplete
+      });
+      
+      if (allComplete) {
+        console.log('✅ Dashboard: Marking consent forms task as complete');
+        dispatch(updatePreAppointmentTask({ 
+          taskKey: 'completeConsentForms', 
+          completed: true 
+        }));
+      }
+    }
+  }, [consentState.isLoaded, consentState.photographConsent, consentState.mounjaroConsent, consentState.telehealthConsent, dispatch]);
+
   // Function to determine if prepareQuestions task is completed
   const isPrepareQuestionsCompleted = () => {
     if (!questions) return false;
@@ -151,6 +185,44 @@ export default function Dashboard() {
     // Check if user has questions or explicitly marked "no questions"
     return (questions.questions && questions.questions.trim().length > 0) || 
            questions.noQuestions === true;
+  };
+
+  // Function to determine if all consent forms are completed
+  const areAllConsentFormsComplete = () => {
+    if (!consentState.isLoaded) return false;
+    
+    const photographComplete = consentState.photographConsent?.data?.complete === true;
+    const mounjaroComplete = consentState.mounjaroConsent?.data?.complete === true;
+    const telehealthComplete = consentState.telehealthConsent?.data?.complete === true;
+    
+    console.log('📋 Dashboard: Consent forms completion status:', {
+      photograph: photographComplete,
+      mounjaro: mounjaroComplete,
+      telehealth: telehealthComplete,
+      allComplete: photographComplete && mounjaroComplete && telehealthComplete
+    });
+    
+    return photographComplete && mounjaroComplete && telehealthComplete;
+  };
+
+  // Function to check if all pre-appointment tasks are complete
+  const areAllPreAppointmentTasksComplete = () => {
+    const profileComplete = preAppointmentTasks.completeMedicalProfile;
+    const questionsComplete = isPrepareQuestionsCompleted();
+    const consentFormsComplete = areAllConsentFormsComplete();
+    const measurementsComplete = preAppointmentTasks.enterWeightHeight;
+    
+    const allComplete = profileComplete && questionsComplete && consentFormsComplete && measurementsComplete;
+    
+    console.log('📋 Dashboard: All pre-appointment tasks status:', {
+      profile: profileComplete,
+      questions: questionsComplete,
+      consentForms: consentFormsComplete,
+      measurements: measurementsComplete,
+      allComplete
+    });
+    
+    return allComplete;
   };
 
   // Handler for weight/height entry completion
@@ -171,6 +243,18 @@ export default function Dashboard() {
   // Handler for going back from weight/height entry
   const handleWeightHeightBack = () => {
     setShowWeightHeightEntry(false);
+  };
+
+  // Handler for reschedule request
+  const handleReschedule = () => {
+    console.log('🔄 Dashboard: Reschedule requested for appointment:', currentAppointment);
+    
+    if (currentAppointment?._id) {
+      dispatch(requestReschedule(currentAppointment._id));
+    } else {
+      // If no appointment ID, still dispatch the action (saga will handle it)
+      dispatch(requestReschedule(null));
+    }
   };
 
   // Handler for prepare questions completion
@@ -314,7 +398,24 @@ export default function Dashboard() {
                         `${currentAppointment.type.toUpperCase()} Scheduled` : 
                         'CONSULTATION Scheduled'}
                     </Typography>
-                    <Chip label="Confirmed" color="success" size="small" />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Chip label="Confirmed" color="success" size="small" />
+                      {areAllPreAppointmentTasksComplete() && (
+                        <Chip 
+                          label="Ready for appointment" 
+                          color="primary" 
+                          size="small"
+                          sx={{
+                            backgroundColor: '#877449',
+                            color: '#000',
+                            fontWeight: 'bold',
+                            '&:hover': {
+                              backgroundColor: '#B8941F',
+                            }
+                          }}
+                        />
+                      )}
+                    </Box>
                   </Box>
                   
                   {/* Appointment Date & Time */}
@@ -367,6 +468,7 @@ export default function Dashboard() {
                     <Button
                       variant="outlined"
                       size="small"
+                      onClick={handleReschedule}
                       sx={{
                         textTransform: 'none',
                         borderColor: '#877449',
@@ -432,11 +534,11 @@ export default function Dashboard() {
                     icon: <Assignment />
                   },
                   {
-                    key: 'testTechnology',
-                    title: 'Test Your Technology',
-                    description: 'Ensure your device and internet connection work properly',
-                    path: '/schedule',
-                    icon: <Schedule />
+                    key: 'completeConsentForms',
+                    title: 'Complete Consent Forms',
+                    description: 'Review and sign required consent forms',
+                    path: '/consent-forms',
+                    icon: <Description />
                   },
                   {
                     key: 'enterWeightHeight',
@@ -559,7 +661,7 @@ export default function Dashboard() {
                           }}
                         >
                           <Box sx={{ mr: 2 }}>
-                            {preAppointmentTasks[task.key] ? (
+                            {(task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? (
                               <CheckCircle sx={{ color: 'success.main' }} />
                             ) : (
                               <Close sx={{ color: 'error.main' }} />
@@ -570,8 +672,8 @@ export default function Dashboard() {
                               variant="subtitle1"
                               component="div"
                               sx={{
-                                color: preAppointmentTasks[task.key] ? 'success.main' : 'error.main',
-                                fontWeight: preAppointmentTasks[task.key] ? 'bold' : 'normal',
+                                color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.main' : 'error.main',
+                                fontWeight: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'bold' : 'normal',
                                 mb: 0.5
                               }}
                             >
@@ -581,7 +683,7 @@ export default function Dashboard() {
                               variant="body2"
                               component="div"
                               sx={{
-                                color: preAppointmentTasks[task.key] ? 'success.dark' : 'error.dark'
+                                color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.dark' : 'error.dark'
                               }}
                             >
                               {task.description}

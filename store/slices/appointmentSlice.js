@@ -9,7 +9,7 @@ const initialState = {
   preAppointmentTasks: {
     completeMedicalProfile: false,
     prepareQuestions: false,
-    testTechnology: false,
+    completeConsentForms: false,
     enterWeightHeight: false,
   },
   questions: {
@@ -137,6 +137,11 @@ export const loadQuestions = () => ({
 export const saveQuestions = (questionsData) => ({
   type: 'appointment/saveQuestions',
   payload: questionsData,
+});
+
+export const requestReschedule = (appointmentId) => ({
+  type: 'appointment/requestReschedule',
+  payload: { appointmentId },
 });
 
 export default appointmentSlice.reducer;

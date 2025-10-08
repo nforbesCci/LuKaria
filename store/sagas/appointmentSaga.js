@@ -8,7 +8,9 @@ import {
   setQuestions,
   setQuestionsLoading,
   setQuestionsError,
+  clearAppointments,
 } from '../slices/appointmentSlice';
+import { sendNotification } from '../slices/notificationSlice';
 import { checkAppointmentConfiguration, getAppointmentDetails, saveAppointment } from '../../lib/api/appointmentService';
 import { setIsScheduled } from '../slices/userSlice';
 
@@ -216,6 +218,56 @@ function* saveQuestions(action) {
   }
 }
 
+// Handle reschedule request
+function* requestReschedule(action) {
+  try {
+    console.log('🔄 Saga: Requesting reschedule for appointment:', action.payload);
+    
+    const { appointmentId } = action.payload;
+    
+    // Call API to update appointment status
+    console.log('📞 Calling API: POST /api/appointment/reschedule');
+    const response = yield call(fetch, '/api/appointment/reschedule', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ appointmentId, status: 'request appointment' }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = yield call([response, 'json']);
+    console.log('📨 API Response received:', data);
+    
+    if (data.success) {
+      console.log('✅ Appointment reschedule requested successfully');
+      
+      // Clear current appointment and reset schedule status
+      yield put(clearAppointments());
+      yield put(setIsScheduled(false));
+      
+      // Send notification
+      console.log('📤 Sending reschedule notification');
+      yield put(sendNotification({
+        type: 'schedule',
+        details: 'request appointment',
+        message: 'User has requested to reschedule their appointment',
+        timestamp: new Date().toISOString(),
+      }));
+      
+    } else {
+      throw new Error(data.error || 'Failed to request reschedule');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error requesting reschedule:', error);
+    yield put(setBookingError(error.message));
+  }
+}
+
 // Utility function to create delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -227,5 +279,6 @@ export default function* appointmentSaga() {
   yield takeEvery('appointment/checkAppointmentConfig', checkAppointmentConfig);
   yield takeEvery('appointment/loadQuestions', loadQuestions);
   yield takeEvery('appointment/saveQuestions', saveQuestions);
+  yield takeEvery('appointment/requestReschedule', requestReschedule);
 }
 

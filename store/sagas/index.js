@@ -5,6 +5,8 @@ import userSaga from './userSaga';
 import { adminSaga } from './adminSaga';
 import profileSaga from './profileSaga';
 import measurementsSaga from './measurementsSaga';
+import consentSaga from './consentSaga';
+import notificationSaga from './notificationSaga';
 
 // Root saga that combines all sagas
 export default function* rootSaga() {
@@ -15,6 +17,8 @@ export default function* rootSaga() {
     fork(adminSaga),
     fork(profileSaga),
     fork(measurementsSaga),
+    fork(consentSaga),
+    fork(notificationSaga),
   ]);
 }
 
