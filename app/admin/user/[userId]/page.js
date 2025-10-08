@@ -386,22 +386,31 @@ export default function UserDetailPage() {
                     <Typography variant="h6" gutterBottom>
                       Current Medications
                     </Typography>
-                    {userMetadata.current_medications?.length > 0 ? (
-                      <Stack spacing={1}>
-                        {userMetadata.current_medications.map((medication, index) => (
-                          <Chip
-                            key={index}
-                            label={medication}
-                            color="primary"
-                            variant="outlined"
-                          />
-                        ))}
-                      </Stack>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        No current medications
-                      </Typography>
-                    )}
+                    {(() => {
+                      // Handle both array and string formats
+                      const medications = Array.isArray(userMetadata.current_medications)
+                        ? userMetadata.current_medications
+                        : typeof userMetadata.current_medications === 'string' && userMetadata.current_medications
+                        ? [userMetadata.current_medications]
+                        : [];
+                      
+                      return medications.length > 0 ? (
+                        <Stack spacing={1}>
+                          {medications.map((medication, index) => (
+                            <Chip
+                              key={index}
+                              label={medication}
+                              color="primary"
+                              variant="outlined"
+                            />
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          No current medications
+                        </Typography>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               </Grid>
