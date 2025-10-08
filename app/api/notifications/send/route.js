@@ -26,7 +26,7 @@ export async function POST(request) {
 
     // Connect to MongoDB
     const client = await clientPromise;
-    const db = client.db('LukariaDB');
+    const db = client.db('lukaria');
     const collection = db.collection('NotificationCollection');
 
     // Prepare notification document

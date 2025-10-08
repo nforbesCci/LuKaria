@@ -400,6 +400,18 @@ export default function Dashboard() {
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                       <Chip label="Confirmed" color="success" size="small" />
+                      {currentAppointment.rescheduleRequested && (
+                        <Chip 
+                          label="Reschedule Requested" 
+                          color="warning" 
+                          size="small"
+                          sx={{
+                            backgroundColor: '#ff9800',
+                            color: '#000',
+                            fontWeight: 'bold',
+                          }}
+                        />
+                      )}
                       {areAllPreAppointmentTasksComplete() && (
                         <Chip 
                           label="Ready for appointment" 
@@ -469,6 +481,7 @@ export default function Dashboard() {
                       variant="outlined"
                       size="small"
                       onClick={handleReschedule}
+                      disabled={currentAppointment.rescheduleRequested === true}
                       sx={{
                         textTransform: 'none',
                         borderColor: '#877449',
@@ -476,6 +489,10 @@ export default function Dashboard() {
                         '&:hover': {
                           borderColor: '#877449',
                           backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        },
+                        '&.Mui-disabled': {
+                          borderColor: '#555',
+                          color: '#888',
                         }
                       }}
                     >

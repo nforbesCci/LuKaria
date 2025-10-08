@@ -63,12 +63,16 @@ export async function GET(request) {
         length: appointmentLength,
         date: appointmentDate,
         provider: appointmentProvider || 'Default Provider',
-        type: appointmentType || 'consultation'
+        type: appointmentType || 'consultation',
+        rescheduleRequested: userAppointment?.rescheduleRequested || false,
+        rescheduleRequestedAt: userAppointment?.rescheduleRequestedAt || null
       } : null,
       status: isScheduled ? 'scheduled' : 'not_scheduled',
       checkedAt: new Date().toISOString(),
       userId,
-      source: userAppointment ? 'database' : 'not_found'
+      source: userAppointment ? 'database' : 'not_found',
+      rescheduleRequested: userAppointment?.rescheduleRequested || false,
+      rescheduleRequestedAt: userAppointment?.rescheduleRequestedAt || null
     };
 
     console.log('✅ Returning appointment data:', JSON.stringify(appointmentData, null, 2));

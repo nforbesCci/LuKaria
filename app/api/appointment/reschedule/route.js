@@ -27,22 +27,13 @@ export async function POST(request) {
 
     // Connect to MongoDB
     const client = await clientPromise;
-    const db = client.db('LukariaDB');
-    const collection = db.collection('AppointmentCollection');
-
+    const db = client.db('lukaria');
+    const collection = db.collection('appointments');
+     // Get appointment data
     // Update appointment status to "request appointment"
     console.log('💾 API: Updating appointment status to:', status);
-    
-    // Build query - if appointmentId provided, convert to ObjectId
-    const query = { userId };
-    if (appointmentId) {
-      try {
-        query._id = new ObjectId(appointmentId);
-      } catch (e) {
-        console.error('❌ API: Invalid appointment ID format:', appointmentId);
-        // If invalid ObjectId format, just use userId and update most recent
-      }
-    }
+        
+    const query = { userId: userId };
     
     console.log('🔍 API: Query:', query);
     

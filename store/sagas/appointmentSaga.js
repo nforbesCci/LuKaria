@@ -111,8 +111,15 @@ function* checkAppointmentConfig() {
           ...appointmentData,
           scheduledAt: response.data.scheduledAt,
           source: 'server_config',
-          checkedAt: response.data.checkedAt
+          checkedAt: response.data.checkedAt,
+          rescheduleRequested: response.data.rescheduleRequested,
+          rescheduleRequestedAt: response.data.rescheduleRequestedAt
         };
+        
+        console.log('📋 Setting appointment with reschedule status:', {
+          rescheduleRequested: serverAppointmentData.rescheduleRequested,
+          rescheduleRequestedAt: serverAppointmentData.rescheduleRequestedAt
+        });
         
         yield put(setCurrentAppointment(serverAppointmentData));
         yield put(setScheduleCompleted(true));
