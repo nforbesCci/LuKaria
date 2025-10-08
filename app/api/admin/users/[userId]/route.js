@@ -63,7 +63,7 @@ export const GET = withApiAuthRequired(async (req, { params }) => {
     console.log('📞 Fetching user from Auth0 with ID:', params.userId);
     
     // Fetch the specific user from Auth0
-    const user = await management.users.get({ id: params.userId });
+    const user = await management.users.get(params.userId );
     
     console.log('✅ User fetched successfully:', {
       user_id: user.user_id,
