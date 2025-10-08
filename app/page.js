@@ -229,9 +229,7 @@ export default function Home() {
                           }
                         }}
                       >
-                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                          Login
-                        </Box>
+                        Login
                       </Button>
           )}
           
@@ -251,9 +249,7 @@ export default function Home() {
                           }
                         }}
                       >
-                        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                          Logout
-                        </Box>
+                        Logout
                       </Button>
           )}
         </Box>
@@ -482,7 +478,7 @@ export default function Home() {
                   flexDirection: 'column', 
                   justifyContent: 'center', 
                   backgroundColor: { xs: 'rgba(0, 0, 0, 0.8)', md: '#000000' },
-                  backgroundImage: { xs: 'url(/images/weightloss2.jpg)', md: 'none' },
+                  backgroundImage: { xs: 'url(/images/weightloss4.png)', md: 'none' },
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
@@ -561,7 +557,7 @@ export default function Home() {
                 <Box
                   sx={{
                     flex: 1,
-                    backgroundImage: 'url(/images/weightloss2.jpg)',
+                    backgroundImage: 'url(/images/weightloss4.png)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
