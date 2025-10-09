@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useConsultationAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import {
@@ -40,6 +41,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 
 export default function WeightLogging() {
   const { user, isLoading, error } = useUser();
+  
+  // Access control - Admin or Patient with consultation
+  useConsultationAccess();
   const [mounted, setMounted] = useState(false);
   const [isAddingEntry, setIsAddingEntry] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);

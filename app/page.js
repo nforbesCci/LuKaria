@@ -50,8 +50,23 @@ export default function Home() {
   useEffect(() => {
     if (mounted && user && !shouldRedirect) {
       setShouldRedirect(true);
-      // Redirect to dashboard for authenticated users
-      router.push('/dashboard');
+      
+      // Get user groups
+      const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
+      console.log('🔐 Login Redirect - User groups:', userGroups);
+      
+      // Check if user is ONLY in Doctor group (not Admin or Patient)
+      const isOnlyDoctor = userGroups.includes('Doctor') && 
+                          !userGroups.includes('Admin') && 
+                          !userGroups.includes('Patient');
+      
+      if (isOnlyDoctor) {
+        console.log('👨‍⚕️ User is Doctor only - redirecting to Administration');
+        router.push('/admin');
+      } else {
+        console.log('👤 User is Patient/Admin - redirecting to Dashboard');
+        router.push('/dashboard');
+      }
     }
   }, [user, mounted, router, shouldRedirect]);
 
@@ -100,12 +115,17 @@ export default function Home() {
 
   // Show redirect message for logged-in users
   if (user || shouldRedirect) {
+    const userGroups = user?.groups || user?.['https://lukariagroup.com/roles'] || [];
+    const isOnlyDoctor = userGroups.includes('Doctor') && 
+                        !userGroups.includes('Admin') && 
+                        !userGroups.includes('Patient');
+    
     return (
       <>
         <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
           <CircularProgress />
           <Typography variant="h6" sx={{ mt: 2 }}>
-            Redirecting to Dashboard...
+            {isOnlyDoctor ? 'Redirecting to Administration...' : 'Redirecting to Dashboard...'}
           </Typography>
         </Container>
       </>
@@ -144,6 +164,18 @@ export default function Home() {
             }}
           >
             Home
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/info'}
+          >
+            Info
           </Typography>
           <Typography 
             variant="body2" 

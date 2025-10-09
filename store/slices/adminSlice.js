@@ -121,4 +121,14 @@ export const {
   resetAdmin,
 } = adminSlice.actions;
 
+// Action creators for sagas
+export const fetchUsers = () => ({
+  type: 'admin/fetchUsers',
+});
+
+export const enableUserAccount = (payload) => ({
+  type: 'admin/enableUserAccount',
+  payload,
+});
+
 export default adminSlice.reducer;

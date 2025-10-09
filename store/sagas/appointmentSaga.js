@@ -67,6 +67,31 @@ function* completeSchedule(action) {
       yield put(setScheduleCompleted(true));
       yield put(setIsScheduled(true));
       
+      // Update user_metadata.scheduled in Auth0
+      try {
+        console.log('📝 Updating user_metadata.scheduled in Auth0...');
+        const metadataResponse = yield call(fetch, '/api/profile/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_metadata: {
+              scheduled: true
+            }
+          }),
+        });
+        
+        if (metadataResponse.ok) {
+          console.log('✅ user_metadata.scheduled updated in Auth0');
+        } else {
+          console.warn('⚠️ Failed to update user_metadata.scheduled in Auth0');
+        }
+      } catch (metadataError) {
+        console.error('❌ Error updating user_metadata.scheduled:', metadataError);
+        // Don't fail the entire operation if metadata update fails
+      }
+      
       console.log('✅ Schedule completed and saved successfully');
     } else {
       throw new Error('Failed to save appointment to database');

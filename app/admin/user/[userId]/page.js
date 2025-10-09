@@ -3,6 +3,8 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { enableUserAccount } from '../../../../store/slices/adminSlice';
 import Header from '../../../../components/Header';
 import {
   Container,
@@ -68,11 +70,13 @@ export default function UserDetailPage() {
   const { user: currentUser, isLoading, error } = useUser();
   const params = useParams();
   const router = useRouter();
+  const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
+  const [enablingAccount, setEnablingAccount] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -119,6 +123,32 @@ export default function UserDetailPage() {
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handleToggleAccount = async () => {
+    setEnablingAccount(true);
+    const currentStatus = userMetadata?.consultationOccurred;
+    const newStatus = !currentStatus;
+    
+    try {
+      console.log(`${newStatus ? '🔓' : '🔒'} ${newStatus ? 'Enabling' : 'Disabling'} account for user:`, params.userId);
+      
+      // Dispatch saga to update consultationOccurred
+      dispatch(enableUserAccount({
+        userId: params.userId,
+        consultationOccurred: newStatus
+      }));
+      
+      // Refresh user data after a short delay to allow the saga to complete
+      setTimeout(() => {
+        fetchUserData();
+        setEnablingAccount(false);
+      }, 2000);
+      
+    } catch (err) {
+      console.error('❌ Error toggling account:', err);
+      setEnablingAccount(false);
+    }
   };
 
   const calculateBMI = (weight, height) => {
@@ -236,6 +266,28 @@ export default function UserDetailPage() {
             </Box>
             <Stack direction="row" spacing={2}>
               <Button
+                variant="contained"
+                onClick={handleToggleAccount}
+                disabled={enablingAccount}
+                sx={{
+                  textTransform: 'none',
+                  backgroundColor: userMetadata?.consultationOccurred ? '#f44336' : '#877449',
+                  color: '#fff',
+                  '&:hover': {
+                    backgroundColor: userMetadata?.consultationOccurred ? '#d32f2f' : '#B8941F',
+                  },
+                  '&.Mui-disabled': {
+                    backgroundColor: '#555',
+                    color: '#888',
+                  }
+                }}
+              >
+                {enablingAccount ? 
+                  (userMetadata?.consultationOccurred ? 'Disabling...' : 'Enabling...') :
+                  (userMetadata?.consultationOccurred ? 'Disable Account' : 'Enable Account')
+                }
+              </Button>
+              <Button
                 variant="outlined"
                 startIcon={<PictureAsPdf />}
                 onClick={generatePDF}
@@ -262,6 +314,18 @@ export default function UserDetailPage() {
               Profile Completion Status
             </Typography>
             <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  {userMetadata.consultationOccurred ? (
+                    <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
+                  ) : (
+                    <Cancel sx={{ color: 'error.main', mr: 1 }} />
+                  )}
+                  <Typography variant="body2">
+                    Consultation: {userMetadata.consultationOccurred ? 'Completed' : 'Not Completed'}
+                  </Typography>
+                </Box>
+              </Grid>
               <Grid item xs={12} md={4}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   {userMetadata.profile_completed ? (

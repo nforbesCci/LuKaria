@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAppSelector } from '../store/hooks';
+import { canAccessPage } from '../hooks/useAccessControl';
 import {
   Drawer,
   List,
@@ -59,6 +60,10 @@ export default function NavigationDrawer() {
     // Check processed custom claims first
     (user?.groups && user.groups.some(item => item.toLowerCase() === "doctor" || item.toLowerCase() === "admin"));
 
+  // Check if user has had consultation
+  const consultationOccurred = user?.user_metadata?.consultationOccurred || 
+                               user?.['https://lukariagroup.com/user_metadata']?.consultationOccurred;
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -76,44 +81,53 @@ export default function NavigationDrawer() {
     }
   };
 
+  // Build navigation items based on user access
   const navigationItems = [
-    {
-      text: 'Dashboard',
-      icon: <Dashboard />,
-      path: '/dashboard',
-    },
-    {
-      text: 'Profile',
-      icon: <Person />,
-      path: '/profile',
-    },
-    {
-      text: 'Consent Forms',
-      icon: <Description />,
-      path: '/consent-forms',
-    },
-    {
-      text: 'Side Effects',
-      icon: <MedicalServices />,
-      path: '/side-effects',
-    },
-    {
-      text: 'Weight Logging',
-      icon: <Scale />,
-      path: '/weight-logging',
-    },
-    {
-      text: 'Medication Tracker',
-      icon: <Medication />,
-      path: '/medication-tracker',
-    },
-    {
-      text: 'Meal Tracker',
-      icon: <Restaurant />,
-      path: '/meal-tracker',
-    },
-    // Admin-only items
-    ...(isAdmin ? [{
+    // Basic access items - Admin and Patient
+    ...(canAccessPage(user, 'basic') ? [
+      {
+        text: 'Dashboard',
+        icon: <Dashboard />,
+        path: '/dashboard',
+      },
+      {
+        text: 'Profile',
+        icon: <Person />,
+        path: '/profile',
+      },
+      {
+        text: 'Consent Forms',
+        icon: <Description />,
+        path: '/consent-forms',
+      },
+    ] : []),
+    
+    // Consultation required items - Admin or Patient with consultation
+    ...(canAccessPage(user, 'consultation') ? [
+      {
+        text: 'Side Effects',
+        icon: <MedicalServices />,
+        path: '/side-effects',
+      },
+      {
+        text: 'Weight Logging',
+        icon: <Scale />,
+        path: '/weight-logging',
+      },
+      {
+        text: 'Medication Tracker',
+        icon: <Medication />,
+        path: '/medication-tracker',
+      },
+      {
+        text: 'Meal Tracker',
+        icon: <Restaurant />,
+        path: '/meal-tracker',
+      },
+    ] : []),
+    
+    // Admin portal - Admin and Doctor only
+    ...(canAccessPage(user, 'admin') ? [{
       text: 'Administration',
       icon: <AdminPanelSettings />,
       path: '/admin',
@@ -152,6 +166,21 @@ export default function NavigationDrawer() {
 
   // Hide navigation drawer on Contact page
   if (pathname === '/contact') {
+    return null;
+  }
+
+  // Hide navigation drawer on Info page
+  if (pathname === '/info') {
+    return null;
+  }
+
+  // Hide navigation drawer on Unauthorized page
+  if (pathname === '/unauthorized') {
+    return null;
+  }
+
+  // Hide navigation drawer on Consultation Required page
+  if (pathname === '/consultation-required') {
     return null;
   }
 

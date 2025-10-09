@@ -11,15 +11,20 @@ import { useAppSelector } from '../store/hooks';
 export function useScheduleProtection() {
   const router = useRouter();
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
+  const isScheduled = useAppSelector((state) => state.user.isScheduled);
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
   useEffect(() => {
-    // If schedule is not completed and user is trying to navigate away from schedule page
-    if (!scheduleCompleted && currentPath !== '/schedule' && currentPath !== '/') {
+    // Only enforce schedule protection if:
+    // 1. Schedule is NOT completed
+    // 2. User is NOT already scheduled (isScheduled is false or undefined)
+    // 3. User is not on schedule page or home page
+    // This prevents redirect loop when user is already scheduled
+    if (!scheduleCompleted && !isScheduled && currentPath !== '/schedule' && currentPath !== '/') {
       // Redirect back to schedule page
       router.push('/schedule');
     }
-  }, [scheduleCompleted, currentPath, router]);
+  }, [scheduleCompleted, isScheduled, currentPath, router]);
 
   return { scheduleCompleted };
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useBasicAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Link from 'next/link';
@@ -62,6 +63,9 @@ export default function Profile() {
   const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  
+  // Access control - only Admin and Patient can access
+  useBasicAccess();
   
   // Redux state
   const profileState = useAppSelector((state) => state.profile);

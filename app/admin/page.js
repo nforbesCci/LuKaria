@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useAdminAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
@@ -69,6 +70,9 @@ export default function AdminPage() {
   const { user, isLoading, error } = useUser();
   const router = useRouter();
   const dispatch = useDispatch();
+  
+  // Access control - only Admin and Doctor can access
+  useAdminAccess();
   const [mounted, setMounted] = useState(false);
 
   // Debug: Log user object to see what's available

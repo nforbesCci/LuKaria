@@ -74,6 +74,18 @@ export default function Contact() {
               cursor: 'pointer',
               '&:hover': { textDecoration: 'underline' }
             }}
+            onClick={() => window.location.href = '/info'}
+          >
+            Info
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
             onClick={() => window.location.href = '/faq'}
           >
             FAQ
@@ -84,7 +96,7 @@ export default function Contact() {
               color: '#000000', 
               fontWeight: '600',
               cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
+              textDecoration: 'underline'
             }}
           >
             Contact

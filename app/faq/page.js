@@ -92,7 +92,18 @@ export default function FAQ() {
               cursor: 'pointer',
               '&:hover': { textDecoration: 'underline' }
             }}
-            onClick={() => window.location.href = '/faq'}
+            onClick={() => window.location.href = '/info'}
+          >
+            Info
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
           >
             FAQ
           </Typography>

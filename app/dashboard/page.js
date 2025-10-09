@@ -8,11 +8,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask, loadQuestions, requestReschedule } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask, loadQuestions, requestReschedule, setScheduleCompleted } from '../../store/slices/appointmentSlice';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { fetchMeasurements } from '../../store/slices/measurementsSlice';
 import { fetchPhotographConsent, fetchMounjaroConsent, fetchTelehealthConsent } from '../../store/slices/consentSlice';
 import { useScheduleProtection } from '../../hooks/useScheduleProtection';
+import { useBasicAccess } from '../../hooks/useAccessControl';
 import {
   Container,
   Typography,
@@ -66,6 +67,9 @@ export default function Dashboard() {
   const consentState = useAppSelector((state) => state.consent);
 
 
+  // Access control - only Admin and Patient can access
+  useBasicAccess();
+  
   // Schedule protection - prevent access to dashboard if schedule not completed
   useScheduleProtection();
 
@@ -93,6 +97,14 @@ export default function Dashboard() {
     dispatch(fetchMounjaroConsent());
     dispatch(fetchTelehealthConsent());
   }, [dispatch]);
+
+  // Initialize schedule completion status from user metadata
+  useEffect(() => {
+    if (user?.user_metadata?.scheduled !== undefined) {
+      console.log('📅 Dashboard: Setting schedule completion from user_metadata.scheduled:', user.user_metadata.scheduled);
+      dispatch(setScheduleCompleted(user.user_metadata.scheduled));
+    }
+  }, [user, dispatch]);
 
   // Debug: Log appointment data when it changes
   useEffect(() => {

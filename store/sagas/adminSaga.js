@@ -114,8 +114,50 @@ function* updateUserSaga(action) {
   }
 }
 
+// Enable/Disable user account saga - toggles consultationOccurred
+function* enableUserAccountSaga(action) {
+  try {
+    yield put(setLoading(true));
+    yield put(setError(null));
+    
+    const { userId, consultationOccurred } = action.payload;
+    
+    console.log(`${consultationOccurred ? '🔓' : '🔒'} Admin Saga: ${consultationOccurred ? 'Enabling' : 'Disabling'} account for user:`, userId);
+    console.log('📋 Setting consultationOccurred:', consultationOccurred);
+    
+    // Call API to update user metadata in Auth0
+    const response = yield call(fetch, `/api/admin/users/${userId}/enable`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        consultationOccurred 
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = yield call([response, 'json']);
+      throw new Error(errorData.error || 'Failed to enable user account');
+    }
+    
+    const data = yield call([response, 'json']);
+    console.log(`✅ Admin Saga: Account ${consultationOccurred ? 'enabled' : 'disabled'} successfully:`, data);
+    
+    // Optionally refresh the users list
+    // yield put({ type: 'admin/fetchUsers' });
+    
+  } catch (error) {
+    console.error('❌ Admin Saga: Error enabling account:', error);
+    yield put(setError(error.message));
+  } finally {
+    yield put(setLoading(false));
+  }
+}
+
 // Root admin saga
 export function* adminSaga() {
   yield takeEvery('admin/fetchUsers', fetchUsersSaga);
   yield takeEvery('admin/updateUser', updateUserSaga);
+  yield takeEvery('admin/enableUserAccount', enableUserAccountSaga);
 }
