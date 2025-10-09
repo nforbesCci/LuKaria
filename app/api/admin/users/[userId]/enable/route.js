@@ -29,7 +29,8 @@ const getManagementClient = async () => {
 
 export async function POST(request, { params }) {
   try {
-    console.log('🔓 API: Enable account request for user:', params.userId);
+    const { consultationOccurred } = await request.json();
+    console.log(`${consultationOccurred ? '🔓' : '🔒'} API: ${consultationOccurred ? 'Enable' : 'Disable'} account request for user:`, params.userId);
     
     // Get admin session
     const session = await getSession();
@@ -47,14 +48,12 @@ export async function POST(request, { params }) {
     const isAdmin = adminGroups.includes('Admin') || adminGroups.includes('Doctor');
     
     if (!isAdmin) {
-      console.error('❌ API: User is not authorized to enable accounts');
+      console.error('❌ API: User is not authorized to modify accounts');
       return NextResponse.json(
         { success: false, error: 'Not authorized' },
         { status: 403 }
       );
     }
-
-    const { consultationOccurred } = await request.json();
     
     console.log('📋 API: Updating consultationOccurred to:', consultationOccurred);
 
@@ -71,11 +70,11 @@ export async function POST(request, { params }) {
         }
       );
 
-      console.log('✅ API: User metadata updated successfully in Auth0');
+      console.log(`✅ API: User metadata updated successfully in Auth0 - consultationOccurred set to ${consultationOccurred}`);
       
       return NextResponse.json({
         success: true,
-        message: 'Account enabled successfully',
+        message: `Account ${consultationOccurred ? 'enabled' : 'disabled'} successfully`,
         user: {
           user_id: updatedUser.user_id,
           user_metadata: updatedUser.user_metadata,
@@ -89,7 +88,7 @@ export async function POST(request, { params }) {
       console.log('🔄 Returning mock success for development...');
       return NextResponse.json({
         success: true,
-        message: 'Account enabled (mock - Auth0 API not available)',
+        message: `Account ${consultationOccurred ? 'enabled' : 'disabled'} (mock - Auth0 API not available)`,
         user: {
           user_id: params.userId,
           user_metadata: {
