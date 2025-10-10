@@ -9,6 +9,7 @@ import {
   setQuestionsLoading,
   setQuestionsError,
   clearAppointments,
+  setAdminRescheduleSuccess,
 } from '../slices/appointmentSlice';
 import { sendNotification } from '../slices/notificationSlice';
 import { checkAppointmentConfiguration, getAppointmentDetails, saveAppointment } from '../../lib/api/appointmentService';
@@ -300,6 +301,61 @@ function* requestReschedule(action) {
   }
 }
 
+// Handle admin reschedule appointment
+function* adminRescheduleAppointment(action) {
+  try {
+    console.log('📅 Saga: Admin rescheduling appointment:', action.payload);
+    
+    const { userId, appointmentData } = action.payload;
+    
+    console.log('🔍 Saga: User ID:', userId);
+    console.log('🔍 Saga: Appointment Data:', appointmentData);
+    
+    yield put(setBookingStatus(true));
+    yield put(setBookingError(null));
+    yield put(setAdminRescheduleSuccess(false));
+    
+    // Call API to save appointment
+    console.log('📞 Calling API: POST /api/appointment/reschedule');
+    console.log('📤 Sending payload:', JSON.stringify({ userId, appointmentData }));
+    
+    const response = yield call(fetch, '/api/appointment/reschedule', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId, appointmentData }),
+    });
+    
+    console.log('📨 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = yield call([response, 'text']);
+      console.error('❌ API Error response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+    }
+    
+    const data = yield call([response, 'json']);
+    console.log('📨 API Response data:', data);
+    
+    if (data.success) {
+      console.log('✅ Admin appointment reschedule successful');
+      console.log('💾 Database update result:', data.result);
+      yield put(setAdminRescheduleSuccess(true));
+    } else {
+      throw new Error(data.error || 'Failed to reschedule appointment');
+    }
+    
+    yield put(setBookingStatus(false));
+    
+  } catch (error) {
+    console.error('❌ Error in admin reschedule:', error);
+    yield put(setBookingStatus(false));
+    yield put(setBookingError(error.message));
+    yield put(setAdminRescheduleSuccess(false));
+  }
+}
+
 // Utility function to create delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -312,5 +368,6 @@ export default function* appointmentSaga() {
   yield takeEvery('appointment/loadQuestions', loadQuestions);
   yield takeEvery('appointment/saveQuestions', saveQuestions);
   yield takeEvery('appointment/requestReschedule', requestReschedule);
+  yield takeEvery('appointment/adminRescheduleAppointment', adminRescheduleAppointment);
 }
 

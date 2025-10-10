@@ -73,9 +73,13 @@ function* fetchProfileSaga(action) {
     
     const result = yield call(fetchProfileFromDatabase);
     
-    console.log('✅ Profile Saga: Profile fetched successfully', result);
+    console.log('✅ Profile Saga: Profile fetched successfully');
+    console.log('📋 Profile Saga: Full result:', result);
+    console.log('📋 Profile Saga: Profile data:', result.profile);
+    console.log('📋 Profile Saga: user_metadata:', result.profile?.user_metadata);
+    console.log('📋 Profile Saga: consultationOccurred:', result.profile?.user_metadata?.consultationOccurred);
     
-    yield put(fetchProfileSuccess(result));
+    yield put(fetchProfileSuccess(result.profile));
   } catch (error) {
     console.error('❌ Profile Saga: Error fetching profile', error);
     yield put(fetchProfileFailure(error.message));

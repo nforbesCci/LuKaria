@@ -33,6 +33,10 @@ const profileSlice = createSlice({
       state.error = null;
     },
     fetchProfileSuccess: (state, action) => {
+      console.log('🏪 Profile Slice: Storing profile data:', action.payload);
+      console.log('🏪 Profile Slice: user_metadata:', action.payload?.user_metadata);
+      console.log('🏪 Profile Slice: consultationOccurred:', action.payload?.user_metadata?.consultationOccurred);
+      
       state.isLoading = false;
       state.profile = action.payload;
       state.isLoaded = true;

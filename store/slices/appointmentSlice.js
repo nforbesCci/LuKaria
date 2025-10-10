@@ -6,6 +6,7 @@ const initialState = {
   isBooking: false,
   isScheduleCompleted: false,
   bookingError: null,
+  adminRescheduleSuccess: false,
   preAppointmentTasks: {
     completeMedicalProfile: false,
     prepareQuestions: false,
@@ -92,6 +93,9 @@ const appointmentSlice = createSlice({
         error: null,
       };
     },
+    setAdminRescheduleSuccess: (state, action) => {
+      state.adminRescheduleSuccess = action.payload;
+    },
   },
 });
 
@@ -109,6 +113,7 @@ export const {
   setQuestionsLoading,
   setQuestionsError,
   clearQuestions,
+  setAdminRescheduleSuccess,
 } = appointmentSlice.actions;
 
 // Action creators for sagas
@@ -142,6 +147,11 @@ export const saveQuestions = (questionsData) => ({
 export const requestReschedule = (appointmentId) => ({
   type: 'appointment/requestReschedule',
   payload: { appointmentId },
+});
+
+export const adminRescheduleAppointment = (userId, appointmentData) => ({
+  type: 'appointment/adminRescheduleAppointment',
+  payload: { userId, appointmentData },
 });
 
 export default appointmentSlice.reducer;

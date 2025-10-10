@@ -45,8 +45,9 @@ export default function NavigationDrawer() {
   
   // Redux state
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
+  const profileState = useAppSelector((state) => state.profile);
 
-  // Debug: Log user object to see what's available
+  // Debug: Log user object and profile to see what's available
   useEffect(() => {
     if (user) {
       console.log('NavigationDrawer - User object:', user);
@@ -55,14 +56,20 @@ export default function NavigationDrawer() {
     }
   }, [user]);
 
+  // Debug: Log profile state
+  useEffect(() => {
+    console.log('📋 NavigationDrawer - Profile State:', {
+      isLoaded: profileState.isLoaded,
+      hasProfile: !!profileState.profile,
+      profileData: profileState.profile,
+      consultationOccurred: profileState.profile?.user_metadata?.consultationOccurred,
+    });
+  }, [profileState]);
+
   // Check if user is in doctor or admin group using processed custom claims
   const isAdmin = user && 
     // Check processed custom claims first
     (user?.groups && user.groups.some(item => item.toLowerCase() === "doctor" || item.toLowerCase() === "admin"));
-
-  // Check if user has had consultation
-  const consultationOccurred = user?.user_metadata?.consultationOccurred || 
-                               user?.['https://lukariagroup.com/user_metadata']?.consultationOccurred;
 
   useEffect(() => {
     setMounted(true);
@@ -84,7 +91,7 @@ export default function NavigationDrawer() {
   // Build navigation items based on user access
   const navigationItems = [
     // Basic access items - Admin and Patient
-    ...(canAccessPage(user, 'basic') ? [
+    ...(canAccessPage(user, 'basic', profileState.profile) ? [
       {
         text: 'Dashboard',
         icon: <Dashboard />,
@@ -103,7 +110,7 @@ export default function NavigationDrawer() {
     ] : []),
     
     // Consultation required items - Admin or Patient with consultation
-    ...(canAccessPage(user, 'consultation') ? [
+    ...(canAccessPage(user, 'consultation', profileState.profile) ? [
       {
         text: 'Side Effects',
         icon: <MedicalServices />,
@@ -127,7 +134,7 @@ export default function NavigationDrawer() {
     ] : []),
     
     // Admin portal - Admin and Doctor only
-    ...(canAccessPage(user, 'admin') ? [{
+    ...(canAccessPage(user, 'admin', profileState.profile) ? [{
       text: 'Administration',
       icon: <AdminPanelSettings />,
       path: '/admin',

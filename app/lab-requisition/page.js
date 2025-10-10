@@ -36,6 +36,42 @@ import html2canvas from 'html2canvas';
 export default function LabRequisition() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
+
+  // Add print-specific styles
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = `
+      @media print {
+        @page { size: letter; margin: 0.25in; }
+        body { margin: 0 !important; padding: 0 !important; background: white !important; }
+        .MuiContainer-root { max-width: 8in !important; width: 8in !important; margin: 0 auto !important; padding: 0 !important; }
+        #lab-requisition-content { padding: 2px !important; background: white !important; width: 100% !important; }
+        #lab-requisition-content * { 
+          line-height: 0.6 !important; 
+          margin: 0 !important; 
+          background: white !important;
+          color: black !important;
+        }
+        #lab-requisition-content .MuiPaper-root { padding: 2px !important; margin: 0 !important; background: white !important; width: 100% !important; }
+        #lab-requisition-content .MuiCard-root { margin-bottom: 2px !important; background: white !important; }
+        #lab-requisition-content .MuiCardContent-root { padding: 2px 4px !important; background: white !important; }
+        #lab-requisition-content .MuiBox-root { margin-bottom: 2px !important; padding: 2px !important; background: white !important; }
+        #lab-requisition-content .MuiTypography-root { margin-bottom: 1px !important; line-height: 0.6 !important; font-size: 0.6rem !important; color: black !important; }
+        #lab-requisition-content .MuiFormControlLabel-root { margin: 0px !important; line-height: 0.6 !important; color: black !important; }
+        #lab-requisition-content .MuiGrid-item { padding: 1px !important; }
+        #lab-requisition-content .MuiAccordion-root { margin-bottom: 1px !important; background: white !important; }
+        #lab-requisition-content .MuiAccordionDetails-root { padding: 2px !important; background: white !important; }
+        #lab-requisition-content .MuiTextField-root { margin: 0 !important; }
+        #lab-requisition-content .MuiCheckbox-root { padding: 2px !important; color: black !important; }
+        #lab-requisition-content .MuiSvgIcon-root { color: black !important; }
+      }
+    `;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
   const [hematologyTests, setHematologyTests] = useState({
     CBC: false,
     RETIC: false,
@@ -556,36 +592,82 @@ export default function LabRequisition() {
       const element = document.getElementById('lab-requisition-content');
       if (!element) return;
 
+      // Store original inline styles
+      const originalStyles = new Map();
+      
+      // Function to apply white background and black text to all elements
+      const applyPrintStyles = (el) => {
+        const elements = el.querySelectorAll('*');
+        elements.forEach((elem) => {
+          originalStyles.set(elem, {
+            backgroundColor: elem.style.backgroundColor,
+            color: elem.style.color,
+            background: elem.style.background,
+          });
+          elem.style.backgroundColor = 'white';
+          elem.style.background = 'white';
+          elem.style.color = 'black';
+        });
+        // Also apply to root element
+        originalStyles.set(el, {
+          backgroundColor: el.style.backgroundColor,
+          color: el.style.color,
+          background: el.style.background,
+        });
+        el.style.backgroundColor = 'white';
+        el.style.background = 'white';
+        el.style.color = 'black';
+      };
+
+      // Apply white backgrounds before capturing
+      applyPrintStyles(element);
+
+      // Wait for layout to update
+      await new Promise(resolve => setTimeout(resolve, 200));
+
       // Create canvas from HTML content
       const canvas = await html2canvas(element, {
-        scale: 2, // Higher resolution
+        scale: 1.5,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         width: element.scrollWidth,
         height: element.scrollHeight,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
       });
 
-      // Calculate dimensions for letter size (8.5" x 11")
-      const imgWidth = 210; // A4 width in mm (8.5 inches)
-      const pageHeight = 295; // A4 height in mm (11 inches)
+      // Restore original styles
+      originalStyles.forEach((styles, elem) => {
+        elem.style.backgroundColor = styles.backgroundColor;
+        elem.style.color = styles.color;
+        elem.style.background = styles.background;
+      });
+
+      // Calculate dimensions for letter size
+      const imgWidth = 210; // A4 width in mm (close to letter)
+      const pageHeight = 297; // A4 height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      let heightLeft = imgHeight;
-      let position = 0;
+      // Create PDF with compression
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
 
-      // Add image to PDF
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Add new pages if content is longer than one page
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      // If content is too tall, scale it down to fit one page while maintaining aspect ratio
+      if (imgHeight > pageHeight) {
+        const scaleFactor = pageHeight / imgHeight;
+        const scaledWidth = imgWidth * scaleFactor;
+        const scaledHeight = pageHeight;
+        const xOffset = (imgWidth - scaledWidth) / 2;
+        
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, 0, scaledWidth, scaledHeight);
+      } else {
+        // Content fits on one page
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
       }
 
       // Save the PDF
@@ -650,9 +732,19 @@ export default function LabRequisition() {
   return (
     <>
       <Header />
-      <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
+      <Container maxWidth="lg" sx={{ 
+        mt: 0, 
+        mb: 0, 
+        pt: 0,
+        '@media print': {
+          maxWidth: '8in !important',
+          width: '8in !important',
+          padding: '0 !important',
+          margin: '0 auto !important',
+        }
+      }}>
         {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5, '@media print': { display: 'none' } }}>
           <Button
             variant="outlined"
             startIcon={<ArrowBack />}
@@ -661,9 +753,7 @@ export default function LabRequisition() {
           >
             Back
           </Button>
-          <Typography variant="h4" component="h1" color="primary" sx={{ flexGrow: 1 }}>
-            Lab Requisition
-          </Typography>
+          <Box sx={{ flexGrow: 1 }} />
           <Button
             variant="contained"
             startIcon={<Print />}
@@ -691,14 +781,37 @@ export default function LabRequisition() {
 
         {/* Main Content - Patient Information in Own Row */}
         <div id="lab-requisition-content">
-        <Paper elevation={2} sx={{ p: 1.5, '& .MuiInputBase-input': { fontSize: '0.875rem' }, '& .MuiFormControlLabel-root': { fontSize: '0.75rem', lineHeight: 0.8 }, '& .MuiFormControlLabel-root .MuiFormControlLabel-label': { fontSize: '0.75rem' }, '& .MuiFormControlLabel-root .MuiTypography-root': { fontSize: '0.75rem' } }}>
+        <Paper elevation={2} sx={{ 
+          p: 0.5, 
+          lineHeight: 0.8, 
+          '& *': { lineHeight: 0.8 }, 
+          '& .MuiInputBase-input': { fontSize: '0.875rem' }, 
+          '& .MuiFormControlLabel-root': { fontSize: '0.75rem', lineHeight: 0.64, my: '1px' }, 
+          '& .MuiFormControlLabel-root .MuiFormControlLabel-label': { fontSize: '0.75rem', lineHeight: 0.64 }, 
+          '& .MuiFormControlLabel-root .MuiTypography-root': { fontSize: '0.75rem', lineHeight: 0.64 }, 
+          '& .MuiTypography-root': { lineHeight: 0.8 },
+          '@media print': {
+            p: '2px',
+            background: 'white !important',
+            '& *': { 
+              lineHeight: '0.6 !important', 
+              fontSize: '0.6rem !important',
+              background: 'white !important',
+              color: 'black !important'
+            },
+            '& .MuiCard-root': { mb: '2px !important', background: 'white !important' },
+            '& .MuiCardContent-root': { p: '2px 4px !important', background: 'white !important' },
+            '& .MuiBox-root': { mb: '2px !important', p: '2px !important', background: 'white !important' },
+            '& .MuiFormControlLabel-root': { my: '0px !important', color: 'black !important' },
+            '& .MuiAccordion-root': { mb: '1px !important', background: 'white !important' },
+            '& .MuiTypography-root': { color: 'black !important' },
+            '& .MuiSvgIcon-root': { color: 'black !important' },
+          }
+        }}>
           {/* Patient Information - Full Width Row */}
-          <Card variant="outlined" sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
-                Patient Information
-              </Typography>
-              <Grid container spacing={2}>
+          <Card variant="outlined" sx={{ mb: 0.625 }}>
+            <CardContent sx={{ py: 0.5, px: 1.5 }}>
+              <Grid container spacing={1}>
                 <Grid item xs={12} sm={6} md={2.4}>
                   <TextField
                     fullWidth
@@ -747,13 +860,13 @@ export default function LabRequisition() {
           </Card>
 
           {/* Rest of Content - 2 Column Layout */}
-          <Grid container spacing={3}>
+          <Grid container spacing={1}>
 
             {/* Column 1 - Section A: Requisition Physician */}
             <Grid item xs={12} md={6}>
-              <Card variant="outlined" sx={{ mb: 0 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+              <Card variant="outlined" sx={{ mb: 0.625 }}>
+                <CardContent sx={{ py: 0.5, px: 1.5 }}>
+                  <Typography variant="h6" color="primary" sx={{ fontWeight: 600, mb: 0.625 }}>
                     A. Requisition Physician
                   </Typography>
                   <Grid container spacing={2}>
@@ -835,9 +948,9 @@ export default function LabRequisition() {
 
             {/* Column 2 - Section B: Copies of Result */}
             <Grid item xs={12} md={6}>
-              <Card variant="outlined" sx={{ mb: 0 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+              <Card variant="outlined" sx={{ mb: 0.625 }}>
+                <CardContent sx={{ py: 0.5, px: 1.5 }}>
+                  <Typography variant="h6" color="primary" sx={{ fontWeight: 600, mb: 0.625 }}>
                     B. Copies of Result
                   </Typography>
                   <Grid container spacing={2}>
@@ -919,13 +1032,13 @@ export default function LabRequisition() {
           </Grid>
 
           {/* Lab Tests Section */}
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+          <Box sx={{ mt: 0.625 }}>
+            <Typography variant="h6" color="primary" sx={{ fontWeight: 600, mb: 0.625 }}>
               Laboratory Tests Requested
             </Typography>
-            <Paper variant="outlined" sx={{ mt: 1 }}>
+            <Paper variant="outlined" sx={{ mt: 0.625, '& .MuiAccordion-root': { mb: '2px' }, '& .MuiAccordion-root:last-child': { mb: 0 } }}>
               {/* Hematology Section */}
-              <Accordion defaultExpanded>
+              <Accordion defaultExpanded sx={{ mb: '2px' }}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls="hematology-content"
@@ -936,16 +1049,16 @@ export default function LabRequisition() {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={3}>
-                    {/* Left Column - Routine and Special Tests */}
-                    <Grid item xs={12} md={6}>
+                  <Grid container spacing={1}>
+                    {/* Left Column - Routine Tests (30%) */}
+                    <Grid item xs={12} md={3.6}>
                       {/* Routine Tests */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Routine
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={4}>
                               <FormControlLabel
                                 control={
@@ -1024,14 +1137,14 @@ export default function LabRequisition() {
 
                     </Grid>
 
-                    {/* Right Column - Coagulation Tests */}
-                    <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
+                    {/* Right Column - Coagulation Tests (70%) */}
+                    <Grid item xs={12} md={8.4}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Coagulation Tests
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={12/7}>
                               <FormControlLabel
                                 control={
@@ -1213,7 +1326,7 @@ export default function LabRequisition() {
           {/* Clinical Chemistry */}
           <Box sx={{ mt: 2 }}>
             <Paper elevation={2} sx={{ p: 0, borderRadius: 2 }}>
-              <Accordion defaultExpanded>
+              <Accordion defaultExpanded sx={{ mb: '2px' }}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls="clinical-chemistry-content"
@@ -1228,12 +1341,12 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Electrolytes and Renal Function Tests */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Electrolytes and Renal Function Tests
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
@@ -1373,12 +1486,12 @@ export default function LabRequisition() {
 
                     {/* Right Column - Blood Sugar */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Blood Sugar
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -1444,12 +1557,12 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Tumor Markers - Under Blood Sugar */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Tumor Markers
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -1521,12 +1634,12 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Serum Protein and Lipids */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Serum Protein and Lipids
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -1640,12 +1753,12 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Hormones - Under Serum Protein and Lipids */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Hormones
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -1821,12 +1934,12 @@ export default function LabRequisition() {
 
                     {/* Right Column - Urine */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Urine
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -2036,12 +2149,12 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Cardiac and Liver Function Test - Under Urine */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Cardiac and Liver Function Test
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={12/5}>
                               <FormControlLabel
                                 control={
@@ -2161,7 +2274,7 @@ export default function LabRequisition() {
 
                   {/* Other Subsection */}
                   <Divider sx={{ my: 2 }} />
-                  <Box sx={{ mb: 1.5 }}>
+                  <Box sx={{ mb: 0.625 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
                       Other
                     </Typography>
@@ -2386,7 +2499,7 @@ export default function LabRequisition() {
           {/* Immunology */}
           <Box sx={{ mt: 2 }}>
             <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
-              <Accordion defaultExpanded>
+              <Accordion defaultExpanded sx={{ mb: '2px' }}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls="immunology-content"
@@ -2402,12 +2515,12 @@ export default function LabRequisition() {
                     {/* Left Column - Serology and Serum Protein Concentrate */}
                     <Grid item xs={12} md={6}>
                       {/* Serology */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Serology
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -2473,12 +2586,12 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* Serum Protein Concentrate */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Serum Protein Concentrate
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2}>
                               <FormControlLabel
                                 control={
@@ -2566,12 +2679,12 @@ export default function LabRequisition() {
 
                     {/* Right Column - Autoantibodies */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Autoantibodies
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -2729,12 +2842,12 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Lymphocyte Enumeration (80%) */}
                     <Grid item xs={12} md={9.6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Lymphocyte Enumeration
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2}>
                               <FormControlLabel
                                 control={
@@ -2814,12 +2927,12 @@ export default function LabRequisition() {
 
                     {/* Right Column - Other Tests (20%) */}
                     <Grid item xs={12} md={2.4}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Other Tests
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={12}>
                               <FormControlLabel
                                 control={
@@ -2874,7 +2987,7 @@ export default function LabRequisition() {
           {/* Bacteriology */}
           <Box sx={{ mt: 2 }}>
             <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
-              <Accordion defaultExpanded>
+              <Accordion defaultExpanded sx={{ mb: '2px' }}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls="bacteriology-content"
@@ -2889,8 +3002,8 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Antibiotic Treatment */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Please state any current antibiotic treatment:
                         </Typography>
                         <TextField
@@ -2908,12 +3021,12 @@ export default function LabRequisition() {
 
                     {/* Right Column - Other Tests */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Other
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={6}>
                               <FormControlLabel
                                 control={
@@ -2967,7 +3080,7 @@ export default function LabRequisition() {
           {/* Parasitology */}
           <Box sx={{ mt: 2 }}>
             <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
-              <Accordion defaultExpanded>
+              <Accordion defaultExpanded sx={{ mb: '2px' }}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls="parasitology-content"
@@ -2982,12 +3095,12 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - General Parasitology Tests (30%) */}
                     <Grid item xs={12} md={3.6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           General Parasitology Tests
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={6}>
                               <FormControlLabel
                                 control={
@@ -3035,12 +3148,12 @@ export default function LabRequisition() {
 
                     {/* Right Column - EIA (70%) */}
                     <Grid item xs={12} md={8.4}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           EIA
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2}>
                               <FormControlLabel
                                 control={
@@ -3127,7 +3240,7 @@ export default function LabRequisition() {
           {/* Virology */}
           <Box sx={{ mt: 2 }}>
             <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2 }}>
-              <Accordion defaultExpanded>
+              <Accordion defaultExpanded sx={{ mb: '2px' }}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls="virology-content"
@@ -3142,12 +3255,12 @@ export default function LabRequisition() {
                   <Grid container spacing={3}>
                     {/* Left Column - Fever and Rash */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Fever and Rash
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -3215,12 +3328,12 @@ export default function LabRequisition() {
 
                     {/* Right Column - Hepatitis Screening */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'primary.main' }}>
                           Hepatitis Screening
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={2}>
                               <FormControlLabel
                                 control={
@@ -3303,16 +3416,16 @@ export default function LabRequisition() {
                   {/* Vaccine Status Subsection */}
 
                   {/* Vaccine Status, STI Screening, and Advanced Virology Testing - Two Column Layout */}
-                  <Grid container spacing={3}>
+                  <Grid container spacing={1}>
                     {/* Left Column - Vaccine Status and STI Screening */}
                     <Grid item xs={12} md={6}>
                       {/* Vaccine Status */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 0.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.25, color: 'primary.main' }}>
                           Vaccine Status
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -3354,12 +3467,12 @@ export default function LabRequisition() {
                       </Box>
 
                       {/* STI Screening */}
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 0.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.25, color: 'primary.main' }}>
                           STI Screening
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={1}>
+                          <Grid container spacing={0.25}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -3415,35 +3528,35 @@ export default function LabRequisition() {
 
                     {/* Right Column - Advanced Virology Testing */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{ mb: 1.5, border: '1px solid #877449', borderRadius: 1, p: 1.5 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+                      <Box sx={{ mb: 0.625, border: '1px solid #877449', borderRadius: 1, p: 0.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.25, color: 'primary.main' }}>
                           Advanced Virology Testing
                         </Typography>
-                        <Paper elevation={1} sx={{ p: 1, backgroundColor: '#f8f9fa' }}>
-                          <Grid container spacing={1}>
+                        <Paper elevation={1} sx={{ p: 0.5, backgroundColor: '#f8f9fa' }}>
+                          <Grid container spacing={0.25}>
                             {/* Header Row */}
                             <Grid item xs={3}>
-                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main', fontSize: '0.7rem', py: 0.25 }}>
                                 Organism
                               </Typography>
                             </Grid>
                             <Grid item xs={2.25}>
-                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main', fontSize: '0.7rem', py: 0.25 }}>
                                 Genotyping
                               </Typography>
                             </Grid>
                             <Grid item xs={2.25}>
-                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main', fontSize: '0.7rem', py: 0.25 }}>
                                 Resistance
                               </Typography>
                             </Grid>
                             <Grid item xs={2.25}>
-                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main', fontSize: '0.7rem', py: 0.25 }}>
                                 Viral Load
                               </Typography>
                             </Grid>
                             <Grid item xs={2.25}>
-                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'primary.main', fontSize: '0.7rem', py: 0.25 }}>
                                 PCR
                               </Typography>
                             </Grid>
@@ -3452,47 +3565,51 @@ export default function LabRequisition() {
                             {Object.entries(virologyGridTests).map(([organism, tests]) => (
                               <Fragment key={organism}>
                                 <Grid item xs={3}>
-                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.7rem', py: 0.25 }}>
                                     {organism}
                                   </Typography>
                                 </Grid>
                                 <Grid item xs={2.25}>
-                                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
                                       checked={tests['Genotyping']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'Genotyping')}
                                       color="primary"
                                       size="small"
+                                      sx={{ py: 0.25 }}
                                     />
                                   </Box>
                                 </Grid>
                                 <Grid item xs={2.25}>
-                                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
                                       checked={tests['Resistance']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'Resistance')}
                                       color="primary"
                                       size="small"
+                                      sx={{ py: 0.25 }}
                                     />
                                   </Box>
                                 </Grid>
                                 <Grid item xs={2.25}>
-                                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
                                       checked={tests['Viral Load']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'Viral Load')}
                                       color="primary"
                                       size="small"
+                                      sx={{ py: 0.25 }}
                                     />
                                   </Box>
                                 </Grid>
                                 <Grid item xs={2.25}>
-                                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
                                       checked={tests['PCR']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'PCR')}
                                       color="primary"
                                       size="small"
+                                      sx={{ py: 0.25 }}
                                     />
                                   </Box>
                                 </Grid>
@@ -3670,7 +3787,7 @@ export default function LabRequisition() {
 
           {/* Clinical Information */}
           <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+            <Typography variant="h6" color="primary" sx={{ fontWeight: 600, mb: 0.625 }}>
               Clinical Information
             </Typography>
             <TextField
@@ -3685,7 +3802,7 @@ export default function LabRequisition() {
 
           {/* Urgency */}
           <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom color="primary" sx={{ fontWeight: 600 }}>
+            <Typography variant="h6" color="primary" sx={{ fontWeight: 600, mb: 0.625 }}>
               Urgency
             </Typography>
             <Box sx={{ mt: 2 }}>

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
-import { ObjectId } from 'mongodb';
-import clientPromise from '../../../../lib/mongodb';
+import { getDatabase } from '../../../../lib/mongodb';
 
 export async function POST(request) {
   try {
@@ -18,56 +17,118 @@ export async function POST(request) {
       );
     }
 
-    const userId = session.user.sub;
-    console.log('👤 API: User ID:', userId);
-
     // Parse request body
-    const { appointmentId, status } = await request.json();
-    console.log('📥 API: Reschedule data received:', { appointmentId, status });
+    const body = await request.json();
+    console.log('📥 API: Reschedule data received:', body);
 
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db('lukaria');
-    const collection = db.collection('appointments');
-     // Get appointment data
-    // Update appointment status to "request appointment"
-    console.log('💾 API: Updating appointment status to:', status);
-        
-    const query = { userId: userId };
-    
-    console.log('🔍 API: Query:', query);
-    
-    const result = await collection.updateOne(
-      query,
-      {
-        $set: {
-          status: status || 'request appointment',
-          rescheduleRequested: true,
-          rescheduleRequestedAt: new Date().toISOString(),
-          updatedAt: new Date(),
+    // Check if this is an admin reschedule (has userId and appointmentData)
+    if (body.userId && body.appointmentData) {
+      // Admin reschedule - check admin permissions
+      const adminGroups = session.user.groups || session.user['https://lukariagroup.com/roles'] || [];
+      const isAdmin = adminGroups.includes('Admin') || adminGroups.includes('Doctor');
+      
+      console.log('🔐 API: Admin groups:', adminGroups);
+      console.log('🔐 API: Is admin:', isAdmin);
+      
+      if (!isAdmin) {
+        console.error('❌ API: User is not authorized to reschedule for others');
+        return NextResponse.json(
+          { success: false, error: 'Not authorized' },
+          { status: 403 }
+        );
+      }
+
+      console.log('👤 API: Admin rescheduling for user:', body.userId);
+      console.log('📋 API: Appointment data to save:', JSON.stringify(body.appointmentData, null, 2));
+      
+      // Update user profile with new appointment data
+      const db = await getDatabase();
+      
+     
+      
+      const result = await db.collection('appointments').updateOne(
+        { userId: body.userId },
+        { 
+          $set: { 
+            isScheduled: true,
+            date: body.appointmentData.date,
+            time: body.appointmentData.time,
+            length: body.appointmentData.length,
+            rawData: { startDate: new Date(body.appointmentData.date),
+               endDate: new Date(body.appointmentData.date).toISOString() + body.appointmentData.length },
+            scheduledAt: new Date(),
+            type: body.appointmentData.type,
+          }
         },
-      },
-      { sort: { createdAt: -1 } } // Update the most recent if no ID provided
-    );
-
-    if (result.matchedCount === 0) {
-      console.error('❌ API: No appointment found to update');
-      return NextResponse.json(
-        { success: false, error: 'No appointment found' },
-        { status: 404 }
+        { upsert: true }
       );
-    }
 
-    console.log('✅ API: Appointment status updated successfully');
-
-    return NextResponse.json({
-      success: true,
-      message: 'Reschedule request processed successfully',
-      result: {
+      console.log('✅ API: Appointment updated successfully');
+      console.log('📊 API: Update result:', {
         matchedCount: result.matchedCount,
         modifiedCount: result.modifiedCount,
-      },
-    });
+        upsertedCount: result.upsertedCount,
+        upsertedId: result.upsertedId
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Appointment rescheduled successfully',
+        result: {
+          matchedCount: result.matchedCount,
+          modifiedCount: result.modifiedCount,
+          upsertedCount: result.upsertedCount,
+          upsertedId: result.upsertedId
+        },
+      });
+    } else {
+      // User reschedule request - original functionality
+      const userId = session.user.sub;
+      console.log('👤 API: User ID:', userId);
+
+      const { appointmentId, status } = body;
+      
+      const db = await getDatabase();
+      const collection = db.collection('appointments');
+      
+      console.log('💾 API: Updating appointment status to:', status);
+          
+      const query = { userId: userId };
+      
+      console.log('🔍 API: Query:', query);
+      
+      const result = await collection.updateOne(
+        query,
+        {
+          $set: {
+            status: status || 'request appointment',
+            rescheduleRequested: true,
+            rescheduleRequestedAt: new Date().toISOString(),
+            updatedAt: new Date(),
+          },
+        },
+        { sort: { createdAt: -1 } }
+      );
+
+      if (result.matchedCount === 0) {
+        console.error('❌ API: No appointment found to update');
+        return NextResponse.json(
+          { success: false, error: 'No appointment found' },
+          { status: 404 }
+        );
+      }
+
+      console.log('✅ API: Appointment status updated successfully');
+
+      return NextResponse.json({
+        success: true,
+        message: 'Reschedule request processed successfully',
+        result: {
+          matchedCount: result.matchedCount,
+          modifiedCount: result.modifiedCount,
+        },
+      });
+    }
 
   } catch (error) {
     console.error('❌ API: Error processing reschedule request:', error);

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useAppSelector } from '../store/hooks';
 
 /**
  * Access control rules for different pages
@@ -61,12 +62,17 @@ export function useBasicAccess() {
 export function useConsultationAccess() {
   const { user, isLoading } = useUser();
   const router = useRouter();
+  const profileState = useAppSelector((state) => state.profile);
 
   useEffect(() => {
     if (!isLoading && user) {
       const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-      const consultationOccurred = user.user_metadata?.consultationOccurred || 
-                                   user['https://lukariagroup.com/user_metadata']?.consultationOccurred;
+      
+      // Check multiple sources for consultationOccurred (prefer MongoDB profile)
+      const consultationOccurred = profileState.profile?.user_metadata?.consultationOccurred ||
+                                   user.user_metadata?.consultationOccurred || 
+                                   user['https://lukariagroup.com/user_metadata']?.consultationOccurred ||
+                                   false;
       
       const isAdmin = userGroups.includes('Admin');
       const isPatientWithConsultation = userGroups.includes('Patient') && consultationOccurred;
@@ -74,6 +80,9 @@ export function useConsultationAccess() {
       console.log('🔐 Consultation Access Check:', {
         groups: userGroups,
         consultationOccurred,
+        consultationFromMongoDB: profileState.profile?.user_metadata?.consultationOccurred,
+        consultationFromMetadata: user.user_metadata?.consultationOccurred,
+        consultationFromClaim: user['https://lukariagroup.com/user_metadata']?.consultationOccurred,
         isAdmin,
         isPatientWithConsultation,
         hasAccess: isAdmin || isPatientWithConsultation
@@ -90,7 +99,7 @@ export function useConsultationAccess() {
         }
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, profileState.profile, router]);
 
   return { user, isLoading };
 }
@@ -126,12 +135,25 @@ export function useAdminAccess() {
 /**
  * Utility function to check if user should see navigation items
  */
-export function canAccessPage(user, pageType) {
+export function canAccessPage(user, pageType, profileData = null) {
   if (!user) return false;
   
   const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-  const consultationOccurred = user.user_metadata?.consultationOccurred || 
-                               user['https://lukariagroup.com/user_metadata']?.consultationOccurred;
+  
+  // Check multiple sources (prefer MongoDB profile if available)
+  const consultationOccurred = profileData?.user_metadata?.consultationOccurred ||
+                               user.user_metadata?.consultationOccurred || 
+                               user['https://lukariagroup.com/user_metadata']?.consultationOccurred ||
+                               false;
+
+  console.log('🔐 canAccessPage check:', {
+    pageType,
+    userGroups,
+    consultationOccurred,
+    consultationFromProfile: profileData?.user_metadata?.consultationOccurred,
+    consultationFromMetadata: user.user_metadata?.consultationOccurred,
+    consultationFromClaim: user['https://lukariagroup.com/user_metadata']?.consultationOccurred,
+  });
 
   switch (pageType) {
     case 'basic':

@@ -3,6 +3,8 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useAppDispatch } from '../store/hooks';
+import { fetchProfile } from '../store/slices/profileSlice';
 import {
   AppBar,
   Toolbar,
@@ -18,10 +20,19 @@ export default function Header() {
   const { user, isLoading } = useUser();
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Load profile when user is authenticated
+  useEffect(() => {
+    if (user && mounted) {
+      console.log('🔄 Header: User authenticated, loading profile...');
+      dispatch(fetchProfile());
+    }
+  }, [user, mounted, dispatch]);
 
   // Check if navigation drawer should be visible
   const isNavigationVisible = () => {

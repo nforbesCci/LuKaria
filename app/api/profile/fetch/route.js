@@ -38,7 +38,11 @@ export async function GET(request) {
       userId: profile.userId,
       name: profile.name,
       email: profile.userEmail,
+      hasUserMetadata: !!profile.user_metadata,
+      consultationOccurred: profile.user_metadata?.consultationOccurred,
     });
+    
+    console.log('📋 Profile Fetch API: Full profile data:', JSON.stringify(profile, null, 2));
 
     return NextResponse.json({
       success: true,
