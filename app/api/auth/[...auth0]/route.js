@@ -1,6 +1,6 @@
 import { handleAuth, handleLogin, handleCallback, handleLogout } from '@auth0/nextjs-auth0';
 
-export const GET = handleAuth({
+const auth0Handler = handleAuth({
   login: handleLogin({
     authorizationParams: {
       scope: 'openid profile email',
@@ -52,3 +52,9 @@ export const GET = handleAuth({
     returnTo: process.env.AUTH0_BASE_URL,
   }),
 });
+
+export async function GET(request, context) {
+  // Await params in Next.js 15
+  const params = await context.params;
+  return auth0Handler(request, { params });
+}

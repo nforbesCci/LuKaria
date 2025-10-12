@@ -184,7 +184,7 @@ export default function FAQ() {
               }}
             >
               <Login sx={{ fontSize: 20 }} />
-              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Box>
                 Login
               </Box>
             </Box>

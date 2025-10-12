@@ -6,6 +6,7 @@ import {
   Container,
   Typography,
   Box,
+  Card,
   CircularProgress,
   Alert,
 } from '@mui/material';
@@ -165,7 +166,7 @@ export default function Contact() {
               }}
             >
               <Login sx={{ fontSize: 20 }} />
-              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Box>
                 Login
               </Box>
             </Box>
@@ -174,25 +175,26 @@ export default function Contact() {
       </Box>
 
       {/* Main Content */}
-      <Box sx={{ backgroundColor: '#000000', minHeight: '100vh', py: 4 }}>
+      <Box sx={{ backgroundColor: '#FFFFFF', minHeight: '100vh', py: 4 }}>
         <Container maxWidth="lg" sx={{ mt: 16, mb: 4 }}>
-          <Typography 
-            variant="h3" 
-            component="h1" 
-            gutterBottom 
-            textAlign="center" 
-            sx={{ 
-              color: '#877449',
-              fontSize: '2rem',
-              fontWeight: 400,
-              fontFamily: 'Tahoma, sans-serif',
-              mb: 4
-            }}
-          >
-            Contact Us
-          </Typography>
+          <Card sx={{ backgroundColor: '#000000', p: 4 }}>
+            <Typography 
+              variant="h3" 
+              component="h1" 
+              gutterBottom 
+              textAlign="center" 
+              sx={{ 
+                color: '#877449',
+                fontSize: '2rem',
+                fontWeight: 400,
+                fontFamily: 'Tahoma, sans-serif',
+                mb: 4
+              }}
+            >
+              Contact Us
+            </Typography>
 
-          <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center' }}>
+            <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center' }}>
             <Box sx={{ 
               backgroundColor: '#36454F', 
               p: 0.625, 
@@ -314,7 +316,8 @@ export default function Contact() {
                 Click to send a WhatsApp message
               </Typography>
             </Box>
-          </Box>
+            </Box>
+          </Card>
         </Container>
       </Box>
     </>
