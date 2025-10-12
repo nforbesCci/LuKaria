@@ -89,7 +89,8 @@ export function useConsultationAccess() {
       });
 
       // Admin has full access, Patient needs consultation
-      if (!isAdmin && !isPatientWithConsultation) {
+
+      if (profileState?.profile && !isAdmin && !isPatientWithConsultation && !consultationOccurred) {
         if (userGroups.includes('Patient') && !consultationOccurred) {
           console.log('❌ Access Denied: Patient has not had consultation yet');
           router.push('/consultation-required');
@@ -97,6 +98,7 @@ export function useConsultationAccess() {
           console.log('❌ Access Denied: User does not have required group');
           router.push('/unauthorized');
         }
+        
       }
     }
   }, [user, isLoading, profileState.profile, router]);

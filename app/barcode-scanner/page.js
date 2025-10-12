@@ -230,14 +230,15 @@ function BarcodeScannerContent() {
     if (productInfo && returnTo === 'meal-tracker') {
       // Store product info in localStorage for meal tracker to pick up
       const mealData = {
-        name: productInfo.name,
+        name: productInfo.name || 'Unknown Product',
         calories: productInfo.calories || 0,
         servingSize: productInfo.servingSize || '100g',
-        barcode: productInfo.barcode,
-        brand: productInfo.brand,
-        source: productInfo.source
+        barcode: scannedBarcode || productInfo.barcode,
+        brand: productInfo.brand || '',
+        source: productInfo.source || 'Manual Entry'
       };
       
+      console.log('📦 Sending product to meal tracker:', mealData);
       localStorage.setItem('scannedProductForMeal', JSON.stringify(mealData));
       
       // Navigate back to meal tracker
@@ -380,10 +381,20 @@ function BarcodeScannerContent() {
                 <Button
                   variant="outlined"
                   startIcon={<NavigateBefore />}
-                  onClick={() => window.location.href = '/meal-tracker'}
+                  onClick={() => {
+                    // Preserve the form data flag to keep the add meal form open
+                    const formData = localStorage.getItem('mealFormData');
+                    if (formData) {
+                      // Form data exists, will return to add meal form
+                      window.location.href = '/meal-tracker';
+                    } else {
+                      // No form data, just return to meal tracker
+                      window.location.href = '/meal-tracker';
+                    }
+                  }}
                   sx={{ textTransform: 'none' }}
                 >
-                  Back to Meal Tracker
+                  Back to Add Meal
                 </Button>
               )}
               {!isScanning ? (
@@ -458,7 +469,7 @@ function BarcodeScannerContent() {
             </Typography>
             {returnTo === 'meal-tracker' ? (
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Enter a barcode manually if scanning doesn't work. Once you find the product, click "Add to Meal Tracker" to return to your meal form.
+                Enter a barcode manually if scanning doesn't work. Once you find the product, click "Add to Meal" to return to your meal form, or click "Back to Add Meal" above to return without selecting a product.
               </Typography>
             ) : (
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -642,13 +653,15 @@ function BarcodeScannerContent() {
                     </Alert>
                   )}
 
-                  {returnTo === 'meal-tracker' && productInfo && productInfo.calories && (
+                  {returnTo === 'meal-tracker' && productInfo && !productInfo.suggestGoogleLens && (
                     <Box sx={{ mt: 3, p: 2, backgroundColor: 'success.50', borderRadius: 1 }}>
                       <Typography variant="subtitle2" gutterBottom color="success.main">
                         Ready to add this to your meal?
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        This product will be added to your meal tracker with the nutritional information we found.
+                        {productInfo.calories 
+                          ? 'This product will be added to your meal tracker with the nutritional information we found.'
+                          : 'This product will be added to your meal tracker. You can fill in the nutritional information manually.'}
                       </Typography>
                       <Button
                         variant="contained"
@@ -657,7 +670,7 @@ function BarcodeScannerContent() {
                         onClick={handleUseForMeal}
                         sx={{ textTransform: 'none' }}
                       >
-                        Add to Meal Tracker
+                        Add to Meal
                       </Button>
                     </Box>
                   )}

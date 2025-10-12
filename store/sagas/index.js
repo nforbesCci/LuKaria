@@ -8,6 +8,7 @@ import measurementsSaga from './measurementsSaga';
 import medicationSaga from './medicationSaga';
 import consentSaga from './consentSaga';
 import notificationSaga from './notificationSaga';
+import mealsSaga from './mealsSaga';
 
 // Root saga that combines all sagas
 export default function* rootSaga() {
@@ -21,6 +22,7 @@ export default function* rootSaga() {
     fork(medicationSaga),
     fork(consentSaga),
     fork(notificationSaga),
+    fork(mealsSaga),
   ]);
 }
 

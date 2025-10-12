@@ -4,6 +4,8 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useConsultationAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveMeals, fetchMeals } from '../../store/slices/mealsSlice';
 import Header from '../../components/Header';
 import {
   Container,
@@ -33,6 +35,9 @@ import {
   FormControlLabel,
   Radio,
   InputAdornment,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   Person,
@@ -54,6 +59,8 @@ export default function MealTracker() {
   
   // Access control - Admin or Patient with consultation
   useConsultationAccess();
+  const dispatch = useDispatch();
+  const mealsState = useSelector((state) => state.meals);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
@@ -64,79 +71,136 @@ export default function MealTracker() {
     name: '',
     calories: '',
     quantity: '',
-    unit: 'g',
+    unit: 'servings',
     mealType: 'breakfast',
     notes: ''
   });
+  const [foodSearchResults, setFoodSearchResults] = useState([]);
+  const [isSearchingFood, setIsSearchingFood] = useState(false);
+  const [showFoodResults, setShowFoodResults] = useState(false);
+  const [mealItems, setMealItems] = useState([]); // Track multiple items in a meal
 
   useEffect(() => {
     setMounted(true);
     setSelectedDate(new Date());
-  }, []);
-
-  // Load user's meals from Auth0 metadata
-  useEffect(() => {
-    if (user && selectedDate) {
-      const savedMeals = user.user_metadata?.meals || {};
-      const dateKey = formatDateKey(selectedDate);
-      setMeals(savedMeals[dateKey] || []);
+    
+    // Fetch meals from database when component mounts
+    if (user) {
+      dispatch(fetchMeals());
     }
-  }, [user, selectedDate]);
+  }, [user, dispatch]);
 
-  // Check for scanned product data from barcode scanner
+  // Load meals from Redux store for selected date
+  useEffect(() => {
+    if (selectedDate && mealsState.meals) {
+      const dateKey = formatDateKey(selectedDate);
+      setMeals(mealsState.meals[dateKey] || []);
+    }
+  }, [selectedDate, mealsState.meals]);
+
+  // Check for scanned product data from barcode scanner or returning to add meal form
   useEffect(() => {
     const scannedProduct = localStorage.getItem('scannedProductForMeal');
     const formData = localStorage.getItem('mealFormData');
     
-    if (scannedProduct && mounted) {
-      try {
-        const productData = JSON.parse(scannedProduct);
-        let restoredFormData = {
-          name: productData.name,
-          calories: productData.calories.toString(),
-          quantity: '1',
-          unit: productData.servingSize.includes('g') ? 'g' : 'serving',
-          mealType: 'breakfast',
-          notes: `Scanned from barcode: ${productData.barcode}`
-        };
-        
-        // Restore previous form data if available
-        if (formData) {
-          try {
-            const parsedFormData = JSON.parse(formData);
-            restoredFormData = {
-              ...parsedFormData,
-              name: productData.name,
-              calories: productData.calories.toString(),
-              quantity: parsedFormData.quantity || '1',
-              unit: productData.servingSize.includes('g') ? 'g' : 'serving',
-              notes: `Scanned from barcode: ${productData.barcode}`
-            };
-            
-            // Restore editing state
-            if (parsedFormData.isEditing) {
-              setEditingMeal({ id: Date.now() }); // Placeholder for editing
-            }
-            
-            // Restore selected date
-            if (parsedFormData.selectedDate) {
-              setSelectedDate(new Date(parsedFormData.selectedDate));
-            }
-          } catch (error) {
-            console.error('Error parsing form data:', error);
+    if (mounted) {
+      // Case 1: User scanned/selected a product
+      if (scannedProduct) {
+        try {
+          const productData = JSON.parse(scannedProduct);
+          console.log('📦 Received product from barcode scanner:', productData);
+          
+          // Always use servings as unit
+          let unit = 'servings';
+          
+          // Build notes with brand info if available
+          let notes = `Scanned from barcode: ${productData.barcode || 'unknown'}`;
+          if (productData.brand) {
+            notes += ` | Brand: ${productData.brand}`;
           }
+          if (productData.source) {
+            notes += ` | Source: ${productData.source}`;
+          }
+          
+          let restoredFormData = {
+            name: productData.name || 'Unknown Product',
+            calories: (productData.calories || 0).toString(),
+            quantity: '1',
+            unit: unit,
+            mealType: 'breakfast',
+            notes: notes
+          };
+          
+          // Restore previous form data if available
+          if (formData) {
+            try {
+              const parsedFormData = JSON.parse(formData);
+              restoredFormData = {
+                ...restoredFormData,
+                quantity: parsedFormData.quantity || '1',
+                mealType: parsedFormData.mealType || 'breakfast',
+              };
+              
+              // Restore editing state
+              if (parsedFormData.isEditing) {
+                setEditingMeal({ id: Date.now() }); // Placeholder for editing
+              }
+              
+              // Restore selected date
+              if (parsedFormData.selectedDate) {
+                setSelectedDate(new Date(parsedFormData.selectedDate));
+              }
+            } catch (error) {
+              console.error('Error parsing form data:', error);
+            }
+          }
+          
+          console.log('✅ Populating meal form with:', restoredFormData);
+          setNewMeal(restoredFormData);
+          setIsAddingMeal(true);
+          
+          // Clear the localStorage data
+          localStorage.removeItem('scannedProductForMeal');
+          localStorage.removeItem('mealFormData');
+        } catch (error) {
+          console.error('Error parsing scanned product data:', error);
+          localStorage.removeItem('scannedProductForMeal');
+          localStorage.removeItem('mealFormData');
         }
-        
-        setNewMeal(restoredFormData);
-        setIsAddingMeal(true);
-        
-        // Clear the localStorage data
-        localStorage.removeItem('scannedProductForMeal');
-        localStorage.removeItem('mealFormData');
-      } catch (error) {
-        console.error('Error parsing scanned product data:', error);
-        localStorage.removeItem('scannedProductForMeal');
-        localStorage.removeItem('mealFormData');
+      } 
+      // Case 2: User clicked "Back to Add Meal" without selecting a product
+      else if (formData) {
+        try {
+          const parsedFormData = JSON.parse(formData);
+          console.log('🔙 Returning to add meal form:', parsedFormData);
+          
+          setNewMeal({
+            name: parsedFormData.name || '',
+            calories: parsedFormData.calories || '',
+            quantity: parsedFormData.quantity || '',
+            unit: parsedFormData.unit || 'servings',
+            mealType: parsedFormData.mealType || 'breakfast',
+            notes: parsedFormData.notes || ''
+          });
+          
+          // Restore editing state
+          if (parsedFormData.isEditing) {
+            setEditingMeal({ id: Date.now() }); // Placeholder for editing
+          }
+          
+          // Restore selected date
+          if (parsedFormData.selectedDate) {
+            setSelectedDate(new Date(parsedFormData.selectedDate));
+          }
+          
+          setIsAddingMeal(true);
+          
+          // Clear the localStorage data
+          localStorage.removeItem('mealFormData');
+        } catch (error) {
+          console.error('Error parsing form data:', error);
+          localStorage.removeItem('mealFormData');
+        }
       }
     }
   }, [mounted]);
@@ -185,15 +249,18 @@ export default function MealTracker() {
       name: '',
       calories: '',
       quantity: '',
-      unit: 'g',
+      unit: 'servings',
       mealType: 'breakfast',
       notes: ''
     });
+    setFoodSearchResults([]);
+    setShowFoodResults(false);
+    setMealItems([]); // Clear any previous meal items
   };
 
-  const handleSaveMeal = () => {
+  const handleAddItemToMeal = () => {
     if (!newMeal.name.trim()) {
-      alert('Please enter a meal name');
+      alert('Please enter an item name');
       return;
     }
 
@@ -202,23 +269,104 @@ export default function MealTracker() {
       return;
     }
 
-    const meal = {
-      ...newMeal,
+    if (!newMeal.quantity || newMeal.quantity <= 0) {
+      alert('Please enter a valid quantity');
+      return;
+    }
+
+    const newItem = {
       id: Date.now(),
+      name: newMeal.name,
       calories: parseFloat(newMeal.calories),
-      quantity: parseFloat(newMeal.quantity) || 1,
-      date: selectedDate.toISOString()
+      quantity: parseFloat(newMeal.quantity),
+      unit: newMeal.unit,
+      notes: newMeal.notes
     };
 
-    const updatedMeals = [...meals, meal];
-    setMeals(updatedMeals);
+    setMealItems([...mealItems, newItem]);
     
-    // Save to user metadata (in a real app, this would be an API call)
-    console.log('Saving meal:', meal);
-    console.log('Updated meals for date:', formatDateKey(selectedDate), updatedMeals);
+    // Clear the form for next item, but keep mealType
+    setNewMeal({
+      name: '',
+      calories: '',
+      quantity: '',
+      unit: 'servings',
+      mealType: newMeal.mealType,
+      notes: ''
+    });
     
-    setIsAddingMeal(false);
-    setNewMeal({ name: '', calories: '', quantity: '', unit: 'g', mealType: 'breakfast', notes: '' });
+    setFoodSearchResults([]);
+    setShowFoodResults(false);
+  };
+
+  const handleRemoveItemFromMeal = (itemId) => {
+    setMealItems(mealItems.filter(item => item.id !== itemId));
+  };
+
+  const handleSaveMeal = () => {
+    // If there are items in the list, save them all
+    if (mealItems.length > 0) {
+      const newMeals = mealItems.map(item => ({
+        ...item,
+        id: Date.now() + Math.random(), // Ensure unique IDs
+        mealType: newMeal.mealType,
+        date: selectedDate.toISOString()
+      }));
+
+      const updatedMeals = [...meals, ...newMeals];
+      setMeals(updatedMeals);
+      
+      console.log('Saving meals:', newMeals);
+      console.log('Updated meals for date:', formatDateKey(selectedDate), updatedMeals);
+      
+      // Dispatch action to save to database
+      dispatch(saveMeals({
+        date: formatDateKey(selectedDate),
+        meals: updatedMeals
+      }));
+      
+      setIsAddingMeal(false);
+      setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
+      setMealItems([]);
+      setFoodSearchResults([]);
+      setShowFoodResults(false);
+    } else {
+      // If no items in list but form is filled, save current item
+      if (!newMeal.name.trim()) {
+        alert('Please add at least one item to the meal');
+        return;
+      }
+
+      if (!newMeal.calories || newMeal.calories <= 0) {
+        alert('Please enter a valid calorie count');
+        return;
+      }
+
+      const meal = {
+        ...newMeal,
+        id: Date.now(),
+        calories: parseFloat(newMeal.calories),
+        quantity: parseFloat(newMeal.quantity) || 1,
+        date: selectedDate.toISOString()
+      };
+
+      const updatedMeals = [...meals, meal];
+      setMeals(updatedMeals);
+      
+      console.log('Saving meal:', meal);
+      console.log('Updated meals for date:', formatDateKey(selectedDate), updatedMeals);
+      
+      // Dispatch action to save to database
+      dispatch(saveMeals({
+        date: formatDateKey(selectedDate),
+        meals: updatedMeals
+      }));
+      
+      setIsAddingMeal(false);
+      setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
+      setFoodSearchResults([]);
+      setShowFoodResults(false);
+    }
   };
 
   const handleDeleteMeal = (mealId) => {
@@ -227,6 +375,13 @@ export default function MealTracker() {
       setMeals(updatedMeals);
       
       console.log('Deleted meal:', mealId);
+      
+      // Dispatch action to save to database
+      dispatch(saveMeals({
+        date: formatDateKey(selectedDate),
+        meals: updatedMeals
+      }));
+      
       alert('Meal deleted successfully!');
     }
   };
@@ -269,9 +424,18 @@ export default function MealTracker() {
     
     console.log('Updated meal:', updatedMeal);
     
+    // Dispatch action to save to database
+    dispatch(saveMeals({
+      date: formatDateKey(selectedDate),
+      meals: updatedMeals
+    }));
+    
     setIsAddingMeal(false);
     setEditingMeal(null);
-    setNewMeal({ name: '', calories: '', quantity: '', unit: 'g', mealType: 'breakfast', notes: '' });
+    setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
+    setMealItems([]);
+    setFoodSearchResults([]);
+    setShowFoodResults(false);
   };
 
   const handleBarcodeLookup = () => {
@@ -286,6 +450,55 @@ export default function MealTracker() {
     
     // Navigate to barcode scanner page
     router.push('/barcode-scanner?returnTo=meal-tracker');
+  };
+
+  const handleFoodSearch = async () => {
+    const itemName = newMeal.name.trim();
+    
+    // Only search if there's a valid search term
+    if (!itemName || itemName.length < 3) {
+      setFoodSearchResults([]);
+      setShowFoodResults(false);
+      return;
+    }
+    
+    setIsSearchingFood(true);
+    setShowFoodResults(true);
+    
+    try {
+      console.log('🔍 Searching for food:', itemName);
+      const response = await fetch(`/api/food/search?query=${encodeURIComponent(itemName)}&pageSize=10`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to search for food');
+      }
+      
+      const data = await response.json();
+      console.log('✅ Food search results:', data);
+      
+      setFoodSearchResults(data.foods || []);
+    } catch (error) {
+      console.error('❌ Error searching for food:', error);
+      alert('Failed to search for food. Please try again.');
+      setFoodSearchResults([]);
+    } finally {
+      setIsSearchingFood(false);
+    }
+  };
+
+  const handleSelectFood = (food) => {
+    // Auto-populate the form with selected food data
+    setNewMeal({
+      ...newMeal,
+      name: food.description,
+      calories: food.calories.toString() || '',
+      quantity: food.servingSize?.toString() || '100',
+      unit: 'servings',
+      notes: food.brandName ? `Brand: ${food.brandName}` : ''
+    });
+    
+    setShowFoodResults(false);
+    setFoodSearchResults([]);
   };
 
   // Calculate total calories for the day
@@ -410,7 +623,10 @@ export default function MealTracker() {
                   onClick={() => {
                     setIsAddingMeal(false);
                     setEditingMeal(null);
-                    setNewMeal({ name: '', calories: '', quantity: '', unit: 'g', mealType: 'breakfast', notes: '' });
+                    setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
+    setMealItems([]);
+                    setFoodSearchResults([]);
+                    setShowFoodResults(false);
                   }}
                   sx={{ textTransform: 'none' }}
                 >
@@ -423,14 +639,6 @@ export default function MealTracker() {
             <Card sx={{ mb: 4 }}>
               <CardContent sx={{ p: 4 }}>
                 <Stack spacing={3}>
-                  <TextField
-                    fullWidth
-                    label="Meal Name"
-                    value={newMeal.name}
-                    onChange={(e) => setNewMeal({...newMeal, name: e.target.value})}
-                    placeholder="e.g., Grilled Chicken Breast"
-                  />
-                  
                   <FormControl component="fieldset">
                     <FormLabel component="legend">Meal Type</FormLabel>
                     <RadioGroup
@@ -449,7 +657,28 @@ export default function MealTracker() {
                     </RadioGroup>
                   </FormControl>
 
-                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                    <TextField
+                      label="Item"
+                      value={newMeal.name}
+                      onChange={(e) => setNewMeal({...newMeal, name: e.target.value})}
+                      onBlur={handleFoodSearch}
+                      placeholder="e.g., Grilled Chicken Breast"
+                      sx={{ flexGrow: 1, minWidth: 200 }}
+                      helperText="Type food name and click away to search for nutritional info or by barcode"
+                    />
+                    <Button
+                      variant="outlined"
+                      startIcon={<QrCodeScanner />}
+                      onClick={handleBarcodeLookup}
+                      sx={{ 
+                        textTransform: 'none',
+                        height: '56px',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Scan Barcode
+                    </Button>
                     <TextField
                       label="Quantity"
                       type="number"
@@ -458,24 +687,101 @@ export default function MealTracker() {
                       inputProps={{ step: "0.1", min: "0" }}
                       sx={{ width: 120 }}
                     />
+                    <FormControl sx={{ width: 120 }}>
+                      <InputLabel>Unit</InputLabel>
+                      <Select
+                        value={newMeal.unit}
+                        onChange={(e) => setNewMeal({...newMeal, unit: e.target.value})}
+                        label="Unit"
+                      >
+                        <MenuItem value="servings">servings</MenuItem>
+                      </Select>
+                    </FormControl>
                     <TextField
-                      label="Unit"
-                      value={newMeal.unit}
-                      onChange={(e) => setNewMeal({...newMeal, unit: e.target.value})}
-                      sx={{ width: 100 }}
-                    />
-                    <TextField
-                      label="Calories per unit"
+                      label="Calories per serving"
                       type="number"
                       value={newMeal.calories}
                       onChange={(e) => setNewMeal({...newMeal, calories: e.target.value})}
                       inputProps={{ step: "0.1", min: "0" }}
                       InputProps={{
-                        endAdornment: <InputAdornment position="end">cal/{newMeal.unit}</InputAdornment>
+                        endAdornment: <InputAdornment position="end">cal/serving</InputAdornment>
                       }}
-                      sx={{ flexGrow: 1 }}
+                      sx={{ flexGrow: 1, minWidth: 150 }}
                     />
                   </Box>
+
+                  {/* Food Search Results */}
+                  {showFoodResults && (
+                    <Paper elevation={3} sx={{ p: 2, maxHeight: 400, overflow: 'auto' }}>
+                      {isSearchingFood ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 3 }}>
+                          <CircularProgress size={24} sx={{ mr: 2 }} />
+                          <Typography>Searching food database...</Typography>
+                        </Box>
+                      ) : foodSearchResults.length > 0 ? (
+                        <>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="h6">
+                              Found {foodSearchResults.length} results
+                            </Typography>
+                            <IconButton size="small" onClick={() => setShowFoodResults(false)}>
+                              <Close />
+                            </IconButton>
+                          </Box>
+                          <List dense>
+                            {foodSearchResults.map((food, index) => (
+                              <ListItem
+                                key={food.fdcId}
+                                button
+                                onClick={() => handleSelectFood(food)}
+                                divider={index < foodSearchResults.length - 1}
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: 'action.hover',
+                                    cursor: 'pointer'
+                                  }
+                                }}
+                              >
+                                <ListItemIcon>
+                                  <Restaurant color="primary" />
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={food.description}
+                                  secondary={
+                                    <Box>
+                                      {food.brandName && (
+                                        <Typography variant="caption" display="block" color="text.secondary">
+                                          Brand: {food.brandName}
+                                        </Typography>
+                                      )}
+                                      <Typography variant="body2" component="span">
+                                        Calories: {Math.round(food.calories)} cal
+                                        {food.servingSize && ` per ${food.servingSize}${food.servingSizeUnit || ''}`}
+                                      </Typography>
+                                      {(food.protein > 0 || food.carbs > 0 || food.fat > 0) && (
+                                        <Typography variant="caption" display="block" color="text.secondary">
+                                          P: {food.protein?.toFixed(1)}g | C: {food.carbs?.toFixed(1)}g | F: {food.fat?.toFixed(1)}g
+                                        </Typography>
+                                      )}
+                                    </Box>
+                                  }
+                                />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </>
+                      ) : (
+                        <Box sx={{ textAlign: 'center', py: 3 }}>
+                          <Typography color="text.secondary">
+                            No results found for "{newMeal.name}"
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Try a different search term or enter nutritional info manually
+                          </Typography>
+                        </Box>
+                      )}
+                    </Paper>
+                  )}
 
                   {newMeal.quantity && newMeal.calories && (
                     <Box sx={{ p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
@@ -495,27 +801,68 @@ export default function MealTracker() {
                     placeholder="Any additional notes about this meal..."
                   />
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<QrCodeScanner />}
-                      onClick={handleBarcodeLookup}
-                      sx={{ textTransform: 'none' }}
-                    >
-                      Scan Barcode
-                    </Button>
-                    <Typography variant="body2" color="text.secondary">
-                      Don't know the calories? Use the barcode scanner to find nutritional information!
-                    </Typography>
-                  </Box>
+                  {/* Items Added to Meal */}
+                  {!editingMeal && mealItems.length > 0 && (
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: 'grey.50' }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Items in this meal ({mealItems.length})
+                      </Typography>
+                      <List dense>
+                        {mealItems.map((item, index) => (
+                          <ListItem
+                            key={item.id}
+                            divider={index < mealItems.length - 1}
+                            secondaryAction={
+                              <IconButton 
+                                edge="end" 
+                                size="small" 
+                                onClick={() => handleRemoveItemFromMeal(item.id)}
+                                color="error"
+                              >
+                                <Delete />
+                              </IconButton>
+                            }
+                          >
+                            <ListItemIcon>
+                              <Restaurant fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={item.name}
+                              secondary={`${item.quantity} ${item.unit} • ${Math.round(item.calories * item.quantity)} cal`}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                      <Box sx={{ mt: 2, p: 1, backgroundColor: 'primary.50', borderRadius: 1 }}>
+                        <Typography variant="body2" fontWeight="bold">
+                          Total: {Math.round(mealItems.reduce((sum, item) => sum + (item.calories * item.quantity), 0))} calories
+                        </Typography>
+                      </Box>
+                    </Paper>
+                  )}
 
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mt: 3, flexWrap: 'wrap' }}>
+                    {!editingMeal && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<Add />}
+                        onClick={handleAddItemToMeal}
+                        sx={{ textTransform: 'none' }}
+                      >
+                        Add Item to Meal
+                      </Button>
+                    )}
+
+                    <Box sx={{ display: 'flex', gap: 2, ml: 'auto' }}>
                     <Button
                       variant="outlined"
                       onClick={() => {
                         setIsAddingMeal(false);
                         setEditingMeal(null);
-                        setNewMeal({ name: '', calories: '', quantity: '', unit: 'g', mealType: 'breakfast', notes: '' });
+                        setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
+    setMealItems([]);
+                        setFoodSearchResults([]);
+                        setShowFoodResults(false);
                       }}
                       sx={{ textTransform: 'none' }}
                     >
@@ -526,8 +873,9 @@ export default function MealTracker() {
                       variant="contained"
                       sx={{ textTransform: 'none' }}
                     >
-                      {editingMeal ? 'Update Meal' : 'Add Meal'}
+                      {editingMeal ? 'Update Meal' : (mealItems.length > 0 ? 'Save Meal' : 'Add Meal')}
                     </Button>
+                    </Box>
                   </Box>
                 </Stack>
               </CardContent>
@@ -710,28 +1058,18 @@ export default function MealTracker() {
         {mealTypes.map(type => (
           <Card key={type.key} sx={{ mb: 3 }}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant="h6" sx={{ mr: 1 }}>
-                    {type.icon}
-                  </Typography>
-                  <Typography variant="h6">
-                    {type.label}
-                  </Typography>
-                  <Chip 
-                    label={`${mealsByType[type.key].length} items`}
-                    size="small"
-                    sx={{ ml: 2 }}
-                  />
-                </Box>
-                <Button
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ mr: 1 }}>
+                  {type.icon}
+                </Typography>
+                <Typography variant="h6">
+                  {type.label}
+                </Typography>
+                <Chip 
+                  label={`${mealsByType[type.key].length} items`}
                   size="small"
-                  startIcon={<Add />}
-                  onClick={handleAddMeal}
-                  sx={{ textTransform: 'none' }}
-                >
-                  Add {type.label}
-                </Button>
+                  sx={{ ml: 2 }}
+                />
               </Box>
               
               {mealsByType[type.key].length === 0 ? (
