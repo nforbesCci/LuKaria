@@ -6,6 +6,7 @@ import {
   Container,
   Typography,
   Box,
+  Card,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -192,48 +193,49 @@ export default function FAQ() {
       </Box>
 
       {/* Main Content */}
-      <Box sx={{ backgroundColor: '#000000', minHeight: '100vh', py: 4 }}>
+      <Box sx={{ backgroundColor: '#FFFFFF', minHeight: '100vh', py: 4 }}>
         <Container maxWidth="lg" sx={{ mt: 16, mb: 4 }}>
-          <Typography 
-            variant="h3" 
-            component="h1" 
-            gutterBottom 
-            textAlign="center" 
-            color="primary"
-            sx={{
-              fontSize: { xs: '1.5rem', sm: '2.5rem' },
-              fontWeight: 600,
-              mb: 4,
-              color: '#877449'
-            }}
-          >
-            Frequently Asked Questions
-          </Typography>
-
-          {/* Tab Menu */}
-          <Box sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
-            <Tabs
-              value={activeTab}
-              onChange={handleTabChange}
-              centered
+          <Card sx={{ backgroundColor: '#000000', p: 4 }}>
+            <Typography 
+              variant="h3" 
+              component="h1" 
+              gutterBottom 
+              textAlign="center" 
+              color="primary"
               sx={{
-                '& .MuiTabs-indicator': {
-                  backgroundColor: '#877449',
-                },
-                '& .MuiTab-root': {
-                  color: '#877449',
-                  fontWeight: 600,
-                  '&.Mui-selected': {
-                    color: '#877449',
-                  },
-                },
+                fontSize: { xs: '1.5rem', sm: '2.5rem' },
+                fontWeight: 600,
+                mb: 4,
+                color: '#877449'
               }}
             >
-              <Tab label="Mounjaro" />
-            </Tabs>
-          </Box>
+              Frequently Asked Questions
+            </Typography>
 
-          <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+            {/* Tab Menu */}
+            <Box sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
+              <Tabs
+                value={activeTab}
+                onChange={handleTabChange}
+                centered
+                sx={{
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: '#877449',
+                  },
+                  '& .MuiTab-root': {
+                    color: '#877449',
+                    fontWeight: 600,
+                    '&.Mui-selected': {
+                      color: '#877449',
+                    },
+                  },
+                }}
+              >
+                <Tab label="Mounjaro" />
+              </Tabs>
+            </Box>
+
+            <Box sx={{ maxWidth: 800, mx: 'auto' }}>
             {/* Mounjaro Tab Content */}
             {activeTab === 0 && (
               <Box>
@@ -407,7 +409,8 @@ export default function FAQ() {
             )}
 
 
-          </Box>
+            </Box>
+          </Card>
         </Container>
       </Box>
     </>
