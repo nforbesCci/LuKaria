@@ -121,7 +121,7 @@ export default function Dashboard() {
       console.log('👤 Dashboard: Profile loaded successfully:', profileState.profile);
       
       // If profile exists, mark medical profile task as complete
-      if (profileState.profile && profileState.profile.exists) {
+      if (profileState.profile ) {
         console.log('✅ Dashboard: Profile exists, marking medical profile task as complete');
         dispatch(updatePreAppointmentTask({ 
           taskKey: 'completeMedicalProfile', 

@@ -2,7 +2,7 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useBasicAccess } from '../../hooks/useAccessControl';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '../../components/Header';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -63,6 +63,7 @@ export default function Profile() {
   const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const hasFetchedProfile = useRef(false);
   
   // Access control - only Admin and Patient can access
   useBasicAccess();
@@ -107,20 +108,29 @@ export default function Profile() {
 
   useEffect(() => {
     setMounted(true);
-    
-    // Reset the isSaved flag when component mounts to prevent unwanted redirects
+  }, []);
+
+  // Separate effect for fetching profile - only run once when mounted and user is available
+  useEffect(() => {
+    if (mounted && user && !isLoading && !hasFetchedProfile.current) {
+      console.log('📊 Profile: Loading profile data (first time only)...');
+      console.log('👤 Profile: User object:', user);
+      
+      // Mark as fetched BEFORE dispatching to prevent race conditions
+      hasFetchedProfile.current = true;
+      
+      // Fetch profile data
+      dispatch(fetchProfile());
+    }
+  }, [mounted, user, isLoading, dispatch]);
+
+  // Separate effect to reset isSaved flag on mount
+  useEffect(() => {
     if (profileState.isSaved) {
       console.log('🔄 Profile: Resetting isSaved flag to prevent unwanted redirect');
       dispatch(resetSaveFlag());
     }
-    
-    // Fetch profile data when component mounts
-    console.log('📊 Profile: Loading profile data...');
-    console.log('👤 Profile: User object:', user);
-    console.log('🔐 Profile: Auth0 loading state:', isLoading);
-    console.log('❌ Profile: Auth0 error:', error);
-    dispatch(fetchProfile());
-  }, [dispatch, user, isLoading, error]);
+  }, []); // Run only once on mount
 
   // Handle profile save success/failure
   useEffect(() => {
@@ -260,10 +270,10 @@ export default function Profile() {
 
   // Load profile data from Redux store if it exists
   useEffect(() => {
-    if (profileState.isLoaded && profileState.profile && profileState.profile.exists) {
+    if (profileState.isLoaded && profileState.profile ) {
       console.log('👤 Profile: Loading existing profile data from store:', profileState.profile);
       
-      const profileData = profileState.profile.profile;
+      const profileData = profileState.profile;
       setFormData(prev => ({
         ...prev,
         // Personal Information - Don't override Auth0 data for name and email
