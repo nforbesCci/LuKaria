@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getDatabase } from '../../../../lib/mongodb';
 
-export async function GET(request) {
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
   try {
     console.log('🔄 Measurements Fetch API: Starting measurements fetch...');
     
-    // Get the user session
-    const session = await getSession(request);
+    // Get the user session (no parameters needed for Next.js 15)
+    const session = await getSession();
     if (!session || !session.user) {
       console.log('❌ Measurements Fetch API: No user session found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -20,11 +22,17 @@ export async function GET(request) {
     const db = await getDatabase();
     console.log('🔗 Measurements Fetch API: Connected to MongoDB');
 
-    // Find the measurements for this user
-    const measurements = await db.collection('measurements').findOne({ userId: userId });
-    console.log('🔍 Measurements Fetch API: Measurements found:', !!measurements);
+    // Find the most recent measurement for this user (sorted by dateKey and createdAt)
+    const measurements = await db.collection('measurements')
+      .find({ userId: userId })
+      .sort({ dateKey: -1, createdAt: -1 })
+      .limit(1)
+      .toArray();
+    
+    const latestMeasurement = measurements.length > 0 ? measurements[0] : null;
+    console.log('🔍 Measurements Fetch API: Latest measurement found:', !!latestMeasurement);
 
-    if (!measurements) {
+    if (!latestMeasurement) {
       console.log('📝 Measurements Fetch API: No measurements found for user');
       return NextResponse.json({
         success: true,
@@ -34,17 +42,18 @@ export async function GET(request) {
       });
     }
 
-    console.log('✅ Measurements Fetch API: Measurements fetched successfully', {
-      userId: measurements.userId,
-      weight: measurements.weight,
-      heightFeet: measurements.heightFeet,
-      bmi: measurements.bmi,
+    console.log('✅ Measurements Fetch API: Latest measurement fetched successfully', {
+      userId: latestMeasurement.userId,
+      weight: latestMeasurement.weight,
+      heightFeet: latestMeasurement.heightFeet,
+      bmi: latestMeasurement.bmi,
+      dateKey: latestMeasurement.dateKey,
     });
 
     return NextResponse.json({
       success: true,
       message: 'Measurements fetched successfully',
-      measurements: measurements,
+      measurements: latestMeasurement,
       exists: true,
     });
 

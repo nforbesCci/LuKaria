@@ -6,6 +6,7 @@ import userSlice from './slices/userSlice';
 import adminSlice from './slices/adminSlice';
 import profileSlice from './slices/profileSlice';
 import measurementsSlice from './slices/measurementsSlice';
+import medicationSlice from './slices/medicationSlice';
 import consentSlice from './slices/consentSlice';
 import notificationSlice from './slices/notificationSlice';
 import rootSaga from './sagas';
@@ -21,6 +22,7 @@ export const store = configureStore({
     admin: adminSlice,
     profile: profileSlice,
     measurements: measurementsSlice,
+    medication: medicationSlice,
     consent: consentSlice,
     notification: notificationSlice,
   },

@@ -541,7 +541,7 @@ export default function UserDetailPage() {
                     shrink: true,
                   }}
                   InputProps={{
-                    startAdornment: <CalendarToday sx={{ mr: 1, color: 'text.secondary' }} />
+                    startAdornment: <CalendarToday sx={{ mr: 1, color: '#877449' }} />
                   }}
                 />
               </Grid>
@@ -906,7 +906,7 @@ export default function UserDetailPage() {
               <Button
                 variant="contained"
                 color="primary"
-                startIcon={<Event />}
+                startIcon={<Event sx={{ color: '#877449' }} />}
                 onClick={() => {
                   console.log('📅 Loading appointment details for reschedule');
                   console.log('DB Profile:', dbProfile);
@@ -1043,7 +1043,7 @@ export default function UserDetailPage() {
             <CardContent>
               <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CalendarToday sx={{ fontSize: 30, mr: 2, color: 'primary.main' }} />
+                  <CalendarToday sx={{ fontSize: 30, mr: 2, color: '#877449' }} />
                   <Box>
                     <Typography variant="h5" gutterBottom color="primary">
                       {dbProfile?.isScheduled ? 'Reschedule' : 'Schedule'} Appointment
@@ -1230,7 +1230,7 @@ export default function UserDetailPage() {
                           <Typography variant="body2">{userMetadata.address || 'Not provided'}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <CalendarToday sx={{ mr: 1, color: 'text.secondary' }} />
+                          <CalendarToday sx={{ mr: 1, color: '#877449' }} />
                           <Typography variant="body2">
                             Born: {userMetadata.birthdate ? formatDate(userMetadata.birthdate) : 'Not provided'}
                           </Typography>

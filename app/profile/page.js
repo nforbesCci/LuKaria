@@ -39,6 +39,7 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  InputAdornment,
 } from '@mui/material';
 import {
   Person,
@@ -55,6 +56,7 @@ import {
   NavigateBefore,
   Check,
   Lock,
+  CalendarToday,
 } from '@mui/icons-material';
 
 export default function Profile() {
@@ -577,6 +579,30 @@ export default function Profile() {
                     error={!formData.dateOfBirth}
                     helperText={!formData.dateOfBirth ? 'Date of birth is required' : ''}
                     InputLabelProps={{ shrink: true }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <CalendarToday sx={{ color: '#877449' }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    inputProps={{
+                      max: new Date().toISOString().split('T')[0]
+                    }}
+                    sx={{
+                      '& .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                        filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                        cursor: 'pointer',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '&:hover .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                          filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                        },
+                        '&.Mui-focused .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                          filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                        },
+                      },
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>

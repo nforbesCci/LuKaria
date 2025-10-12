@@ -2,7 +2,9 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useConsultationAccess } from '../../hooks/useAccessControl';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveMedication, fetchAllMedications } from '../../store/slices/medicationSlice';
 import Header from '../../components/Header';
 import {
   Container,
@@ -20,19 +22,11 @@ import {
   Avatar,
   Chip,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Divider,
+  InputAdornment,
 } from '@mui/material';
 import {
   Medication,
@@ -43,11 +37,19 @@ import {
   ShowChart,
   Timeline,
   TrendingUp,
+  Save,
+  Cancel,
+  CalendarToday,
+  AccessTime,
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 export default function MedicationTracker() {
   const { user, isLoading, error } = useUser();
+  
+  // Redux hooks
+  const dispatch = useDispatch();
+  const medicationState = useSelector((state) => state.medication);
   
   // Access control - Admin or Patient with consultation
   useConsultationAccess();
@@ -55,7 +57,6 @@ export default function MedicationTracker() {
   const [isAddingEntry, setIsAddingEntry] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
   const [medicationHistory, setMedicationHistory] = useState([]);
-  const [currentMedications, setCurrentMedications] = useState([]);
   const [newEntry, setNewEntry] = useState({
     date: new Date().toISOString().split('T')[0],
     time: new Date().toTimeString().slice(0, 5),
@@ -66,16 +67,7 @@ export default function MedicationTracker() {
 
   // Common medications list
   const commonMedications = [
-    'Metformin',
-    'Ozempic',
-    'Wegovy',
-    'Semaglutide',
-    'Liraglutide',
-    'Insulin',
-    'Multivitamin',
-    'Vitamin D',
-    'Iron',
-    'Calcium',
+    'Mounjaro',
     'Other'
   ];
 
@@ -83,18 +75,88 @@ export default function MedicationTracker() {
     setMounted(true);
   }, []);
 
-  // Load user's medication history and current medications from Auth0 metadata
+  // Load medications from database when component mounts
   useEffect(() => {
-    if (user) {
-      // Load medication history from user metadata
-      const savedHistory = user.user_metadata?.medication_history || [];
-      setMedicationHistory(savedHistory);
-      
-      // Load current medications from user metadata
-      const savedCurrentMedications = user.user_metadata?.current_medications_list || [];
-      setCurrentMedications(savedCurrentMedications);
+    if (user && mounted) {
+      console.log('💊 Medication Tracker: Fetching medications from database...');
+      dispatch(fetchAllMedications());
     }
-  }, [user]);
+  }, [user, mounted, dispatch]);
+
+  // Load medication history from Redux state
+  useEffect(() => {
+    if (medicationState.allMedicationsLoaded && medicationState.allMedications) {
+      console.log('💊 Medication Tracker: Loading medication history from Redux state', {
+        count: medicationState.allMedications.length,
+        data: medicationState.allMedications
+      });
+      
+      // Transform medications to history format
+      const history = medicationState.allMedications.map((medication, index) => {
+        return {
+          id: medication._id || `medication-${index}`,
+          date: medication.date,
+          time: medication.time,
+          medicationName: medication.medicationName,
+          dosage: medication.dosage,
+          notes: medication.notes || '',
+          timestamp: new Date(medication.timestamp).getTime()
+        };
+      });
+      
+      console.log('💊 Medication Tracker: Transformed medication history', history);
+      setMedicationHistory(history);
+    } else if (medicationState.allMedicationsLoaded && medicationState.allMedications.length === 0) {
+      console.log('💊 Medication Tracker: No medication history found');
+      setMedicationHistory([]);
+    }
+  }, [medicationState.allMedicationsLoaded, medicationState.allMedications]);
+
+  // Handle successful save
+  useEffect(() => {
+    if (medicationState.isSaved && !medicationState.isLoading) {
+      console.log('✅ Medication saved successfully, reloading all medications');
+      
+      // Reload all medications to get updated list
+      dispatch(fetchAllMedications());
+    }
+  }, [medicationState.isSaved, medicationState.isLoading, dispatch]);
+
+  // Load medication data when date changes
+  useEffect(() => {
+    if (newEntry.date && medicationState.allMedications && medicationState.allMedications.length > 0) {
+      console.log('📅 Checking for existing medication on date:', newEntry.date);
+      
+      // Find medication entry for the selected date
+      const existingMedication = medicationState.allMedications.find(
+        med => med.date === newEntry.date
+      );
+      
+      if (existingMedication) {
+        console.log('✅ Found existing medication for date:', existingMedication);
+        
+        // Pre-fill form with existing medication data
+        setNewEntry(prev => ({
+          ...prev,
+          time: existingMedication.time || prev.time,
+          medicationName: existingMedication.medicationName || '',
+          dosage: existingMedication.dosage || '',
+          notes: existingMedication.notes || ''
+        }));
+      } else {
+        console.log('📝 No existing medication found for date, clearing fields');
+        
+        // Clear form fields except date
+        setNewEntry(prev => ({
+          ...prev,
+          medicationName: '',
+          dosage: '',
+          notes: ''
+          // Keep time as is
+        }));
+      }
+    }
+  }, [newEntry.date, medicationState.allMedications]);
 
   // Prepare chart data
   const chartData = medicationHistory
@@ -139,22 +201,28 @@ export default function MedicationTracker() {
       return;
     }
 
-    const entry = {
-      ...newEntry,
-      id: Date.now(),
-      timestamp: new Date(`${newEntry.date}T${newEntry.time}`).getTime()
+    console.log('🔄 Saving medication entry via saga:', newEntry);
+
+    // Prepare medication data for saga
+    const medicationData = {
+      medicationName: newEntry.medicationName,
+      dosage: newEntry.dosage,
+      date: newEntry.date,
+      time: newEntry.time,
+      notes: newEntry.notes || ''
     };
 
-    const updatedHistory = [...medicationHistory, entry];
-    setMedicationHistory(updatedHistory);
-    
-    // Save to user metadata (in a real app, this would be an API call)
-    console.log('Saving medication entry:', entry);
-    console.log('Updated medication history:', updatedHistory);
+    // Dispatch saga to save medication
+    dispatch(saveMedication(medicationData));
     
     setIsAddingEntry(false);
-    setNewEntry({ date: '', time: '', medicationName: '', dosage: '', notes: '' });
-    alert('Medication entry saved successfully!');
+    setNewEntry({ 
+      date: new Date().toISOString().split('T')[0], 
+      time: new Date().toTimeString().slice(0, 5),
+      medicationName: '', 
+      dosage: '', 
+      notes: '' 
+    });
   };
 
   const handleDeleteEntry = (entryId) => {
@@ -162,38 +230,8 @@ export default function MedicationTracker() {
       const updatedHistory = medicationHistory.filter(entry => entry.id !== entryId);
       setMedicationHistory(updatedHistory);
       
-      // Save to user metadata
+      // TODO: Create delete API and saga
       console.log('Deleted medication entry:', entryId);
-      alert('Medication entry deleted successfully!');
-    }
-  };
-
-  const handleAddCurrentMedication = () => {
-    const medicationName = prompt('Enter medication name:');
-    if (medicationName && medicationName.trim()) {
-      const newMedication = {
-        id: Date.now(),
-        name: medicationName.trim(),
-        dosage: '',
-        frequency: 'As needed'
-      };
-      const updatedCurrent = [...currentMedications, newMedication];
-      setCurrentMedications(updatedCurrent);
-      
-      // Save to user metadata
-      console.log('Added current medication:', newMedication);
-      alert('Medication added to current list!');
-    }
-  };
-
-  const handleDeleteCurrentMedication = (medicationId) => {
-    if (window.confirm('Are you sure you want to remove this medication?')) {
-      const updatedCurrent = currentMedications.filter(med => med.id !== medicationId);
-      setCurrentMedications(updatedCurrent);
-      
-      // Save to user metadata
-      console.log('Removed current medication:', medicationId);
-      alert('Medication removed from current list!');
     }
   };
 
@@ -318,78 +356,152 @@ export default function MedicationTracker() {
           </Box>
         </Paper>
 
-        {/* Current Medications */}
-        <Card sx={{ mb: 4 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-              <Typography variant="h5" component="h2">
-                Current Medications
-              </Typography>
-              <Button
-                variant="outlined"
-                startIcon={<Add />}
-                onClick={handleAddCurrentMedication}
-                sx={{ 
-                  textTransform: 'none',
-                  minWidth: { xs: 'auto', sm: '64px' },
-                  px: { xs: 1, sm: 2 }
-                }}
-              >
-                <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                  Add Medication
-                </Box>
-              </Button>
-            </Box>
-            
-            {currentMedications.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Medication sx={{ fontSize: 60, color: 'grey.400', mb: 2 }} />
-                <Typography variant="h6" color="text.secondary" gutterBottom>
-                  No current medications
+        {/* Log Medication Form */}
+        {isAddingEntry ? (
+          <Card sx={{ mb: 4 }}>
+            <CardContent sx={{ p: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                <Typography variant="h5" component="h2">
+                  Log Medication
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Add your current medications to track them easily
-                </Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={handleAddCurrentMedication}
-                  sx={{ 
-                    textTransform: 'none',
-                    minWidth: { xs: 'auto', sm: '64px' },
-                    px: { xs: 1, sm: 2 }
-                  }}
+                <IconButton
+                  onClick={() => setIsAddingEntry(false)}
+                  size="small"
+                  sx={{ color: 'text.secondary' }}
                 >
-                  <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                    Add First Medication
-                  </Box>
-                </Button>
+                  <Cancel />
+                </IconButton>
               </Box>
-            ) : (
-              <List>
-                {currentMedications.map((medication) => (
-                  <ListItem key={medication.id} divider>
-                    <ListItemText
-                      primary={medication.name}
-                      secondary={medication.dosage ? `Dosage: ${medication.dosage}` : 'No dosage specified'}
-                    />
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => handleDeleteCurrentMedication(medication.id)}
-                        color="error"
-                      >
-                        <Delete />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </CardContent>
-        </Card>
-
+              
+              <Stack spacing={3}>
+                <Box sx={{ width: '100%' }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        required
+                        label="Date"
+                        type="date"
+                        value={newEntry.date}
+                        onChange={(e) => setNewEntry({...newEntry, date: e.target.value})}
+                        InputLabelProps={{ shrink: true }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <CalendarToday sx={{ color: '#877449' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        inputProps={{
+                          max: new Date().toISOString().split('T')[0]
+                        }}
+                        sx={{
+                          '& .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                            filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                            cursor: 'pointer',
+                          },
+                          '& .MuiOutlinedInput-root': {
+                            '&:hover .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                              filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                            },
+                            '&.Mui-focused .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                              filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        required
+                        label="Time"
+                        type="time"
+                        value={newEntry.time}
+                        onChange={(e) => setNewEntry({...newEntry, time: e.target.value})}
+                        InputLabelProps={{ shrink: true }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <AccessTime sx={{ color: '#877449' }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                            filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                            cursor: 'pointer',
+                          },
+                          '& .MuiOutlinedInput-root': {
+                            '&:hover .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                              filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                            },
+                            '&.Mui-focused .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                              filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+                
+                <FormControl fullWidth required>
+                  <InputLabel>Medication Name</InputLabel>
+                  <Select
+                    value={newEntry.medicationName}
+                    onChange={(e) => setNewEntry({...newEntry, medicationName: e.target.value})}
+                    label="Medication Name"
+                  >
+                    {commonMedications.map((medication) => (
+                      <MenuItem key={medication} value={medication}>
+                        {medication}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                
+                <TextField
+                  fullWidth
+                  required
+                  label="Dosage in mg"
+                  value={newEntry.dosage}
+                  onChange={(e) => setNewEntry({...newEntry, dosage: e.target.value})}
+                  placeholder="e.g., 500, 1000"
+                />
+                
+                <TextField
+                  fullWidth
+                  label="Notes (optional)"
+                  multiline
+                  rows={3}
+                  value={newEntry.notes}
+                  onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
+                  placeholder="Any additional notes about this medication..."
+                />
+                
+                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
+                  <Button 
+                    onClick={() => setIsAddingEntry(false)}
+                    variant="outlined"
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleSaveEntry} 
+                    variant="contained"
+                    startIcon={<Save />}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Save Entry
+                  </Button>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
         {/* Charts */}
         {chartData.length > 0 && (
           <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -462,23 +574,9 @@ export default function MedicationTracker() {
                 <Typography variant="h6" color="text.secondary" gutterBottom>
                   No medication entries yet
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary">
                   Start tracking your medications to see your intake patterns over time
                 </Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={handleAddEntry}
-                  sx={{ 
-                    textTransform: 'none',
-                    minWidth: { xs: 'auto', sm: '64px' },
-                    px: { xs: 1, sm: 2 }
-                  }}
-                >
-                  <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                    Log First Entry
-                  </Box>
-                </Button>
               </Box>
             ) : (
               <Stack spacing={2}>
@@ -496,7 +594,7 @@ export default function MedicationTracker() {
                           </Typography>
                           <Box sx={{ mt: 1 }}>
                             <Chip 
-                              label={`Dosage: ${entry.dosage}`} 
+                              label={`Dosage: ${entry.dosage} mg`} 
                               color="primary"
                               size="small"
                               sx={{ mr: 1 }}
@@ -522,95 +620,8 @@ export default function MedicationTracker() {
             )}
           </CardContent>
         </Card>
-
-        {/* Add Entry Dialog */}
-        <Dialog open={isAddingEntry} onClose={() => setIsAddingEntry(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Log Medication</DialogTitle>
-          <DialogContent>
-            <Stack spacing={3} sx={{ mt: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Date"
-                    type="date"
-                    value={newEntry.date}
-                    onChange={(e) => setNewEntry({...newEntry, date: e.target.value})}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Time"
-                    type="time"
-                    value={newEntry.time}
-                    onChange={(e) => setNewEntry({...newEntry, time: e.target.value})}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-              </Grid>
-              
-              <FormControl fullWidth>
-                <InputLabel>Medication Name</InputLabel>
-                <Select
-                  value={newEntry.medicationName}
-                  onChange={(e) => setNewEntry({...newEntry, medicationName: e.target.value})}
-                  label="Medication Name"
-                >
-                  {commonMedications.map((medication) => (
-                    <MenuItem key={medication} value={medication}>
-                      {medication}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              
-              <TextField
-                fullWidth
-                label="Dosage"
-                value={newEntry.dosage}
-                onChange={(e) => setNewEntry({...newEntry, dosage: e.target.value})}
-                placeholder="e.g., 500mg, 1 tablet, 2 drops"
-              />
-              
-              <TextField
-                fullWidth
-                label="Notes (optional)"
-                multiline
-                rows={3}
-                value={newEntry.notes}
-                onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
-                placeholder="Any additional notes about this medication..."
-              />
-            </Stack>
-          </DialogContent>
-          <DialogActions>
-            <Button 
-              onClick={() => setIsAddingEntry(false)}
-              sx={{ 
-                minWidth: { xs: 'auto', sm: '64px' },
-                px: { xs: 1, sm: 2 }
-              }}
-            >
-              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                Cancel
-              </Box>
-            </Button>
-            <Button 
-              onClick={handleSaveEntry} 
-              variant="contained"
-              sx={{ 
-                minWidth: { xs: 'auto', sm: '64px' },
-                px: { xs: 1, sm: 2 }
-              }}
-            >
-              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                Save Entry
-              </Box>
-            </Button>
-          </DialogActions>
-        </Dialog>
+          </>
+        )}
       </Container>
     </>
   );

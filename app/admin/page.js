@@ -457,7 +457,7 @@ export default function AdminPage() {
                           </TableCell>
                           <TableCell>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <CalendarToday sx={{ fontSize: 16, mr: 1, color: 'text.secondary' }} />
+                              <CalendarToday sx={{ fontSize: 16, mr: 1, color: '#877449' }} />
                               <Typography variant="body2">
                                 {formatDate(user.created_at)}
                               </Typography>

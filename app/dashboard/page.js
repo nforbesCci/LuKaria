@@ -168,19 +168,14 @@ export default function Dashboard() {
   // Update consent forms task based on completion status
   useEffect(() => {
     if (consentState.isLoaded) {
-      const photographComplete = consentState.photographConsent?.data?.complete === true;
-      const mounjaroComplete = consentState.mounjaroConsent?.data?.complete === true;
+      // Only checking telehealth consent since photograph and mounjaro are hidden
       const telehealthComplete = consentState.telehealthConsent?.data?.complete === true;
-      const allComplete = photographComplete && mounjaroComplete && telehealthComplete;
       
       console.log('✅ Dashboard: Consent forms completion status:', {
-        photograph: photographComplete,
-        mounjaro: mounjaroComplete,
-        telehealth: telehealthComplete,
-        allComplete
+        telehealth: telehealthComplete
       });
       
-      if (allComplete) {
+      if (telehealthComplete) {
         console.log('✅ Dashboard: Marking consent forms task as complete');
         dispatch(updatePreAppointmentTask({ 
           taskKey: 'completeConsentForms', 
@@ -188,7 +183,7 @@ export default function Dashboard() {
         }));
       }
     }
-  }, [consentState.isLoaded, consentState.photographConsent, consentState.mounjaroConsent, consentState.telehealthConsent, dispatch]);
+  }, [consentState.isLoaded, consentState.telehealthConsent, dispatch]);
 
   // Function to determine if prepareQuestions task is completed
   const isPrepareQuestionsCompleted = () => {
@@ -203,18 +198,14 @@ export default function Dashboard() {
   const areAllConsentFormsComplete = () => {
     if (!consentState.isLoaded) return false;
     
-    const photographComplete = consentState.photographConsent?.data?.complete === true;
-    const mounjaroComplete = consentState.mounjaroConsent?.data?.complete === true;
+    // Only checking telehealth consent since photograph and mounjaro are hidden
     const telehealthComplete = consentState.telehealthConsent?.data?.complete === true;
     
     console.log('📋 Dashboard: Consent forms completion status:', {
-      photograph: photographComplete,
-      mounjaro: mounjaroComplete,
-      telehealth: telehealthComplete,
-      allComplete: photographComplete && mounjaroComplete && telehealthComplete
+      telehealth: telehealthComplete
     });
     
-    return photographComplete && mounjaroComplete && telehealthComplete;
+    return telehealthComplete;
   };
 
   // Function to check if all pre-appointment tasks are complete
@@ -393,7 +384,7 @@ export default function Dashboard() {
           <Card sx={{ mb: 4, backgroundColor: '#1a1a1a' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CalendarToday sx={{ fontSize: 30, mr: 2, color: 'primary.main' }} />
+                <CalendarToday sx={{ fontSize: 30, mr: 2, color: '#877449' }} />
                 <Box>
                   <Typography variant="h5" gutterBottom color="primary">
                     Upcoming Appointment
@@ -404,7 +395,14 @@ export default function Dashboard() {
               {/* Show appointment details if scheduled, otherwise show "not scheduled" message */}
               {isScheduled && currentAppointment ? (
                 <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                    gap: { xs: 2, sm: 0 },
+                    mb: 2 
+                  }}>
                     <Typography variant="h6">
                       {currentAppointment.type ? 
                         `${currentAppointment.type.toUpperCase()} Scheduled` : 
@@ -413,16 +411,28 @@ export default function Dashboard() {
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                       <Chip label="Confirmed" color="success" size="small" />
                       {currentAppointment.rescheduleRequested && (
-                        <Chip 
-                          label="Reschedule Requested" 
-                          color="warning" 
-                          size="small"
-                          sx={{
-                            backgroundColor: '#ff9800',
-                            color: '#000',
-                            fontWeight: 'bold',
-                          }}
-                        />
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          <Chip 
+                            label="Reschedule Requested" 
+                            color="warning" 
+                            size="small"
+                            sx={{
+                              backgroundColor: '#ff9800',
+                              color: '#000',
+                              fontWeight: 'bold',
+                            }}
+                          />
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              fontSize: '0.7rem',
+                              color: '#877449',
+                              fontStyle: 'italic'
+                            }}
+                          >
+                            A member of the Svelte team will contact you in 24 hours.
+                          </Typography>
+                        </Box>
                       )}
                       {areAllPreAppointmentTasksComplete() && (
                         <Chip 

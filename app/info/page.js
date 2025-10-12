@@ -25,6 +25,7 @@ import {
   LocalHospital,
   Description,
   Info as InfoIcon,
+  Login,
 } from '@mui/icons-material';
 
 export default function InfoPage() {
@@ -144,6 +145,36 @@ export default function InfoPage() {
           <Typography variant="body1" component="span" className="svelte_post_script">
             by LuKaria
           </Typography>
+        </Box>
+
+        {/* Login Button on the right */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {!user && (
+            <Box
+              onClick={() => window.location.href = '/api/auth/login'}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 2,
+                py: 1,
+                backgroundColor: '#36454F',
+                color: '#877449',
+                borderRadius: 1,
+                cursor: 'pointer',
+                textTransform: 'none',
+                minWidth: { xs: 'auto', sm: '64px' },
+                '&:hover': {
+                  backgroundColor: '#2C3E50',
+                }
+              }}
+            >
+              <Login sx={{ fontSize: 20 }} />
+              <Box>
+                Login
+              </Box>
+            </Box>
+          )}
         </Box>
       </Box>
 

@@ -247,7 +247,7 @@ export default function Schedule() {
 
         <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <CalendarToday sx={{ fontSize: { xs: 24, sm: 30 }, mr: 2, color: 'primary.main' }} />
+            <CalendarToday sx={{ fontSize: { xs: 24, sm: 30 }, mr: 2, color: '#877449' }} />
             <Box>
               <Typography 
                 variant="h4" 

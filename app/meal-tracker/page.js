@@ -46,6 +46,7 @@ import {
   NavigateNext,
   CheckCircle,
   Close,
+  CalendarToday,
 } from '@mui/icons-material';
 
 export default function MealTracker() {
@@ -611,11 +612,32 @@ export default function MealTracker() {
                     handleDateChange(newDate);
                   }
                 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <CalendarToday sx={{ color: '#877449' }} />
+                    </InputAdornment>
+                  ),
+                }}
                 inputProps={{
                   max: new Date().toISOString().split('T')[0],
                   min: getFirstLoginDate().toISOString().split('T')[0]
                 }}
-                sx={{ width: 200 }}
+                sx={{ 
+                  width: 200,
+                  '& .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                    filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                    cursor: 'pointer',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                      filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                    },
+                    '&.Mui-focused .MuiInputBase-input::-webkit-calendar-picker-indicator': {
+                      filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
+                    },
+                  },
+                }}
               />
               
               <Button

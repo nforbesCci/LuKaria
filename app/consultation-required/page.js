@@ -108,7 +108,7 @@ export default function ConsultationRequiredPage() {
             </Box>
           )}
 
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="outlined"
               startIcon={<Home />}
@@ -125,23 +125,6 @@ export default function ConsultationRequiredPage() {
               }}
             >
               Return to Dashboard
-            </Button>
-            
-            <Button
-              variant="contained"
-              startIcon={<Schedule />}
-              onClick={() => router.push('/schedule')}
-              sx={{
-                backgroundColor: '#877449',
-                color: '#000',
-                px: 3,
-                py: 1.5,
-                '&:hover': {
-                  backgroundColor: '#B8941F',
-                }
-              }}
-            >
-              Schedule Consultation
             </Button>
           </Box>
         </Paper>

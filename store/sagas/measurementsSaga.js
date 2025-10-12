@@ -1,5 +1,12 @@
 import { call, put, takeEvery, all } from 'redux-saga/effects';
-import { saveMeasurementsSuccess, saveMeasurementsFailure, fetchMeasurementsSuccess, fetchMeasurementsFailure } from '../slices/measurementsSlice';
+import { 
+  saveMeasurementsSuccess, 
+  saveMeasurementsFailure, 
+  fetchMeasurementsSuccess, 
+  fetchMeasurementsFailure,
+  fetchAllMeasurementsSuccess,
+  fetchAllMeasurementsFailure
+} from '../slices/measurementsSlice';
 
 // API call to save measurements to MongoDB
 function* saveMeasurementsToDatabase(measurementsData) {
@@ -50,6 +57,30 @@ function* fetchMeasurementsFromDatabase() {
   }
 }
 
+// API call to fetch all measurements from MongoDB
+function* fetchAllMeasurementsFromDatabase() {
+  try {
+    const response = yield call(fetch, '/api/measurements/fetchAll', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = yield response.json();
+      console.error('❌ Measurements Saga: API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorData.details || errorData.error || 'Unknown error'}`);
+    }
+
+    const result = yield response.json();
+    return result;
+  } catch (error) {
+    console.error('Error fetching all measurements from database:', error);
+    throw error;
+  }
+}
+
 // Saga to handle measurements saving
 function* saveMeasurementsSaga(action) {
   try {
@@ -82,6 +113,25 @@ function* fetchMeasurementsSaga(action) {
   }
 }
 
+// Saga to handle fetching all measurements
+function* fetchAllMeasurementsSaga(action) {
+  try {
+    console.log('🔄 Measurements Saga: Starting fetch all measurements...');
+    
+    const result = yield call(fetchAllMeasurementsFromDatabase);
+    
+    console.log('✅ Measurements Saga: All measurements fetched successfully', {
+      count: result.count,
+      measurements: result.measurements
+    });
+    
+    yield put(fetchAllMeasurementsSuccess(result.measurements || []));
+  } catch (error) {
+    console.error('❌ Measurements Saga: Error fetching all measurements', error);
+    yield put(fetchAllMeasurementsFailure(error.message));
+  }
+}
+
 // Watch for measurements save actions
 export function* watchSaveMeasurements() {
   yield takeEvery('measurements/saveMeasurements', saveMeasurementsSaga);
@@ -92,9 +142,15 @@ export function* watchFetchMeasurements() {
   yield takeEvery('measurements/fetchMeasurements', fetchMeasurementsSaga);
 }
 
+// Watch for fetch all measurements actions
+export function* watchFetchAllMeasurements() {
+  yield takeEvery('measurements/fetchAllMeasurements', fetchAllMeasurementsSaga);
+}
+
 export default function* measurementsSaga() {
   yield all([
     watchSaveMeasurements(),
     watchFetchMeasurements(),
+    watchFetchAllMeasurements(),
   ]);
 }

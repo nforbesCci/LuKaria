@@ -2,12 +2,14 @@ import { getSession } from '@auth0/nextjs-auth0';
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/appointment/check - Check if appointment is configured and get details
-export async function GET(request) {
+export async function GET() {
   console.log('🔍 API Route Called: GET /api/appointment/check');
   
   try {
-    const session = await getSession(request);
+    const session = await getSession();
     
     console.log('👤 Session:', session ? 'Found' : 'Not found');
     console.log('👤 User:', session?.user?.sub || 'No user');
@@ -99,13 +101,14 @@ export async function GET(request) {
 // POST /api/appointment/check - Update appointment configuration
 export async function POST(request) {
   try {
-    const session = await getSession(request);
+    const body = await request.json();
+    const session = await getSession();
     
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { isScheduled, appointmentTime, appointmentLength, appointmentDate, appointmentProvider, appointmentType } = await request.json();
+    const { isScheduled, appointmentTime, appointmentLength, appointmentDate, appointmentProvider, appointmentType } = body;
     const userId = session.user.sub;
 
     // Get appointments collection from MongoDB

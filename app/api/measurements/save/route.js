@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getDatabase } from '../../../../lib/mongodb';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     console.log('🔄 Measurements Save API: Starting measurements save...');
     
-    // Get the user session
-    const session = await getSession(request);
+    // Parse request body first
+    const measurementsData = await request.json();
+    
+    // Get the user session (no parameters for Next.js 15)
+    const session = await getSession();
     if (!session || !session.user) {
       console.log('❌ Measurements Save API: No user session found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -16,14 +21,19 @@ export async function POST(request) {
     const userId = session.user.sub;
     const userEmail = session.user.email;
     console.log('👤 Measurements Save API: User ID:', userId);
-
-    // Parse request body
-    const measurementsData = await request.json();
     console.log('📊 Measurements Save API: Measurements data:', measurementsData);
-
+    
     // Connect to MongoDB
     const db = await getDatabase();
     console.log('🔗 Measurements Save API: Connected to MongoDB');
+
+    // Use provided date or current date
+    const measurementDate = measurementsData.date ? new Date(measurementsData.date) : new Date();
+    // Normalize to start of day for consistency
+    measurementDate.setHours(0, 0, 0, 0);
+    const dateKey = measurementsData.date; // YYYY-MM-DD format
+
+    console.log('📅 Measurements Save API: Date for measurement:', dateKey);
 
     // Prepare the document to save
     const document = {
@@ -32,39 +42,47 @@ export async function POST(request) {
       weight: measurementsData.weight,
       heightFeet: measurementsData.heightFeet,
       heightInches: measurementsData.heightInches || 0,
+      waistCircumference: measurementsData.waistCircumference || null,
       bmi: measurementsData.bmi,
       bmiCategory: measurementsData.bmiCategory,
-      date: new Date().toISOString(),
-      createdAt: new Date(),
+      notes: measurementsData.notes || '',
+      dateKey: dateKey, // Store date key for easy querying
       updatedAt: new Date()
     };
 
-    // Check if measurements already exist for this user
-    const existingMeasurements = await db.collection('measurements').findOne({ userId: userId });
+    // Check if measurement already exists for this user on this date
+    const existingMeasurement = await db.collection('measurements').findOne({ 
+      userId: userId,
+      dateKey: dateKey 
+    });
     
     let result;
-    if (existingMeasurements) {
-      // Update existing measurements
+    if (existingMeasurement) {
+      // Update existing measurement for this date (only one per day allowed)
       result = await db.collection('measurements').updateOne(
-        { userId: userId },
+        { 
+          userId: userId,
+          dateKey: dateKey 
+        },
         { 
           $set: {
             ...document,
-            createdAt: existingMeasurements.createdAt // Preserve original creation date
+            createdAt: existingMeasurement.createdAt // Preserve original creation date
           }
         }
       );
-      console.log('✅ Measurements Save API: Measurements updated successfully');
+      console.log('✅ Measurements Save API: Measurement updated for date:', dateKey);
     } else {
-      // Insert new measurements
+      // Insert new measurement for this date
+      document.createdAt = new Date();
       result = await db.collection('measurements').insertOne(document);
-      console.log('✅ Measurements Save API: Measurements created successfully');
+      console.log('✅ Measurements Save API: Measurement created for date:', dateKey);
     }
 
     return NextResponse.json({
       success: true,
-      message: existingMeasurements ? 'Measurements updated successfully' : 'Measurements saved successfully',
-      measurementsId: result.insertedId || existingMeasurements?._id,
+      message: existingMeasurement ? 'Measurement updated successfully' : 'Measurement saved successfully',
+      measurementsId: result.insertedId || existingMeasurement?._id,
       measurements: document
     });
 
