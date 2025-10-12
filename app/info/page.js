@@ -148,11 +148,11 @@ export default function InfoPage() {
       </Box>
 
       {/* Main Content */}
-      <Container maxWidth="lg" sx={{ mt: 18, mb: 6 }}>
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h3" gutterBottom className="Svelte_logo" sx={{ color: '#877449' }}>
-            Payment Information
-          </Typography>
+        <Container maxWidth="lg" sx={{ mt: 18, mb: 6 }}>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
+              Payment Information
+            </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
             Transparent pricing for your weight loss journey
           </Typography>
@@ -173,7 +173,7 @@ export default function InfoPage() {
                 
                 <Paper elevation={3} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
                   <Typography variant="h4" sx={{ color: '#877449', fontWeight: 'bold', mb: 1 }}>
-                    $299/month
+                    $88,000/month
                   </Typography>
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                     Comprehensive Weight Loss Program
@@ -186,7 +186,7 @@ export default function InfoPage() {
                       </ListItemIcon>
                       <ListItemText 
                         primary="Monthly physician consultation"
-                        primaryTypographyProps={{ variant: 'body2' }}
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
                     <ListItem>
@@ -195,7 +195,7 @@ export default function InfoPage() {
                       </ListItemIcon>
                       <ListItemText 
                         primary="GLP-1 medication included"
-                        primaryTypographyProps={{ variant: 'body2' }}
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
                     <ListItem>
@@ -204,7 +204,7 @@ export default function InfoPage() {
                       </ListItemIcon>
                       <ListItemText 
                         primary="Free medication delivery"
-                        primaryTypographyProps={{ variant: 'body2' }}
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
                     <ListItem>
@@ -213,7 +213,7 @@ export default function InfoPage() {
                       </ListItemIcon>
                       <ListItemText 
                         primary="24/7 support access"
-                        primaryTypographyProps={{ variant: 'body2' }}
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
                     <ListItem>
@@ -222,7 +222,7 @@ export default function InfoPage() {
                       </ListItemIcon>
                       <ListItemText 
                         primary="Personalized treatment plan"
-                        primaryTypographyProps={{ variant: 'body2' }}
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
                   </List>
@@ -230,12 +230,11 @@ export default function InfoPage() {
 
                 <Paper elevation={3} sx={{ p: 2, backgroundColor: '#36454F', border: '1px solid #877449' }}>
                   <Typography variant="body2" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                    Limited Time Offer
+                    Limited time introductory offer (ends November 15)
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    • Free initial consultation ($150 value)<br />
-                    • First month medication discount<br />
-                    • Premium Svelte membership benefits
+                  <Typography variant="body2" sx={{ color: '#877449' }}>
+                    • Free initial consultation ($8,000 value)<br />
+                    • Lifetime medication discount of 10% ($8,000/month value)
                   </Typography>
                 </Paper>
               </CardContent>
@@ -259,31 +258,35 @@ export default function InfoPage() {
                     Accepted Payment Methods
                   </Typography>
                   <List dense>
-                    <ListItem>
-                      <ListItemIcon>
+                    <ListItem sx={{ alignItems: 'flex-start' }}>
+                      <ListItemIcon sx={{ mt: 0.5 }}>
                         <CheckCircle sx={{ color: '#877449' }} />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Major Credit Cards (Visa, MasterCard, Amex)"
-                        primaryTypographyProps={{ variant: 'body2' }}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <CheckCircle sx={{ color: '#877449' }} />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Debit Cards"
-                        primaryTypographyProps={{ variant: 'body2' }}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <CheckCircle sx={{ color: '#877449' }} />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="HSA/FSA Cards"
-                        primaryTypographyProps={{ variant: 'body2' }}
+                        primary="Bank Transfer"
+                        secondary={
+                          <Box component="span" sx={{ display: 'block', mt: 1 }}>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Account Holder: KADRIA FAIRCLOUGH-STONE
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Bank Name: FCIB
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Branch: NEW KINGSTON
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Branch Transit: 09676
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Account Type: Chequing
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Account Number: 1002362428
+                            </Typography>
+                          </Box>
+                        }
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449', fontWeight: 600 }}
                       />
                     </ListItem>
                   </List>
@@ -305,19 +308,6 @@ export default function InfoPage() {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     • Automatic renewal for convenience
-                  </Typography>
-                </Box>
-
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" sx={{ color: '#877449', mb: 1 }}>
-                    <LocalHospital sx={{ mr: 1, verticalAlign: 'middle' }} />
-                    Insurance & Reimbursement
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    While we don't directly bill insurance, you may be able to submit receipts for reimbursement from your HSA/FSA or insurance provider.
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    We provide detailed invoices for your records.
                   </Typography>
                 </Box>
 
@@ -428,11 +418,8 @@ export default function InfoPage() {
                 backgroundImage: 'linear-gradient(135deg, #877449 0%, #B8941F 100%)'
               }}
             >
-              <Typography variant="h5" sx={{ color: '#000', fontWeight: '600', mb: 2 }}>
+              <Typography variant="h5" sx={{ color: '#000', fontWeight: '600', mb: 3 }}>
                 Ready to Start Your Weight Loss Journey?
-              </Typography>
-              <Typography variant="body1" sx={{ color: '#000', mb: 3 }}>
-                Join thousands of others who have achieved their weight loss goals with Svelte
               </Typography>
               <Button
                 variant="contained"

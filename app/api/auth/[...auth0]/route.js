@@ -56,5 +56,15 @@ const auth0Handler = handleAuth({
 export async function GET(request, context) {
   // Await params in Next.js 15
   const params = await context.params;
-  return auth0Handler(request, { params });
+  // Create a new context object with the awaited params
+  const newContext = { ...context, params };
+  return auth0Handler(request, newContext);
+}
+
+export async function POST(request, context) {
+  // Await params in Next.js 15
+  const params = await context.params;
+  // Create a new context object with the awaited params
+  const newContext = { ...context, params };
+  return auth0Handler(request, newContext);
 }
