@@ -2,7 +2,7 @@ import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 import { NextResponse } from 'next/server';
 
 // Public paths that don't require authentication
-const publicPaths = ['/', '/info', '/faq', '/contact', '/information', '/unauthorized', '/consultation-required'];
+const publicPaths = ['/', '/info', '/faq', '/contact', '/information', '/unauthorized', '/consultation-required', '/privacy-policy', '/terms'];
 
 export default function middleware(req) {
   const { pathname } = req.nextUrl;

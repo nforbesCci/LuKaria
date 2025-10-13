@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Script from 'next/script';
+import Footer from './Footer';
+import { Box } from '@mui/material';
 
 export default function ClientLayout({ children }) {
   const [mounted, setMounted] = useState(false);
@@ -21,7 +23,14 @@ export default function ClientLayout({ children }) {
       )}
       
       {/* Only render children after mounting to prevent hydration issues */}
-      {mounted && children}
+      {mounted && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Box sx={{ flex: 1 }}>
+            {children}
+          </Box>
+          <Footer />
+        </Box>
+      )}
     </>
   );
 }

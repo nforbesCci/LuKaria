@@ -43,6 +43,11 @@ export default function NavigationDrawer() {
   const pathname = usePathname();
   const { user, isLoading } = useUser();
   
+  // Hide navigation drawer on privacy policy, terms, and about pages
+  if (pathname === '/privacy-policy' || pathname === '/terms' || pathname === '/about') {
+    return null;
+  }
+  
   // Redux state
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
   const profileState = useAppSelector((state) => state.profile);

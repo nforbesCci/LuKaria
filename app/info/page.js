@@ -106,6 +106,18 @@ export default function InfoPage() {
           >
             Contact
           </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/about'}
+          >
+            About Us
+          </Typography>
         </Box>
       </Box>
 
