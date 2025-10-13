@@ -31,7 +31,7 @@ export default function PrivacyPolicy() {
         title="Privacy Policy | Svelte by LuKaria"
         description="Read Svelte by LuKaria's privacy policy. Learn how we protect your personal health information and maintain HIPAA compliance for our virtual weight loss clinic."
         keywords="privacy policy, HIPAA compliance, patient privacy, telehealth privacy, medical data protection"
-        canonical="https://localhost:3000/privacy-policy"
+        canonical="https://www.lukariagroup.com/privacy-policy"
       />
       {/* Navigation Menu */}
       <Box

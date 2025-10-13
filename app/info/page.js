@@ -46,7 +46,7 @@ export default function InfoPage() {
         title="Payment Information | Svelte by LuKaria"
         description="Transparent pricing for Svelte by LuKaria weight loss program. $80,000/month includes physician appointments, GLP-1 medications, and support. Special introductory offers available."
         keywords="weight loss pricing, GLP-1 cost, Mounjaro price Jamaica, medical weight loss program cost, affordable weight loss"
-        canonical="https://localhost:3000/info"
+        canonical="https://www.lukariagroup.com/info"
       />
       {/* Navigation Menu */}
       <Box

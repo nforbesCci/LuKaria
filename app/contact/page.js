@@ -42,7 +42,7 @@ export default function Contact() {
         title="Contact Us | Svelte by LuKaria"
         description="Get in touch with Svelte by LuKaria. Contact our patient care team for questions about virtual weight loss consultations, GLP-1 medications, and program enrollment."
         keywords="contact weight loss clinic, Jamaica telehealth contact, virtual consultation contact, patient care support"
-        canonical="https://localhost:3000/contact"
+        canonical="https://www.lukariagroup.com/contact"
       />
       {/* Navigation Menu */}
       <Box
@@ -108,6 +108,18 @@ export default function Contact() {
             }}
           >
             Contact
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/about'}
+          >
+            About Us
           </Typography>
         </Box>
       </Box>

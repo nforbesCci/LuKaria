@@ -46,7 +46,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_JM',
-    url: 'https://localhost:3000',
+    url: 'https://www.lukariagroup.com',
     title: 'Svelte by LuKaria - Virtual Medical Weight Loss',
     description: 'Virtual medical weight loss clinic offering GLP-1 medications. Licensed physicians provide personalized care through secure telehealth in Jamaica.',
     siteName: 'Svelte by LuKaria',
@@ -69,7 +69,7 @@ export const metadata = {
     google: 'TAAk9hGtQmi6UwNq4n4g8UrBCM2w91kIZU0ndvLHlKw',
   },
   alternates: {
-    canonical: 'https://localhost:3000',
+    canonical: 'https://www.lukariagroup.com',
   },
 };
 

@@ -60,7 +60,7 @@ export default function FAQ() {
         title="FAQ - Frequently Asked Questions | Svelte by LuKaria"
         description="Common questions about GLP-1 medications, Mounjaro, weight loss treatment, virtual consultations, and program details. Get answers to your weight loss questions."
         keywords="GLP-1 FAQ, Mounjaro questions, weight loss answers, virtual consultation FAQ, medical weight loss questions"
-        canonical="https://localhost:3000/faq"
+        canonical="https://www.lukariagroup.com/faq"
       />
       {/* Navigation Menu */}
       <Box
@@ -126,6 +126,18 @@ export default function FAQ() {
             onClick={() => window.location.href = '/contact'}
           >
             Contact
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/about'}
+          >
+            About Us
           </Typography>
         </Box>
       </Box>

@@ -141,7 +141,7 @@ export default function Home() {
         title="Svelte by LuKaria - Virtual Medical Weight Loss | GLP-1 Medications"
         description="Virtual medical weight loss clinic in Jamaica. GLP-1 medications like Mounjaro prescribed by licensed physicians. Flat monthly fee, no waiting rooms. Start your transformation today."
         keywords="weight loss Jamaica, GLP-1 medications, Mounjaro, virtual weight loss clinic, telemedicine Jamaica, online doctor, medical weight loss, obesity treatment"
-        canonical="https://localhost:3000"
+        canonical="https://www.lukariagroup.com"
       />
       {/* Navigation Menu */}
       <Box
@@ -207,6 +207,18 @@ export default function Home() {
             onClick={() => window.location.href = '/contact'}
           >
             Contact
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/about'}
+          >
+            About Us
           </Typography>
         </Box>
       </Box>

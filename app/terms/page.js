@@ -31,7 +31,7 @@ export default function Terms() {
         title="Terms and Conditions | Svelte by LuKaria"
         description="Read the terms and conditions for using Svelte by LuKaria virtual weight loss services. Understand your rights and responsibilities as a patient."
         keywords="terms and conditions, service agreement, patient terms, telehealth terms, medical services agreement"
-        canonical="https://localhost:3000/terms"
+        canonical="https://www.lukariagroup.com/terms"
       />
       {/* Navigation Menu */}
       <Box

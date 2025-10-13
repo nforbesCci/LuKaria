@@ -38,7 +38,7 @@ export default function AboutUs() {
         title="About Us - Our Mission | Svelte by LuKaria"
         description="Learn about Svelte by LuKaria and Dr. Kadria Fairclough. Virtual medical weight loss clinic dedicated to transforming lives through science-backed, compassionate care in Jamaica."
         keywords="Dr. Kadria Fairclough, Svelte by LuKaria, weight loss doctor Jamaica, lifestyle medicine, obesity management, virtual clinic"
-        canonical="https://localhost:3000/about"
+        canonical="https://www.lukariagroup.com/about"
       />
       {/* Navigation Menu */}
       <Box
