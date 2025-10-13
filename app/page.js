@@ -551,7 +551,7 @@ export default function Home() {
                      <strong>Medications delivered to you</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Flat monthly fee</strong>
+                     <strong>Flat monthly fee - does not change with changing dose</strong>
                    </Typography>
                    <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
                      <strong>Exclusive Svelte membership with special offers and premium benefits</strong>

@@ -20,7 +20,6 @@ import {
 import {
   AttachMoney,
   CreditCard,
-  Schedule,
   CheckCircle,
   LocalHospital,
   Description,
@@ -204,7 +203,7 @@ export default function InfoPage() {
                 
                 <Paper elevation={3} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
                   <Typography variant="h4" sx={{ color: '#877449', fontWeight: 'bold', mb: 1 }}>
-                    $88,000/month
+                    $80,000/month
                   </Typography>
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                     Comprehensive Weight Loss Program
@@ -216,7 +215,7 @@ export default function InfoPage() {
                         <CheckCircle sx={{ color: '#877449' }} />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Monthly physician consultation"
+                        primary="Monthly physician appointments"
                         primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
@@ -243,7 +242,7 @@ export default function InfoPage() {
                         <CheckCircle sx={{ color: '#877449' }} />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="24/7 support access"
+                        primary="Personalized treatment plan"
                         primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
@@ -252,7 +251,16 @@ export default function InfoPage() {
                         <CheckCircle sx={{ color: '#877449' }} />
                       </ListItemIcon>
                       <ListItemText 
-                        primary="Personalized treatment plan"
+                        primary="Flat monthly fee - does not change with changing dose"
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckCircle sx={{ color: '#877449' }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Discounts for Referring friends and family"
                         primaryTypographyProps={{ variant: 'body2', color: '#877449' }}
                       />
                     </ListItem>
@@ -261,11 +269,11 @@ export default function InfoPage() {
 
                 <Paper elevation={3} sx={{ p: 2, backgroundColor: '#36454F', border: '1px solid #877449' }}>
                   <Typography variant="body2" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                    Limited time introductory offer (ends November 15)
+                    Limited time introductory offer (ends Nov. 15)
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#877449' }}>
-                    • Free initial consultation ($8,000 value)<br />
-                    • Lifetime medication discount of 10% ($8,000/month value)
+                    • 50% Discount on initial consultation ($4,000 value)<br />
+                    • 5% discount on first month's medication ($4,000 value)
                   </Typography>
                 </Paper>
               </CardContent>
@@ -322,35 +330,6 @@ export default function InfoPage() {
                     </ListItem>
                   </List>
                 </Box>
-
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" sx={{ color: '#877449', mb: 1 }}>
-                    <Schedule sx={{ mr: 1, verticalAlign: 'middle' }} />
-                    Billing Schedule
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    • Monthly subscription billed on the same day each month
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    • No long-term contracts required
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    • Cancel anytime with 30-day notice
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    • Automatic renewal for convenience
-                  </Typography>
-                </Box>
-
-                <Paper elevation={3} sx={{ p: 2, backgroundColor: '#36454F' }}>
-                  <Typography variant="body2" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                    <InfoIcon sx={{ fontSize: 18, mr: 0.5, verticalAlign: 'middle' }} />
-                    Secure Payment Processing
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    All payments are processed securely through our encrypted payment gateway. Your financial information is never stored on our servers.
-                  </Typography>
-                </Paper>
               </CardContent>
             </Card>
           </Grid>
@@ -362,7 +341,7 @@ export default function InfoPage() {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Description sx={{ fontSize: 40, color: '#877449', mr: 1 }} />
                   <Typography variant="h5" sx={{ color: '#877449', fontWeight: '600' }}>
-                    What's Included in Your Subscription
+                    Svelte Member Benefits
                   </Typography>
                 </Box>
                 <Divider sx={{ mb: 3, borderColor: '#877449' }} />
@@ -373,8 +352,8 @@ export default function InfoPage() {
                       <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
                         Medical Care
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Monthly virtual consultations with licensed physicians who specialize in weight management.
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        Monthly virtual appointments with licensed physician.
                       </Typography>
                     </Paper>
                   </Grid>
@@ -384,8 +363,8 @@ export default function InfoPage() {
                       <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
                         Medications
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        FDA-approved GLP-1 medications like Mounjaro, shipped directly to your door.
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        FDA-approved GLP-1 medications like Mounjaro, shipped directly to you.
                       </Typography>
                     </Paper>
                   </Grid>
@@ -395,8 +374,8 @@ export default function InfoPage() {
                       <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
                         Support
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        24/7 access to our patient care team for questions and guidance throughout your journey.
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        Personalized guidance from our patient care team through out your journey.
                       </Typography>
                     </Paper>
                   </Grid>
@@ -406,7 +385,7 @@ export default function InfoPage() {
                       <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
                         Monitoring
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
                         Regular health tracking and progress monitoring to ensure safe and effective weight loss.
                       </Typography>
                     </Paper>
@@ -417,8 +396,8 @@ export default function InfoPage() {
                       <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
                         Resources
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Access to nutrition guides, exercise plans, and educational materials.
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        Access to nutritional and fitness support and educational materials.
                       </Typography>
                     </Paper>
                   </Grid>
@@ -426,10 +405,10 @@ export default function InfoPage() {
                   <Grid item xs={12} sm={6} md={4}>
                     <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
                       <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                        Premium Benefits
+                        Referral Program
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Exclusive Svelte member perks, special offers, and priority support.
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        For each referral that starts the program receive an exclusive discount
                       </Typography>
                     </Paper>
                   </Grid>
