@@ -3,10 +3,10 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useConsultationAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveMeals, fetchMeals } from '../../store/slices/mealsSlice';
 import Header from '../../components/Header';
+import BarcodeScanner from '../../components/BarcodeScanner';
 import {
   Container,
   Typography,
@@ -35,9 +35,6 @@ import {
   FormControlLabel,
   Radio,
   InputAdornment,
-  InputLabel,
-  Select,
-  MenuItem,
 } from '@mui/material';
 import {
   Person,
@@ -62,7 +59,6 @@ export default function MealTracker() {
   const dispatch = useDispatch();
   const mealsState = useSelector((state) => state.meals);
   const [mounted, setMounted] = useState(false);
-  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
   const [meals, setMeals] = useState([]);
   const [isAddingMeal, setIsAddingMeal] = useState(false);
@@ -71,7 +67,7 @@ export default function MealTracker() {
     name: '',
     calories: '',
     quantity: '',
-    unit: 'servings',
+    unit: 'g',
     mealType: 'breakfast',
     notes: ''
   });
@@ -79,14 +75,17 @@ export default function MealTracker() {
   const [isSearchingFood, setIsSearchingFood] = useState(false);
   const [showFoodResults, setShowFoodResults] = useState(false);
   const [mealItems, setMealItems] = useState([]); // Track multiple items in a meal
+  const [searchMethod, setSearchMethod] = useState('name'); // 'name' or 'barcode'
+  const [isBarcodeScannerView, setIsBarcodeScannerView] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     setSelectedDate(new Date());
     
-    // Fetch meals from database when component mounts
+    // Fetch last 2 weeks of meals from database when component mounts
     if (user) {
-      dispatch(fetchMeals());
+      console.log('📅 Fetching last 2 weeks of meals...');
+      dispatch(fetchMeals({ daysBack: 14 }));
     }
   }, [user, dispatch]);
 
@@ -94,116 +93,12 @@ export default function MealTracker() {
   useEffect(() => {
     if (selectedDate && mealsState.meals) {
       const dateKey = formatDateKey(selectedDate);
-      setMeals(mealsState.meals[dateKey] || []);
+      const mealsForDate = mealsState.meals[dateKey] || [];
+      console.log(`📅 Loading meals from store for ${dateKey}:`, mealsForDate.length, 'meals');
+      setMeals(mealsForDate);
     }
   }, [selectedDate, mealsState.meals]);
 
-  // Check for scanned product data from barcode scanner or returning to add meal form
-  useEffect(() => {
-    const scannedProduct = localStorage.getItem('scannedProductForMeal');
-    const formData = localStorage.getItem('mealFormData');
-    
-    if (mounted) {
-      // Case 1: User scanned/selected a product
-      if (scannedProduct) {
-        try {
-          const productData = JSON.parse(scannedProduct);
-          console.log('📦 Received product from barcode scanner:', productData);
-          
-          // Always use servings as unit
-          let unit = 'servings';
-          
-          // Build notes with brand info if available
-          let notes = `Scanned from barcode: ${productData.barcode || 'unknown'}`;
-          if (productData.brand) {
-            notes += ` | Brand: ${productData.brand}`;
-          }
-          if (productData.source) {
-            notes += ` | Source: ${productData.source}`;
-          }
-          
-          let restoredFormData = {
-            name: productData.name || 'Unknown Product',
-            calories: (productData.calories || 0).toString(),
-            quantity: '1',
-            unit: unit,
-            mealType: 'breakfast',
-            notes: notes
-          };
-          
-          // Restore previous form data if available
-          if (formData) {
-            try {
-              const parsedFormData = JSON.parse(formData);
-              restoredFormData = {
-                ...restoredFormData,
-                quantity: parsedFormData.quantity || '1',
-                mealType: parsedFormData.mealType || 'breakfast',
-              };
-              
-              // Restore editing state
-              if (parsedFormData.isEditing) {
-                setEditingMeal({ id: Date.now() }); // Placeholder for editing
-              }
-              
-              // Restore selected date
-              if (parsedFormData.selectedDate) {
-                setSelectedDate(new Date(parsedFormData.selectedDate));
-              }
-            } catch (error) {
-              console.error('Error parsing form data:', error);
-            }
-          }
-          
-          console.log('✅ Populating meal form with:', restoredFormData);
-          setNewMeal(restoredFormData);
-          setIsAddingMeal(true);
-          
-          // Clear the localStorage data
-          localStorage.removeItem('scannedProductForMeal');
-          localStorage.removeItem('mealFormData');
-        } catch (error) {
-          console.error('Error parsing scanned product data:', error);
-          localStorage.removeItem('scannedProductForMeal');
-          localStorage.removeItem('mealFormData');
-        }
-      } 
-      // Case 2: User clicked "Back to Add Meal" without selecting a product
-      else if (formData) {
-        try {
-          const parsedFormData = JSON.parse(formData);
-          console.log('🔙 Returning to add meal form:', parsedFormData);
-          
-          setNewMeal({
-            name: parsedFormData.name || '',
-            calories: parsedFormData.calories || '',
-            quantity: parsedFormData.quantity || '',
-            unit: parsedFormData.unit || 'servings',
-            mealType: parsedFormData.mealType || 'breakfast',
-            notes: parsedFormData.notes || ''
-          });
-          
-          // Restore editing state
-          if (parsedFormData.isEditing) {
-            setEditingMeal({ id: Date.now() }); // Placeholder for editing
-          }
-          
-          // Restore selected date
-          if (parsedFormData.selectedDate) {
-            setSelectedDate(new Date(parsedFormData.selectedDate));
-          }
-          
-          setIsAddingMeal(true);
-          
-          // Clear the localStorage data
-          localStorage.removeItem('mealFormData');
-        } catch (error) {
-          console.error('Error parsing form data:', error);
-          localStorage.removeItem('mealFormData');
-        }
-      }
-    }
-  }, [mounted]);
 
   // Get user's first login date for calendar range
   const getFirstLoginDate = () => {
@@ -245,17 +140,20 @@ export default function MealTracker() {
 
   const handleAddMeal = () => {
     setIsAddingMeal(true);
+    
+    // Start with no meal type selected - user must choose
     setNewMeal({
       name: '',
       calories: '',
       quantity: '',
-      unit: 'servings',
-      mealType: 'breakfast',
+      unit: 'g',
+      mealType: '', // No default meal type
       notes: ''
     });
     setFoodSearchResults([]);
     setShowFoodResults(false);
-    setMealItems([]); // Clear any previous meal items
+    setMealItems([]);
+    setSearchMethod('name'); // Reset to name search
   };
 
   const handleAddItemToMeal = () => {
@@ -290,7 +188,7 @@ export default function MealTracker() {
       name: '',
       calories: '',
       quantity: '',
-      unit: 'servings',
+      unit: 'g',
       mealType: newMeal.mealType,
       notes: ''
     });
@@ -308,12 +206,14 @@ export default function MealTracker() {
     if (mealItems.length > 0) {
       const newMeals = mealItems.map(item => ({
         ...item,
-        id: Date.now() + Math.random(), // Ensure unique IDs
+        id: item.id || Date.now() + Math.random(), // Use existing ID if available, or generate new
         mealType: newMeal.mealType,
         date: selectedDate.toISOString()
       }));
 
-      const updatedMeals = [...meals, ...newMeals];
+      // Remove existing meals of this meal type and add new ones
+      const mealsWithoutThisType = meals.filter(meal => meal.mealType !== newMeal.mealType);
+      const updatedMeals = [...mealsWithoutThisType, ...newMeals];
       setMeals(updatedMeals);
       
       console.log('Saving meals:', newMeals);
@@ -326,10 +226,11 @@ export default function MealTracker() {
       }));
       
       setIsAddingMeal(false);
-      setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
+      setNewMeal({ name: '', calories: '', quantity: '', unit: 'g', mealType: 'breakfast', notes: '' });
       setMealItems([]);
       setFoodSearchResults([]);
       setShowFoodResults(false);
+      setSearchMethod('name');
     } else {
       // If no items in list but form is filled, save current item
       if (!newMeal.name.trim()) {
@@ -366,6 +267,7 @@ export default function MealTracker() {
       setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
       setFoodSearchResults([]);
       setShowFoodResults(false);
+      setSearchMethod('name');
     }
   };
 
@@ -436,20 +338,44 @@ export default function MealTracker() {
     setMealItems([]);
     setFoodSearchResults([]);
     setShowFoodResults(false);
+    setSearchMethod('name');
   };
 
   const handleBarcodeLookup = () => {
-    // Store current meal form data in localStorage before navigating
-    const currentFormData = {
+    // Show barcode scanner view
+    setIsBarcodeScannerView(true);
+  };
+
+  const handleBarcodeProductSelect = (productData) => {
+    console.log('📦 Received product from barcode scanner:', productData);
+    
+    // Build notes with brand info if available
+    let notes = `Scanned from barcode: ${productData.barcode || 'unknown'}`;
+    if (productData.brand) {
+      notes += ` | Brand: ${productData.brand}`;
+    }
+    if (productData.source) {
+      notes += ` | Source: ${productData.source}`;
+    }
+    
+    // Calculate calories per gram (divide by 100)
+    const caloriesPerGram = productData.calories ? (productData.calories / 100).toFixed(2) : 0;
+    
+    // Populate the form with product data
+    setNewMeal({
       ...newMeal,
-      selectedDate: selectedDate ? selectedDate.toISOString() : new Date().toISOString(),
-      isEditing: !!editingMeal
-    };
+      name: productData.name || 'Unknown Product',
+      calories: caloriesPerGram.toString(),
+      quantity: '100',
+      unit: 'g',
+      notes: notes
+    });
     
-    localStorage.setItem('mealFormData', JSON.stringify(currentFormData));
+    // Switch back to name mode to show the populated form
+    setSearchMethod('name');
     
-    // Navigate to barcode scanner page
-    router.push('/barcode-scanner?returnTo=meal-tracker');
+    // Close the barcode scanner view
+    setIsBarcodeScannerView(false);
   };
 
   const handleFoodSearch = async () => {
@@ -487,13 +413,16 @@ export default function MealTracker() {
   };
 
   const handleSelectFood = (food) => {
+    // Calculate calories per gram (divide by 100)
+    const caloriesPerGram = food.calories ? (food.calories / 100).toFixed(2) : 0;
+    
     // Auto-populate the form with selected food data
     setNewMeal({
       ...newMeal,
       name: food.description,
-      calories: food.calories.toString() || '',
-      quantity: food.servingSize?.toString() || '100',
-      unit: 'servings',
+      calories: caloriesPerGram.toString(),
+      quantity: '100',
+      unit: 'g',
       notes: food.brandName ? `Brand: ${food.brandName}` : ''
     });
     
@@ -591,7 +520,18 @@ export default function MealTracker() {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        {isAddingMeal ? (
+        {isBarcodeScannerView ? (
+          // Barcode Scanner View
+          <Box>
+            <BarcodeScanner 
+              onProductSelect={handleBarcodeProductSelect}
+              onClose={() => {
+                setIsBarcodeScannerView(false);
+                setSearchMethod('name'); // Reset to name search when closing
+              }}
+            />
+          </Box>
+        ) : isAddingMeal ? (
           // Add/Edit Meal Form
           <>
             {/* Header Section */}
@@ -624,9 +564,10 @@ export default function MealTracker() {
                     setIsAddingMeal(false);
                     setEditingMeal(null);
                     setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
-    setMealItems([]);
+                    setMealItems([]);
                     setFoodSearchResults([]);
                     setShowFoodResults(false);
+                    setSearchMethod('name');
                   }}
                   sx={{ textTransform: 'none' }}
                 >
@@ -644,7 +585,27 @@ export default function MealTracker() {
                     <RadioGroup
                       row
                       value={newMeal.mealType}
-                      onChange={(e) => setNewMeal({...newMeal, mealType: e.target.value})}
+                      onChange={(e) => {
+                        const newMealType = e.target.value;
+                        setNewMeal({...newMeal, mealType: newMealType});
+                        
+                        // Check if meals exist for this meal type and load them
+                        const existingMealsForType = meals.filter(meal => meal.mealType === newMealType);
+                        if (existingMealsForType.length > 0) {
+                          console.log(`📋 Meal type changed to ${newMealType}, loading ${existingMealsForType.length} existing meals...`);
+                          setMealItems(existingMealsForType.map(meal => ({
+                            id: meal.id,
+                            name: meal.name,
+                            calories: meal.calories,
+                            quantity: meal.quantity,
+                            unit: meal.unit,
+                            notes: meal.notes || ''
+                          })));
+                        } else {
+                          console.log(`📋 Meal type changed to ${newMealType}, no existing meals`);
+                          setMealItems([]);
+                        }
+                      }}
                     >
                       {mealTypes.map(type => (
                         <FormControlLabel 
@@ -657,61 +618,98 @@ export default function MealTracker() {
                     </RadioGroup>
                   </FormControl>
 
-                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                    <TextField
-                      label="Item"
-                      value={newMeal.name}
-                      onChange={(e) => setNewMeal({...newMeal, name: e.target.value})}
-                      onBlur={handleFoodSearch}
-                      placeholder="e.g., Grilled Chicken Breast"
-                      sx={{ flexGrow: 1, minWidth: 200 }}
-                      helperText="Type food name and click away to search for nutritional info or by barcode"
-                    />
-                    <Button
-                      variant="outlined"
-                      startIcon={<QrCodeScanner />}
-                      onClick={handleBarcodeLookup}
-                      sx={{ 
-                        textTransform: 'none',
-                        height: '56px',
-                        whiteSpace: 'nowrap'
+                  <FormControl component="fieldset" disabled={!newMeal.mealType}>
+                    <FormLabel component="legend">Search by</FormLabel>
+                    <RadioGroup
+                      row
+                      value={searchMethod}
+                      onChange={(e) => {
+                        const newMethod = e.target.value;
+                        setSearchMethod(newMethod);
+                        // Auto-open barcode scanner when barcode is selected
+                        if (newMethod === 'barcode') {
+                          handleBarcodeLookup();
+                        }
                       }}
                     >
-                      Scan Barcode
-                    </Button>
+                      <FormControlLabel 
+                        value="name" 
+                        control={<Radio />} 
+                        label="Name" 
+                      />
+                      <FormControlLabel 
+                        value="barcode" 
+                        control={<Radio />} 
+                        label="Barcode" 
+                      />
+                    </RadioGroup>
+                  </FormControl>
+
+                  {!newMeal.mealType && (
+                    <Alert severity="info">
+                      Please select a meal type to continue
+                    </Alert>
+                  )}
+
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                    {searchMethod === 'name' ? (
+                      <>
+                        <TextField
+                          label="Item"
+                          value={newMeal.name}
+                          onChange={(e) => setNewMeal({...newMeal, name: e.target.value})}
+                          onBlur={handleFoodSearch}
+                          placeholder="e.g., Grilled Chicken Breast"
+                          sx={{ flexGrow: 1, minWidth: 200 }}
+                          helperText="Type food name and click away to search for nutritional info"
+                          disabled={!newMeal.mealType}
+                        />
+                      </>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        startIcon={<QrCodeScanner />}
+                        onClick={handleBarcodeLookup}
+                        disabled={!newMeal.mealType}
+                        sx={{ 
+                          textTransform: 'none',
+                          height: '56px',
+                          whiteSpace: 'nowrap',
+                          flexGrow: 1,
+                          minWidth: 200
+                        }}
+                      >
+                        Scan Barcode
+                      </Button>
+                    )}
                     <TextField
-                      label="Quantity"
+                      label="Quantity (grams)"
                       type="number"
                       value={newMeal.quantity}
                       onChange={(e) => setNewMeal({...newMeal, quantity: e.target.value})}
                       inputProps={{ step: "0.1", min: "0" }}
-                      sx={{ width: 120 }}
+                      InputProps={{
+                        endAdornment: <InputAdornment position="end">g</InputAdornment>
+                      }}
+                      sx={{ width: 150 }}
+                      disabled={!newMeal.mealType}
                     />
-                    <FormControl sx={{ width: 120 }}>
-                      <InputLabel>Unit</InputLabel>
-                      <Select
-                        value={newMeal.unit}
-                        onChange={(e) => setNewMeal({...newMeal, unit: e.target.value})}
-                        label="Unit"
-                      >
-                        <MenuItem value="servings">servings</MenuItem>
-                      </Select>
-                    </FormControl>
                     <TextField
-                      label="Calories per serving"
+                      label="Calories per gram"
                       type="number"
                       value={newMeal.calories}
                       onChange={(e) => setNewMeal({...newMeal, calories: e.target.value})}
-                      inputProps={{ step: "0.1", min: "0" }}
+                      inputProps={{ step: "0.01", min: "0" }}
                       InputProps={{
-                        endAdornment: <InputAdornment position="end">cal/serving</InputAdornment>
+                        endAdornment: <InputAdornment position="end">cal/g</InputAdornment>
                       }}
                       sx={{ flexGrow: 1, minWidth: 150 }}
+                      disabled={!newMeal.mealType}
                     />
                   </Box>
 
                   {/* Food Search Results */}
-                  {showFoodResults && (
+                  {searchMethod === 'name' && showFoodResults && (
                     <Paper elevation={3} sx={{ p: 2, maxHeight: 400, overflow: 'auto' }}>
                       {isSearchingFood ? (
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 3 }}>
@@ -799,12 +797,27 @@ export default function MealTracker() {
                     value={newMeal.notes}
                     onChange={(e) => setNewMeal({...newMeal, notes: e.target.value})}
                     placeholder="Any additional notes about this meal..."
+                    disabled={!newMeal.mealType}
                   />
+
+                  {/* Add Item to Meal Button */}
+                  {!editingMeal && (
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={handleAddItemToMeal}
+                      fullWidth
+                      sx={{ textTransform: 'none' }}
+                      disabled={!newMeal.mealType}
+                    >
+                      Add Item to Meal
+                    </Button>
+                  )}
 
                   {/* Items Added to Meal */}
                   {!editingMeal && mealItems.length > 0 && (
-                    <Paper elevation={2} sx={{ p: 2, backgroundColor: 'grey.50' }}>
-                      <Typography variant="subtitle2" gutterBottom>
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#36454F' }}>
+                      <Typography variant="subtitle2" gutterBottom sx={{ color: '#877449' }}>
                         Items in this meal ({mealItems.length})
                       </Typography>
                       <List dense>
@@ -812,57 +825,51 @@ export default function MealTracker() {
                           <ListItem
                             key={item.id}
                             divider={index < mealItems.length - 1}
+                            sx={{ 
+                              borderColor: index < mealItems.length - 1 ? '#877449' : 'transparent'
+                            }}
                             secondaryAction={
                               <IconButton 
                                 edge="end" 
                                 size="small" 
                                 onClick={() => handleRemoveItemFromMeal(item.id)}
-                                color="error"
+                                sx={{ color: '#FF6B6B' }}
                               >
                                 <Delete />
                               </IconButton>
                             }
                           >
                             <ListItemIcon>
-                              <Restaurant fontSize="small" />
+                              <Restaurant fontSize="small" sx={{ color: '#877449' }} />
                             </ListItemIcon>
                             <ListItemText
                               primary={item.name}
-                              secondary={`${item.quantity} ${item.unit} • ${Math.round(item.calories * item.quantity)} cal`}
+                              secondary={`${item.quantity} ${item.unit === 'g' ? 'grams' : item.unit} • ${Math.round(item.calories * item.quantity)} cal`}
+                              primaryTypographyProps={{ sx: { color: '#877449' } }}
+                              secondaryTypographyProps={{ sx: { color: '#B8941F' } }}
                             />
                           </ListItem>
                         ))}
                       </List>
-                      <Box sx={{ mt: 2, p: 1, backgroundColor: 'primary.50', borderRadius: 1 }}>
-                        <Typography variant="body2" fontWeight="bold">
+                      <Box sx={{ mt: 2, p: 1, backgroundColor: '#877449', borderRadius: 1 }}>
+                        <Typography variant="body2" fontWeight="bold" sx={{ color: '#000' }}>
                           Total: {Math.round(mealItems.reduce((sum, item) => sum + (item.calories * item.quantity), 0))} calories
                         </Typography>
                       </Box>
                     </Paper>
                   )}
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mt: 3, flexWrap: 'wrap' }}>
-                    {!editingMeal && (
-                      <Button
-                        variant="outlined"
-                        startIcon={<Add />}
-                        onClick={handleAddItemToMeal}
-                        sx={{ textTransform: 'none' }}
-                      >
-                        Add Item to Meal
-                      </Button>
-                    )}
-
-                    <Box sx={{ display: 'flex', gap: 2, ml: 'auto' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3, flexWrap: 'wrap' }}>
                     <Button
                       variant="outlined"
                       onClick={() => {
                         setIsAddingMeal(false);
                         setEditingMeal(null);
-                        setNewMeal({ name: '', calories: '', quantity: '', unit: 'servings', mealType: 'breakfast', notes: '' });
-    setMealItems([]);
+                        setNewMeal({ name: '', calories: '', quantity: '', unit: 'g', mealType: 'breakfast', notes: '' });
+                        setMealItems([]);
                         setFoodSearchResults([]);
                         setShowFoodResults(false);
+                        setSearchMethod('name');
                       }}
                       sx={{ textTransform: 'none' }}
                     >
@@ -872,10 +879,10 @@ export default function MealTracker() {
                       onClick={editingMeal ? handleUpdateMeal : handleSaveMeal} 
                       variant="contained"
                       sx={{ textTransform: 'none' }}
+                      disabled={!newMeal.mealType}
                     >
                       {editingMeal ? 'Update Meal' : (mealItems.length > 0 ? 'Save Meal' : 'Add Meal')}
                     </Button>
-                    </Box>
                   </Box>
                 </Stack>
               </CardContent>
@@ -932,7 +939,14 @@ export default function MealTracker() {
             <Typography variant="h6" gutterBottom>
               Select Date
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: { xs: 'flex-start', md: 'space-between' },
+              gap: 2, 
+              mb: 2,
+              flexWrap: 'wrap'
+            }}>
               <Button
                 variant="outlined"
                 startIcon={<NavigateBefore />}
@@ -946,7 +960,7 @@ export default function MealTracker() {
                   }
                 }}
                 disabled={!selectedDate || selectedDate <= getFirstLoginDate()}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', order: { xs: 1, md: 1 } }}
               >
                 Previous Day
               </Button>
@@ -972,7 +986,10 @@ export default function MealTracker() {
                   min: getFirstLoginDate().toISOString().split('T')[0]
                 }}
                 sx={{ 
-                  width: 200,
+                  width: { xs: '100%', md: 'auto' },
+                  flexGrow: { xs: 0, md: 1 },
+                  maxWidth: { xs: '100%', md: 300 },
+                  order: { xs: 3, md: 2 },
                   '& .MuiInputBase-input::-webkit-calendar-picker-indicator': {
                     filter: 'invert(55%) sepia(18%) saturate(1019%) hue-rotate(8deg) brightness(92%) contrast(85%)',
                     cursor: 'pointer',
@@ -1001,7 +1018,7 @@ export default function MealTracker() {
                   }
                 }}
                 disabled={!selectedDate || selectedDate >= new Date()}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', order: { xs: 2, md: 3 } }}
               >
                 Next Day
               </Button>
@@ -1090,7 +1107,7 @@ export default function MealTracker() {
                         secondary={
                           <Box>
                             <Typography variant="body2" component="span">
-                              {meal.quantity} {meal.unit} • {Math.round(meal.calories * meal.quantity)} calories
+                              {meal.quantity} {meal.unit === 'g' ? 'grams' : meal.unit} • {Math.round(meal.calories * meal.quantity)} calories
                             </Typography>
                             {meal.notes && (
                               <Typography variant="caption" display="block" color="text.secondary">

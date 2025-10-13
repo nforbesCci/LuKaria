@@ -32,9 +32,9 @@ function* saveMealsToDatabase(mealsData) {
 }
 
 // API call to fetch meals from MongoDB
-function* fetchMealsFromDatabase() {
+function* fetchMealsFromDatabase(daysBack = 14) {
   try {
-    const response = yield call(fetch, '/api/meals/fetch', {
+    const response = yield call(fetch, `/api/meals/fetch?daysBack=${daysBack}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -77,9 +77,10 @@ function* saveMealsSaga(action) {
 // Saga to handle meals fetching
 function* fetchMealsSaga(action) {
   try {
-    console.log('🔄 Meals Saga: Starting meals fetch...');
+    const daysBack = action.payload?.daysBack || 14;
+    console.log('🔄 Meals Saga: Starting meals fetch for last', daysBack, 'days...');
     
-    const result = yield call(fetchMealsFromDatabase);
+    const result = yield call(fetchMealsFromDatabase, daysBack);
     
     console.log('✅ Meals Saga: Meals fetched successfully', result);
     

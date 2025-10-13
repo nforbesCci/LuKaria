@@ -17,17 +17,35 @@ export async function GET(request) {
     }
 
     const userId = session.user.sub;
+    
+    // Get date range from query params (default to last 2 weeks)
+    const { searchParams } = new URL(request.url);
+    const daysBack = parseInt(searchParams.get('daysBack')) || 14;
 
-    console.log('📖 Fetching meals for user:', userId);
+    // Calculate date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysBack);
+    
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    console.log('📖 Fetching meals for user:', userId, 'from', startDateStr, 'to', endDateStr);
 
     // Connect to MongoDB
     const client = await clientPromise;
     const db = client.db('lukaria');
     const mealsCollection = db.collection('meals');
 
-    // Fetch all meals for this user
+    // Fetch meals within date range for this user
     const mealsDocs = await mealsCollection
-      .find({ userId: userId })
+      .find({ 
+        userId: userId,
+        date: { 
+          $gte: startDateStr,
+          $lte: endDateStr
+        }
+      })
       .sort({ date: -1 })
       .toArray();
 
@@ -41,7 +59,12 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      meals: mealsObject
+      meals: mealsObject,
+      dateRange: {
+        start: startDateStr,
+        end: endDateStr,
+        daysBack: daysBack
+      }
     });
 
   } catch (error) {
