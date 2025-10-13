@@ -120,12 +120,28 @@ export default function Dashboard() {
     if (profileState.isLoaded && profileState.profile) {
       console.log('👤 Dashboard: Profile loaded successfully:', profileState.profile);
       
-      // If profile exists, mark medical profile task as complete
-      if (profileState.profile ) {
-        console.log('✅ Dashboard: Profile exists, marking medical profile task as complete');
+      // If profile exists and has required fields, mark medical profile task as complete
+      const hasPreferredPhone = profileState.profile.user_metadata?.preferredPhoneNumber;
+      const hasDateOfBirth = profileState.profile.user_metadata?.dateOfBirth;
+      const hasParish = profileState.profile.user_metadata?.parish;
+      
+      const isProfileComplete = profileState.profile && hasPreferredPhone && hasDateOfBirth && hasParish;
+      
+      if (isProfileComplete) {
+        console.log('✅ Dashboard: Profile exists with required fields, marking medical profile task as complete');
         dispatch(updatePreAppointmentTask({ 
           taskKey: 'completeMedicalProfile', 
           completed: true 
+        }));
+      } else {
+        console.log('⚠️ Dashboard: Profile incomplete - missing required fields:', {
+          hasPreferredPhone,
+          hasDateOfBirth,
+          hasParish
+        });
+        dispatch(updatePreAppointmentTask({ 
+          taskKey: 'completeMedicalProfile', 
+          completed: false 
         }));
       }
     }
