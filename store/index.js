@@ -10,6 +10,7 @@ import medicationSlice from './slices/medicationSlice';
 import consentSlice from './slices/consentSlice';
 import notificationSlice from './slices/notificationSlice';
 import mealsSlice from './slices/mealsSlice';
+import sideEffectsSlice from './slices/sideEffectsSlice';
 import rootSaga from './sagas';
 
 // Create the saga middleware
@@ -27,6 +28,7 @@ export const store = configureStore({
     consent: consentSlice,
     notification: notificationSlice,
     meals: mealsSlice,
+    sideEffects: sideEffectsSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

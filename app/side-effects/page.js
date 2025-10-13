@@ -3,6 +3,8 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useConsultationAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveSideEffects, fetchSideEffects } from '../../store/slices/sideEffectsSlice';
 import Header from '../../components/Header';
 import {
   Container,
@@ -46,6 +48,8 @@ export default function SideEffects() {
   
   // Access control - Admin or Patient with consultation
   useConsultationAccess();
+  const dispatch = useDispatch();
+  const sideEffectsState = useSelector((state) => state.sideEffects);
   const [mounted, setMounted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -109,22 +113,36 @@ export default function SideEffects() {
     setMounted(true);
   }, []);
 
-  // Pre-populate form with Auth0 user data when available
+  // Fetch side effects from database when component mounts
   useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        // You could load previous side effects reports from user_metadata
-        sideEffects: user.user_metadata?.reported_side_effects || [],
-        otherSideEffect: user.user_metadata?.other_side_effect || '',
-        appetiteSuppressed: user.user_metadata?.appetite_suppressed || '',
-        hasTreatmentConcerns: user.user_metadata?.has_treatment_concerns || '',
-        treatmentConcerns: user.user_metadata?.treatment_concerns || '',
-        requestDoctorContact: user.user_metadata?.request_doctor_contact || false,
-        contactMessage: user.user_metadata?.contact_message || '',
-      }));
+    if (user && mounted) {
+      console.log('🔄 Fetching side effects from database...');
+      dispatch(fetchSideEffects());
     }
-  }, [user]);
+  }, [user, mounted, dispatch]);
+
+  // Load the most recent side effects report from Redux store
+  useEffect(() => {
+    if (sideEffectsState.sideEffects && sideEffectsState.sideEffects.sideEffects?.length > 0) {
+      // Get the most recent report (already sorted by createdAt desc from API)
+      const mostRecentReport = sideEffectsState.sideEffects.sideEffects[0];
+      
+      console.log('📋 Loading most recent side effects report:', mostRecentReport);
+      
+      setFormData({
+        sideEffects: mostRecentReport.sideEffects || [],
+        otherSideEffect: mostRecentReport.otherSideEffect || '',
+        appetiteSuppressed: mostRecentReport.appetiteSuppressed || '',
+        hasTreatmentConcerns: mostRecentReport.hasTreatmentConcerns || '',
+        treatmentConcerns: mostRecentReport.treatmentConcerns || '',
+        requestDoctorContact: mostRecentReport.requestDoctorContact || false,
+        contactMessage: mostRecentReport.contactMessage || '',
+        reportId: mostRecentReport.reportId,
+        reportDate: mostRecentReport.reportDate,
+        complete: mostRecentReport.complete || false,
+      });
+    }
+  }, [sideEffectsState.sideEffects]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -152,6 +170,16 @@ export default function SideEffects() {
         email: 'doctor@healthcare.com'
       };
 
+      const reportData = {
+        ...formData,
+        reportDate: new Date().toISOString(),
+        reportId: `SE-${Date.now()}`
+      };
+
+      // Save side effects to database using saga
+      console.log('💾 Dispatching save side effects action:', reportData);
+      dispatch(saveSideEffects(reportData));
+
       // Send email to doctor via API endpoint
       const response = await fetch('/api/send-side-effects-report', {
         method: 'POST',
@@ -165,16 +193,12 @@ export default function SideEffects() {
             id: user.sub
           },
           doctor: assignedDoctor,
-          reportData: {
-            ...formData,
-            reportDate: new Date().toISOString(),
-            reportId: `SE-${Date.now()}`
-          }
+          reportData: reportData
         })
       });
 
       if (response.ok) {
-        alert('Side effects report sent to your doctor successfully!');
+        alert('Side effects report saved and sent to your doctor successfully!');
         // Optionally reset form or mark as sent
       } else {
         throw new Error('Failed to send report');
@@ -287,12 +311,20 @@ export default function SideEffects() {
     );
   }
 
+  // Check if form is complete and should be read-only
+  const isFormComplete = formData.complete === true;
+
   const renderStepContent = (stepIndex) => {
     switch (stepIndex) {
       case 0:
         return (
           <Card sx={{ mb: 4 }}>
             <CardContent sx={{ p: 4 }}>
+              {isFormComplete && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                  This report has been submitted and is now read-only. To submit a new report, please contact your healthcare provider.
+                </Alert>
+              )}
               <Typography variant="h6" gutterBottom>
                 Are you experiencing any of the following side effects?
               </Typography>
@@ -305,6 +337,7 @@ export default function SideEffects() {
                           <Checkbox
                             checked={formData.sideEffects.includes(sideEffect)}
                             onChange={(e) => handleSideEffectChange(sideEffect, e.target.checked)}
+                            disabled={isFormComplete}
                           />
                         }
                         label={sideEffect}
@@ -323,6 +356,7 @@ export default function SideEffects() {
                   value={formData.otherSideEffect}
                   onChange={(e) => handleInputChange('otherSideEffect', e.target.value)}
                   placeholder="Please describe any other side effects you're experiencing..."
+                  disabled={isFormComplete}
                 />
               </Box>
             </CardContent>
@@ -333,7 +367,12 @@ export default function SideEffects() {
         return (
           <Card sx={{ mb: 4 }}>
             <CardContent sx={{ p: 4 }}>
-              <FormControl component="fieldset">
+              {isFormComplete && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                  This report has been submitted and is now read-only.
+                </Alert>
+              )}
+              <FormControl component="fieldset" disabled={isFormComplete}>
                 <FormLabel component="legend">Has your appetite been adequately suppressed?</FormLabel>
                 <RadioGroup
                   row
@@ -352,9 +391,14 @@ export default function SideEffects() {
         return (
           <Card sx={{ mb: 4 }}>
             <CardContent sx={{ p: 4 }}>
+              {isFormComplete && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                  This report has been submitted and is now read-only.
+                </Alert>
+              )}
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <FormControl component="fieldset">
+                  <FormControl component="fieldset" disabled={isFormComplete}>
                     <FormLabel component="legend">Do you have any concerns regarding your treatment?</FormLabel>
                     <RadioGroup
                       row
@@ -377,6 +421,7 @@ export default function SideEffects() {
                       value={formData.treatmentConcerns}
                       onChange={(e) => handleInputChange('treatmentConcerns', e.target.value)}
                       placeholder="Please describe any concerns you have about your treatment..."
+                      disabled={isFormComplete}
                     />
                   </Grid>
                 )}
@@ -389,9 +434,14 @@ export default function SideEffects() {
         return (
           <Card sx={{ mb: 4 }}>
             <CardContent sx={{ p: 4 }}>
+              {isFormComplete && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                  This report has been submitted and is now read-only.
+                </Alert>
+              )}
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <FormControl component="fieldset">
+                  <FormControl component="fieldset" disabled={isFormComplete}>
                     <FormLabel component="legend">Would you like your doctor to contact you?</FormLabel>
                     <RadioGroup
                       row
@@ -414,6 +464,7 @@ export default function SideEffects() {
                       value={formData.contactMessage}
                       onChange={(e) => handleInputChange('contactMessage', e.target.value)}
                       placeholder="Any additional information you'd like to share with your doctor..."
+                      disabled={isFormComplete}
                     />
                   </Grid>
                 )}
