@@ -477,14 +477,33 @@ export default function SideEffects() {
         return (
           <Card sx={{ mb: 4 }}>
             <CardContent sx={{ p: 4 }}>
-              <Typography variant="h6" gutterBottom>
-                Ready to send your side effects report?
-              </Typography>
-              
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Review your information below and click "Send to Doctor" to submit your report. 
-                Your assigned doctor will receive an email with all the details you've provided.
-              </Typography>
+              {isFormComplete ? (
+                <>
+                  <Alert severity="success" sx={{ mb: 3 }}>
+                    <Typography variant="body1" fontWeight="bold">
+                      This report has been submitted successfully!
+                    </Typography>
+                    <Typography variant="body2">
+                      Your side effects report was sent to your doctor on {formData.reportDate ? new Date(formData.reportDate).toLocaleString() : 'N/A'}. 
+                      Report ID: {formData.reportId}
+                    </Typography>
+                  </Alert>
+                  <Typography variant="h6" gutterBottom>
+                    Submitted Report Summary
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <Typography variant="h6" gutterBottom>
+                    Ready to send your side effects report?
+                  </Typography>
+                  
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                    Review your information below and click "Send to Doctor" to submit your report. 
+                    Your assigned doctor will receive an email with all the details you've provided.
+                  </Typography>
+                </>
+              )}
 
               {/* Report Summary */}
               <Box sx={{ backgroundColor: 'grey.50', p: 3, borderRadius: 2, mb: 3 }}>
@@ -549,12 +568,14 @@ export default function SideEffects() {
                 )}
               </Box>
 
-              <Alert severity="info" sx={{ mb: 3 }}>
-                <Typography variant="body2">
-                  <strong>Note:</strong> This report will be sent to your assigned doctor via email. 
-                  If you need immediate medical attention, please contact your doctor directly or seek emergency care.
-                </Typography>
-              </Alert>
+              {!isFormComplete && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                  <Typography variant="body2">
+                    <strong>Note:</strong> This report will be sent to your assigned doctor via email. 
+                    If you need immediate medical attention, please contact your doctor directly or seek emergency care.
+                  </Typography>
+                </Alert>
+              )}
             </CardContent>
           </Card>
         );
@@ -712,12 +733,13 @@ export default function SideEffects() {
                   }}
                   size="small"
                   variant="contained"
+                  disabled={isFormComplete}
                 >
                   <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                     Next
                   </Box>
                 </Button>
-              ) : (
+              ) : !isFormComplete ? (
                 <Button
                   onClick={handleSendToDoctor}
                   disabled={isSending}
@@ -734,6 +756,14 @@ export default function SideEffects() {
                     {isSending ? 'Sending...' : 'Send'}
                   </Box>
                 </Button>
+              ) : (
+                <Chip 
+                  icon={<CheckCircle />} 
+                  label="Submitted" 
+                  color="success" 
+                  variant="filled" 
+                  size="small"
+                />
               )}
             </Box>
           </Box>
@@ -760,25 +790,39 @@ export default function SideEffects() {
               {isStepValid(activeStep) && (
                 <Chip icon={<CheckCircle />} label="Valid" color="success" variant="filled" size="small" />
               )}
+              {isFormComplete && (
+                <Chip icon={<CheckCircle />} label="Submitted" color="success" variant="filled" />
+              )}
             </Box>
 
             {activeStep === steps.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={handleSendToDoctor}
-                disabled={isSending}
-                startIcon={<Send />}
-                sx={{ textTransform: 'none' }}
-                size="large"
-              >
-                {isSending ? 'Sending...' : 'Send to Doctor'}
-              </Button>
+              !isFormComplete ? (
+                <Button
+                  variant="contained"
+                  onClick={handleSendToDoctor}
+                  disabled={isSending}
+                  startIcon={<Send />}
+                  sx={{ textTransform: 'none' }}
+                  size="large"
+                >
+                  {isSending ? 'Sending...' : 'Send to Doctor'}
+                </Button>
+              ) : (
+                <Chip 
+                  icon={<CheckCircle />} 
+                  label="Report Submitted" 
+                  color="success" 
+                  variant="filled" 
+                  sx={{ fontSize: '1rem', py: 2.5, px: 2 }}
+                />
+              )
             ) : (
               <Button
                 variant="contained"
                 onClick={handleNext}
                 endIcon={<NavigateNext />}
                 sx={{ textTransform: 'none' }}
+                disabled={isFormComplete}
               >
                 Next
               </Button>
