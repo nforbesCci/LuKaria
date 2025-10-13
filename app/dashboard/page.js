@@ -121,9 +121,9 @@ export default function Dashboard() {
       console.log('👤 Dashboard: Profile loaded successfully:', profileState.profile);
       
       // If profile exists and has required fields, mark medical profile task as complete
-      const hasPreferredPhone = profileState.profile.user_metadata?.preferredPhoneNumber;
-      const hasDateOfBirth = profileState.profile.user_metadata?.dateOfBirth;
-      const hasParish = profileState.profile.user_metadata?.parish;
+      const hasPreferredPhone = profileState.profile?.preferredPhone;
+      const hasDateOfBirth = profileState.profile?.dateOfBirth;
+      const hasParish = profileState.profile?.parish;
       
       const isProfileComplete = profileState.profile && hasPreferredPhone && hasDateOfBirth && hasParish;
       
