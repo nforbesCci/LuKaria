@@ -2,6 +2,7 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
+import SEO from '../../components/SEO';
 import {
   Container,
   Typography,
@@ -41,6 +42,12 @@ export default function InfoPage() {
 
   return (
     <>
+      <SEO 
+        title="Payment Information | Svelte by LuKaria"
+        description="Transparent pricing for Svelte by LuKaria weight loss program. $80,000/month includes physician appointments, GLP-1 medications, and support. Special introductory offers available."
+        keywords="weight loss pricing, GLP-1 cost, Mounjaro price Jamaica, medical weight loss program cost, affordable weight loss"
+        canonical="https://localhost:3000/info"
+      />
       {/* Navigation Menu */}
       <Box
         sx={{ 

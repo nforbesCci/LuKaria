@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import SEO from '../../components/SEO';
 import {
   Container,
   Typography,
@@ -37,6 +38,12 @@ export default function Contact() {
 
   return (
     <>
+      <SEO 
+        title="Contact Us | Svelte by LuKaria"
+        description="Get in touch with Svelte by LuKaria. Contact our patient care team for questions about virtual weight loss consultations, GLP-1 medications, and program enrollment."
+        keywords="contact weight loss clinic, Jamaica telehealth contact, virtual consultation contact, patient care support"
+        canonical="https://localhost:3000/contact"
+      />
       {/* Navigation Menu */}
       <Box
         sx={{ 

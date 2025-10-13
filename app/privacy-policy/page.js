@@ -3,6 +3,7 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
+import SEO from '../../components/SEO';
 import {
   Container,
   Typography,
@@ -26,6 +27,12 @@ export default function PrivacyPolicy() {
 
   return (
     <>
+      <SEO 
+        title="Privacy Policy | Svelte by LuKaria"
+        description="Read Svelte by LuKaria's privacy policy. Learn how we protect your personal health information and maintain HIPAA compliance for our virtual weight loss clinic."
+        keywords="privacy policy, HIPAA compliance, patient privacy, telehealth privacy, medical data protection"
+        canonical="https://localhost:3000/privacy-policy"
+      />
       {/* Navigation Menu */}
       <Box
         sx={{ 

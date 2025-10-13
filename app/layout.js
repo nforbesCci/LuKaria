@@ -6,8 +6,71 @@ import ReduxProvider from '../components/ReduxProvider';
 import './globals.css';
 
 export const metadata = {
-  title: 'Svelte by LuKaria',
-  description: 'Ultimate Weight Loss Journey',
+  title: {
+    default: 'Svelte by LuKaria - Virtual Medical Weight Loss | GLP-1 Medications',
+    template: '%s | Svelte by LuKaria'
+  },
+  description: 'Virtual medical weight loss clinic offering GLP-1 medications like Mounjaro. Licensed physicians provide personalized weight loss plans through secure telehealth in Jamaica. Start your transformation today.',
+  keywords: [
+    'weight loss',
+    'GLP-1 medications',
+    'Mounjaro',
+    'virtual healthcare',
+    'telemedicine',
+    'medical weight loss',
+    'obesity treatment',
+    'Jamaica healthcare',
+    'weight management',
+    'telehealth Jamaica',
+    'online doctor consultation',
+    'prescription weight loss',
+    'Svelte',
+    'LuKaria',
+    'lifestyle medicine',
+    'metabolic health'
+  ],
+  authors: [{ name: 'LuKaria' }],
+  creator: 'LuKaria',
+  publisher: 'LuKaria',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_JM',
+    url: 'https://localhost:3000',
+    title: 'Svelte by LuKaria - Virtual Medical Weight Loss',
+    description: 'Virtual medical weight loss clinic offering GLP-1 medications. Licensed physicians provide personalized care through secure telehealth in Jamaica.',
+    siteName: 'Svelte by LuKaria',
+    images: [
+      {
+        url: '/images/Lukaria_logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Svelte by LuKaria Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Svelte by LuKaria - Virtual Medical Weight Loss',
+    description: 'Virtual medical weight loss clinic offering GLP-1 medications in Jamaica.',
+    images: ['/images/Lukaria_logo.png'],
+  },
+  verification: {
+    google: 'TAAk9hGtQmi6UwNq4n4g8UrBCM2w91kIZU0ndvLHlKw',
+  },
+  alternates: {
+    canonical: 'https://localhost:3000',
+  },
 };
 
 export default function RootLayout({ children }) {

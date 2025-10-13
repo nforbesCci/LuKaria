@@ -3,6 +3,7 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
+import SEO from '../../components/SEO';
 import {
   Container,
   Typography,
@@ -26,6 +27,12 @@ export default function Terms() {
 
   return (
     <>
+      <SEO 
+        title="Terms and Conditions | Svelte by LuKaria"
+        description="Read the terms and conditions for using Svelte by LuKaria virtual weight loss services. Understand your rights and responsibilities as a patient."
+        keywords="terms and conditions, service agreement, patient terms, telehealth terms, medical services agreement"
+        canonical="https://localhost:3000/terms"
+      />
       {/* Navigation Menu */}
       <Box
         sx={{ 

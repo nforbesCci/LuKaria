@@ -4,6 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import SEO from '../components/SEO';
 import {
   Container,
   Typography,
@@ -136,6 +137,12 @@ export default function Home() {
 
   return (
     <>
+      <SEO 
+        title="Svelte by LuKaria - Virtual Medical Weight Loss | GLP-1 Medications"
+        description="Virtual medical weight loss clinic in Jamaica. GLP-1 medications like Mounjaro prescribed by licensed physicians. Flat monthly fee, no waiting rooms. Start your transformation today."
+        keywords="weight loss Jamaica, GLP-1 medications, Mounjaro, virtual weight loss clinic, telemedicine Jamaica, online doctor, medical weight loss, obesity treatment"
+        canonical="https://localhost:3000"
+      />
       {/* Navigation Menu */}
       <Box
         sx={{ 

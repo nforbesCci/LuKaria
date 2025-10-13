@@ -1,0 +1,35 @@
+# Robots.txt for Svelte by LuKaria
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Specific pages
+Allow: /info
+Allow: /faq
+Allow: /contact
+Allow: /about
+Allow: /privacy-policy
+Allow: /terms
+
+# Block admin and authenticated pages from search engines
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+Disallow: /schedule
+Disallow: /weight-logging
+Disallow: /meal-tracker
+Disallow: /medication-tracker
+Disallow: /side-effects
+Disallow: /consent-forms
+Disallow: /consultation-required
+Disallow: /unauthorized
+Disallow: /lab-requisition
+Disallow: /barcode-scanner
+
+# Block API routes
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://www.lukariagroup.com/sitemap.xml
+

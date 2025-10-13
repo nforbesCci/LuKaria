@@ -2,6 +2,7 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
+import SEO from '../../components/SEO';
 import {
   Container,
   Typography,
@@ -33,6 +34,12 @@ export default function AboutUs() {
 
   return (
     <>
+      <SEO 
+        title="About Us - Our Mission | Svelte by LuKaria"
+        description="Learn about Svelte by LuKaria and Dr. Kadria Fairclough. Virtual medical weight loss clinic dedicated to transforming lives through science-backed, compassionate care in Jamaica."
+        keywords="Dr. Kadria Fairclough, Svelte by LuKaria, weight loss doctor Jamaica, lifestyle medicine, obesity management, virtual clinic"
+        canonical="https://localhost:3000/about"
+      />
       {/* Navigation Menu */}
       <Box
         sx={{ 
