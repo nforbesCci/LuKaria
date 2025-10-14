@@ -332,7 +332,7 @@ export default function AboutUs() {
                       }}
                     />
                     <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, flex: 1 }}>
-                      Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss.
+                      Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss. Dr. Fairclough has always believed in patient-centred care which focuses on patient education and informed decision making. She possesses years of Canadian experience with Telehealth delivery.
                     </Typography>
                   </Box>
                 </Box>
