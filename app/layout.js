@@ -27,7 +27,10 @@ export const metadata = {
     'Svelte',
     'LuKaria',
     'lifestyle medicine',
-    'metabolic health'
+    'metabolic health',
+    'Kadria',
+    'Kadria Fairclough',
+    'Dr. Kadria Fairclough'
   ],
   authors: [{ name: 'LuKaria' }],
   creator: 'LuKaria',

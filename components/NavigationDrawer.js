@@ -30,6 +30,8 @@ import {
   PushPin,
   PushPinOutlined,
   Description,
+  Schedule,
+  Report,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -139,11 +141,23 @@ export default function NavigationDrawer() {
     ] : []),
     
     // Admin portal - Admin and Doctor only
-    ...(canAccessPage(user, 'admin', profileState.profile) ? [{
-      text: 'Administration',
-      icon: <AdminPanelSettings />,
-      path: '/admin',
-    }] : []),
+    ...(canAccessPage(user, 'admin', profileState.profile) ? [
+      {
+        text: 'Administration',
+        icon: <AdminPanelSettings />,
+        path: '/admin',
+      },
+      {
+        text: 'Reschedule Requests',
+        icon: <Schedule />,
+        path: '/admin/reschedule-requests',
+      },
+      {
+        text: 'Side Effects Reports',
+        icon: <Report />,
+        path: '/admin/side-effects',
+      },
+    ] : []),
   ];
 
   const handleNavigation = (path) => {

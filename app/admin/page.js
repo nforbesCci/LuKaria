@@ -307,14 +307,42 @@ export default function AdminPage() {
                 </Typography>
               </Box>
             </Box>
-            <Button
-              variant="outlined"
-              startIcon={<Refresh />}
-              onClick={fetchUsers}
-              sx={{ textTransform: 'none' }}
-            >
-              Refresh
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Button
+                variant="contained"
+                onClick={() => router.push('/admin/reschedule-requests')}
+                sx={{ 
+                  textTransform: 'none',
+                  backgroundColor: '#877449',
+                  '&:hover': {
+                    backgroundColor: '#B8941F'
+                  }
+                }}
+              >
+                View Reschedule Requests
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => router.push('/admin/side-effects')}
+                sx={{ 
+                  textTransform: 'none',
+                  backgroundColor: '#877449',
+                  '&:hover': {
+                    backgroundColor: '#B8941F'
+                  }
+                }}
+              >
+                View Side Effects Reports
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Refresh />}
+                onClick={fetchUsers}
+                sx={{ textTransform: 'none' }}
+              >
+                Refresh
+              </Button>
+            </Box>
           </Box>
         </Paper>
 
