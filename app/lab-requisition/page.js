@@ -25,13 +25,28 @@ import {
   Print,
   Save,
   PictureAsPdf,
+  Send,
 } from '@mui/icons-material';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearPdfState } from '../../store/slices/pdfSlice';
 
 export default function LabRequisition() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
+  const dispatch = useDispatch();
+  const { isGenerating, isSending, error: pdfError, success: pdfSuccess } = useSelector(state => state.pdf);
+
+  // Clear PDF state after success/error
+  useEffect(() => {
+    if (pdfSuccess || pdfError) {
+      const timer = setTimeout(() => {
+        dispatch(clearPdfState());
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [pdfSuccess, pdfError, dispatch]);
 
   // Add print-specific styles
   useEffect(() => {
@@ -42,6 +57,9 @@ export default function LabRequisition() {
         body { margin: 0 !important; padding: 0 !important; background: white !important; }
         .MuiContainer-root { max-width: 8in !important; width: 8in !important; margin: 0 auto !important; padding: 0 !important; }
         #lab-requisition-content { padding: 2px !important; background: white !important; width: 100% !important; }
+        #lab-requisition-content .pdf-header { display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 8px !important; padding: 4px !important; border-bottom: 2px solid #000 !important; }
+        #lab-requisition-content .pdf-header img { height: 50px !important; width: auto !important; margin-right: 8px !important; }
+        #lab-requisition-content .pdf-header h4 { font-size: 1.8rem !important; color: #1976d2 !important; font-weight: bold !important; font-family: "Alex Brush", cursive !important; }
         #lab-requisition-content * { 
           line-height: 0.6 !important; 
           margin: 0 !important; 
@@ -574,6 +592,18 @@ export default function LabRequisition() {
     }
   };
 
+  const sendPDF = () => {
+    const fileName = `Lab-Requisition-${user?.name?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+    dispatch({
+      type: 'pdf/generateAndSendPdf',
+      payload: {
+        elementId: 'lab-requisition-content',
+        fileName,
+        userInfo: user,
+      },
+    });
+  };
+
   if (isLoading || !mounted) {
     return (
       <>
@@ -670,6 +700,15 @@ export default function LabRequisition() {
             PDF
           </Button>
           <Button
+            variant="contained"
+            startIcon={<Send />}
+            onClick={sendPDF}
+            disabled={isGenerating || isSending}
+            sx={{ textTransform: 'none', mr: 1, backgroundColor: '#2e7d32', '&:hover': { backgroundColor: '#1b5e20' } }}
+          >
+            {isGenerating || isSending ? <CircularProgress size={20} color="inherit" /> : 'Send'}
+          </Button>
+          <Button
             variant="outlined"
             startIcon={<Save />}
             sx={{ textTransform: 'none' }}
@@ -680,6 +719,56 @@ export default function LabRequisition() {
 
         {/* Main Content - Patient Information in Own Row */}
         <div id="lab-requisition-content">
+        
+        {/* PDF Header */}
+        <Box className="pdf-header" sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          mb: 2,
+          p: 1,
+          borderBottom: '2px solid #000',
+          '@media print': {
+            display: 'flex !important'
+          }
+        }}>
+          <Box component="img" 
+            src="/images/Lukaria_logo.png" 
+            alt="LuKaria Logo"
+            sx={{ 
+              height: 60, 
+              width: 'auto',
+              mr: 2,
+              '@media print': {
+                height: '50px !important'
+              }
+            }} 
+          />
+          <Typography variant="h4" sx={{ 
+            fontWeight: 'bold',
+            color: '#1976d2',
+            fontFamily: '"Alex Brush", cursive',
+            '@media print': {
+              fontSize: '1.8rem !important',
+              color: '#1976d2 !important'
+            }
+          }}>
+            Svelte by LuKaria
+          </Typography>
+        </Box>
+        
+        {/* Success/Error Alerts */}
+        {pdfSuccess && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            PDF sent successfully! Check your email and SharePoint for the document.
+          </Alert>
+        )}
+        {pdfError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            Error sending PDF: {pdfError}
+          </Alert>
+        )}
+        
         <Paper elevation={2} sx={{ 
           p: 0.5, 
           backgroundColor: 'white',
@@ -763,12 +852,12 @@ export default function LabRequisition() {
           {/* Rest of Content - 2 Column Layout */}
           <Grid container spacing={1}>
 
-            {/* Column 1 - Section A: Requisition Physician */}
+            {/* Column 1 - Section A: Requesting Physician */}
             <Grid item xs={12} md={6}>
               <Card variant="outlined" sx={{ mb: 0.625, backgroundColor: 'white' }}>
                 <CardContent sx={{ py: 0.5, px: 1.5 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.625, color: 'black' }}>
-                    A. Requisition Physician
+                    A. Requesting Physician
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={3}>
@@ -847,12 +936,12 @@ export default function LabRequisition() {
               </Card>
             </Grid>
 
-            {/* Column 2 - Section B: Copies of Result */}
+            {/* Column 2 - Section B: Copy results to: */}
             <Grid item xs={12} md={6}>
               <Card variant="outlined" sx={{ mb: 0.625, backgroundColor: 'white' }}>
                 <CardContent sx={{ py: 0.5, px: 1.5 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.625, color: 'black' }}>
-                    B. Copies of Result
+                    B. Copy results to:
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={3}>
@@ -897,36 +986,16 @@ export default function LabRequisition() {
                         defaultValue="123 Medical Plaza\nSuite 456\nKingston, Jamaica"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        fullWidth
-                        label="Date"
-                        type="date"
-                        variant="standard"
-                        defaultValue={new Date().toISOString().split('T')[0]}
-                        InputLabelProps={{ shrink: true }}
-                      />
-                    </Grid>
                   </Grid>
-                  <Box sx={{ mt: 2, textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                      Signature
-                    </Typography>
-                    <Box
-                      sx={{
-                        border: '1px dashed #ccc',
-                        height: 60,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: '#f9f9f9'
-                      }}
-                    >
-                      <Typography variant="body2" color="text.secondary">
-                        Doctor's Signature
-                      </Typography>
-                    </Box>
-                  </Box>
+                </CardContent>
+              </Card>
+              
+              {/* Email Results Card */}
+              <Card variant="outlined" sx={{ mb: 0.625, backgroundColor: 'white' }}>
+                <CardContent sx={{ py: 0.5, px: 1.5 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.625, color: 'black', textAlign: 'center' }}>
+                    SEND ALL RESULTS TO EMAIL: kadriaf@lukariagroup.com
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>

@@ -221,11 +221,11 @@ export default function InfoPage() {
                 <Divider sx={{ mb: 3, borderColor: '#877449' }} />
                 
                 <Paper elevation={3} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
-                  <Typography variant="h4" sx={{ color: '#877449', fontWeight: 'bold', mb: 1 }}>
-                    $80,000/month
+                  <Typography variant="h4" sx={{ color: '#877449', fontWeight: 'bold', mb: 1, fontSize: '1.6rem' }}>
+                    Comprehensive Weight Loss Program
                   </Typography>
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                    Comprehensive Weight Loss Program
+                    All-inclusive monthly program
                   </Typography>
                   
                   <List dense>
@@ -284,6 +284,12 @@ export default function InfoPage() {
                       />
                     </ListItem>
                   </List>
+                  
+                  <Box sx={{ textAlign: 'center', mt: 3, pt: 2, borderTop: '1px solid #877449' }}>
+                    <Typography variant="h5" sx={{ color: '#877449', fontWeight: 'bold' }}>
+                      $80,000/month
+                    </Typography>
+                  </Box>
                 </Paper>
 
                 <Paper elevation={3} sx={{ p: 2, backgroundColor: '#36454F', border: '1px solid #877449' }}>

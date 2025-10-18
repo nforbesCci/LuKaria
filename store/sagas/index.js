@@ -10,6 +10,7 @@ import consentSaga from './consentSaga';
 import notificationSaga from './notificationSaga';
 import mealsSaga from './mealsSaga';
 import sideEffectsSaga from './sideEffectsSaga';
+import { pdfSaga } from './pdfSaga';
 
 // Root saga that combines all sagas
 export default function* rootSaga() {
@@ -25,6 +26,7 @@ export default function* rootSaga() {
     fork(notificationSaga),
     fork(mealsSaga),
     fork(sideEffectsSaga),
+    fork(pdfSaga),
   ]);
 }
 

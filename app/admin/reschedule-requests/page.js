@@ -27,6 +27,7 @@ import {
   Refresh
 } from '@mui/icons-material';
 import SEO from '../../../components/SEO';
+import RescheduleAppointment from '../../../components/RescheduleAppointment';
 
 export default function RescheduleRequestsPage() {
   const { user, isLoading: userLoading } = useUser();
@@ -41,6 +42,8 @@ export default function RescheduleRequestsPage() {
     hasNextPage: false,
     hasPrevPage: false
   });
+  const [currentView, setCurrentView] = useState('list'); // 'list' or 'reschedule'
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   // Check if user is admin/doctor
   const isAdmin = user && (
@@ -93,6 +96,24 @@ export default function RescheduleRequestsPage() {
     fetchRescheduleRequests(pagination.currentPage);
   };
 
+  const handleReBook = (request) => {
+    setSelectedRequest(request);
+    setCurrentView('reschedule');
+  };
+
+  const handleBackToList = () => {
+    setCurrentView('list');
+    setSelectedRequest(null);
+  };
+
+  const handleRescheduleSuccess = (rescheduleData) => {
+    console.log('Appointment rescheduled:', rescheduleData);
+    // Refresh the requests list and go back to list view
+    fetchRescheduleRequests(pagination.currentPage);
+    setCurrentView('list');
+    setSelectedRequest(null);
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -138,6 +159,25 @@ export default function RescheduleRequestsPage() {
           Access denied. Admin or Doctor role required to view reschedule requests.
         </Alert>
       </Container>
+    );
+  }
+
+  // Show reschedule component if in reschedule view
+  if (currentView === 'reschedule' && selectedRequest) {
+    return (
+      <>
+        <SEO 
+          title="Reschedule Appointment - Admin"
+          description="Reschedule appointment for patient"
+          keywords="admin, reschedule, appointment, management"
+          canonical="https://www.lukariagroup.com/admin/reschedule-requests"
+        />
+        <RescheduleAppointment
+          request={selectedRequest}
+          onReschedule={handleRescheduleSuccess}
+          onBack={handleBackToList}
+        />
+      </>
     );
   }
 
@@ -305,6 +345,27 @@ export default function RescheduleRequestsPage() {
                                 Last Updated: {formatDate(request.updatedAt)}
                               </Typography>
                             )}
+                            
+                            <Box sx={{ mt: 3, display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                sx={{
+                                  backgroundColor: '#877449',
+                                  color: 'white',
+                                  textTransform: 'none',
+                                  fontWeight: '600',
+                                  px: 2,
+                                  py: 1,
+                                  '&:hover': {
+                                    backgroundColor: '#B8941F',
+                                  }
+                                }}
+                                onClick={() => handleReBook(request)}
+                              >
+                                Re-book
+                              </Button>
+                            </Box>
                           </Box>
                         </Grid>
                       </Grid>
