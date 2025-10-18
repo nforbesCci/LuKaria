@@ -27,10 +27,13 @@ import {
   Refresh
 } from '@mui/icons-material';
 import SEO from '../../../components/SEO';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAdminRescheduleSuccess } from '../../../store/slices/appointmentSlice';
 import RescheduleAppointment from '../../../components/RescheduleAppointment';
 
 export default function RescheduleRequestsPage() {
   const { user, isLoading: userLoading } = useUser();
+  const dispatch = useDispatch();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -104,6 +107,8 @@ export default function RescheduleRequestsPage() {
   const handleBackToList = () => {
     setCurrentView('list');
     setSelectedRequest(null);
+    // Clear any success state from previous reschedule operations
+    dispatch(setAdminRescheduleSuccess(false));
   };
 
   const handleRescheduleSuccess = (rescheduleData) => {
@@ -112,6 +117,8 @@ export default function RescheduleRequestsPage() {
     fetchRescheduleRequests(pagination.currentPage);
     setCurrentView('list');
     setSelectedRequest(null);
+    // Clear the success state to prevent issues on next re-book
+    dispatch(setAdminRescheduleSuccess(false));
   };
 
   const formatDate = (dateString) => {

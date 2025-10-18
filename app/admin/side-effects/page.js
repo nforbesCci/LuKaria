@@ -35,7 +35,8 @@ import {
   Message,
   Refresh,
   Visibility,
-  Close
+  Close,
+  Done
 } from '@mui/icons-material';
 import SEO from '../../../components/SEO';
 
@@ -114,6 +115,62 @@ export default function AdminSideEffectsPage() {
   const handleBackToList = () => {
     setViewMode('list');
     setSelectedReport(null);
+  };
+
+  const handleMarkAsReviewed = async (reportId) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔄 Marking side effect as reviewed:', reportId);
+      
+      const response = await fetch('/api/admin/side-effects/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reportId }),
+      });
+      
+      console.log('📡 API Response status:', response.status);
+      console.log('📡 API Response headers:', response.headers);
+      
+      // Check if response is HTML (404/500 error page)
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const htmlText = await response.text();
+        console.error('❌ Received HTML instead of JSON:', htmlText.substring(0, 200));
+        throw new Error('Server returned an error page. Please check if the API endpoint exists.');
+      }
+      
+      const data = await response.json();
+      console.log('📨 API Response data:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to mark as reviewed');
+      }
+      
+      if (data.success) {
+        console.log('✅ Successfully marked as reviewed');
+        // Update the selected report to show it's been reviewed
+        setSelectedReport(prev => ({
+          ...prev,
+          reviewed: true,
+          reviewedAt: new Date().toISOString(),
+          reviewedBy: user.sub
+        }));
+        
+        // Refresh the reports list
+        fetchSideEffectsReports(pagination.currentPage);
+      } else {
+        throw new Error(data.error || 'Failed to mark as reviewed');
+      }
+    } catch (err) {
+      console.error('❌ Error marking as reviewed:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -411,6 +468,40 @@ export default function AdminSideEffectsPage() {
             {/* Detail Content */}
             {selectedReport && (
               <Stack spacing={3}>
+                {/* Action Buttons - Moved to top */}
+                <Paper sx={{ p: 3 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'flex-end', 
+                    gap: 2,
+                    alignItems: 'center'
+                  }}>
+                    {!selectedReport.reviewed ? (
+                      <Button
+                        variant="contained"
+                        startIcon={<Done />}
+                        onClick={() => handleMarkAsReviewed(selectedReport._id)}
+                        disabled={loading}
+                        sx={{
+                          backgroundColor: '#2e7d32',
+                          '&:hover': {
+                            backgroundColor: '#1b5e20'
+                          }
+                        }}
+                      >
+                        Mark as Reviewed
+                      </Button>
+                    ) : (
+                      <Chip 
+                        label="Already Reviewed" 
+                        color="success"
+                        icon={<CheckCircle />}
+                        size="large"
+                      />
+                    )}
+                  </Box>
+                </Paper>
+
                 {/* Patient Information */}
                 <Paper sx={{ p: 3, backgroundColor: '#f8f9fa' }}>
                   <Typography variant="h5" sx={{ color: '#877449', mb: 3, fontWeight: '600' }}>
@@ -547,8 +638,26 @@ export default function AdminSideEffectsPage() {
                         size="large"
                       />
                     </Grid>
+                    {selectedReport.reviewed && (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body2" color="text.secondary">Reviewed Date</Typography>
+                          <Typography variant="h6">{formatDate(selectedReport.reviewedAt)}</Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body2" color="text.secondary">Review Status</Typography>
+                          <Chip 
+                            label="Reviewed" 
+                            color="success"
+                            size="large"
+                            icon={<CheckCircle />}
+                          />
+                        </Grid>
+                      </>
+                    )}
                   </Grid>
                 </Paper>
+
               </Stack>
             )}
           </Box>

@@ -45,7 +45,8 @@ export async function GET(request) {
     
     // Find all completed side effects reports
     const query = { 
-      complete: true 
+      complete: true,
+      reviewed: { $ne: true }
     };
     
     console.log('🔍 API: Query:', query);

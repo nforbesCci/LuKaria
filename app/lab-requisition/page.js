@@ -684,6 +684,30 @@ export default function LabRequisition() {
           </Button>
           <Box sx={{ flexGrow: 1 }} />
           <Button
+            variant="outlined"
+            startIcon={<Print />}
+            onClick={() => {
+              // Select weight loss tests
+              const weightLossTests = [
+                'ALT', 'AST', 'ALP', 'BUN', 'Creatinine', 
+                'HbA1C (Glycosylated hemoglobin)', 
+                'Total cholesterol', 'LDL Cholesterol', 
+                'HDL Cholesterol', 'Triglycerides'
+              ];
+              
+              // Find and check the corresponding checkboxes
+              weightLossTests.forEach(testName => {
+                const checkbox = document.querySelector(`input[value="${testName}"]`);
+                if (checkbox) {
+                  checkbox.checked = true;
+                }
+              });
+            }}
+            sx={{ textTransform: 'none', mr: 1, borderColor: '#877449', color: '#877449', '&:hover': { borderColor: '#B8941F', backgroundColor: 'rgba(135, 116, 73, 0.04)' } }}
+          >
+            Weight Loss Tests
+          </Button>
+          <Button
             variant="contained"
             startIcon={<Print />}
             onClick={() => window.print()}
@@ -733,7 +757,7 @@ export default function LabRequisition() {
           }
         }}>
           <Box component="img" 
-            src="/images/Lukaria_logo.png" 
+            src="/images/Lukaria_logo_background_removed_small.png" 
             alt="LuKaria Logo"
             sx={{ 
               height: 60, 
@@ -753,7 +777,12 @@ export default function LabRequisition() {
               color: '#1976d2 !important'
             }
           }}>
-            Svelte by LuKaria
+            Svelte <span style={{ 
+              fontFamily: 'sans-serif', 
+              fontSize: '0.6em', 
+              verticalAlign: 'sub',
+              fontWeight: 'normal'
+            }}>by LuKaria</span>
           </Typography>
         </Box>
         
@@ -986,7 +1015,7 @@ export default function LabRequisition() {
                         defaultValue="123 Medical Plaza\nSuite 456\nKingston, Jamaica"
                       />
                     </Grid>
-                  </Grid>
+                    </Grid>
                 </CardContent>
               </Card>
               
@@ -995,7 +1024,7 @@ export default function LabRequisition() {
                 <CardContent sx={{ py: 0.5, px: 1.5 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.625, color: 'black', textAlign: 'center' }}>
                     SEND ALL RESULTS TO EMAIL: kadriaf@lukariagroup.com
-                  </Typography>
+                    </Typography>
                 </CardContent>
               </Card>
             </Grid>

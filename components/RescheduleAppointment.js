@@ -35,6 +35,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useDispatch, useSelector } from 'react-redux';
+import { adminRescheduleAppointment, setAdminRescheduleSuccess } from '../store/slices/appointmentSlice';
 
 export default function RescheduleAppointment({ 
   request, 
@@ -42,7 +43,7 @@ export default function RescheduleAppointment({
   onBack
 }) {
   const dispatch = useDispatch();
-  const { isRescheduling, rescheduleError, rescheduleSuccess } = useSelector(state => state.appointment);
+  const { isBooking, bookingError, adminRescheduleSuccess } = useSelector(state => state.appointment);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     date: null,
@@ -68,13 +69,20 @@ export default function RescheduleAppointment({
 
   // Handle success from Redux state
   useEffect(() => {
-    if (rescheduleSuccess) {
+    if (adminRescheduleSuccess) {
       setSuccess(true);
       setTimeout(() => {
-        onReschedule && onReschedule(rescheduleSuccess);
+        onReschedule && onReschedule(adminRescheduleSuccess);
       }, 2000);
     }
-  }, [rescheduleSuccess, onReschedule]);
+  }, [adminRescheduleSuccess, onReschedule]);
+
+  // Clear success state when component mounts
+  useEffect(() => {
+    // Reset any existing success state when component loads
+    // This prevents the component from immediately triggering success
+    dispatch(setAdminRescheduleSuccess(false));
+  }, [dispatch]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -89,7 +97,6 @@ export default function RescheduleAppointment({
     }
 
     const appointmentData = {
-      userId: request.userId,
       date: formData.date.toISOString(),
       time: formData.time.toTimeString().slice(0, 5),
       type: formData.type,
@@ -98,10 +105,7 @@ export default function RescheduleAppointment({
       rescheduleRequestId: request._id
     };
 
-    dispatch({
-      type: 'appointment/rescheduleAppointment',
-      payload: appointmentData
-    });
+    dispatch(adminRescheduleAppointment(request.userId, appointmentData));
   };
 
   const formatDate = (dateString) => {
@@ -190,11 +194,11 @@ export default function RescheduleAppointment({
                 New Appointment Details
               </Typography>
 
-              {rescheduleError && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {rescheduleError}
-                </Alert>
-              )}
+               {bookingError && (
+                 <Alert severity="error" sx={{ mb: 2 }}>
+                   {bookingError}
+                 </Alert>
+               )}
 
               {success && (
                 <Alert severity="success" sx={{ mb: 2 }}>
@@ -296,40 +300,40 @@ export default function RescheduleAppointment({
           backgroundColor: '#f8f9fa',
           borderRadius: 1
         }}>
-          <Button
-            onClick={onBack}
-            disabled={isRescheduling}
-            sx={{ 
-              color: '#877449',
-              textTransform: 'none',
-              fontWeight: '600'
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleReschedule}
-            variant="contained"
-            disabled={isRescheduling || !formData.date || !formData.time}
-            startIcon={isRescheduling ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <Save />}
-            sx={{
-              backgroundColor: '#877449',
-              color: 'white',
-              textTransform: 'none',
-              fontWeight: '600',
-              px: 3,
-              py: 1.5,
-              '&:hover': {
-                backgroundColor: '#B8941F',
-              },
-              '&:disabled': {
-                backgroundColor: '#ccc',
-                color: '#666'
-              }
-            }}
-          >
-            {isRescheduling ? 'Rescheduling...' : 'Reschedule Appointment'}
-          </Button>
+           <Button
+             onClick={onBack}
+             disabled={isBooking}
+             sx={{ 
+               color: '#877449',
+               textTransform: 'none',
+               fontWeight: '600'
+             }}
+           >
+             Cancel
+           </Button>
+           <Button
+             onClick={handleReschedule}
+             variant="contained"
+             disabled={isBooking || !formData.date || !formData.time}
+             startIcon={isBooking ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <Save />}
+             sx={{
+               backgroundColor: '#877449',
+               color: 'white',
+               textTransform: 'none',
+               fontWeight: '600',
+               px: 3,
+               py: 1.5,
+               '&:hover': {
+                 backgroundColor: '#B8941F',
+               },
+               '&:disabled': {
+                 backgroundColor: '#ccc',
+                 color: '#666'
+               }
+             }}
+           >
+             {isBooking ? 'Rescheduling...' : 'Reschedule Appointment'}
+           </Button>
         </Box>
       </Container>
     </LocalizationProvider>
