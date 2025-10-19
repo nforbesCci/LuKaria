@@ -9,6 +9,9 @@ import medicationSaga from './medicationSaga';
 import consentSaga from './consentSaga';
 import notificationSaga from './notificationSaga';
 import mealsSaga from './mealsSaga';
+import adminMealsSaga from './adminMealsSaga';
+import adminConsentSaga from './adminConsentSaga';
+import adminAppointmentTasksSaga from './adminAppointmentTasksSaga';
 import sideEffectsSaga from './sideEffectsSaga';
 import { pdfSaga } from './pdfSaga';
 
@@ -25,6 +28,9 @@ export default function* rootSaga() {
     fork(consentSaga),
     fork(notificationSaga),
     fork(mealsSaga),
+    fork(adminMealsSaga),
+    fork(adminConsentSaga),
+    fork(adminAppointmentTasksSaga),
     fork(sideEffectsSaga),
     fork(pdfSaga),
   ]);

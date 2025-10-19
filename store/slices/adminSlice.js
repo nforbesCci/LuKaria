@@ -20,6 +20,21 @@ const initialState = {
   // UI state
   selectedUser: null,
   editDialogOpen: false,
+  
+  // Admin meals data
+  adminMeals: {},
+  adminMealsLoading: false,
+  adminMealsError: null,
+  
+  // Admin consent forms data
+  adminConsentForms: [],
+  adminConsentFormsLoading: false,
+  adminConsentFormsError: null,
+  
+  // Admin appointment tasks data
+  adminAppointmentTasks: [],
+  adminAppointmentTasksLoading: false,
+  adminAppointmentTasksError: null,
 };
 
 const adminSlice = createSlice({
@@ -87,6 +102,117 @@ const adminSlice = createSlice({
       state.editDialogOpen = action.payload;
     },
     
+    // Admin meals actions
+    fetchAdminMeals: (state, action) => {
+      state.adminMealsLoading = true;
+      state.adminMealsError = null;
+    },
+    fetchAdminMealsSuccess: (state, action) => {
+      state.adminMealsLoading = false;
+      state.adminMeals = action.payload.meals || {};
+      state.adminMealsError = null;
+      console.log('🔄 Admin slice: fetchAdminMealsSuccess called with payload:', action.payload);
+      console.log('🔄 Admin slice: Setting adminMeals to:', action.payload.meals);
+    },
+    fetchAdminMealsFailure: (state, action) => {
+      state.adminMealsLoading = false;
+      state.adminMealsError = action.payload;
+    },
+    clearAdminMealsError: (state) => {
+      state.adminMealsError = null;
+    },
+    
+    // Admin consent forms actions
+    fetchAdminConsentForms: (state, action) => {
+      state.adminConsentFormsLoading = true;
+      state.adminConsentFormsError = null;
+    },
+    fetchAdminConsentFormsSuccess: (state, action) => {
+      state.adminConsentFormsLoading = false;
+      state.adminConsentForms = action.payload.consentForms || [];
+      state.adminConsentFormsError = null;
+    },
+    fetchAdminConsentFormsFailure: (state, action) => {
+      state.adminConsentFormsLoading = false;
+      state.adminConsentFormsError = action.payload;
+    },
+    updateAdminConsentForm: (state, action) => {
+      // Optimistic update - update the form in the array
+      const { formType, updates } = action.payload;
+      const formIndex = state.adminConsentForms.findIndex(form => form.formType === formType);
+      if (formIndex !== -1) {
+        state.adminConsentForms[formIndex] = {
+          ...state.adminConsentForms[formIndex],
+          ...updates,
+          updatedAt: new Date()
+        };
+      }
+    },
+    updateAdminConsentFormSuccess: (state, action) => {
+      // Confirmation that the update was successful
+      console.log('✅ Admin slice: Consent form updated successfully');
+    },
+    updateAdminConsentFormFailure: (state, action) => {
+      // Revert optimistic update on failure
+      state.adminConsentFormsError = action.payload;
+    },
+    clearAdminConsentFormsError: (state) => {
+      state.adminConsentFormsError = null;
+    },
+    
+    // Admin appointment tasks actions
+    fetchAdminAppointmentTasks: (state, action) => {
+      state.adminAppointmentTasksLoading = true;
+      state.adminAppointmentTasksError = null;
+    },
+    fetchAdminAppointmentTasksSuccess: (state, action) => {
+      state.adminAppointmentTasksLoading = false;
+      state.adminAppointmentTasks = action.payload.appointmentTasks || [];
+      state.adminAppointmentTasksError = null;
+    },
+    fetchAdminAppointmentTasksFailure: (state, action) => {
+      state.adminAppointmentTasksLoading = false;
+      state.adminAppointmentTasksError = action.payload;
+    },
+    createAdminAppointmentTask: (state, action) => {
+      // Optimistic update - add the new task to the array
+      const { task } = action.payload;
+      if (task) {
+        state.adminAppointmentTasks.unshift(task);
+      }
+    },
+    createAdminAppointmentTaskSuccess: (state, action) => {
+      // Confirmation that the task was created successfully
+      console.log('✅ Admin slice: Appointment task created successfully');
+    },
+    createAdminAppointmentTaskFailure: (state, action) => {
+      // Revert optimistic update on failure
+      state.adminAppointmentTasksError = action.payload;
+    },
+    updateAdminAppointmentTask: (state, action) => {
+      // Optimistic update - update the task in the array
+      const { taskId, updates } = action.payload;
+      const taskIndex = state.adminAppointmentTasks.findIndex(task => task._id === taskId);
+      if (taskIndex !== -1) {
+        state.adminAppointmentTasks[taskIndex] = {
+          ...state.adminAppointmentTasks[taskIndex],
+          ...updates,
+          updatedAt: new Date()
+        };
+      }
+    },
+    updateAdminAppointmentTaskSuccess: (state, action) => {
+      // Confirmation that the update was successful
+      console.log('✅ Admin slice: Appointment task updated successfully');
+    },
+    updateAdminAppointmentTaskFailure: (state, action) => {
+      // Revert optimistic update on failure
+      state.adminAppointmentTasksError = action.payload;
+    },
+    clearAdminAppointmentTasksError: (state) => {
+      state.adminAppointmentTasksError = null;
+    },
+    
     // Reset actions
     resetFilters: (state) => {
       state.searchTerm = '';
@@ -117,6 +243,27 @@ export const {
   setSort,
   setSelectedUser,
   setEditDialogOpen,
+  fetchAdminMeals,
+  fetchAdminMealsSuccess,
+  fetchAdminMealsFailure,
+  clearAdminMealsError,
+  fetchAdminConsentForms,
+  fetchAdminConsentFormsSuccess,
+  fetchAdminConsentFormsFailure,
+  updateAdminConsentForm,
+  updateAdminConsentFormSuccess,
+  updateAdminConsentFormFailure,
+  clearAdminConsentFormsError,
+  fetchAdminAppointmentTasks,
+  fetchAdminAppointmentTasksSuccess,
+  fetchAdminAppointmentTasksFailure,
+  createAdminAppointmentTask,
+  createAdminAppointmentTaskSuccess,
+  createAdminAppointmentTaskFailure,
+  updateAdminAppointmentTask,
+  updateAdminAppointmentTaskSuccess,
+  updateAdminAppointmentTaskFailure,
+  clearAdminAppointmentTasksError,
   resetFilters,
   resetAdmin,
 } = adminSlice.actions;
@@ -128,6 +275,36 @@ export const fetchUsers = () => ({
 
 export const enableUserAccount = (payload) => ({
   type: 'admin/enableUserAccount',
+  payload,
+});
+
+export const fetchAdminMealsAction = (payload) => ({
+  type: 'admin/fetchAdminMeals',
+  payload,
+});
+
+export const fetchAdminConsentFormsAction = (payload) => ({
+  type: 'admin/fetchAdminConsentForms',
+  payload,
+});
+
+export const updateAdminConsentFormAction = (payload) => ({
+  type: 'admin/updateAdminConsentForm',
+  payload,
+});
+
+export const fetchAdminAppointmentTasksAction = (payload) => ({
+  type: 'admin/fetchAdminAppointmentTasks',
+  payload,
+});
+
+export const createAdminAppointmentTaskAction = (payload) => ({
+  type: 'admin/createAdminAppointmentTask',
+  payload,
+});
+
+export const updateAdminAppointmentTaskAction = (payload) => ({
+  type: 'admin/updateAdminAppointmentTask',
   payload,
 });
 
