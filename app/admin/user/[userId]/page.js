@@ -4,7 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction } from '../../../../store/slices/adminSlice';
+import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction } from '../../../../store/slices/adminSlice';
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
 import { useAdminAccess } from '../../../../hooks/useAccessControl';
 import Header from '../../../../components/Header';
@@ -118,6 +118,12 @@ export default function UserDetailPage() {
   const consentFormsLoading = useSelector((state) => state.admin.adminConsentFormsLoading);
   const consentFormsError = useSelector((state) => state.admin.adminConsentFormsError);
   
+  // Get admin profile state from Redux
+  const adminProfile = useSelector((state) => state.admin.adminProfile);
+  const adminProfileLoading = useSelector((state) => state.admin.adminProfileLoading);
+  const adminProfileError = useSelector((state) => state.admin.adminProfileError);
+  const medicalProfileStatus = useSelector((state) => state.admin.medicalProfileStatus);
+  
   // Debug Redux state
   console.log('🔍 Redux meals state:', {
     meals,
@@ -137,6 +143,16 @@ export default function UserDetailPage() {
       hasData: meals && Object.keys(meals).length > 0
     });
   }, [meals, mealsLoading, mealsError]);
+
+  // Debug when admin profile state changes
+  useEffect(() => {
+    console.log('🔄 Admin profile state changed:', {
+      adminProfile,
+      adminProfileLoading,
+      adminProfileError,
+      medicalProfileStatus
+    });
+  }, [adminProfile, adminProfileLoading, adminProfileError, medicalProfileStatus]);
   const [tabValue, setTabValue] = useState(0);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -188,8 +204,10 @@ export default function UserDetailPage() {
     if (params.userId) {
       fetchUserData();
       fetchDbProfile();
+      // Fetch admin profile to check medical profile task completion
+      dispatch(fetchAdminProfileAction({ userId: params.userId }));
     }
-  }, [params.userId]);
+  }, [params.userId, dispatch]);
 
   // Fetch meals when Meal Tracker tab is selected or week changes
   useEffect(() => {
@@ -1141,13 +1159,18 @@ export default function UserDetailPage() {
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {userMetadata.medical_profile_completed ? (
+                    {medicalProfileStatus?.completed ? (
                       <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
                     ) : (
                       <Cancel sx={{ color: 'error.main', mr: 1 }} />
                     )}
                     <Typography variant="body2">
-                      Medical Profile: {userMetadata.medical_profile_completed ? 'Complete' : 'Incomplete'}
+                      Medical Profile: {medicalProfileStatus?.completed ? 'Complete' : 'Incomplete'}
+                      {medicalProfileStatus?.missingFields && medicalProfileStatus.missingFields.length > 0 && (
+                        <Typography variant="caption" color="text.secondary" display="block">
+                          Missing: {medicalProfileStatus.missingFields.join(', ')}
+                        </Typography>
+                      )}
                     </Typography>
                   </Box>
                 </Grid>

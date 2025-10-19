@@ -35,6 +35,12 @@ const initialState = {
   adminAppointmentTasks: [],
   adminAppointmentTasksLoading: false,
   adminAppointmentTasksError: null,
+  
+  // Admin profile data
+  adminProfile: null,
+  adminProfileLoading: false,
+  adminProfileError: null,
+  medicalProfileStatus: null,
 };
 
 const adminSlice = createSlice({
@@ -213,6 +219,42 @@ const adminSlice = createSlice({
       state.adminAppointmentTasksError = null;
     },
     
+    // Admin profile actions
+    fetchAdminProfile: (state, action) => {
+      state.adminProfileLoading = true;
+      state.adminProfileError = null;
+    },
+    fetchAdminProfileSuccess: (state, action) => {
+      state.adminProfileLoading = false;
+      state.adminProfile = action.payload.profile;
+      state.medicalProfileStatus = action.payload.medicalProfileStatus;
+      state.adminProfileError = null;
+    },
+    fetchAdminProfileFailure: (state, action) => {
+      state.adminProfileLoading = false;
+      state.adminProfileError = action.payload;
+    },
+    checkMedicalProfileTask: (state, action) => {
+      // This action is handled by the saga
+    },
+    checkMedicalProfileTaskSuccess: (state, action) => {
+      // Update medical profile status
+      if (state.medicalProfileStatus) {
+        state.medicalProfileStatus.completed = action.payload.completed;
+        if (action.payload.completed) {
+          state.medicalProfileStatus.fields = action.payload.fields;
+        } else {
+          state.medicalProfileStatus.missingFields = action.payload.missingFields;
+        }
+      }
+    },
+    checkMedicalProfileTaskFailure: (state, action) => {
+      state.adminProfileError = action.payload;
+    },
+    clearAdminProfileError: (state) => {
+      state.adminProfileError = null;
+    },
+    
     // Reset actions
     resetFilters: (state) => {
       state.searchTerm = '';
@@ -264,6 +306,13 @@ export const {
   updateAdminAppointmentTaskSuccess,
   updateAdminAppointmentTaskFailure,
   clearAdminAppointmentTasksError,
+  fetchAdminProfile,
+  fetchAdminProfileSuccess,
+  fetchAdminProfileFailure,
+  checkMedicalProfileTask,
+  checkMedicalProfileTaskSuccess,
+  checkMedicalProfileTaskFailure,
+  clearAdminProfileError,
   resetFilters,
   resetAdmin,
 } = adminSlice.actions;
@@ -305,6 +354,16 @@ export const createAdminAppointmentTaskAction = (payload) => ({
 
 export const updateAdminAppointmentTaskAction = (payload) => ({
   type: 'admin/updateAdminAppointmentTask',
+  payload,
+});
+
+export const fetchAdminProfileAction = (payload) => ({
+  type: 'admin/fetchAdminProfile',
+  payload,
+});
+
+export const checkMedicalProfileTaskAction = (payload) => ({
+  type: 'admin/checkMedicalProfileTask',
   payload,
 });
 

@@ -12,6 +12,7 @@ import mealsSaga from './mealsSaga';
 import adminMealsSaga from './adminMealsSaga';
 import adminConsentSaga from './adminConsentSaga';
 import adminAppointmentTasksSaga from './adminAppointmentTasksSaga';
+import adminProfileSaga from './adminProfileSaga';
 import sideEffectsSaga from './sideEffectsSaga';
 import { pdfSaga } from './pdfSaga';
 
@@ -31,6 +32,7 @@ export default function* rootSaga() {
     fork(adminMealsSaga),
     fork(adminConsentSaga),
     fork(adminAppointmentTasksSaga),
+    fork(adminProfileSaga),
     fork(sideEffectsSaga),
     fork(pdfSaga),
   ]);
