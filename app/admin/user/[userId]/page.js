@@ -1369,7 +1369,18 @@ export default function UserDetailPage() {
           </Box>
 
           <TabPanel value={tabValue} index={0}>
-            {!isEditingProfile ? (
+            {adminProfileLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Loading profile data...
+                </Typography>
+              </Box>
+            ) : adminProfileError ? (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Error loading profile: {adminProfileError}
+              </Alert>
+            ) : !isEditingProfile ? (
               // View Mode
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -1403,28 +1414,34 @@ export default function UserDetailPage() {
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Phone sx={{ mr: 1, color: 'text.secondary' }} />
-                          <Typography variant="body2">{userMetadata.phone_number || 'Not provided'}</Typography>
+                          <Typography variant="body2">{adminProfile?.preferredPhone || 'Not provided'}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
-                          <Typography variant="body2">{userMetadata.address || 'Not provided'}</Typography>
+                          <Typography variant="body2">{adminProfile?.homeAddress || 'Not provided'}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <CalendarToday sx={{ mr: 1, color: '#877449' }} />
                           <Typography variant="body2">
-                            Born: {userMetadata.birthdate ? formatDate(userMetadata.birthdate) : 'Not provided'}
+                            Born: {adminProfile?.dateOfBirth ? formatDate(adminProfile.dateOfBirth) : 'Not provided'}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Person sx={{ mr: 1, color: 'text.secondary' }} />
                           <Typography variant="body2">
-                            Gender: {dbProfile?.gender || userMetadata.gender || 'Not provided'}
+                            Gender: {adminProfile?.sex || 'Not provided'}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
                           <Typography variant="body2">
-                            Parish: {dbProfile?.parish || userMetadata.parish || 'Not provided'}
+                            Parish: {adminProfile?.parish || 'Not provided'}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Phone sx={{ mr: 1, color: 'text.secondary' }} />
+                          <Typography variant="body2">
+                            Preferred Phone: {adminProfile?.preferredPhoneNumber || 'Not provided'}
                           </Typography>
                         </Box>
                       </Stack>
@@ -1441,19 +1458,19 @@ export default function UserDetailPage() {
                         <Box>
                           <Typography variant="caption" color="text.secondary">Name</Typography>
                           <Typography variant="body2">
-                            {userMetadata.emergency_contact_name || dbProfile?.nextOfKinName || 'Not provided'}
+                            {adminProfile?.emergencyContactName || 'Not provided'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Phone</Typography>
                           <Typography variant="body2">
-                            {userMetadata.emergency_contact_phone || dbProfile?.nextOfKinPhone || 'Not provided'}
+                            {adminProfile?.emergencyContactPhone || 'Not provided'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Relationship</Typography>
                           <Typography variant="body2">
-                            {userMetadata.emergency_contact_relationship || dbProfile?.nextOfKinRelationship || 'Not provided'}
+                            {adminProfile?.emergencyContactRelationship || 'Not provided'}
                           </Typography>
                         </Box>
                       </Stack>
@@ -1470,22 +1487,22 @@ export default function UserDetailPage() {
                         <Box>
                           <Typography variant="caption" color="text.secondary">Medical Conditions</Typography>
                           <Typography variant="body2">
-                            {(userMetadata.medical_conditions || dbProfile?.medicalConditions || []).length > 0
-                              ? (userMetadata.medical_conditions || dbProfile?.medicalConditions || []).join(', ')
+                            {(adminProfile?.medicalConditions || []).length > 0
+                              ? (adminProfile?.medicalConditions || []).join(', ')
                               : 'None reported'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Current Medications</Typography>
                           <Typography variant="body2">
-                            {userMetadata.current_medications || dbProfile?.currentMedications || 'None reported'}
+                            {adminProfile?.currentMedications || 'None reported'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Allergies</Typography>
                           <Typography variant="body2">
-                            {userMetadata.has_allergies || dbProfile?.hasAllergies
-                              ? userMetadata.allergic_medications || dbProfile?.allergicMedications || 'Yes'
+                            {adminProfile?.hasAllergies
+                              ? adminProfile?.allergicMedications || 'Yes'
                               : 'None reported'}
                           </Typography>
                         </Box>
