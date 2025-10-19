@@ -20,11 +20,19 @@ async function getAccessToken() {
       scopes: ['https://graph.microsoft.com/.default'],
     };
 
-    const response = await cca.acquireTokenSilent(clientCredentialRequest);
+    const response = await cca.acquireTokenByClientCredential(clientCredentialRequest);
+    console.log('Token acquired successfully:', {
+      expiresOn: response.expiresOn,
+      scopes: response.scopes
+    });
     return response.accessToken;
   } catch (error) {
-    console.error('Error acquiring token:', error);
-    throw new Error('Failed to acquire access token');
+    console.error('Error acquiring token:', {
+      message: error.message,
+      code: error.errorCode,
+      correlationId: error.correlationId
+    });
+    throw new Error(`Failed to acquire access token: ${error.message}`);
   }
 }
 
@@ -32,6 +40,7 @@ async function getAccessToken() {
 async function uploadToSharePoint(pdfBuffer, fileName) {
   try {
     const accessToken = await getAccessToken();
+    console.log('Access token acquired successfully');
     
     const graphClient = Client.init({
       authProvider: (done) => {
@@ -39,30 +48,77 @@ async function uploadToSharePoint(pdfBuffer, fileName) {
       },
     });
 
-    // Upload to SharePoint document library
-    const uploadResponse = await graphClient
-      .sites(process.env.MS365_SHAREPOINT_SITE_ID)
-      .drives('root')
-      .items('Lab Requisitions')
-      .children
-      .post({
-        name: fileName,
-        file: {
-          content: pdfBuffer,
-        },
-      });
+    console.log('Uploading to SharePoint:', {
+      siteId: process.env.MS365_SHAREPOINT_SITE_ID,
+      fileName,
+      bufferSize: pdfBuffer.length
+    });
 
+    // First, let's try to create the folder if it doesn't exist
+    try {
+      await graphClient
+        .api(`/sites/${process.env.MS365_SHAREPOINT_SITE_ID}/drive/root:/Lab Requisitions:/children`)
+        .get();
+      console.log('Lab Requisitions folder exists');
+    } catch (folderError) {
+      console.log('Lab Requisitions folder does not exist, creating it...');
+      try {
+        await graphClient
+          .api(`/sites/${process.env.MS365_SHAREPOINT_SITE_ID}/drive/root/children`)
+          .post({
+            name: 'Lab Requisitions',
+            folder: {},
+            '@microsoft.graph.conflictBehavior': 'rename'
+          });
+        console.log('Lab Requisitions folder created');
+      } catch (createError) {
+        console.log('Could not create folder, proceeding with upload anyway');
+      }
+    }
+
+    // Try multiple upload approaches
+    let uploadResponse;
+    try {
+      // Method 1: Direct upload to root with folder path
+      uploadResponse = await graphClient
+        .api(`/sites/${process.env.MS365_SHAREPOINT_SITE_ID}/drive/root:/Lab Requisitions/${fileName}:/content`)
+        .put(pdfBuffer);
+    } catch (uploadError) {
+      console.log('Method 1 failed, trying method 2:', uploadError.message);
+      try {
+        // Method 2: Upload to root and move to folder
+        uploadResponse = await graphClient
+          .api(`/sites/${process.env.MS365_SHAREPOINT_SITE_ID}/drive/root:/${fileName}:/content`)
+          .put(pdfBuffer);
+      } catch (uploadError2) {
+        console.log('Method 2 failed, trying method 3:', uploadError2.message);
+        // Method 3: Use the drive ID directly
+        const driveId = process.env.MS365_SHAREPOINT_DRIVE_ID || 'root';
+        uploadResponse = await graphClient
+          .api(`/drives/${driveId}/root:/Lab Requisitions/${fileName}:/content`)
+          .put(pdfBuffer);
+      }
+    }
+
+    console.log('SharePoint upload successful:', uploadResponse);
     return uploadResponse.webUrl;
   } catch (error) {
-    console.error('Error uploading to SharePoint:', error);
-    throw new Error('Failed to upload PDF to SharePoint');
+    console.error('Error uploading to SharePoint:', {
+      message: error.message,
+      code: error.code,
+      statusCode: error.statusCode,
+      body: error.body,
+      headers: error.headers
+    });
+    throw new Error(`Failed to upload PDF to SharePoint: ${error.message}`);
   }
 }
 
 // Send email with PDF attachment
-async function sendEmailWithAttachment(pdfBuffer, fileName, uploadUrl) {
+async function sendEmailWithAttachment(pdfBuffer, fileName) {
   try {
     const accessToken = await getAccessToken();
+    console.log('Access token acquired for email');
     
     const graphClient = Client.init({
       authProvider: (done) => {
@@ -72,6 +128,12 @@ async function sendEmailWithAttachment(pdfBuffer, fileName, uploadUrl) {
 
     // Convert PDF buffer to base64
     const base64Content = pdfBuffer.toString('base64');
+    console.log('Email details:', {
+      from: process.env.MS365_EMAIL_FROM,
+      to: "nfforbes@gmail.com",//process.env.MS365_EMAIL_TO,
+      fileName,
+      attachmentSize: base64Content.length
+    });
 
     const message = {
       subject: `Lab Requisition - ${fileName}`,
@@ -80,14 +142,14 @@ async function sendEmailWithAttachment(pdfBuffer, fileName, uploadUrl) {
         content: `
           <p>Dear Dr. Fairclough,</p>
           <p>Please find attached the lab requisition form.</p>
-          <p>The document has also been saved to SharePoint: <a href="${uploadUrl}">View in SharePoint</a></p>
           <p>Best regards,<br>Svelte by LuKaria System</p>
         `,
       },
       toRecipients: [
         {
           emailAddress: {
-            address: process.env.MS365_EMAIL_TO,
+            address: "nfforbes@gmail.com",
+            name: "Neil Forbes"
           },
         },
       ],
@@ -101,44 +163,63 @@ async function sendEmailWithAttachment(pdfBuffer, fileName, uploadUrl) {
       ],
     };
 
+    console.log('Sending email with message:', JSON.stringify(message, null, 2));
+
     await graphClient
-      .users(process.env.MS365_EMAIL_FROM)
-      .sendMail({
+      .api(`/users/${process.env.MS365_EMAIL_FROM}/sendMail`)
+      .post({
         message: message,
         saveToSentItems: true,
-      })
-      .post();
+      });
 
-    return { success: true, uploadUrl };
+    console.log('Email sent successfully');
+    return { success: true };
   } catch (error) {
-    console.error('Error sending email:', error);
-    throw new Error('Failed to send email');
+    console.error('Error sending email:', {
+      message: error.message,
+      code: error.code,
+      statusCode: error.statusCode,
+      body: error.body
+    });
+    throw new Error(`Failed to send email: ${error.message}`);
   }
 }
 
+
+
 export async function POST(request) {
   try {
+    console.log('PDF send API called');
     const { pdfData, fileName } = await request.json();
 
     if (!pdfData || !fileName) {
+      console.error('Missing required fields:', { pdfData: !!pdfData, fileName: !!fileName });
       return NextResponse.json(
         { error: 'PDF data and filename are required' },
         { status: 400 }
       );
     }
 
+    console.log('Processing PDF:', { fileName, dataLength: pdfData.length });
+
     // Convert base64 to buffer
     const pdfBuffer = Buffer.from(pdfData, 'base64');
+    console.log('PDF buffer created:', { size: pdfBuffer.length });
 
-    // Upload to SharePoint
-    const uploadUrl = await uploadToSharePoint(pdfBuffer, fileName);
+    await uploadToSharePoint(pdfBuffer, fileName);
 
     // Send email with attachment
-    const result = await sendEmailWithAttachment(pdfBuffer, fileName, uploadUrl);
+    console.log('Starting email send...');
+    const result = await sendEmailWithAttachment(pdfBuffer, fileName);
+    console.log('Email send completed');
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error in PDF send API:', error);
+    console.error('Error in PDF send API:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }

@@ -22,10 +22,10 @@ import {
 } from '@mui/material';
 import {
   ArrowBack,
-  Print,
   Save,
   PictureAsPdf,
   Send,
+  MedicalServices,
 } from '@mui/icons-material';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -229,6 +229,10 @@ export default function LabRequisition() {
   });
 
   const [otherTestText, setOtherTestText] = useState('');
+
+  const [executiveProfileTests, setExecutiveProfileTests] = useState({
+    'Executive Profile': false
+  });
 
   const [serologyTests, setSerologyTests] = useState({
     'VDRL': false,
@@ -446,6 +450,13 @@ export default function LabRequisition() {
     if (testName === 'Other') {
       setOtherTestText('');
     }
+  };
+
+  const handleExecutiveProfileTestChange = (testName) => {
+    setExecutiveProfileTests(prev => ({
+      ...prev,
+      [testName]: !prev[testName]
+    }));
   };
 
   const handleSerologyTestChange = (testName) => {
@@ -685,35 +696,43 @@ export default function LabRequisition() {
           <Box sx={{ flexGrow: 1 }} />
           <Button
             variant="outlined"
-            startIcon={<Print />}
+            startIcon={<MedicalServices />}
             onClick={() => {
-              // Select weight loss tests
-              const weightLossTests = [
-                'ALT', 'AST', 'ALP', 'BUN', 'Creatinine', 
-                'HbA1C (Glycosylated hemoglobin)', 
-                'Total cholesterol', 'LDL Cholesterol', 
-                'HDL Cholesterol', 'Triglycerides'
-              ];
+              // Select weight loss tests by updating React state directly
               
-              // Find and check the corresponding checkboxes
-              weightLossTests.forEach(testName => {
-                const checkbox = document.querySelector(`input[value="${testName}"]`);
-                if (checkbox) {
-                  checkbox.checked = true;
-                }
-              });
+              // Update cardiac/liver tests (ALT, AST, ALP)
+              setCardiacLiverTests(prev => ({
+                ...prev,
+                'ALT': true,
+                'AST': true,
+                'ALP': true
+              }));
+              
+              // Update electrolytes tests (BUN, Creatinine)
+              setElectrolytesTests(prev => ({
+                ...prev,
+                'BUN': true,
+                'Creatinine': true
+              }));
+              
+              // Update blood sugar tests (HbA1c)
+              setBloodSugarTests(prev => ({
+                ...prev,
+                'HbA1c': true
+              }));
+              
+              // Update serum protein/lipids tests (Total Cholesterol, LDL, HDL, Triglyceride)
+              setSerumProteinLipids(prev => ({
+                ...prev,
+                'Total Cholesterol': true,
+                'LDL': true,
+                'HDL': true,
+                'Triglyceride': true
+              }));
             }}
             sx={{ textTransform: 'none', mr: 1, borderColor: '#877449', color: '#877449', '&:hover': { borderColor: '#B8941F', backgroundColor: 'rgba(135, 116, 73, 0.04)' } }}
           >
             Weight Loss Tests
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<Print />}
-            onClick={() => window.print()}
-            sx={{ textTransform: 'none', mr: 1 }}
-          >
-            Print
           </Button>
           <Button
             variant="contained"
@@ -1054,6 +1073,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="CBC"
                                     checked={hematologyTests.CBC}
                                     onChange={() => handleHematologyTestChange('CBC')}
                                     color="primary"
@@ -1066,6 +1086,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="RETIC"
                                     checked={hematologyTests.RETIC}
                                     onChange={() => handleHematologyTestChange('RETIC')}
                                     color="primary"
@@ -1078,6 +1099,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="ESR"
                                     checked={hematologyTests.ESR}
                                     onChange={() => handleHematologyTestChange('ESR')}
                                     color="primary"
@@ -1090,6 +1112,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Info Mono"
                                     checked={hematologyTests['Info Mono']}
                                     onChange={() => handleHematologyTestChange('Info Mono')}
                                     color="primary"
@@ -1102,6 +1125,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="CSF/Fluid"
                                     checked={hematologyTests['CSF/Fluid']}
                                     onChange={() => handleHematologyTestChange('CSF/Fluid')}
                                     color="primary"
@@ -1114,6 +1138,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Hb Electrophonesis"
                                     checked={hematologyTests['Hb Electrophonesis']}
                                     onChange={() => handleHematologyTestChange('Hb Electrophonesis')}
                                     color="primary"
@@ -1140,6 +1165,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="PT"
                                     checked={coagulationTests.PT}
                                     onChange={() => handleCoagulationTestChange('PT')}
                                     color="primary"
@@ -1152,6 +1178,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="PTT"
                                     checked={coagulationTests.PTT}
                                     onChange={() => handleCoagulationTestChange('PTT')}
                                     color="primary"
@@ -1164,6 +1191,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="INR"
                                     checked={coagulationTests.INR}
                                     onChange={() => handleCoagulationTestChange('INR')}
                                     color="primary"
@@ -1176,6 +1204,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Fibrinogen"
                                     checked={coagulationTests.Fibrinogen}
                                     onChange={() => handleCoagulationTestChange('Fibrinogen')}
                                     color="primary"
@@ -1188,6 +1217,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Thrombin Time"
                                     checked={coagulationTests['Thrombin Time']}
                                     onChange={() => handleCoagulationTestChange('Thrombin Time')}
                                     color="primary"
@@ -1200,6 +1230,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Bleeding Time"
                                     checked={coagulationTests['Bleeding Time']}
                                     onChange={() => handleCoagulationTestChange('Bleeding Time')}
                                     color="primary"
@@ -1212,6 +1243,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Ristocetin"
                                     checked={coagulationTests.Ristocetin}
                                     onChange={() => handleCoagulationTestChange('Ristocetin')}
                                     color="primary"
@@ -1224,6 +1256,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="FDP"
                                     checked={coagulationTests.FDP}
                                     onChange={() => handleCoagulationTestChange('FDP')}
                                     color="primary"
@@ -1236,6 +1269,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Mixing Studies"
                                     checked={coagulationTests['Mixing Studies']}
                                     onChange={() => handleCoagulationTestChange('Mixing Studies')}
                                     color="primary"
@@ -1248,6 +1282,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Lupus Anticoagulant"
                                     checked={coagulationTests['Lupus Anticoagulant']}
                                     onChange={() => handleCoagulationTestChange('Lupus Anticoagulant')}
                                     color="primary"
@@ -1260,6 +1295,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Platelet Aggregation"
                                     checked={coagulationTests['Platelet Aggregation']}
                                     onChange={() => handleCoagulationTestChange('Platelet Aggregation')}
                                     color="primary"
@@ -1272,6 +1308,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Factor Assay XIII"
                                     checked={coagulationTests['Factor Assay XIII']}
                                     onChange={() => handleCoagulationTestChange('Factor Assay XIII')}
                                     color="primary"
@@ -1284,6 +1321,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Factor Assay IX"
                                     checked={coagulationTests['Factor Assay IX']}
                                     onChange={() => handleCoagulationTestChange('Factor Assay IX')}
                                     color="primary"
@@ -1296,6 +1334,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Factor Assay XI"
                                     checked={coagulationTests['Factor Assay XI']}
                                     onChange={() => handleCoagulationTestChange('Factor Assay XI')}
                                     color="primary"
@@ -1331,11 +1370,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.Na}
-                                onChange={() => handleElectrolytesTestChange('Na')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="Na"
+                              checked={electrolytesTests.Na}
+                              onChange={() => handleElectrolytesTestChange('Na')}
+                              color="primary"
+                            />
                             }
                             label="Na"
                           />
@@ -1343,11 +1383,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.K}
-                                onChange={() => handleElectrolytesTestChange('K')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="K"
+                              checked={electrolytesTests.K}
+                              onChange={() => handleElectrolytesTestChange('K')}
+                              color="primary"
+                            />
                             }
                             label="K"
                           />
@@ -1355,11 +1396,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.Cl}
-                                onChange={() => handleElectrolytesTestChange('Cl')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="Cl"
+                              checked={electrolytesTests.Cl}
+                              onChange={() => handleElectrolytesTestChange('Cl')}
+                              color="primary"
+                            />
                             }
                             label="Cl"
                           />
@@ -1367,11 +1409,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.HCO3}
-                                onChange={() => handleElectrolytesTestChange('HCO3')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="HCO3"
+                              checked={electrolytesTests.HCO3}
+                              onChange={() => handleElectrolytesTestChange('HCO3')}
+                              color="primary"
+                            />
                             }
                             label="HCO3"
                           />
@@ -1379,11 +1422,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.Urea}
-                                onChange={() => handleElectrolytesTestChange('Urea')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="Urea"
+                              checked={electrolytesTests.Urea}
+                              onChange={() => handleElectrolytesTestChange('Urea')}
+                              color="primary"
+                            />
                             }
                             label="Urea"
                           />
@@ -1391,11 +1435,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.BUN}
-                                onChange={() => handleElectrolytesTestChange('BUN')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="BUN"
+                              checked={electrolytesTests.BUN}
+                              onChange={() => handleElectrolytesTestChange('BUN')}
+                              color="primary"
+                            />
                             }
                             label="BUN"
                           />
@@ -1403,11 +1448,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.Creatinine}
-                                onChange={() => handleElectrolytesTestChange('Creatinine')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="Creatinine"
+                              checked={electrolytesTests.Creatinine}
+                              onChange={() => handleElectrolytesTestChange('Creatinine')}
+                              color="primary"
+                            />
                             }
                             label="Creatinine"
                           />
@@ -1415,11 +1461,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.Phosphorus}
-                                onChange={() => handleElectrolytesTestChange('Phosphorus')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="Phosphorus"
+                              checked={electrolytesTests.Phosphorus}
+                              onChange={() => handleElectrolytesTestChange('Phosphorus')}
+                              color="primary"
+                            />
                             }
                             label="Phosphorus"
                           />
@@ -1427,11 +1474,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests.Calcium}
-                                onChange={() => handleElectrolytesTestChange('Calcium')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="Calcium"
+                              checked={electrolytesTests.Calcium}
+                              onChange={() => handleElectrolytesTestChange('Calcium')}
+                              color="primary"
+                            />
                             }
                             label="Calcium"
                           />
@@ -1439,11 +1487,12 @@ export default function LabRequisition() {
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
-                              <Checkbox
-                                checked={electrolytesTests['Uric Acid']}
-                                onChange={() => handleElectrolytesTestChange('Uric Acid')}
-                                color="primary"
-                              />
+                            <Checkbox
+                              name="Uric Acid"
+                              checked={electrolytesTests['Uric Acid']}
+                              onChange={() => handleElectrolytesTestChange('Uric Acid')}
+                              color="primary"
+                            />
                             }
                             label="Uric Acid"
                           />
@@ -1451,11 +1500,12 @@ export default function LabRequisition() {
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
-                                  <Checkbox
-                                    checked={electrolytesTests.Magnesium}
-                                    onChange={() => handleElectrolytesTestChange('Magnesium')}
-                                    color="primary"
-                                  />
+                                <Checkbox
+                                  name="Magnesium"
+                                  checked={electrolytesTests.Magnesium}
+                                  onChange={() => handleElectrolytesTestChange('Magnesium')}
+                                  color="primary"
+                                />
                                 }
                                 label="Magnesium"
                               />
@@ -1477,6 +1527,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Random Glucose"
                                     checked={bloodSugarTests['Random Glucose']}
                                     onChange={() => handleBloodSugarTestChange('Random Glucose')}
                                     color="primary"
@@ -1489,6 +1540,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Fasting Glucose"
                                     checked={bloodSugarTests['Fasting Glucose']}
                                     onChange={() => handleBloodSugarTestChange('Fasting Glucose')}
                                     color="primary"
@@ -1501,6 +1553,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={bloodSugarTests['2h PPG']}
                                     onChange={() => handleBloodSugarTestChange('2h PPG')}
                                     color="primary"
@@ -1513,6 +1566,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="OGTT"
                                     checked={bloodSugarTests['OGTT']}
                                     onChange={() => handleBloodSugarTestChange('OGTT')}
                                     color="primary"
@@ -1525,6 +1579,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="HbA1c"
                                     checked={bloodSugarTests['HbA1c']}
                                     onChange={() => handleBloodSugarTestChange('HbA1c')}
                                     color="primary"
@@ -1548,6 +1603,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="AFP"
                                     checked={tumorMarkers['AFP']}
                                     onChange={() => handleTumorMarkerChange('AFP')}
                                     color="primary"
@@ -1560,6 +1616,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="CEA"
                                     checked={tumorMarkers['CEA']}
                                     onChange={() => handleTumorMarkerChange('CEA')}
                                     color="primary"
@@ -1572,6 +1629,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="CA-125"
                                     checked={tumorMarkers['CA-125']}
                                     onChange={() => handleTumorMarkerChange('CA-125')}
                                     color="primary"
@@ -1584,6 +1642,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="CA-15-3"
                                     checked={tumorMarkers['CA-15-3']}
                                     onChange={() => handleTumorMarkerChange('CA-15-3')}
                                     color="primary"
@@ -1596,6 +1655,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Total PSA"
                                     checked={tumorMarkers['Total PSA']}
                                     onChange={() => handleTumorMarkerChange('Total PSA')}
                                     color="primary"
@@ -1625,6 +1685,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Total Protein"
                                     checked={serumProteinLipids['Total Protein']}
                                     onChange={() => handleSerumProteinLipidsChange('Total Protein')}
                                     color="primary"
@@ -1637,6 +1698,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Albumin"
                                     checked={serumProteinLipids['Albumin']}
                                     onChange={() => handleSerumProteinLipidsChange('Albumin')}
                                     color="primary"
@@ -1649,6 +1711,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Globulin"
                                     checked={serumProteinLipids['Globulin']}
                                     onChange={() => handleSerumProteinLipidsChange('Globulin')}
                                     color="primary"
@@ -1661,6 +1724,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Total Cholesterol"
                                     checked={serumProteinLipids['Total Cholesterol']}
                                     onChange={() => handleSerumProteinLipidsChange('Total Cholesterol')}
                                     color="primary"
@@ -1673,6 +1737,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="LDL"
                                     checked={serumProteinLipids['LDL']}
                                     onChange={() => handleSerumProteinLipidsChange('LDL')}
                                     color="primary"
@@ -1685,6 +1750,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="HDL"
                                     checked={serumProteinLipids['HDL']}
                                     onChange={() => handleSerumProteinLipidsChange('HDL')}
                                     color="primary"
@@ -1697,6 +1763,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Triglyceride"
                                     checked={serumProteinLipids['Triglyceride']}
                                     onChange={() => handleSerumProteinLipidsChange('Triglyceride')}
                                     color="primary"
@@ -1709,6 +1776,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Protein Electrophoresis"
                                     checked={serumProteinLipids['Protein Electrophoresis']}
                                     onChange={() => handleSerumProteinLipidsChange('Protein Electrophoresis')}
                                     color="primary"
@@ -1721,6 +1789,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Lipoprotein Electrophoresis"
                                     checked={serumProteinLipids['Lipoprotein Electrophoresis']}
                                     onChange={() => handleSerumProteinLipidsChange('Lipoprotein Electrophoresis')}
                                     color="primary"
@@ -1744,6 +1813,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['FSH']}
                                     onChange={() => handleHormoneTestChange('FSH')}
                                     color="primary"
@@ -1756,6 +1826,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['TSH']}
                                     onChange={() => handleHormoneTestChange('TSH')}
                                     color="primary"
@@ -1768,6 +1839,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['FT3']}
                                     onChange={() => handleHormoneTestChange('FT3')}
                                     color="primary"
@@ -1780,6 +1852,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['DHEA-S']}
                                     onChange={() => handleHormoneTestChange('DHEA-S')}
                                     color="primary"
@@ -1792,6 +1865,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['FT4']}
                                     onChange={() => handleHormoneTestChange('FT4')}
                                     color="primary"
@@ -1804,6 +1878,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['Cortisol']}
                                     onChange={() => handleHormoneTestChange('Cortisol')}
                                     color="primary"
@@ -1816,6 +1891,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['ACTH']}
                                     onChange={() => handleHormoneTestChange('ACTH')}
                                     color="primary"
@@ -1828,6 +1904,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['Prolactin']}
                                     onChange={() => handleHormoneTestChange('Prolactin')}
                                     color="primary"
@@ -1840,6 +1917,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['LH']}
                                     onChange={() => handleHormoneTestChange('LH')}
                                     color="primary"
@@ -1852,6 +1930,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['Beta-HCG']}
                                     onChange={() => handleHormoneTestChange('Beta-HCG')}
                                     color="primary"
@@ -1864,6 +1943,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['Oestradiol']}
                                     onChange={() => handleHormoneTestChange('Oestradiol')}
                                     color="primary"
@@ -1876,6 +1956,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['Progesterone']}
                                     onChange={() => handleHormoneTestChange('Progesterone')}
                                     color="primary"
@@ -1888,6 +1969,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['Testosterone']}
                                     onChange={() => handleHormoneTestChange('Testosterone')}
                                     color="primary"
@@ -1900,6 +1982,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hormoneTests['Growth Hormone']}
                                     onChange={() => handleHormoneTestChange('Growth Hormone')}
                                     color="primary"
@@ -1925,6 +2008,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Na']}
                                     onChange={() => handleUrineTestChange('Na')}
                                     color="primary"
@@ -1937,6 +2021,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Urinalysis']}
                                     onChange={() => handleUrineTestChange('Urinalysis')}
                                     color="primary"
@@ -1949,6 +2034,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['K']}
                                     onChange={() => handleUrineTestChange('K')}
                                     color="primary"
@@ -1961,6 +2047,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Microscopy']}
                                     onChange={() => handleUrineTestChange('Microscopy')}
                                     color="primary"
@@ -1973,6 +2060,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Urea']}
                                     onChange={() => handleUrineTestChange('Urea')}
                                     color="primary"
@@ -1985,6 +2073,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['VMA']}
                                     onChange={() => handleUrineTestChange('VMA')}
                                     color="primary"
@@ -1997,6 +2086,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Creatinine']}
                                     onChange={() => handleUrineTestChange('Creatinine')}
                                     color="primary"
@@ -2009,6 +2099,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Uric Acid']}
                                     onChange={() => handleUrineTestChange('Uric Acid')}
                                     color="primary"
@@ -2021,6 +2112,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Creatinine Clearance']}
                                     onChange={() => handleUrineTestChange('Creatinine Clearance')}
                                     color="primary"
@@ -2033,6 +2125,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Calcium']}
                                     onChange={() => handleUrineTestChange('Calcium')}
                                     color="primary"
@@ -2045,6 +2138,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Phosphorus']}
                                     onChange={() => handleUrineTestChange('Phosphorus')}
                                     color="primary"
@@ -2057,6 +2151,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Protein']}
                                     onChange={() => handleUrineTestChange('Protein')}
                                     color="primary"
@@ -2069,6 +2164,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['17-KS']}
                                     onChange={() => handleUrineTestChange('17-KS')}
                                     color="primary"
@@ -2081,6 +2177,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['17-KGS']}
                                     onChange={() => handleUrineTestChange('17-KGS')}
                                     color="primary"
@@ -2093,6 +2190,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Protein Electrophoresis']}
                                     onChange={() => handleUrineTestChange('Protein Electrophoresis')}
                                     color="primary"
@@ -2105,6 +2203,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Cortisol']}
                                     onChange={() => handleUrineTestChange('Cortisol')}
                                     color="primary"
@@ -2117,6 +2216,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={urineTests['Microalbumin']}
                                     onChange={() => handleUrineTestChange('Microalbumin')}
                                     color="primary"
@@ -2140,6 +2240,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="CPK"
                                     checked={cardiacLiverTests['CPK']}
                                     onChange={() => handleCardiacLiverTestChange('CPK')}
                                     color="primary"
@@ -2152,6 +2253,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="ALT"
                                     checked={cardiacLiverTests['ALT']}
                                     onChange={() => handleCardiacLiverTestChange('ALT')}
                                     color="primary"
@@ -2164,6 +2266,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Bili D"
                                     checked={cardiacLiverTests['Bili D']}
                                     onChange={() => handleCardiacLiverTestChange('Bili D')}
                                     color="primary"
@@ -2176,6 +2279,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Troponin I"
                                     checked={cardiacLiverTests['Troponin I']}
                                     onChange={() => handleCardiacLiverTestChange('Troponin I')}
                                     color="primary"
@@ -2188,6 +2292,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="AST"
                                     checked={cardiacLiverTests['AST']}
                                     onChange={() => handleCardiacLiverTestChange('AST')}
                                     color="primary"
@@ -2200,6 +2305,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="Bili T"
                                     checked={cardiacLiverTests['Bili T']}
                                     onChange={() => handleCardiacLiverTestChange('Bili T')}
                                     color="primary"
@@ -2212,6 +2318,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="LDH"
                                     checked={cardiacLiverTests['LDH']}
                                     onChange={() => handleCardiacLiverTestChange('LDH')}
                                     color="primary"
@@ -2224,6 +2331,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="ALP"
                                     checked={cardiacLiverTests['ALP']}
                                     onChange={() => handleCardiacLiverTestChange('ALP')}
                                     color="primary"
@@ -2236,6 +2344,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    name="GGT"
                                     checked={cardiacLiverTests['GGT']}
                                     onChange={() => handleCardiacLiverTestChange('GGT')}
                                     color="primary"
@@ -2265,6 +2374,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Amylase']}
                                 onChange={() => handleOtherTestChange('Amylase')}
                                 color="primary"
@@ -2277,6 +2387,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Insulin (F)']}
                                 onChange={() => handleOtherTestChange('Insulin (F)')}
                                 color="primary"
@@ -2289,6 +2400,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['CSF glucose']}
                                 onChange={() => handleOtherTestChange('CSF glucose')}
                                 color="primary"
@@ -2301,6 +2413,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Vitamin B12/Folic acid']}
                                 onChange={() => handleOtherTestChange('Vitamin B12/Folic acid')}
                                 color="primary"
@@ -2313,6 +2426,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Serum Iron/TIBC']}
                                 onChange={() => handleOtherTestChange('Serum Iron/TIBC')}
                                 color="primary"
@@ -2325,6 +2439,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['PTH']}
                                 onChange={() => handleOtherTestChange('PTH')}
                                 color="primary"
@@ -2337,6 +2452,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Ferritin']}
                                 onChange={() => handleOtherTestChange('Ferritin')}
                                 color="primary"
@@ -2349,6 +2465,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Lithium']}
                                 onChange={() => handleOtherTestChange('Lithium')}
                                 color="primary"
@@ -2361,6 +2478,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['CSF Protein']}
                                 onChange={() => handleOtherTestChange('CSF Protein')}
                                 color="primary"
@@ -2373,6 +2491,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Beta-Microglubulin']}
                                 onChange={() => handleOtherTestChange('Beta-Microglubulin')}
                                 color="primary"
@@ -2385,6 +2504,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Salicylate']}
                                 onChange={() => handleOtherTestChange('Salicylate')}
                                 color="primary"
@@ -2397,6 +2517,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Lipase']}
                                 onChange={() => handleOtherTestChange('Lipase')}
                                 color="primary"
@@ -2409,6 +2530,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Digoxin']}
                                 onChange={() => handleOtherTestChange('Digoxin')}
                                 color="primary"
@@ -2421,6 +2543,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['C-peptide']}
                                 onChange={() => handleOtherTestChange('C-peptide')}
                                 color="primary"
@@ -2433,6 +2556,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Dilantin']}
                                 onChange={() => handleOtherTestChange('Dilantin')}
                                 color="primary"
@@ -2445,6 +2569,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={otherTests['Other']}
                                 onChange={() => handleOtherTestChange('Other')}
                                 color="primary"
@@ -2496,6 +2621,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serologyTests['VDRL']}
                                     onChange={() => handleSerologyTestChange('VDRL')}
                                     color="primary"
@@ -2508,6 +2634,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serologyTests['FTA']}
                                     onChange={() => handleSerologyTestChange('FTA')}
                                     color="primary"
@@ -2520,6 +2647,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serologyTests['Widal']}
                                     onChange={() => handleSerologyTestChange('Widal')}
                                     color="primary"
@@ -2532,6 +2660,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serologyTests['ASTO']}
                                     onChange={() => handleSerologyTestChange('ASTO')}
                                     color="primary"
@@ -2544,6 +2673,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serologyTests['Brucella']}
                                     onChange={() => handleSerologyTestChange('Brucella')}
                                     color="primary"
@@ -2567,6 +2697,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serumProteinConcentrate['C3']}
                                     onChange={() => handleSerumProteinConcentrateChange('C3')}
                                     color="primary"
@@ -2583,6 +2714,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serumProteinConcentrate['C4']}
                                     onChange={() => handleSerumProteinConcentrateChange('C4')}
                                     color="primary"
@@ -2599,6 +2731,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serumProteinConcentrate['CRP']}
                                     onChange={() => handleSerumProteinConcentrateChange('CRP')}
                                     color="primary"
@@ -2611,6 +2744,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serumProteinConcentrate['IgA']}
                                     onChange={() => handleSerumProteinConcentrateChange('IgA')}
                                     color="primary"
@@ -2623,6 +2757,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serumProteinConcentrate['IgG']}
                                     onChange={() => handleSerumProteinConcentrateChange('IgG')}
                                     color="primary"
@@ -2635,6 +2770,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={serumProteinConcentrate['IgM']}
                                     onChange={() => handleSerumProteinConcentrateChange('IgM')}
                                     color="primary"
@@ -2660,6 +2796,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['RF']}
                                     onChange={() => handleAutoantibodiesTestChange('RF')}
                                     color="primary"
@@ -2672,6 +2809,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['ANA']}
                                     onChange={() => handleAutoantibodiesTestChange('ANA')}
                                     color="primary"
@@ -2684,6 +2822,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['ENA']}
                                     onChange={() => handleAutoantibodiesTestChange('ENA')}
                                     color="primary"
@@ -2696,6 +2835,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['Anti-CCP']}
                                     onChange={() => handleAutoantibodiesTestChange('Anti-CCP')}
                                     color="primary"
@@ -2708,6 +2848,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['Thyroglobulin']}
                                     onChange={() => handleAutoantibodiesTestChange('Thyroglobulin')}
                                     color="primary"
@@ -2720,6 +2861,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['ANCA']}
                                     onChange={() => handleAutoantibodiesTestChange('ANCA')}
                                     color="primary"
@@ -2732,6 +2874,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['cardiolipin']}
                                     onChange={() => handleAutoantibodiesTestChange('cardiolipin')}
                                     color="primary"
@@ -2744,6 +2887,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['Anti-Beta2GPI']}
                                     onChange={() => handleAutoantibodiesTestChange('Anti-Beta2GPI')}
                                     color="primary"
@@ -2756,6 +2900,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['Mitochondrial']}
                                     onChange={() => handleAutoantibodiesTestChange('Mitochondrial')}
                                     color="primary"
@@ -2768,6 +2913,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['Gastric Parietal Cell']}
                                     onChange={() => handleAutoantibodiesTestChange('Gastric Parietal Cell')}
                                     color="primary"
@@ -2780,6 +2926,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['dsDNA']}
                                     onChange={() => handleAutoantibodiesTestChange('dsDNA')}
                                     color="primary"
@@ -2792,6 +2939,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={autoantibodiesTests['Smooth Muscle']}
                                     onChange={() => handleAutoantibodiesTestChange('Smooth Muscle')}
                                     color="primary"
@@ -2823,6 +2971,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={lymphocyteEnumeration['Viral load']}
                                     onChange={() => handleLymphocyteEnumerationChange('Viral load')}
                                     color="primary"
@@ -2835,6 +2984,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={lymphocyteEnumeration['CD4']}
                                     onChange={() => handleLymphocyteEnumerationChange('CD4')}
                                     color="primary"
@@ -2847,6 +2997,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={lymphocyteEnumeration['CD8']}
                                     onChange={() => handleLymphocyteEnumerationChange('CD8')}
                                     color="primary"
@@ -2859,6 +3010,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={lymphocyteEnumeration['T lymphocytes']}
                                     onChange={() => handleLymphocyteEnumerationChange('T lymphocytes')}
                                     color="primary"
@@ -2871,6 +3023,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={lymphocyteEnumeration['B lymphocytes (CD19/20)']}
                                     onChange={() => handleLymphocyteEnumerationChange('B lymphocytes (CD19/20)')}
                                     color="primary"
@@ -2883,6 +3036,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={lymphocyteEnumeration['NK lymphocytes (CD 38/56)']}
                                     onChange={() => handleLymphocyteEnumerationChange('NK lymphocytes (CD 38/56)')}
                                     color="primary"
@@ -2908,6 +3062,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={immunologyOtherTests['H. pylori']}
                                     onChange={() => handleImmunologyOtherTestChange('H. pylori')}
                                     color="primary"
@@ -2920,6 +3075,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={immunologyOtherTests['Other']}
                                     onChange={() => handleImmunologyOtherTestChange('Other')}
                                     color="primary"
@@ -2973,6 +3129,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={feverRashTests['Dengue']}
                                     onChange={() => handleFeverRashTestChange('Dengue')}
                                     color="primary"
@@ -2985,6 +3142,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={feverRashTests['Rubella']}
                                     onChange={() => handleFeverRashTestChange('Rubella')}
                                     color="primary"
@@ -2997,6 +3155,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={feverRashTests['Measles']}
                                     onChange={() => handleFeverRashTestChange('Measles')}
                                     color="primary"
@@ -3009,6 +3168,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={feverRashTests['Varicella']}
                                     onChange={() => handleFeverRashTestChange('Varicella')}
                                     color="primary"
@@ -3021,6 +3181,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={feverRashTests['Parvovirus']}
                                     onChange={() => handleFeverRashTestChange('Parvovirus')}
                                     color="primary"
@@ -3046,6 +3207,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hepatitisScreeningTests['HBsAg']}
                                     onChange={() => handleHepatitisScreeningTestChange('HBsAg')}
                                     color="primary"
@@ -3058,6 +3220,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hepatitisScreeningTests['HBeAg']}
                                     onChange={() => handleHepatitisScreeningTestChange('HBeAg')}
                                     color="primary"
@@ -3070,6 +3233,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hepatitisScreeningTests['Anti-HAV']}
                                     onChange={() => handleHepatitisScreeningTestChange('Anti-HAV')}
                                     color="primary"
@@ -3082,6 +3246,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hepatitisScreeningTests['Anti-HCV']}
                                     onChange={() => handleHepatitisScreeningTestChange('Anti-HCV')}
                                     color="primary"
@@ -3094,6 +3259,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hepatitisScreeningTests['Anti-HB core']}
                                     onChange={() => handleHepatitisScreeningTestChange('Anti-HB core')}
                                     color="primary"
@@ -3106,6 +3272,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={hepatitisScreeningTests['Anti-HBsAg']}
                                     onChange={() => handleHepatitisScreeningTestChange('Anti-HBsAg')}
                                     color="primary"
@@ -3138,6 +3305,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={vaccineStatusTests['MMR']}
                                     onChange={() => handleVaccineStatusTestChange('MMR')}
                                     color="primary"
@@ -3150,6 +3318,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={vaccineStatusTests['Varicella']}
                                     onChange={() => handleVaccineStatusTestChange('Varicella')}
                                     color="primary"
@@ -3162,6 +3331,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={vaccineStatusTests['Anti-HBsAg']}
                                     onChange={() => handleVaccineStatusTestChange('Anti-HBsAg')}
                                     color="primary"
@@ -3185,6 +3355,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={stiScreeningTests['HSV1']}
                                     onChange={() => handleStiScreeningTestChange('HSV1')}
                                     color="primary"
@@ -3197,6 +3368,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={stiScreeningTests['HSV2']}
                                     onChange={() => handleStiScreeningTestChange('HSV2')}
                                     color="primary"
@@ -3209,6 +3381,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={stiScreeningTests['Chlamydia']}
                                     onChange={() => handleStiScreeningTestChange('Chlamydia')}
                                     color="primary"
@@ -3221,6 +3394,7 @@ export default function LabRequisition() {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+name="2h PPG"
                                     checked={stiScreeningTests['HIV']}
                                     onChange={() => handleStiScreeningTestChange('HIV')}
                                     color="primary"
@@ -3280,6 +3454,7 @@ export default function LabRequisition() {
                                 <Grid item xs={2.25}>
                                   <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
+name="CMV"
                                       checked={tests['Genotyping']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'Genotyping')}
                                       color="primary"
@@ -3291,6 +3466,7 @@ export default function LabRequisition() {
                                 <Grid item xs={2.25}>
                                   <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
+name="CMV"
                                       checked={tests['Resistance']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'Resistance')}
                                       color="primary"
@@ -3302,6 +3478,7 @@ export default function LabRequisition() {
                                 <Grid item xs={2.25}>
                                   <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
+name="CMV"
                                       checked={tests['Viral Load']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'Viral Load')}
                                       color="primary"
@@ -3313,6 +3490,7 @@ export default function LabRequisition() {
                                 <Grid item xs={2.25}>
                                   <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.125 }}>
                                     <Checkbox
+name="CMV"
                                       checked={tests['PCR']}
                                       onChange={() => handleVirologyGridTestChange(organism, 'PCR')}
                                       color="primary"
@@ -3340,6 +3518,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['CMV']}
                                 onChange={() => handleVirologyOtherTestChange('CMV')}
                                 color="primary"
@@ -3352,6 +3531,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['EBV']}
                                 onChange={() => handleVirologyOtherTestChange('EBV')}
                                 color="primary"
@@ -3364,6 +3544,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['TORCH']}
                                 onChange={() => handleVirologyOtherTestChange('TORCH')}
                                 color="primary"
@@ -3376,6 +3557,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['Viral Culture']}
                                 onChange={() => handleVirologyOtherTestChange('Viral Culture')}
                                 color="primary"
@@ -3388,6 +3570,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['HTLV']}
                                 onChange={() => handleVirologyOtherTestChange('HTLV')}
                                 color="primary"
@@ -3400,6 +3583,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['Western Blot']}
                                 onChange={() => handleVirologyOtherTestChange('Western Blot')}
                                 color="primary"
@@ -3412,6 +3596,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['Toxoplasma gondii']}
                                 onChange={() => handleVirologyOtherTestChange('Toxoplasma gondii')}
                                 color="primary"
@@ -3424,6 +3609,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['Stool Rotavirus']}
                                 onChange={() => handleVirologyOtherTestChange('Stool Rotavirus')}
                                 color="primary"
@@ -3436,6 +3622,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['Mumps']}
                                 onChange={() => handleVirologyOtherTestChange('Mumps')}
                                 color="primary"
@@ -3448,6 +3635,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['Influenza']}
                                 onChange={() => handleVirologyOtherTestChange('Influenza')}
                                 color="primary"
@@ -3460,6 +3648,7 @@ export default function LabRequisition() {
                           <FormControlLabel
                             control={
                               <Checkbox
+name="Amylase"
                                 checked={virologyOtherTests['Other']}
                                 onChange={() => handleVirologyOtherTestChange('Other')}
                                 color="primary"
@@ -3491,6 +3680,34 @@ export default function LabRequisition() {
             </Paper>
           </Box>
 
+          {/* Executive Profile Tests */}
+          <Box sx={{ mt: 2 }}>
+            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, backgroundColor: 'white' }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'black', fontSize: '1rem' }}>
+                Executive Profile Tests
+              </Typography>
+              <Box sx={{ mb: 0.625, border: '1px solid #000000', borderRadius: 1, p: 1.5 }}>
+                <FormGroup>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            name="Executive Profile"
+                            checked={executiveProfileTests['Executive Profile']}
+                            onChange={() => handleExecutiveProfileTestChange('Executive Profile')}
+                            color="primary"
+                          />
+                        }
+                        label="Executive Profile"
+                      />
+                    </Grid>
+                  </Grid>
+                </FormGroup>
+              </Box>
+            </Paper>
+          </Box>
+
           {/* Clinical Information */}
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.625, color: 'black' }}>
@@ -3518,6 +3735,7 @@ export default function LabRequisition() {
                     <FormControlLabel
                       control={
                         <Checkbox
+name="Routine (Results within 24-48 hours)"
                           checked={urgency === 'routine'}
                           onChange={() => setUrgency('routine')}
                           color="primary"
@@ -3530,6 +3748,7 @@ export default function LabRequisition() {
                     <FormControlLabel
                       control={
                         <Checkbox
+name="Routine (Results within 24-48 hours)"
                           checked={urgency === 'urgent'}
                           onChange={() => setUrgency('urgent')}
                           color="primary"
@@ -3542,6 +3761,7 @@ export default function LabRequisition() {
                     <FormControlLabel
                       control={
                         <Checkbox
+name="Routine (Results within 24-48 hours)"
                           checked={urgency === 'stat'}
                           onChange={() => setUrgency('stat')}
                           color="primary"

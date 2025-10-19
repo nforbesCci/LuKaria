@@ -1,4 +1,4 @@
-import { call, put, takeEvery, takeLatest } from 'redux-saga/effects';
+import { call, put, take, takeEvery, takeLatest } from 'redux-saga/effects';
 import { 
   generatePdfStart, 
   generatePdfSuccess, 
@@ -63,7 +63,7 @@ function* generatePdfSaga(action) {
     const pdfOutput = pdf.output('datauristring');
     const base64Data = pdfOutput.split(',')[1];
     
-    yield put(generatePdfSuccess({ base64Data, pdf }));
+    yield put(generatePdfSuccess({ base64Data }));
   } catch (error) {
     console.error('Error generating PDF:', error);
     yield put(generatePdfFailure(error.message));
@@ -113,10 +113,10 @@ function* generateAndSendPdfSaga(action) {
     
     // Wait for PDF generation to complete
     const generateAction = yield take('pdf/generatePdfSuccess');
-    const pdfBlob = generateAction.payload;
+    const { base64Data } = generateAction.payload;
     
     // Then send the PDF
-    yield put(sendPdfStart({ pdfBlob, fileName, userInfo }));
+    yield put(sendPdfStart({ pdfBlob: { base64Data }, fileName, userInfo }));
     
     // Wait for send to complete
     yield take('pdf/sendPdfSuccess');
