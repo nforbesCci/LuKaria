@@ -4,7 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction } from '../../../../store/slices/adminSlice';
+import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction } from '../../../../store/slices/adminSlice';
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
 import { useAdminAccess } from '../../../../hooks/useAccessControl';
 import Header from '../../../../components/Header';
@@ -74,16 +74,17 @@ import {
   Check,
   LocalHospital,
   HealthAndSafety,
+  Quiz,
   Home as HomeIcon,
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
-function TabPanel({ children, value, index, ...other }) {
+function TabPanel({ children, value, index, id, ...other }) {
   return (
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`user-tabpanel-${index}`}
+      id={id || `user-tabpanel-${index}`}
       aria-labelledby={`user-tab-${index}`}
       {...other}
     >
@@ -123,6 +124,26 @@ export default function UserDetailPage() {
   const adminProfileLoading = useSelector((state) => state.admin.adminProfileLoading);
   const adminProfileError = useSelector((state) => state.admin.adminProfileError);
   const medicalProfileStatus = useSelector((state) => state.admin.medicalProfileStatus);
+  
+  // Get admin medications state from Redux
+  const adminMedications = useSelector((state) => state.admin.adminMedications);
+  const adminMedicationsLoading = useSelector((state) => state.admin.adminMedicationsLoading);
+  const adminMedicationsError = useSelector((state) => state.admin.adminMedicationsError);
+  
+  // Get admin measurements state from Redux
+  const adminMeasurements = useSelector((state) => state.admin.adminMeasurements);
+  const adminMeasurementsLoading = useSelector((state) => state.admin.adminMeasurementsLoading);
+  const adminMeasurementsError = useSelector((state) => state.admin.adminMeasurementsError);
+  
+  // Get admin side effects state from Redux
+  const adminSideEffects = useSelector((state) => state.admin.adminSideEffects);
+  const adminSideEffectsLoading = useSelector((state) => state.admin.adminSideEffectsLoading);
+  const adminSideEffectsError = useSelector((state) => state.admin.adminSideEffectsError);
+  
+  // Get admin questions state from Redux
+  const adminQuestions = useSelector((state) => state.admin.adminQuestions);
+  const adminQuestionsLoading = useSelector((state) => state.admin.adminQuestionsLoading);
+  const adminQuestionsError = useSelector((state) => state.admin.adminQuestionsError);
   
   // Debug Redux state
   console.log('🔍 Redux meals state:', {
@@ -192,6 +213,7 @@ export default function UserDetailPage() {
   });
   const [savingProfile, setSavingProfile] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(1);
+  const [selectedSideEffect, setSelectedSideEffect] = useState(null);
 
   // Access control - only Admin and Doctor can access
   useAdminAccess();
@@ -224,6 +246,46 @@ export default function UserDetailPage() {
       }));
     }
   }, [tabValue, currentWeek, dispatch, params.userId]);
+
+  // Fetch medications when Medication Tracker tab is selected
+  useEffect(() => {
+    if (tabValue === 4 && params.userId) { // Medication Tracker tab index
+      dispatch(fetchAdminMedicationsAction({ 
+        userId: params.userId, 
+        daysBack: 28 // Last 4 weeks
+      }));
+    }
+  }, [tabValue, params.userId, dispatch]);
+
+  // Fetch measurements when Weight Logging tab is selected
+  useEffect(() => {
+    if (tabValue === 3 && params.userId) { // Weight Logging tab index
+      dispatch(fetchAdminMeasurementsAction({ 
+        userId: params.userId, 
+        daysBack: 28 // Last 4 weeks
+      }));
+    }
+  }, [tabValue, params.userId, dispatch]);
+
+  // Fetch side effects when Side Effects tab is selected
+  useEffect(() => {
+    if (tabValue === 2 && params.userId) { // Side Effects tab index
+      dispatch(fetchAdminSideEffectsAction({ 
+        userId: params.userId, 
+        limit: 4 // Last 4 side effects
+      }));
+    }
+  }, [tabValue, params.userId, dispatch]);
+
+  // Fetch questions when Questions tab is selected
+  useEffect(() => {
+    if (tabValue === 6 && params.userId) { // Questions tab index
+      dispatch(fetchAdminQuestionsAction({ 
+        userId: params.userId, 
+        limit: 10 // Last 10 questions
+      }));
+    }
+  }, [tabValue, params.userId, dispatch]);
 
   // Fetch consent forms when Consent Forms tab is selected
   useEffect(() => {
@@ -800,9 +862,137 @@ export default function UserDetailPage() {
     return (weight / (heightInMeters * heightInMeters)).toFixed(1);
   };
 
-  const generatePDF = () => {
-    // Mock PDF generation
-    alert('PDF generation would be implemented here. This would create a comprehensive user report.');
+  const generateTabPDF = async (tabName, elementId) => {
+    try {
+      // Show loading message
+      const loadingMessage = document.createElement('div');
+      loadingMessage.style.position = 'fixed';
+      loadingMessage.style.top = '50%';
+      loadingMessage.style.left = '50%';
+      loadingMessage.style.transform = 'translate(-50%, -50%)';
+      loadingMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      loadingMessage.style.color = 'white';
+      loadingMessage.style.padding = '20px';
+      loadingMessage.style.borderRadius = '8px';
+      loadingMessage.style.zIndex = '9999';
+      loadingMessage.style.fontFamily = 'Arial, sans-serif';
+      loadingMessage.innerHTML = `Generating ${tabName} PDF...<br><small>This may take a few moments</small>`;
+      document.body.appendChild(loadingMessage);
+
+      // Import jsPDF and html2canvas dynamically
+      const { default: jsPDF } = await import('jspdf');
+      const { default: html2canvas } = await import('html2canvas');
+      
+      // Create a new PDF document
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      // Add header
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(tabName, 105, 20, { align: 'center' });
+      
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`User: ${userData?.name || userData?.email || 'Unknown User'}`, 105, 30, { align: 'center' });
+      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 35, { align: 'center' });
+
+      // Find the tab content element
+      const tabPanel = document.getElementById(elementId);
+      
+      if (tabPanel) {
+        // Create a temporary container for the tab content
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.top = '0';
+        tempContainer.style.width = '800px';
+        tempContainer.style.backgroundColor = '#ffffff';
+        tempContainer.style.padding = '20px';
+        tempContainer.style.fontFamily = 'Arial, sans-serif';
+        tempContainer.style.fontSize = '12px';
+        tempContainer.style.lineHeight = '1.4';
+        tempContainer.style.color = '#000000';
+        
+        // Clone the tab content
+        const clonedContent = tabPanel.cloneNode(true);
+        
+        // Remove any loading spinners or error messages from cloned content
+        const loadingElements = clonedContent.querySelectorAll('[class*="CircularProgress"], [class*="loading"]');
+        loadingElements.forEach(el => el.remove());
+        
+        tempContainer.appendChild(clonedContent);
+        document.body.appendChild(tempContainer);
+
+        try {
+          // Capture the content as canvas
+          const canvas = await html2canvas(tempContainer, {
+            scale: 1.5,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            width: tempContainer.scrollWidth,
+            height: tempContainer.scrollHeight,
+            windowWidth: tempContainer.scrollWidth,
+            windowHeight: tempContainer.scrollHeight,
+          });
+
+          // Calculate dimensions for A4
+          const imgWidth = 170; // A4 width minus margins
+          const pageHeight = 240; // A4 height minus margins for header
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          // If content is too tall, scale it down
+          if (imgHeight > pageHeight) {
+            const scaleFactor = pageHeight / imgHeight;
+            const scaledWidth = imgWidth * scaleFactor;
+            const scaledHeight = pageHeight;
+            const xOffset = (imgWidth - scaledWidth) / 2;
+            
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 20 + xOffset, 45, scaledWidth, scaledHeight);
+          } else {
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 20, 45, imgWidth, imgHeight);
+          }
+
+        } finally {
+          // Clean up temporary container
+          document.body.removeChild(tempContainer);
+        }
+      } else {
+        console.warn(`Tab panel not found for ${tabName}`);
+        // Add a message to PDF if content not found
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Content not available', 105, 100, { align: 'center' });
+      }
+
+      // Remove loading message
+      document.body.removeChild(loadingMessage);
+
+      // Generate filename with user info and date
+      const userName = userData?.name || userData?.email || 'User';
+      const dateStr = new Date().toISOString().split('T')[0];
+      const fileName = `${tabName.replace(/[^a-zA-Z0-9]/g, '-')}-${userName.replace(/[^a-zA-Z0-9]/g, '-')}-${dateStr}.pdf`;
+
+      // Save the PDF
+      pdf.save(fileName);
+
+      // Show success message
+      alert(`${tabName} PDF generated successfully: ${fileName}`);
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Remove loading message if it exists
+      const loadingMessage = document.querySelector('div[style*="position: fixed"]');
+      if (loadingMessage) {
+        document.body.removeChild(loadingMessage);
+      }
+      alert(`Error generating ${tabName} PDF. Please try again.`);
+    }
   };
 
   const generateLabRequisition = () => {
@@ -845,6 +1035,31 @@ export default function UserDetailPage() {
   // Handle unlocking consent forms
   const handleUnlockConsentForm = (formType) => {
     handleConsentFormUpdate(formType, { locked: false });
+  };
+
+  // Handle side effect selection
+  const handleSideEffectClick = (sideEffect) => {
+    setSelectedSideEffect(selectedSideEffect?._id === sideEffect._id ? null : sideEffect);
+  };
+
+  // Handle side effect review
+  const handleReviewSideEffect = (sideEffectId) => {
+    dispatch(updateAdminSideEffectAction({
+      userId: params.userId,
+      sideEffectId,
+      action: 'review',
+      updates: { reviewed: true }
+    }));
+  };
+
+  // Handle side effect open (set complete to false)
+  const handleOpenSideEffect = (sideEffectId) => {
+    dispatch(updateAdminSideEffectAction({
+      userId: params.userId,
+      sideEffectId,
+      action: 'open',
+      updates: { complete: false }
+    }));
   };
 
   // Get date range for a specific week
@@ -1117,14 +1332,6 @@ export default function UserDetailPage() {
                 Reschedule
               </Button>
               <Button
-                variant="outlined"
-                startIcon={<PictureAsPdf />}
-                onClick={generatePDF}
-                sx={{ textTransform: 'none' }}
-              >
-                Generate PDF
-              </Button>
-              <Button
                 variant="contained"
                 startIcon={<Assignment />}
                 onClick={generateLabRequisition}
@@ -1364,10 +1571,23 @@ export default function UserDetailPage() {
               <Tab icon={<Scale />} label="Weight Logging" />
               <Tab icon={<Medication />} label="Medication Tracker" />
               <Tab icon={<Restaurant />} label="Meal Tracker" />
+              <Tab icon={<Quiz />} label="Questions" />
             </Tabs>
           </Box>
 
-          <TabPanel value={tabValue} index={0}>
+          <TabPanel value={tabValue} index={0} id="profile-summary-content">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Profile Summary</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PictureAsPdf />}
+                onClick={() => generateTabPDF('Profile Summary', 'profile-summary-content')}
+                sx={{ textTransform: 'none' }}
+              >
+                Generate PDF
+              </Button>
+            </Box>
             {adminProfileLoading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
                 <CircularProgress />
@@ -1684,7 +1904,19 @@ export default function UserDetailPage() {
             )}
           </TabPanel>
 
-          <TabPanel value={tabValue} index={1}>
+          <TabPanel value={tabValue} index={1} id="consent-forms-content">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Consent Forms</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PictureAsPdf />}
+                onClick={() => generateTabPDF('Consent Forms', 'consent-forms-content')}
+                sx={{ textTransform: 'none' }}
+              >
+                Generate PDF
+              </Button>
+            </Box>
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Card>
@@ -1718,7 +1950,7 @@ export default function UserDetailPage() {
                                   {form.formType?.replace(/([A-Z])/g, ' $1').trim()}
                                 </Typography>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
-                                  <Chip 
+                            <Chip
                                     label={form.enabled ? 'Enabled' : 'Disabled'} 
                                     color={form.enabled ? 'success' : 'default'}
                                     size="small"
@@ -1761,7 +1993,7 @@ export default function UserDetailPage() {
                                 
                                 {form.locked && (
                                   <Button
-                                    variant="outlined"
+                              variant="outlined"
                                     size="small"
                                     color="warning"
                                     onClick={() => handleUnlockConsentForm(form.formType)}
@@ -1781,34 +2013,351 @@ export default function UserDetailPage() {
             </Grid>
           </TabPanel>
 
-          <TabPanel value={tabValue} index={2}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Side Effects
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Side effects reports and tracking will be displayed here.
-                    </Typography>
+          <TabPanel value={tabValue} index={2} id="side-effects-content">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Side Effects</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PictureAsPdf />}
+                onClick={() => generateTabPDF('Side Effects', 'side-effects-content')}
+                sx={{ textTransform: 'none' }}
+              >
+                Generate PDF
+              </Button>
+            </Box>
+            {adminSideEffectsLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Loading side effects data...
+                </Typography>
+              </Box>
+            ) : adminSideEffectsError ? (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Error loading side effects: {adminSideEffectsError}
+              </Alert>
+            ) : (
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        Recent Side Effects - Last 4 Reports
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                        Click on any side effect to view detailed information
+                      </Typography>
+                      
+                      {adminSideEffects && adminSideEffects.length > 0 ? (
+                        <Stack spacing={2}>
+                          {adminSideEffects.map((sideEffect, index) => (
+                            <Box 
+                              key={index}
+                              sx={{ 
+                                p: 2, 
+                                border: '1px solid', 
+                                borderColor: selectedSideEffect?._id === sideEffect._id ? 'primary.main' : 'divider', 
+                                borderRadius: 2,
+                                backgroundColor: selectedSideEffect?._id === sideEffect._id ? 'primary.50' : 'background.paper',
+                                cursor: 'pointer',
+                                '&:hover': {
+                                  backgroundColor: 'action.hover',
+                                  borderColor: 'primary.main'
+                                }
+                              }}
+                              onClick={() => handleSideEffectClick(sideEffect)}
+                            >
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                <Typography variant="h6" color="primary">
+                                  {formatDate(sideEffect.createdAt)}
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Chip 
+                                    label={sideEffect.reviewed ? 'Reviewed' : 'Pending Review'} 
+                                    color={sideEffect.reviewed ? 'success' : 'warning'}
+                                    size="small"
+                                  />
+                                  <Typography variant="caption" color="text.secondary">
+                                    {selectedSideEffect?._id === sideEffect._id ? 'Selected' : 'Click to view details'}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                              
+                              <Typography variant="body2" color="text.secondary">
+                                {sideEffect.sideEffects?.length > 0 
+                                  ? `${sideEffect.sideEffects.length} side effect(s) reported`
+                                  : 'No specific side effects listed'
+                                }
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No side effects found
+                          </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            No side effects have been reported recently.
+                        </Typography>
+                        </Box>
+                      )}
                   </CardContent>
                 </Card>
               </Grid>
+
+                {/* Fixed Details Panel */}
+                {selectedSideEffect && (
+                  <Grid item xs={12}>
+                    <Card sx={{ 
+                      position: 'sticky', 
+                      bottom: 0, 
+                      zIndex: 1,
+                      backgroundColor: 'background.paper',
+                      border: '2px solid',
+                      borderColor: 'primary.main',
+                      boxShadow: 3
+                    }}>
+                  <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                          <Typography variant="h6" color="primary">
+                            Side Effect Details - {formatDate(selectedSideEffect.createdAt)}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            {!selectedSideEffect.reviewed && (
+                              <Button 
+                                variant="contained" 
+                                color="success"
+                                size="small" 
+                                onClick={() => handleReviewSideEffect(selectedSideEffect._id)}
+                              >
+                                Mark as Reviewed
+                              </Button>
+                            )}
+                            {selectedSideEffect.complete && (
+                              <Button 
+                                variant="contained" 
+                                color="warning"
+                                size="small" 
+                                onClick={() => handleOpenSideEffect(selectedSideEffect._id)}
+                              >
+                                Reopen
+                              </Button>
+                            )}
+                            <Button 
+                              variant="outlined" 
+                              size="small" 
+                              onClick={() => setSelectedSideEffect(null)}
+                            >
+                              Close Details
+                            </Button>
+                          </Box>
+                        </Box>
+
+                        {/* Review Status */}
+                        <Box sx={{ mb: 3 }}>
+                          <Chip 
+                            label={selectedSideEffect.reviewed ? 'Reviewed' : 'Pending Review'} 
+                            color={selectedSideEffect.reviewed ? 'success' : 'warning'}
+                            sx={{ mb: 1 }}
+                          />
+                          <Typography variant="body2" color="text.secondary">
+                            {selectedSideEffect.reviewed ? 'This report has been reviewed' : 'This report is pending review'}
+                          </Typography>
+                        </Box>
+
+                        {/* Report Information */}
+                        <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" gutterBottom>
+                            Report Information
+                    </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="caption" color="text.secondary">Report ID</Typography>
+                            <Typography variant="body2" fontWeight="medium">
+                                {selectedSideEffect.reportId || 'Not available'}
+                            </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="caption" color="text.secondary">Report Date</Typography>
+                              <Typography variant="body2" fontWeight="medium">
+                                {selectedSideEffect.reportDate ? formatDate(selectedSideEffect.reportDate) : 'Not available'}
+                            </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="caption" color="text.secondary">Status</Typography>
+                              <Chip 
+                                label={selectedSideEffect.complete ? 'Complete' : 'Incomplete'} 
+                                color={selectedSideEffect.complete ? 'success' : 'warning'}
+                                size="small"
+                              />
+                            </Grid>
+                          </Grid>
+                          </Box>
+
+                        {/* Side Effects List */}
+                        {selectedSideEffect.sideEffects && selectedSideEffect.sideEffects.length > 0 ? (
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                              Reported Side Effects ({selectedSideEffect.sideEffects.length})
+                            </Typography>
+                            <Stack spacing={2}>
+                              {selectedSideEffect.sideEffects.map((effect, effectIndex) => (
+                                <Paper key={effectIndex} elevation={1} sx={{ p: 2 }}>
+                                  <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
+                                    {effect.name || 'Unnamed Side Effect'}
+                                  </Typography>
+                                  {effect.severity && (
+                                    <Chip 
+                                      label={`Severity: ${effect.severity}`} 
+                                      color={effect.severity === 'Mild' ? 'success' : effect.severity === 'Moderate' ? 'warning' : 'error'}
+                                      size="small"
+                                      sx={{ mb: 1 }}
+                                    />
+                                  )}
+                                  {effect.description && (
+                                    <Typography variant="body2" color="text.secondary">
+                                      {effect.description}
+                                    </Typography>
+                                  )}
+                                  {effect.duration && (
+                                    <Typography variant="caption" color="text.secondary">
+                                      Duration: {effect.duration}
+                                    </Typography>
+                                  )}
+                                </Paper>
+                        ))}
+                      </Stack>
+                          </Box>
+                    ) : (
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                              No Specific Side Effects Listed
+                            </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                              This report was submitted but no specific side effects were detailed.
+                      </Typography>
+                          </Box>
+                        )}
+
+                        {/* Other Side Effect */}
+                        {selectedSideEffect.otherSideEffect && (
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                              Other Side Effects
+                            </Typography>
+                            <Typography variant="body2">
+                              {selectedSideEffect.otherSideEffect}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Appetite Information */}
+                        {selectedSideEffect.appetiteSuppressed && (
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                              Appetite Suppression
+                            </Typography>
+                            <Typography variant="body2">
+                              {selectedSideEffect.appetiteSuppressed}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Treatment Concerns */}
+                        {selectedSideEffect.hasTreatmentConcerns && (
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                              Treatment Concerns
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                              Patient has treatment concerns: {selectedSideEffect.hasTreatmentConcerns}
+                            </Typography>
+                            {selectedSideEffect.treatmentConcerns && (
+                              <Typography variant="body2">
+                                <strong>Details:</strong> {selectedSideEffect.treatmentConcerns}
+                              </Typography>
+                            )}
+                          </Box>
+                        )}
+
+                        {/* Doctor Contact Request */}
+                        {selectedSideEffect.requestDoctorContact && (
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                              Doctor Contact Request
+                            </Typography>
+                            <Chip 
+                              label="Patient requested doctor contact" 
+                              color="info"
+                              sx={{ mb: 1 }}
+                            />
+                            {selectedSideEffect.contactMessage && (
+                              <Typography variant="body2" sx={{ mt: 1 }}>
+                                <strong>Message:</strong> {selectedSideEffect.contactMessage}
+                              </Typography>
+                            )}
+                          </Box>
+                        )}
+
+                        {/* Timestamps */}
+                        <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                          <Typography variant="caption" color="text.secondary">
+                            Report Date: {formatDate(selectedSideEffect.createdAt)}
+                          </Typography>
+                          {selectedSideEffect.updatedAt && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              Last Updated: {formatDate(selectedSideEffect.updatedAt)}
+                            </Typography>
+                          )}
+                        </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+                )}
             </Grid>
+            )}
           </TabPanel>
 
-          <TabPanel value={tabValue} index={3}>
+          <TabPanel value={tabValue} index={3} id="weight-logging-content">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Weight Logging</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PictureAsPdf />}
+                onClick={() => generateTabPDF('Weight Logging', 'weight-logging-content')}
+                sx={{ textTransform: 'none' }}
+              >
+                Generate PDF
+              </Button>
+            </Box>
+            {adminMeasurementsLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Loading measurement data...
+                </Typography>
+              </Box>
+            ) : adminMeasurementsError ? (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Error loading measurements: {adminMeasurementsError}
+              </Alert>
+            ) : (
             <Grid container spacing={3}>
+                {/* Summary Cards */}
               <Grid item xs={12} md={4}>
                 <Card>
                   <CardContent sx={{ textAlign: 'center' }}>
                     <Scale sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
                     <Typography variant="h6" color="text.secondary">
-                      Current Weight
+                        Latest Weight
                     </Typography>
                     <Typography variant="h4" color="primary">
-                      {latestWeight ? `${latestWeight.weight} kg` : 'No data'}
+                        {adminMeasurements && adminMeasurements.length > 0 
+                          ? `${adminMeasurements[0].weight} kg` 
+                          : 'No data'}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -1818,10 +2367,12 @@ export default function UserDetailPage() {
                   <CardContent sx={{ textAlign: 'center' }}>
                     <TrendingUp sx={{ fontSize: 40, color: 'secondary.main', mb: 1 }} />
                     <Typography variant="h6" color="text.secondary">
-                      Current BMI
+                        Latest BMI
                     </Typography>
                     <Typography variant="h4" color="secondary">
-                      {currentBMI || 'No data'}
+                        {adminMeasurements && adminMeasurements.length > 0 
+                          ? adminMeasurements[0].bmi 
+                          : 'No data'}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -1833,19 +2384,24 @@ export default function UserDetailPage() {
                       Waist Circumference
                     </Typography>
                     <Typography variant="h4" color="success">
-                      {latestWeight ? `${latestWeight.waistCircumference} cm` : 'No data'}
+                        {adminMeasurements && adminMeasurements.length > 0 
+                          ? `${adminMeasurements[0].waistCircumference} cm` 
+                          : 'No data'}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
+
+                {/* Weight & BMI Progress Chart */}
               <Grid item xs={12}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
-                      Weight & BMI Progress
+                        Weight & BMI Progress - Last 4 Weeks
                     </Typography>
+                      {adminMeasurements && adminMeasurements.length > 0 ? (
                     <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={weightChartData}>
+                          <LineChart data={adminMeasurements}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" />
                         <YAxis yAxisId="left" />
@@ -1856,79 +2412,220 @@ export default function UserDetailPage() {
                         <Line yAxisId="right" type="monotone" dataKey="bmi" stroke="#dc004e" strokeWidth={2} name="BMI" />
                       </LineChart>
                     </ResponsiveContainer>
+                      ) : (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No measurement data found
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            No measurements were recorded in the last 4 weeks.
+                          </Typography>
+                        </Box>
+                      )}
                   </CardContent>
                 </Card>
               </Grid>
-            </Grid>
-          </TabPanel>
 
-          <TabPanel value={tabValue} index={4}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Current Medications
-                    </Typography>
-                    {(() => {
-                      // Handle both array and string formats
-                      const medications = Array.isArray(userMetadata.current_medications)
-                        ? userMetadata.current_medications
-                        : typeof userMetadata.current_medications === 'string' && userMetadata.current_medications
-                        ? [userMetadata.current_medications]
-                        : [];
-                      
-                      return medications.length > 0 ? (
-                        <Stack spacing={1}>
-                          {medications.map((medication, index) => (
-                            <Chip
-                              key={index}
-                              label={medication}
-                              color="primary"
-                              variant="outlined"
-                            />
+                {/* Detailed Measurements List */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        Recent Measurements
+                      </Typography>
+                      {adminMeasurements && adminMeasurements.length > 0 ? (
+                        <Stack spacing={2}>
+                          {adminMeasurements.slice(0, 10).map((measurement, index) => (
+                            <Box key={index} sx={{ 
+                              p: 2, 
+                              border: '1px solid', 
+                              borderColor: 'divider', 
+                              borderRadius: 2,
+                              backgroundColor: 'background.paper'
+                            }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                <Typography variant="h6" color="primary">
+                                  {formatDate(measurement.date)}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {measurement.time || 'No time recorded'}
+                                </Typography>
+                              </Box>
+                              
+                              <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">Weight</Typography>
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {measurement.weight} kg
+                                  </Typography>
+            </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">BMI</Typography>
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {measurement.bmi}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">Waist</Typography>
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {measurement.waistCircumference} cm
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">Height</Typography>
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {measurement.height} cm
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                              
+                              {measurement.notes && (
+                                <Box sx={{ mt: 1 }}>
+                                  <Typography variant="caption" color="text.secondary">Notes</Typography>
+                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                    {measurement.notes}
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
                           ))}
                         </Stack>
                       ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          No current medications
-                        </Typography>
-                      );
-                    })()}
-                  </CardContent>
-                </Card>
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No measurements found
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            No measurements were recorded in the last 4 weeks.
+                          </Typography>
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={6}>
+            )}
+          </TabPanel>
+
+          <TabPanel value={tabValue} index={4} id="medication-tracker-content">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Medication Tracker</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PictureAsPdf />}
+                onClick={() => generateTabPDF('Medication Tracker', 'medication-tracker-content')}
+                sx={{ textTransform: 'none' }}
+              >
+                Generate PDF
+              </Button>
+            </Box>
+            {adminMedicationsLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Loading medication data...
+                </Typography>
+              </Box>
+            ) : adminMedicationsError ? (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Error loading medications: {adminMedicationsError}
+              </Alert>
+            ) : (
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
-                      Recent Medication Logs
+                        Medication Tracker - Last 4 Weeks
                     </Typography>
-                    {userMetadata.medication_history?.length > 0 ? (
-                      <Stack spacing={1}>
-                        {userMetadata.medication_history.slice(0, 5).map((entry, index) => (
-                          <Box key={index} sx={{ p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                            <Typography variant="body2" fontWeight="medium">
-                              {entry.medication} - {entry.dosage}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {formatDate(entry.date)} at {entry.time}
-                            </Typography>
-                          </Box>
-                        ))}
-                      </Stack>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        No medication logs
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                        Medication logs for the past 28 days
                       </Typography>
-                    )}
-                  </CardContent>
-                </Card>
+                      
+                      {adminMedications && adminMedications.length > 0 ? (
+                      <Stack spacing={2}>
+                          {adminMedications.map((medication, index) => (
+                            <Box key={index} sx={{ 
+                              p: 2, 
+                              border: '1px solid', 
+                              borderColor: 'divider', 
+                              borderRadius: 2,
+                              backgroundColor: 'background.paper'
+                            }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                <Typography variant="h6" color="primary">
+                                  {medication.medicationName}
+                              </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {formatDate(medication.date)}
+                                </Typography>
+                            </Box>
+                              
+                              <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">Dosage</Typography>
+                                  <Typography variant="body2">{medication.dosage || 'Not specified'}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">Frequency</Typography>
+                                  <Typography variant="body2">{medication.frequency || 'Not specified'}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">Time</Typography>
+                                  <Typography variant="body2">{medication.time || 'Not specified'}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                  <Typography variant="caption" color="text.secondary">Status</Typography>
+                                  <Chip 
+                                    label={medication.taken ? 'Taken' : 'Missed'} 
+                                    color={medication.taken ? 'success' : 'error'}
+                                    size="small"
+                                  />
+                                </Grid>
+                              </Grid>
+                              
+                              {medication.notes && (
+                                <Box sx={{ mt: 1 }}>
+                                  <Typography variant="caption" color="text.secondary">Notes</Typography>
+                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                                    {medication.notes}
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No medication logs found
+                          </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                            No medication entries were recorded in the last 4 weeks.
+                            </Typography>
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
               </Grid>
-            </Grid>
+            )}
           </TabPanel>
 
-          <TabPanel value={tabValue} index={5}>
+          <TabPanel value={tabValue} index={5} id="meal-tracker-content">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Meal Tracker</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PictureAsPdf />}
+                onClick={() => generateTabPDF('Meal Tracker', 'meal-tracker-content')}
+                sx={{ textTransform: 'none' }}
+              >
+                Generate PDF
+              </Button>
+            </Box>
             <Grid container spacing={3}>
               {/* Week Navigator */}
               <Grid item xs={12}>
@@ -1944,7 +2641,7 @@ export default function UserDetailPage() {
                             const dateRange = getWeekDateRange(currentWeek);
                             return `${dateRange.start} to ${dateRange.end}`;
                           })()}
-                        </Typography>
+                            </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', gap: 1 }}>
                         <Button
@@ -2143,8 +2840,123 @@ export default function UserDetailPage() {
               </Grid>
             </Grid>
           </TabPanel>
+
+          <TabPanel value={tabValue} index={6} id="questions-content">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Questions</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PictureAsPdf />}
+                onClick={() => generateTabPDF('Questions', 'questions-content')}
+                sx={{ textTransform: 'none' }}
+              >
+                Generate PDF
+              </Button>
+            </Box>
+            {adminQuestionsLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Loading questions data...
+                </Typography>
+              </Box>
+            ) : adminQuestionsError ? (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Error loading questions: {adminQuestionsError}
+              </Alert>
+            ) : (
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        Recent Questions - Last 10 Questions
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                        Questions submitted by the user
+                      </Typography>
+                      
+                      {adminQuestions && adminQuestions.length > 0 ? (
+                        <Stack spacing={2}>
+                          {adminQuestions.map((question, index) => (
+                            <Box 
+                              key={index}
+                              sx={{ 
+                                p: 2, 
+                                border: '1px solid', 
+                                borderColor: 'divider', 
+                                borderRadius: 2,
+                                backgroundColor: 'background.paper'
+                              }}
+                            >
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                <Typography variant="h6" color="primary">
+                                  {formatDate(question.createdAt)}
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Chip 
+                                    label={question.answered ? 'Answered' : 'Pending'} 
+                                    color={question.answered ? 'success' : 'warning'}
+                                    size="small"
+                                  />
+                                </Box>
+                              </Box>
+                              
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                <strong>Question:</strong> {question.question || 'No question text available'}
+                              </Typography>
+                              
+                              {question.category && (
+                                <Box sx={{ mb: 1 }}>
+                                  <Typography variant="caption" color="text.secondary">Category:</Typography>
+                                  <Chip 
+                                    label={question.category} 
+                                    size="small" 
+                                    variant="outlined"
+                                    sx={{ ml: 1 }}
+                                  />
+                                </Box>
+                              )}
+                              
+                              {question.answer && (
+                                <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                    <strong>Answer:</strong>
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {question.answer}
+                                  </Typography>
+                                </Box>
+                              )}
+                              
+                              {question.answeredAt && (
+                                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                                  Answered on: {formatDate(question.answeredAt)}
+                                </Typography>
+                              )}
+                          </Box>
+                        ))}
+                      </Stack>
+                    ) : (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                          <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No questions found
+                          </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                            No questions have been submitted recently.
+                      </Typography>
+                        </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+            )}
+          </TabPanel>
         </Card>
         )}
+
       </Container>
     </>
   );

@@ -41,6 +41,26 @@ const initialState = {
   adminProfileLoading: false,
   adminProfileError: null,
   medicalProfileStatus: null,
+  
+  // Admin medications data
+  adminMedications: [],
+  adminMedicationsLoading: false,
+  adminMedicationsError: null,
+  
+  // Admin measurements data
+  adminMeasurements: [],
+  adminMeasurementsLoading: false,
+  adminMeasurementsError: null,
+  
+  // Admin side effects data
+  adminSideEffects: [],
+  adminSideEffectsLoading: false,
+  adminSideEffectsError: null,
+  
+  // Admin questions data
+  adminQuestions: [],
+  adminQuestionsLoading: false,
+  adminQuestionsError: null,
 };
 
 const adminSlice = createSlice({
@@ -255,6 +275,95 @@ const adminSlice = createSlice({
       state.adminProfileError = null;
     },
     
+    // Admin medications actions
+    fetchAdminMedications: (state, action) => {
+      state.adminMedicationsLoading = true;
+      state.adminMedicationsError = null;
+    },
+    fetchAdminMedicationsSuccess: (state, action) => {
+      state.adminMedicationsLoading = false;
+      state.adminMedications = action.payload.medications;
+      state.adminMedicationsError = null;
+    },
+    fetchAdminMedicationsFailure: (state, action) => {
+      state.adminMedicationsLoading = false;
+      state.adminMedicationsError = action.payload;
+    },
+    clearAdminMedicationsError: (state) => {
+      state.adminMedicationsError = null;
+    },
+    
+    // Admin measurements actions
+    fetchAdminMeasurements: (state, action) => {
+      state.adminMeasurementsLoading = true;
+      state.adminMeasurementsError = null;
+    },
+    fetchAdminMeasurementsSuccess: (state, action) => {
+      state.adminMeasurementsLoading = false;
+      state.adminMeasurements = action.payload.measurements;
+      state.adminMeasurementsError = null;
+    },
+    fetchAdminMeasurementsFailure: (state, action) => {
+      state.adminMeasurementsLoading = false;
+      state.adminMeasurementsError = action.payload;
+    },
+    clearAdminMeasurementsError: (state) => {
+      state.adminMeasurementsError = null;
+    },
+    
+    // Admin side effects actions
+    fetchAdminSideEffects: (state, action) => {
+      state.adminSideEffectsLoading = true;
+      state.adminSideEffectsError = null;
+    },
+    fetchAdminSideEffectsSuccess: (state, action) => {
+      state.adminSideEffectsLoading = false;
+      state.adminSideEffects = action.payload.sideEffects;
+      state.adminSideEffectsError = null;
+    },
+    fetchAdminSideEffectsFailure: (state, action) => {
+      state.adminSideEffectsLoading = false;
+      state.adminSideEffectsError = action.payload;
+    },
+    clearAdminSideEffectsError: (state) => {
+      state.adminSideEffectsError = null;
+    },
+    updateAdminSideEffect: (state, action) => {
+      // This action is handled by the saga
+    },
+    updateAdminSideEffectSuccess: (state, action) => {
+      const { sideEffectId, updates } = action.payload;
+      // Update the specific side effect in the list
+      const sideEffectIndex = state.adminSideEffects.findIndex(se => se._id === sideEffectId);
+      if (sideEffectIndex !== -1) {
+        state.adminSideEffects[sideEffectIndex] = {
+          ...state.adminSideEffects[sideEffectIndex],
+          ...updates
+        };
+      }
+    },
+    updateAdminSideEffectFailure: (state, action) => {
+      state.adminSideEffectsError = action.payload;
+    },
+    
+    // Admin questions actions
+    fetchAdminQuestions: (state, action) => {
+      state.adminQuestionsLoading = true;
+      state.adminQuestionsError = null;
+    },
+    fetchAdminQuestionsSuccess: (state, action) => {
+      state.adminQuestionsLoading = false;
+      state.adminQuestions = action.payload.questions;
+      state.adminQuestionsError = null;
+    },
+    fetchAdminQuestionsFailure: (state, action) => {
+      state.adminQuestionsLoading = false;
+      state.adminQuestionsError = action.payload;
+    },
+    clearAdminQuestionsError: (state) => {
+      state.adminQuestionsError = null;
+    },
+    
     // Reset actions
     resetFilters: (state) => {
       state.searchTerm = '';
@@ -313,6 +422,25 @@ export const {
   checkMedicalProfileTaskSuccess,
   checkMedicalProfileTaskFailure,
   clearAdminProfileError,
+  fetchAdminMedications,
+  fetchAdminMedicationsSuccess,
+  fetchAdminMedicationsFailure,
+  clearAdminMedicationsError,
+  fetchAdminMeasurements,
+  fetchAdminMeasurementsSuccess,
+  fetchAdminMeasurementsFailure,
+  clearAdminMeasurementsError,
+  fetchAdminSideEffects,
+  fetchAdminSideEffectsSuccess,
+  fetchAdminSideEffectsFailure,
+  clearAdminSideEffectsError,
+  updateAdminSideEffect,
+  updateAdminSideEffectSuccess,
+  updateAdminSideEffectFailure,
+  fetchAdminQuestions,
+  fetchAdminQuestionsSuccess,
+  fetchAdminQuestionsFailure,
+  clearAdminQuestionsError,
   resetFilters,
   resetAdmin,
 } = adminSlice.actions;
@@ -364,6 +492,31 @@ export const fetchAdminProfileAction = (payload) => ({
 
 export const checkMedicalProfileTaskAction = (payload) => ({
   type: 'admin/checkMedicalProfileTask',
+  payload,
+});
+
+export const fetchAdminMedicationsAction = (payload) => ({
+  type: 'admin/fetchAdminMedications',
+  payload,
+});
+
+export const fetchAdminMeasurementsAction = (payload) => ({
+  type: 'admin/fetchAdminMeasurements',
+  payload,
+});
+
+export const fetchAdminSideEffectsAction = (payload) => ({
+  type: 'admin/fetchAdminSideEffects',
+  payload,
+});
+
+export const updateAdminSideEffectAction = (payload) => ({
+  type: 'admin/updateAdminSideEffect',
+  payload,
+});
+
+export const fetchAdminQuestionsAction = (payload) => ({
+  type: 'admin/fetchAdminQuestions',
   payload,
 });
 
