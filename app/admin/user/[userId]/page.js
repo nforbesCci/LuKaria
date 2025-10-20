@@ -391,29 +391,28 @@ export default function UserDetailPage() {
 
   const handleEditProfile = () => {
     console.log('✏️ Editing profile for user:', params.userId);
-    console.log('Current DB Profile:', dbProfile);
-    console.log('Current User Metadata:', userMetadata);
+    console.log('Current Admin Profile:', adminProfile);
     
-    // Initialize editable profile with current data from both sources
+    // Initialize editable profile with data from adminProfile in store
     setEditableProfile({
       // Personal Information
-      phone_number: userMetadata.phone_number || '',
-      address: userMetadata.address || '',
-      birthdate: userMetadata.birthdate || '',
-      parish: dbProfile?.parish || userMetadata.parish || '',
-      gender: dbProfile?.gender || userMetadata.gender || '',
+      phone_number: adminProfile?.preferredPhone || '',
+      address: adminProfile?.homeAddress || '',
+      birthdate: adminProfile?.dateOfBirth || '',
+      parish: adminProfile?.parish || '',
+      gender: adminProfile?.sex || '',
       
       // Emergency Contact
-      nextOfKinName: userMetadata.emergency_contact_name || dbProfile?.nextOfKinName || '',
-      nextOfKinPhone: userMetadata.emergency_contact_phone || dbProfile?.nextOfKinPhone || '',
-      nextOfKinRelationship: userMetadata.emergency_contact_relationship || dbProfile?.nextOfKinRelationship || '',
+      nextOfKinName: adminProfile?.emergencyContactName || '',
+      nextOfKinPhone: adminProfile?.emergencyContactPhone || '',
+      nextOfKinRelationship: adminProfile?.emergencyContactRelationship || '',
       
       // Medical Information
-      medicalConditions: userMetadata.medical_conditions || dbProfile?.medicalConditions || [],
-      otherMedicalCondition: userMetadata.other_medical_condition || dbProfile?.otherMedicalCondition || '',
-      hasAllergies: userMetadata.has_allergies || dbProfile?.hasAllergies || false,
-      allergicMedications: userMetadata.allergic_medications || dbProfile?.allergicMedications || '',
-      currentMedications: userMetadata.current_medications || dbProfile?.currentMedications || '',
+      medicalConditions: adminProfile?.medicalConditions || [],
+      otherMedicalCondition: adminProfile?.otherMedicalCondition || '',
+      hasAllergies: adminProfile?.hasAllergies || false,
+      allergicMedications: adminProfile?.allergicMedications || '',
+      currentMedications: adminProfile?.currentMedications || '',
     });
     
     setActiveWizardStep(0);
