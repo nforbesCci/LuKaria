@@ -238,6 +238,20 @@ function* saveQuestions(action) {
     if (data.success) {
       yield put(setQuestions(data.data));
       console.log('✅ Questions saved successfully:', data.data);
+      
+      // Update pre-appointment task for questions preparation
+      yield put({
+        type: 'appointment/updatePreAppointmentTask',
+        payload: {
+          taskKey: 'prepareQuestions',
+          completed: true,
+          notes: 'Questions have been prepared and saved',
+          taskData: {
+            completedAt: new Date().toISOString(),
+            source: 'questions_save'
+          }
+        }
+      });
     } else {
       throw new Error(data.error || 'Failed to save questions');
     }

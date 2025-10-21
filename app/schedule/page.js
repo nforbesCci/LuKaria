@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '../../components/Header';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, setScheduleCompleted, completeSchedule, updatePreAppointmentTask, checkAppointmentConfig } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, setScheduleCompleted, completeSchedule, updatePreAppointmentTaskAction, checkAppointmentConfig } from '../../store/slices/appointmentSlice';
 import { useScheduleRedirect } from '../../hooks/useScheduleProtection';
 import { getSchedule } from '../../lib/api/appointmentService';
 import {
@@ -44,7 +44,7 @@ export default function Schedule() {
     }
     
     // Mark technology test as complete when user accesses schedule page
-    dispatch(updatePreAppointmentTask({ 
+    dispatch(updatePreAppointmentTaskAction({ 
       taskKey: 'testTechnology', 
       completed: true 
     }));

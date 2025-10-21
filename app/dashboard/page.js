@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTask, loadQuestions, requestReschedule, setScheduleCompleted } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTaskAction, loadQuestions, requestReschedule, setScheduleCompleted } from '../../store/slices/appointmentSlice';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { fetchMeasurements } from '../../store/slices/measurementsSlice';
 import { fetchPhotographConsent, fetchMounjaroConsent, fetchTelehealthConsent } from '../../store/slices/consentSlice';
@@ -129,7 +129,7 @@ export default function Dashboard() {
       
       if (isProfileComplete) {
         console.log('✅ Dashboard: Profile exists with required fields, marking medical profile task as complete');
-        dispatch(updatePreAppointmentTask({ 
+        dispatch(updatePreAppointmentTaskAction({ 
           taskKey: 'completeMedicalProfile', 
           completed: true 
         }));
@@ -139,7 +139,7 @@ export default function Dashboard() {
           hasDateOfBirth,
           hasParish
         });
-        dispatch(updatePreAppointmentTask({ 
+        dispatch(updatePreAppointmentTaskAction({ 
           taskKey: 'completeMedicalProfile', 
           completed: false 
         }));
@@ -158,7 +158,7 @@ export default function Dashboard() {
       // If measurements exist, mark weight/height task as complete
       if (measurementsState.measurements && measurementsState.measurements.exists) {
         console.log('✅ Dashboard: Measurements exist, marking weight/height task as complete');
-        dispatch(updatePreAppointmentTask({ 
+        dispatch(updatePreAppointmentTaskAction({ 
           taskKey: 'enterWeightHeight', 
           completed: true 
         }));
@@ -193,7 +193,7 @@ export default function Dashboard() {
       
       if (telehealthComplete) {
         console.log('✅ Dashboard: Marking consent forms task as complete');
-        dispatch(updatePreAppointmentTask({ 
+        dispatch(updatePreAppointmentTaskAction({ 
           taskKey: 'completeConsentForms', 
           completed: true 
         }));
@@ -247,7 +247,7 @@ export default function Dashboard() {
   // Handler for weight/height entry completion
   const handleWeightHeightComplete = (data) => {
     // Mark the task as complete
-    dispatch(updatePreAppointmentTask({ 
+    dispatch(updatePreAppointmentTaskAction({ 
       taskKey: 'enterWeightHeight', 
       completed: true 
     }));

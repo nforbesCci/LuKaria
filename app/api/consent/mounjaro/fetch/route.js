@@ -22,14 +22,26 @@ export async function GET(request) {
     const collection = db.collection('MounjaroConsentCollection');
 
     // Fetch the document for this user
-    const document = await collection.findOne({ userId });
+    let document = await collection.findOne({ userId });
 
     if (!document) {
       console.log('📭 No mounjaro consent found for user:', userId);
+      
+      // Create a new document for this user
+      const newDocument = {
+        userId: userId,
+        available: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      // Insert the new document
+      await collection.insertOne(newDocument);
+      
       return NextResponse.json({
         success: true,
         message: 'No mounjaro consent found',
-        data: null,
+        data: newDocument,
       });
     }
 

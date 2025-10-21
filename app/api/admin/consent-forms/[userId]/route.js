@@ -33,15 +33,35 @@ export async function GET(request, { params }) {
 
     // Connect to MongoDB
     const db = await getDatabase('lukaria');
-    const consentCollection = db.collection('consent');
+
+    const telehealthCollection = db.collection('TelehealthCollection');
 
     // Fetch all consent forms for the target user
-    const consentDocs = await consentCollection
-      .find({ userId: targetUserId })
-      .sort({ createdAt: -1 })
-      .toArray();
+    const telehealthDocs = await telehealthCollection
+      .findOne({ userId: targetUserId });
 
-    console.log('✅ Admin consent forms fetched successfully, count:', consentDocs.length);
+    const photographConsentCollection = db.collection('PhotographConsentCollection');
+
+    // Fetch all consent forms for the target user
+    const photographConsentDocs = await photographConsentCollection
+      .findOne({ userId: targetUserId });
+
+      const mounjaroConsentCollection      = db.collection('MounjaroConsentCollection');
+
+      // Fetch all consent forms for the target user
+      const mounjaroConsentDocs = await mounjaroConsentCollection
+        .findOne({ userId: targetUserId });
+
+
+    const consentDocs = {telehealth : telehealthDocs,
+      photograph:photographConsentDocs, 
+      mounjaro: mounjaroConsentDocs};
+
+    console.log('✅ Admin consent forms fetched successfully:', {
+      telehealth: telehealthDocs ? 'found' : 'not found',
+      photograph: photographConsentDocs ? 'found' : 'not found', 
+      mounjaro: mounjaroConsentDocs ? 'found' : 'not found'
+    });
 
     return NextResponse.json({
       success: true,

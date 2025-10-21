@@ -12,6 +12,7 @@ import mealsSaga from './mealsSaga';
 import adminMealsSaga from './adminMealsSaga';
 import adminConsentSaga from './adminConsentSaga';
 import adminAppointmentTasksSaga from './adminAppointmentTasksSaga';
+import adminPreAppointmentTasksSaga from './adminPreAppointmentTasksSaga';
 import adminProfileSaga from './adminProfileSaga';
 import adminMedicationsSaga from './adminMedicationsSaga';
 import adminMeasurementsSaga from './adminMeasurementsSaga';
@@ -19,6 +20,7 @@ import adminSideEffectsSaga from './adminSideEffectsSaga';
 import adminQuestionsSaga from './adminQuestionsSaga';
 import sideEffectsSaga from './sideEffectsSaga';
 import { pdfSaga } from './pdfSaga';
+import preAppointmentTasksSaga from './preAppointmentTasksSaga';
 
 // Root saga that combines all sagas
 export default function* rootSaga() {
@@ -36,6 +38,7 @@ export default function* rootSaga() {
     fork(adminMealsSaga),
     fork(adminConsentSaga),
     fork(adminAppointmentTasksSaga),
+    fork(adminPreAppointmentTasksSaga),
     fork(adminProfileSaga),
     fork(adminMedicationsSaga),
     fork(adminMeasurementsSaga),
@@ -43,6 +46,7 @@ export default function* rootSaga() {
     fork(adminQuestionsSaga),
     fork(sideEffectsSaga),
     fork(pdfSaga),
+    fork(preAppointmentTasksSaga),
   ]);
 }
 

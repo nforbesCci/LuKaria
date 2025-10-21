@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { updatePreAppointmentTask } from '../../store/slices/appointmentSlice';
+import { updatePreAppointmentTaskAction } from '../../store/slices/appointmentSlice';
 import { saveProfile, fetchProfile, resetSaveFlag } from '../../store/slices/profileSlice';
 import {
   Container,
@@ -218,7 +218,7 @@ export default function Profile() {
     dispatch(saveProfile(formData));
     
     // Mark medical profile task as complete
-    dispatch(updatePreAppointmentTask({ 
+    dispatch(updatePreAppointmentTaskAction({ 
       taskKey: 'completeMedicalProfile', 
       completed: true 
     }));

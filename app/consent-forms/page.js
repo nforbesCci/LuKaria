@@ -390,9 +390,9 @@ export default function ConsentForms() {
 
   // Populate Telehealth form fields from store when data is loaded
   useEffect(() => {
-    if (isLoaded && telehealthConsent?.data) {
-      console.log('📋 Loading telehealth consent data into form:', telehealthConsent.data);
-      const data = telehealthConsent.data;
+    if (isLoaded && telehealthConsent) {
+      console.log('📋 Loading telehealth consent data into form:', telehealthConsent);
+      const data = telehealthConsent;
       
       // Check if form is already complete
       if (data.complete === true) {
@@ -783,90 +783,79 @@ export default function ConsentForms() {
     alert('Download functionality coming soon!');
   };
 
-  // Consent form data
-  const forms = [
-    // Hidden - Photograph Consent
-    // {
-    //   id: 'photographConsent',
-    //   title: 'Photograph Consent',
-    //   description: 'Consent for use of Photographs',
-    //   content: `Before and after photographs are important proofs of the success of your program. Many patients who are contemplating whether a weight loss program might be right for them find photographs useful. Images, including before and after photos, may be used for patient education and for advertising.
+  // Get consent data from Redux store
+  const photographConsentData = useSelector(state => state.consent.photographConsent);
+  const mounjaroConsentData = useSelector(state => state.consent.mounjaroConsent);
+  const telehealthConsentData = useSelector(state => state.consent.telehealthConsent);
 
-// Svelte by LuKaria will only use your photographs if you have given permission to do so. Names are not used, and identifying factors are masked when requested. These photos are stored in a secure server in compliance with Jamaica's Data Protection Act. They will be accessed by clinic staff and will not be sold or transferred to any other entity for purposes that have not been agreed to.`,
-    //   hasCustomFields: true,
-    // },
-    // Hidden - Ozempic Consent
-    // {
-    //   id: 'ozempicConsent',
-    //   title: 'Ozempic Consent',
-    //   description: 'Consent for Ozempic (semaglutide) treatment',
-    //   content: 'I consent to treatment with Ozempic (semaglutide) for the management of my condition. I understand that Ozempic is a GLP-1 receptor agonist used to improve blood sugar control and may help with weight management. I acknowledge that I have been informed of potential side effects including nausea, vomiting, diarrhea, constipation, and rare but serious risks such as pancreatitis and thyroid tumors. I understand the importance of regular monitoring and will report any concerning symptoms immediately.',
-    // },
-    // Hidden - Wegovy Consent
-    // {
-    //   id: 'wegovyConsent',
-    //   title: 'Wegovy Consent',
-    //   description: 'Consent for Wegovy (semaglutide) treatment',
-    //   content: 'I consent to treatment with Wegovy (semaglutide) for weight management. I understand that Wegovy is a GLP-1 receptor agonist approved for chronic weight management in adults with obesity or overweight with weight-related medical problems. I acknowledge potential side effects including gastrointestinal symptoms, gallbladder problems, and rare but serious risks such as pancreatitis and thyroid tumors. I understand the importance of lifestyle modifications alongside medication and regular follow-up appointments.',
-    // },
-    // Hidden - Mounjaro Consent
-    // {
-    //   id: 'mounjaroConsent',
-    //   title: 'Mounjaro Consent',
-    //   description: 'Consent for Mounjaro (tirzepatide) treatment',
-    //   hasCustomFields: true,
-    //   content: `Purpose of Treatment:
-// Mounjaro is a human-based glucagon-like peptide-1 receptor agonist and Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
-// 
-// Mounjaro is FDA approved for the management of Type 2 Diabetes, and is used off label for weight management in non-diabetic patients who are overweight or obese. It works by increasing insulin production and lowers glucagon secretion as well as targets areas in the brain that regulate appetite and food intake. Mounjaro also assists the body to store fat more efficiently.
-// 
-// Do not take Mounjaro if:
-// • You have a personal or family history of medullary thyroid carcinoma (Thyroid Cancer)
-// • Multiple Endocrine Neoplasia syndrome type 2
-// • You are pregnant or plan to become pregnant while taking this medicine
-// • You are diabetic and/or taking any medications related to lowering your blood sugar levels without speaking with your endocrinologist. Specifically, if you are prescribed Insulin because the combination may increase your risk of hypoglycemia (low blood sugar) and dosage adjustments by your provider may be necessary
-// • You have a history of Pancreatitis
-// • You are allergic to BPC-157, Tirzepatide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®, Trulicity®, Victoza®, Wegovy®
-// 
-// Possible Drug Interactions:
-// Anti-diabetic agents, specifically: Insulin and Sulfonylureas (e.g., glyburide, glipizide, glimepiride, tolbutamide) due to the increased risk of hypoglycemia (low blood sugar). Do not take with other GLP-1 agonist medicines such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®,Trulicity®, Victoza®, Wegovy® (THIS IS NOT AN ALL-INCLUSIVE LIST). Please tell your provider about any medications that may lower your blood sugar.
-// 
-// Side Effects:
-// I understand that, like all medications, Mounjaro may cause side effects. These may include but are not limited to:
-// • Nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, dyspepsia, dizziness, abdominal distension, belching, hypoglycemia, flatulence, gastroenteritis, and gastroesophageal reflux disease.
-// • Subcutaneous Injections: common injection site reactions characterized by itching, burning at site of administration with or without thickening of the skin(welting)
-// • Serious side effects: Pancreatitis, Cholecystitis, kidney problems, changes in vision (Diabetic retinopathy and NAION), low blood sugar (hypoglycemia), gastroparesis
-// 
-// A very serious allergic reaction to this drug is rare. However, get medical help right away if you notice any symptoms of a serious allergic reaction, including rash, itching/swelling (especially of the face/tongue/throat), severe dizziness, trouble breathing. Report adverse side effects to your doctor.
-// 
-// Precautions:
-// • In rodents, another GLP1 receptor agonist causes dose-dependent and treatment-duration dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether Tirzepatide causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans.
-// • Acute pancreatitis, including fatal and non-fatal hemorrhagic or necrotizing pancreatitis, has been observed in patients treated with GLP-1 receptor agonists, including Tirzepatide.
-// • Acute Gallbladder Disease: Treatment with Tirzepatide is associated with an increased occurrence of cholelithiasis and cholecystitis.
-// • Acute Kidney Injury: There have been reports of acute kidney injury and worsening of chronic renal failure, which in some cases required hemodialysis, in patients treated with Tirzepatide.
-// • Heart Rate Increase: Mean increases in resting heart rate of 1 to 4 beats per minute (bpm) were observed in Tirzepatide adult patients compared to placebo in clinical trials.
-// 
-// Monitoring and Follow-up:
-// I agree to undergo regular monitoring as recommended by my healthcare provider, which may include:
-// • Blood sugar levels and HbA1c testing
-// • Kidney function tests
-// • Liver function tests
-// • Thyroid function tests
-// • Pregnancy testing
-// • Follow-up visits to evaluate the effectiveness and adjust the treatment plan if necessary
-// 
-// Alternatives to Mounjaro:
-// I have been informed of alternative treatment options, which may include lifestyle changes (such as diet and exercise), other medications for type 2 diabetes or weight management, and surgical options for weight loss.
-// 
-// Consent:
-// By signing below, I certify that I have read and understand the contents of this form. I acknowledge that:
-// • I consent to initiating/continuing treatment with Mounjaro
-// • I have had the opportunity to ask questions about Mounjaro and its potential risks and benefits.
-// • I have a proper laboratory testing done prior to starting treatment
-// • I am aware of the possible side effects and drug interactions and give my consent for treatment
-// • I have informed the medical staff of any known allergies to drugs or other substances, and any past adverse reactions I've experienced. I have informed the medical staff of all medications and supplements I'm currently taking
-// • I understand there are other ways and programs that can assist me in my desire to decrease my body weight and acknowledge that no guarantees have been made to me concerning my results.`,
-    // },
+  // Define all possible consent forms
+  const allForms = [
+    {
+      id: 'photographConsent',
+      title: 'Photograph Consent',
+      description: 'Consent for use of Photographs',
+      hasCustomFields: true,
+      content: `Before and after photographs are important proofs of the success of your program. Many patients who are contemplating whether a weight loss program might be right for them find photographs useful. Images, including before and after photos, may be used for patient education and for advertising.
+
+Svelte by LuKaria will only use your photographs if you have given permission to do so. Names are not used, and identifying factors are masked when requested. These photos are stored in a secure server in compliance with Jamaica's Data Protection Act. They will be accessed by clinic staff and will not be sold or transferred to any other entity for purposes that have not been agreed to.`,
+    },
+    {
+      id: 'mounjaroConsent',
+      title: 'Mounjaro Consent',
+      description: 'Consent for Mounjaro (tirzepatide) treatment',
+      hasCustomFields: true,
+      content: `Purpose of Treatment:
+Mounjaro is a human-based glucagon-like peptide-1 receptor agonist and Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
+
+Mounjaro is FDA approved for the management of Type 2 Diabetes, and is used off label for weight management in non-diabetic patients who are overweight or obese. It works by increasing insulin production and lowers glucagon secretion as well as targets areas in the brain that regulate appetite and food intake. Mounjaro also assists the body to store fat more efficiently.
+
+Do not take Mounjaro if:
+• You have a personal or family history of medullary thyroid carcinoma (Thyroid Cancer)
+• Multiple Endocrine Neoplasia syndrome type 2
+• You are pregnant or plan to become pregnant while taking this medicine
+• You are diabetic and/or taking any medications related to lowering your blood sugar levels without speaking with your endocrinologist. Specifically, if you are prescribed Insulin because the combination may increase your risk of hypoglycemia (low blood sugar) and dosage adjustments by your provider may be necessary
+• You have a history of Pancreatitis
+• You are allergic to BPC-157, Tirzepatide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®, Trulicity®, Victoza®, Wegovy®
+
+Possible Drug Interactions:
+Anti-diabetic agents, specifically: Insulin and Sulfonylureas (e.g., glyburide, glipizide, glimepiride, tolbutamide) due to the increased risk of hypoglycemia (low blood sugar). Do not take with other GLP-1 agonist medicines such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®,Trulicity®, Victoza®, Wegovy® (THIS IS NOT AN ALL-INCLUSIVE LIST). Please tell your provider about any medications that may lower your blood sugar.
+
+Side Effects:
+I understand that, like all medications, Mounjaro may cause side effects. These may include but are not limited to:
+• Nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, dyspepsia, dizziness, abdominal distension, belching, hypoglycemia, flatulence, gastroenteritis, and gastroesophageal reflux disease.
+• Subcutaneous Injections: common injection site reactions characterized by itching, burning at site of administration with or without thickening of the skin(welting)
+• Serious side effects: Pancreatitis, Cholecystitis, kidney problems, changes in vision (Diabetic retinopathy and NAION), low blood sugar (hypoglycemia), gastroparesis
+
+A very serious allergic reaction to this drug is rare. However, get medical help right away if you notice any symptoms of a serious allergic reaction, including rash, itching/swelling (especially of the face/tongue/throat), severe dizziness, trouble breathing. Report adverse side effects to your doctor.
+
+Precautions:
+• In rodents, another GLP1 receptor agonist causes dose-dependent and treatment-duration dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether Tirzepatide causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans.
+• Acute pancreatitis, including fatal and non-fatal hemorrhagic or necrotizing pancreatitis, has been observed in patients treated with GLP-1 receptor agonists, including Tirzepatide.
+• Acute Gallbladder Disease: Treatment with Tirzepatide is associated with an increased occurrence of cholelithiasis and cholecystitis.
+• Acute Kidney Injury: There have been reports of acute kidney injury and worsening of chronic renal failure, which in some cases required hemodialysis, in patients treated with Tirzepatide.
+• Heart Rate Increase: Mean increases in resting heart rate of 1 to 4 beats per minute (bpm) were observed in Tirzepatide adult patients compared to placebo in clinical trials.
+
+Monitoring and Follow-up:
+I agree to undergo regular monitoring as recommended by my healthcare provider, which may include:
+• Blood sugar levels and HbA1c testing
+• Kidney function tests
+• Liver function tests
+• Thyroid function tests
+• Pregnancy testing
+• Follow-up visits to evaluate the effectiveness and adjust the treatment plan if necessary
+
+Alternatives to Mounjaro:
+I have been informed of alternative treatment options, which may include lifestyle changes (such as diet and exercise), other medications for type 2 diabetes or weight management, and surgical options for weight loss.
+
+Consent:
+By signing below, I certify that I have read and understand the contents of this form. I acknowledge that:
+• I consent to initiating/continuing treatment with Mounjaro
+• I have had the opportunity to ask questions about Mounjaro and its potential risks and benefits.
+• I have a proper laboratory testing done prior to starting treatment
+• I am aware of the possible side effects and drug interactions and give my consent for treatment
+• I have informed the medical staff of any known allergies to drugs or other substances, and any past adverse reactions I've experienced. I have informed the medical staff of all medications and supplements I'm currently taking
+• I understand there are other ways and programs that can assist me in my desire to decrease my body weight and acknowledge that no guarantees have been made to me concerning my results.`,
+    },
     {
       id: 'telemedicineConsent',
       title: 'Telehealth Consent',
@@ -894,6 +883,20 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
 • To maintain confidentiality, I will not share my telehealth appointment link with anyone unauthorized to attend the appointment.`,
     },
   ];
+
+  // Filter forms based on availability in Redux store
+  const forms = allForms.filter(form => {
+    switch (form.id) {
+      case 'photographConsent':
+        return photographConsentData?.available === true;
+      case 'mounjaroConsent':
+        return mounjaroConsentData?.available === true;
+      case 'telemedicineConsent':
+        return telehealthConsentData?.available === true;
+      default:
+        return false;
+    }
+  });
 
   // Ensure activeTab is within valid range
   useEffect(() => {
@@ -967,6 +970,40 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
 
   const completedForms = Object.values(consentForms).filter(Boolean).length;
   const totalForms = forms.length;
+
+  // Show message if no forms are available
+  if (forms.length === 0) {
+    return (
+      <>
+        <Header />
+        <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
+          <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Box>
+                <Typography 
+                  variant="h4" 
+                  gutterBottom 
+                  color="primary"
+                  sx={{
+                    fontSize: { xs: '1.25rem', sm: '2.125rem' },
+                    fontWeight: 600
+                  }}
+                >
+                  Consent Forms
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  No consent forms are currently available for your account.
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+          <Alert severity="info">
+            No consent forms are currently available. Please contact your healthcare provider if you believe this is an error.
+          </Alert>
+        </Container>
+      </>
+    );
+  }
 
   return (
     <>

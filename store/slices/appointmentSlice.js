@@ -96,6 +96,14 @@ const appointmentSlice = createSlice({
     setAdminRescheduleSuccess: (state, action) => {
       state.adminRescheduleSuccess = action.payload;
     },
+    updatePreAppointmentTaskSuccess: (state, action) => {
+      // Handle successful pre-appointment task update
+      console.log('✅ Appointment Slice: Pre-appointment task updated successfully', action.payload);
+    },
+    updatePreAppointmentTaskFailure: (state, action) => {
+      // Handle failed pre-appointment task update
+      console.error('❌ Appointment Slice: Pre-appointment task update failed', action.payload);
+    },
   },
 });
 
@@ -114,6 +122,8 @@ export const {
   setQuestionsError,
   clearQuestions,
   setAdminRescheduleSuccess,
+  updatePreAppointmentTaskSuccess,
+  updatePreAppointmentTaskFailure,
 } = appointmentSlice.actions;
 
 // Action creators for sagas
@@ -152,6 +162,17 @@ export const requestReschedule = (appointmentId) => ({
 export const adminRescheduleAppointment = (userId, appointmentData) => ({
   type: 'appointment/adminRescheduleAppointment',
   payload: { userId, appointmentData },
+});
+
+// Action creators for pre-appointment tasks saga
+export const updatePreAppointmentTaskAction = (payload) => ({
+  type: 'appointment/updatePreAppointmentTask',
+  payload,
+});
+
+export const clearPreAppointmentTasksAction = (payload) => ({
+  type: 'appointment/clearPreAppointmentTasks',
+  payload,
 });
 
 export default appointmentSlice.reducer;

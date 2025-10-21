@@ -93,7 +93,7 @@ function* fetchPhotographConsentSaga(action) {
       dataKeys: result.data ? Object.keys(result.data) : []
     });
     
-    yield put(fetchPhotographConsentSuccess(result));
+    yield put(fetchPhotographConsentSuccess(result.data));
   } catch (error) {
     console.error('❌ Consent Saga: Error fetching photograph consent', error);
     yield put(fetchPhotographConsentFailure(error.message));
@@ -194,7 +194,7 @@ function* fetchMounjaroConsentSaga(action) {
       dataKeys: result.data ? Object.keys(result.data) : []
     });
     
-    yield put(fetchMounjaroConsentSuccess(result));
+    yield put(fetchMounjaroConsentSuccess(result.data));
   } catch (error) {
     console.error('❌ Consent Saga: Error fetching mounjaro consent', error);
     yield put(fetchMounjaroConsentFailure(error.message));
@@ -290,7 +290,7 @@ function* fetchTelehealthConsentSaga(action) {
       dataKeys: result.data ? Object.keys(result.data) : []
     });
     
-    yield put(fetchTelehealthConsentSuccess(result));
+    yield put(fetchTelehealthConsentSuccess(result.data));
   } catch (error) {
     console.error('❌ Consent Saga: Error fetching telehealth consent', error);
     yield put(fetchTelehealthConsentFailure(error.message));

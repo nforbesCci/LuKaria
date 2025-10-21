@@ -27,7 +27,7 @@ const initialState = {
   adminMealsError: null,
   
   // Admin consent forms data
-  adminConsentForms: [],
+  adminConsentForms: {},
   adminConsentFormsLoading: false,
   adminConsentFormsError: null,
   
@@ -35,6 +35,11 @@ const initialState = {
   adminAppointmentTasks: [],
   adminAppointmentTasksLoading: false,
   adminAppointmentTasksError: null,
+  
+  // Admin pre-appointment tasks data
+  adminPreAppointmentTasks: [],
+  adminPreAppointmentTasksLoading: false,
+  adminPreAppointmentTasksError: null,
   
   // Admin profile data
   adminProfile: null,
@@ -155,7 +160,7 @@ const adminSlice = createSlice({
     },
     fetchAdminConsentFormsSuccess: (state, action) => {
       state.adminConsentFormsLoading = false;
-      state.adminConsentForms = action.payload.consentForms || [];
+      state.adminConsentForms = action.payload.consentForms || {};
       state.adminConsentFormsError = null;
     },
     fetchAdminConsentFormsFailure: (state, action) => {
@@ -237,6 +242,24 @@ const adminSlice = createSlice({
     },
     clearAdminAppointmentTasksError: (state) => {
       state.adminAppointmentTasksError = null;
+    },
+    
+    // Admin pre-appointment tasks actions
+    fetchAdminPreAppointmentTasks: (state, action) => {
+      state.adminPreAppointmentTasksLoading = true;
+      state.adminPreAppointmentTasksError = null;
+    },
+    fetchAdminPreAppointmentTasksSuccess: (state, action) => {
+      state.adminPreAppointmentTasksLoading = false;
+      state.adminPreAppointmentTasks = action.payload.preAppointmentTasks || [];
+      state.adminPreAppointmentTasksError = null;
+    },
+    fetchAdminPreAppointmentTasksFailure: (state, action) => {
+      state.adminPreAppointmentTasksLoading = false;
+      state.adminPreAppointmentTasksError = action.payload;
+    },
+    clearAdminPreAppointmentTasksError: (state) => {
+      state.adminPreAppointmentTasksError = null;
     },
     
     // Admin profile actions
@@ -363,6 +386,19 @@ const adminSlice = createSlice({
     clearAdminQuestionsError: (state) => {
       state.adminQuestionsError = null;
     },
+    deleteAdminQuestion: (state, action) => {
+      // Optimistic update - remove the question from the array
+      const { questionId } = action.payload;
+      state.adminQuestions = state.adminQuestions.filter(q => q._id !== questionId);
+    },
+    deleteAdminQuestionSuccess: (state, action) => {
+      // Question already removed optimistically
+      console.log('✅ Admin Slice: Question deleted successfully', action.payload);
+    },
+    deleteAdminQuestionFailure: (state, action) => {
+      // Revert optimistic update on failure
+      state.adminQuestionsError = action.payload;
+    },
     
     // Reset actions
     resetFilters: (state) => {
@@ -415,6 +451,10 @@ export const {
   updateAdminAppointmentTaskSuccess,
   updateAdminAppointmentTaskFailure,
   clearAdminAppointmentTasksError,
+  fetchAdminPreAppointmentTasks,
+  fetchAdminPreAppointmentTasksSuccess,
+  fetchAdminPreAppointmentTasksFailure,
+  clearAdminPreAppointmentTasksError,
   fetchAdminProfile,
   fetchAdminProfileSuccess,
   fetchAdminProfileFailure,
@@ -441,6 +481,9 @@ export const {
   fetchAdminQuestionsSuccess,
   fetchAdminQuestionsFailure,
   clearAdminQuestionsError,
+  deleteAdminQuestion,
+  deleteAdminQuestionSuccess,
+  deleteAdminQuestionFailure,
   resetFilters,
   resetAdmin,
 } = adminSlice.actions;
@@ -517,6 +560,11 @@ export const updateAdminSideEffectAction = (payload) => ({
 
 export const fetchAdminQuestionsAction = (payload) => ({
   type: 'admin/fetchAdminQuestions',
+  payload,
+});
+
+export const deleteAdminQuestionAction = (payload) => ({
+  type: 'admin/deleteAdminQuestion',
   payload,
 });
 

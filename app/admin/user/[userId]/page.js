@@ -4,7 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction } from '../../../../store/slices/adminSlice';
+import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasks } from '../../../../store/slices/adminSlice';
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
 import { useAdminAccess } from '../../../../hooks/useAccessControl';
 import Header from '../../../../components/Header';
@@ -144,7 +144,9 @@ export default function UserDetailPage() {
   const adminQuestions = useSelector((state) => state.admin.adminQuestions);
   const adminQuestionsLoading = useSelector((state) => state.admin.adminQuestionsLoading);
   const adminQuestionsError = useSelector((state) => state.admin.adminQuestionsError);
-  
+  const adminPreAppointmentTasks = useSelector((state) => state.admin.adminPreAppointmentTasks);
+  const adminPreAppointmentTasksLoading = useSelector((state) => state.admin.adminPreAppointmentTasksLoading);
+
   // Debug Redux state
   console.log('🔍 Redux meals state:', {
     meals,
@@ -230,6 +232,14 @@ export default function UserDetailPage() {
       dispatch(fetchAdminProfileAction({ userId: params.userId }));
     }
   }, [params.userId, dispatch]);
+
+  // Fetch pre-appointment tasks when consultation is completed
+  useEffect(() => {
+    if (params.userId && dbConsultationOccurred) {
+      console.log('🔄 Consultation completed, fetching pre-appointment tasks for user:', params.userId);
+      dispatch(fetchAdminPreAppointmentTasks({ userId: params.userId }));
+    }
+  }, [params.userId, dbConsultationOccurred, dispatch]);
 
   // Fetch meals when Meal Tracker tab is selected or week changes
   useEffect(() => {
@@ -1062,6 +1072,23 @@ export default function UserDetailPage() {
     }));
   };
 
+  // Handle question deletion
+  const handleDeleteQuestion = (questionId) => {
+    console.log('🚀 DISPATCHING DELETE ADMIN QUESTION ACTION!', { 
+      userId: params.userId, 
+      questionId 
+    });
+    
+    // Dispatch the delete action to the saga
+    const action = deleteAdminQuestionAction({ 
+      userId: params.userId, 
+      questionId 
+    });
+    console.log('🚀 Action object:', action);
+    dispatch(action);
+    console.log('🚀 Action dispatched successfully');
+  };
+
   // Get date range for a specific week
   const getWeekDateRange = (weekNumber) => {
     const today = new Date();
@@ -1353,47 +1380,6 @@ export default function UserDetailPage() {
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {userMetadata.profile_completed ? (
-                      <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
-                    ) : (
-                      <Cancel sx={{ color: 'error.main', mr: 1 }} />
-                    )}
-                    <Typography variant="body2">
-                      Personal Information: {userMetadata.profile_completed ? 'Complete' : 'Incomplete'}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {medicalProfileStatus?.completed ? (
-                      <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
-                    ) : (
-                      <Cancel sx={{ color: 'error.main', mr: 1 }} />
-                    )}
-                    <Typography variant="body2">
-                      Medical Profile: {medicalProfileStatus?.completed ? 'Complete' : 'Incomplete'}
-                      {medicalProfileStatus?.missingFields && medicalProfileStatus.missingFields.length > 0 && (
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Missing: {medicalProfileStatus.missingFields.join(', ')}
-                        </Typography>
-                      )}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {userMetadata.emergency_contact_completed ? (
-                      <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
-                    ) : (
-                      <Cancel sx={{ color: 'error.main', mr: 1 }} />
-                    )}
-                    <Typography variant="body2">
-                      Emergency Contact: {userMetadata.emergency_contact_completed ? 'Complete' : 'Incomplete'}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     {dbConsultationOccurred ? (
                       <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
                     ) : (
@@ -1404,19 +1390,52 @@ export default function UserDetailPage() {
                     </Typography>
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={4}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {userData?.appointmentScheduled ? (
-                      <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
-                    ) : (
-                      <Cancel sx={{ color: 'error.main', mr: 1 }} />
-                    )}
-                    <Typography variant="body2">
-                      Appointment Scheduled: {userData?.appointmentScheduled ? 'Yes' : 'No'}
-                    </Typography>
-                  </Box>
-                </Grid>
               </Grid>
+              
+              {/* Pre-Appointment Tasks Status */}
+              {dbConsultationOccurred && (
+                <Box sx={{ mt: 3 }}>
+                  {adminPreAppointmentTasksLoading ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CircularProgress size={16} />
+                      <Typography variant="body2">Loading pre-appointment tasks...</Typography>
+                    </Box>
+                  ) : adminPreAppointmentTasks && adminPreAppointmentTasks.length > 0 ? (
+                    <Grid container spacing={2}>
+                      {adminPreAppointmentTasks.map((task, index) => {
+                        console.log('🔍 Task data:', task);
+                        return (
+                          <Grid item xs={12} md={6} key={task._id || index}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              {task.completed ? (
+                                <CheckCircle sx={{ color: 'success.main', mr: 1 }} />
+                              ) : (
+                                <Cancel sx={{ color: 'error.main', mr: 1 }} />
+                              )}
+                              <Typography variant="body2">
+                                {task.taskKey === 'completeMedicalProfile' ? 'Medical Profile' : 
+                                 task.taskKey === 'enterWeightHeight' ? 'Weight and Height' : 
+                                 task.taskKey === 'completeConsentForms' ? 'Consent Forms Complete' : 
+                                 task.taskKey === 'prepareQuestions' ? 'Prepared Questions' : 
+                                 task.taskKey}
+                              </Typography>
+                            </Box>
+                            {task.notes && (
+                              <Typography variant="caption" color="text.secondary" sx={{ ml: 3, display: 'block' }}>
+                                {task.notes}
+                              </Typography>
+                            )}
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No pre-appointment tasks found
+                    </Typography>
+                  )}
+                </Box>
+              )}
             </CardContent>
           </Card>
         )}
@@ -1936,72 +1955,84 @@ export default function UserDetailPage() {
                       <Alert severity="error" sx={{ mb: 2 }}>
                         Error loading consent forms: {consentFormsError}
                       </Alert>
-                    ) : consentForms.length === 0 ? (
+                    ) : !consentForms || Object.keys(consentForms).length === 0 ? (
                       <Alert severity="info" sx={{ mb: 2 }}>
                         No consent forms found for this user.
                       </Alert>
                     ) : (
                       <Grid container spacing={2}>
-                        {consentForms.map((form) => (
-                          <Grid item xs={12} md={6} lg={4} key={form._id}>
+                        {Object.entries(consentForms).map(([formType, form]) => (
+                          <Grid item xs={12} md={6} lg={4} key={formType}>
                             <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                                 <Typography variant="h6" sx={{ textTransform: 'capitalize' }}>
-                                  {form.formType?.replace(/([A-Z])/g, ' $1').trim()}
+                                  {formType.replace(/([A-Z])/g, ' $1').trim()}
                                 </Typography>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Chip
-                                    label={form.enabled ? 'Enabled' : 'Disabled'} 
-                                    color={form.enabled ? 'success' : 'default'}
-                                    size="small"
-                                  />
-                                  {form.locked && (
-                                    <Chip 
-                                      label="Locked" 
-                                      color="warning"
-                                      size="small"
-                                    />
+                                  {form && (
+                                    <>
+                                      <Chip
+                                        label={form.enabled ? 'Enabled' : 'Disabled'} 
+                                        color={form.enabled ? 'success' : 'default'}
+                                        size="small"
+                                      />
+                                      {form.locked && (
+                                        <Chip 
+                                          label="Locked" 
+                                          color="warning"
+                                          size="small"
+                                        />
+                                      )}
+                                    </>
                                   )}
                                 </Box>
                               </Box>
                               
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                Status: {form.enabled ? 'Active' : 'Inactive'}
-                              </Typography>
-                              
-                              {form.createdAt && (
-                                <Typography variant="caption" color="text.secondary" display="block">
-                                  Created: {formatDateTime(form.createdAt)}
+                              {form ? (
+                                <>
+                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                    Status: {form.enabled ? 'Active' : 'Inactive'}
+                                  </Typography>
+                                  
+                                  {form.createdAt && (
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                      Created: {formatDateTime(form.createdAt)}
+                                    </Typography>
+                                  )}
+                                  
+                                  {form.updatedAt && (
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                      Updated: {formatDateTime(form.updatedAt)}
+                                    </Typography>
+                                  )}
+                                  
+                                  <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                    <Button
+                                      variant={form.enabled ? "outlined" : "contained"}
+                                      size="small"
+                                      color={form.enabled ? "error" : "success"}
+                                      onClick={() => handleToggleConsentForm(formType, !form.enabled)}
+                                    >
+                                      {form.enabled ? 'Disable' : 'Enable'}
+                                    </Button>
+                                    
+                                    {form.locked && (
+                                      <Button
+                                        variant="outlined"
+                                        size="small"
+                                        color="warning"
+                                        onClick={() => handleUnlockConsentForm(formType)}
+                                      >
+                                        Unlock
+                                      </Button>
+                                    )}
+                                  </Box>
+                                </>
+                              ) : (
+                                <Typography variant="body2" color="text.secondary">
+                                  No {formType} consent form found
                                 </Typography>
                               )}
-                              
-                              {form.updatedAt && (
-                                <Typography variant="caption" color="text.secondary" display="block">
-                                  Updated: {formatDateTime(form.updatedAt)}
-                                </Typography>
-                              )}
-                              
-                              <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                <Button
-                                  variant={form.enabled ? "outlined" : "contained"}
-                                  size="small"
-                                  color={form.enabled ? "error" : "success"}
-                                  onClick={() => handleToggleConsentForm(form.formType, !form.enabled)}
-                                >
-                                  {form.enabled ? 'Disable' : 'Enable'}
-                                </Button>
-                                
-                                {form.locked && (
-                                  <Button
-                              variant="outlined"
-                                    size="small"
-                                    color="warning"
-                                    onClick={() => handleUnlockConsentForm(form.formType)}
-                                  >
-                                    Unlock
-                                  </Button>
-                                )}
-                              </Box>
                             </Paper>
                           </Grid>
                         ))}
@@ -2870,12 +2901,7 @@ export default function UserDetailPage() {
                 <Grid item xs={12}>
                   <Card>
                     <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Recent Questions - Last 10 Questions
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                        Questions submitted by the user
-                      </Typography>
+                     
                       
                       {adminQuestions && adminQuestions.length > 0 ? (
                         <Stack spacing={2}>
@@ -2895,16 +2921,28 @@ export default function UserDetailPage() {
                                   {formatDate(question.createdAt)}
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Chip 
-                                    label={question.answered ? 'Answered' : 'Pending'} 
-                                    color={question.answered ? 'success' : 'warning'}
-                                    size="small"
-                                  />
+                                  {question.answered ? (
+                                    <Chip 
+                                      label="Answered" 
+                                      color="success"
+                                      size="small"
+                                    />
+                                  ) : (
+                                    <Button
+                                      variant="outlined"
+                                      color="error"
+                                      size="small"
+                                      onClick={() => handleDeleteQuestion(question._id)}
+                                      sx={{ textTransform: 'none' }}
+                                    >
+                                      Delete
+                                    </Button>
+                                  )}
                                 </Box>
                               </Box>
                               
                               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                <strong>Question:</strong> {question.question || 'No question text available'}
+                                <strong>Question:</strong> {question.questions || 'No question text available'}
                               </Typography>
                               
                               {question.category && (
@@ -2935,23 +2973,23 @@ export default function UserDetailPage() {
                                   Answered on: {formatDate(question.answeredAt)}
                                 </Typography>
                               )}
-                          </Box>
-                        ))}
-                      </Stack>
-                    ) : (
+                            </Box>
+                          ))}
+                        </Stack>
+                      ) : (
                         <Box sx={{ textAlign: 'center', py: 4 }}>
                           <Typography variant="h6" color="text.secondary" gutterBottom>
                             No questions found
                           </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary">
                             No questions have been submitted recently.
-                      </Typography>
+                          </Typography>
                         </Box>
-                    )}
-                  </CardContent>
-                </Card>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
               </Grid>
-            </Grid>
             )}
           </TabPanel>
         </Card>
