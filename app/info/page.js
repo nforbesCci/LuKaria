@@ -45,7 +45,7 @@ export default function InfoPage() {
       <SEO 
         title="Payment Information | Svelte by LuKaria"
         description="Transparent pricing for Svelte by LuKaria weight loss program. $80,000/month includes physician appointments, GLP-1 medications, and support. Special introductory offers available."
-        keywords="weight loss pricing, GLP-1 cost, Mounjaro price Jamaica, medical weight loss program cost, affordable weight loss"
+        keywords="weight loss pricing, GLP-1 cost, Mounjaro price Jamaica, medical weight loss program cost, affordable weight loss, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/info"
       />
       {/* Navigation Menu */}
@@ -200,7 +200,7 @@ export default function InfoPage() {
         <Container maxWidth="lg" sx={{ mt: 18, mb: 6 }}>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Typography variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
-              Payment Information
+              Membership and Pricing
             </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
             Transparent pricing for your weight loss journey

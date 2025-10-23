@@ -449,7 +449,8 @@ export default function UserDetailPage() {
     console.log('📋 Appointment data:', appointmentData);
     
     // Dispatch saga to save appointment
-    dispatch(adminRescheduleAppointment(params.userId, {
+    const decodedUserId = decodeURIComponent(params.userId);
+    dispatch(adminRescheduleAppointment(decodedUserId, {
       type: appointmentData.type,
       date: appointmentData.date,
       time: appointmentData.time,

@@ -4,3 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "20.19.0"
+
+[[redirects]]
+  from = "https://lukariagroup.com/*"
+  to   = "https://www.lukariagroup.com/:splat"
+  status = 301
+  force = true

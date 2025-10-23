@@ -4,6 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Head from 'next/head';
 import SEO from '../components/SEO';
 import {
   Container,
@@ -137,10 +138,13 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <link rel="canonical" href="https://www.lukariagroup.com/" />
+      </Head>
       <SEO 
         title="Svelte by LuKaria - Virtual Medical Weight Loss | GLP-1 Medications"
         description="Virtual medical weight loss clinic in Jamaica. GLP-1 medications like Mounjaro prescribed by licensed physicians. Flat monthly fee, no waiting rooms. Start your transformation today."
-        keywords="weight loss Jamaica, GLP-1 medications, Mounjaro, virtual weight loss clinic, telemedicine Jamaica, online doctor, medical weight loss, obesity treatment"
+        keywords="weight loss Jamaica, GLP-1 medications, Mounjaro, virtual weight loss clinic, telemedicine Jamaica, online doctor, medical weight loss, obesity treatment, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com"
       />
       {/* Navigation Menu */}

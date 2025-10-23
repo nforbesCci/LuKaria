@@ -30,7 +30,7 @@ export default function Terms() {
       <SEO 
         title="Terms and Conditions | Svelte by LuKaria"
         description="Read the terms and conditions for using Svelte by LuKaria virtual weight loss services. Understand your rights and responsibilities as a patient."
-        keywords="terms and conditions, service agreement, patient terms, telehealth terms, medical services agreement"
+        keywords="terms and conditions, service agreement, patient terms, telehealth terms, medical services agreement, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/terms"
       />
       {/* Navigation Menu */}

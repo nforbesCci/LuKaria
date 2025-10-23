@@ -330,10 +330,10 @@ function* adminRescheduleAppointment(action) {
     yield put(setAdminRescheduleSuccess(false));
     
     // Call API to save appointment
-    console.log('📞 Calling API: POST /api/appointment/reschedule');
+    console.log('📞 Calling API: POST /api/admin/appointment/reschedule');
     console.log('📤 Sending payload:', JSON.stringify({ userId, appointmentData }));
     
-    const response = yield call(fetch, '/api/appointment/reschedule', {
+    const response = yield call(fetch, '/api/admin/appointment/reschedule', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

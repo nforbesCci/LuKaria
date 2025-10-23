@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
-import { getDatabase } from '../../../../lib/mongodb';
+import { getDatabase } from '../../../../../lib/mongodb';
 
 export async function POST(request) {
   try {
@@ -19,12 +19,34 @@ export async function POST(request) {
 
     // Check if user is admin or doctor
     const user = session.user;
-    
+    const isAdmin = user.groups && (
+      user.groups.includes('Admin') || 
+      user.groups.includes('Doctor')
+    ) || (
+      user['https://lukariagroup.com/roles'] && (
+        user['https://lukariagroup.com/roles'].includes('Admin') || 
+        user['https://lukariagroup.com/roles'].includes('Doctor')
+      )
+    );
 
-   
-    const userId = user.sub;
-    console.log('📋 Reschedule API: Received data:', { userId });
+    if (!isAdmin) {
+      console.log('❌ Reschedule API: User is not admin/doctor');
+      return NextResponse.json(
+        { error: 'Admin or Doctor role required' },
+        { status: 403 }
+      );
+    }
 
+    const { userId, appointmentData } = await request.json();
+    console.log('📋 Reschedule API: Received data:', { userId, appointmentData });
+
+    if (!userId || !appointmentData || !appointmentData.date || !appointmentData.time) {
+      console.log('❌ Reschedule API: Missing required fields');
+      return NextResponse.json(
+        { error: 'Missing required fields: userId, appointmentData with date and time' },
+        { status: 400 }
+      );
+    }
 
     console.log('🔌 Reschedule API: Connecting to database');
     const db = await getDatabase();
@@ -36,10 +58,25 @@ export async function POST(request) {
       { userId: userId },
       {
         $set: {
+          date: appointmentData.date,
+          time: appointmentData.time,
+          type: appointmentData.type || 'consultation',
+          length: appointmentData.length || '60',
+          notes: appointmentData.notes || '',
+          rawData:{
+            startDate: new Date(`${appointmentData.date.split('T')[0]}T${appointmentData.time}`),
+            endDate: (() => {
+              const startDateTime = new Date(`${appointmentData.date.split('T')[0]}T${appointmentData.time}`);
+              const lengthMinutes = parseInt(appointmentData.length || '60');
+              return new Date(startDateTime.getTime() + (lengthMinutes * 60 * 1000));
+            })()
+          },
           updatedAt: new Date(),
+          rescheduledBy: user.sub,
+          rescheduledAt: new Date(),
           // Clear reschedule request flags
-          rescheduleRequested: true,
-          rescheduleRequestedAt: new Date()
+          rescheduleRequested: false,
+          rescheduleRequestedAt: null
         }
       }
     );
@@ -56,7 +93,7 @@ export async function POST(request) {
 
     
     // Get the updated user data
-    const appointmentData = await db.collection('appointments').findOne({ userId: userId });
+    const updatedUser = await db.collection('appointments').findOne({ userId: userId });
     console.log('✅ Reschedule API: User data fetched successfully');
 
     const responseData = {
@@ -68,15 +105,13 @@ export async function POST(request) {
           time: appointmentData.time,
           type: appointmentData.type,
           length: appointmentData.length,
-          notes: appointmentData.notes,
-          rescheduleRequested: appointmentData.rescheduleRequested,
-          rescheduleRequestedAt:  appointmentData.rescheduleRequestedAt
+          notes: appointmentData.notes
         },
         user: {
-          name: user?.name,
-          email: user?.email
+          name: updatedUser?.name,
+          email: updatedUser?.email
         },
-        rescheduledAt: appointmentData.rescheduleRequestedAt
+        rescheduledAt: new Date()
       }
     };
 

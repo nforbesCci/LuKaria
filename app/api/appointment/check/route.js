@@ -38,7 +38,7 @@ export async function GET() {
 
     // Extract appointment data from database or use defaults
     const appointmentTime = userAppointment?.time || null;
-    const appointmentLength = (userAppointment?.rawData?.startDate && userAppointment?.rawData?.endDate)? userAppointment?.rawData?.endDate - userAppointment?.rawData?.startDate : null;
+    const appointmentLength = (userAppointment?.length) || null;
     const appointmentDate = userAppointment?.rawData?.startDate || null;
     const appointmentEndDate = userAppointment?.rawData?.endDate || null;
     const appointmentProvider = userAppointment?.provider || null;
@@ -61,6 +61,7 @@ export async function GET() {
       isScheduled,
       scheduledAt: isScheduled ? (appointmentDate || userAppointment?.scheduledAt || new Date().toISOString()) : null,
       appointmentDetails: isScheduled ? {
+        _id: userAppointment?._id.toHexString(),
         time: appointmentTime,
         length: appointmentLength,
         date: appointmentDate,

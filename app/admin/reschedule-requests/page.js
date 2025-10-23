@@ -176,7 +176,7 @@ export default function RescheduleRequestsPage() {
         <SEO 
           title="Reschedule Appointment - Admin"
           description="Reschedule appointment for patient"
-          keywords="admin, reschedule, appointment, management"
+          keywords="admin, reschedule, appointment, management, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
           canonical="https://www.lukariagroup.com/admin/reschedule-requests"
         />
         <RescheduleAppointment
@@ -193,7 +193,7 @@ export default function RescheduleRequestsPage() {
       <SEO 
         title="Reschedule Requests - Admin"
         description="View and manage appointment reschedule requests"
-        keywords="admin, reschedule, appointments, management"
+        keywords="admin, reschedule, appointments, management, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/admin/reschedule-requests"
       />
       
