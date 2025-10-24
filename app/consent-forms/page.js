@@ -244,9 +244,9 @@ export default function ConsentForms() {
 
   // Populate form fields from store when data is loaded
   useEffect(() => {
-    if (isLoaded && photographConsent?.data) {
-      console.log('📋 Loading photograph consent data into form:', photographConsent.data);
-      const data = photographConsent.data;
+    if (isLoaded && photographConsent) {
+      console.log('📋 Loading photograph consent data into form:', photographConsent);
+      const data = photographConsent;
       
       // Set loading flag to prevent marking as changed
       setIsLoadingFromStore(true);
@@ -329,9 +329,9 @@ export default function ConsentForms() {
 
   // Populate Mounjaro form fields from store when data is loaded
   useEffect(() => {
-    if (isLoaded && mounjaroConsent?.data) {
-      console.log('📋 Loading mounjaro consent data into form:', mounjaroConsent.data);
-      const data = mounjaroConsent.data;
+    if (isLoaded && mounjaroConsent) {
+      console.log('📋 Loading mounjaro consent data into form:', mounjaroConsent);
+      const data = mounjaroConsent;
       
       // Check if form is already complete
       if (data.complete === true) {

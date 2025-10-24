@@ -167,21 +167,17 @@ const adminSlice = createSlice({
       state.adminConsentFormsLoading = false;
       state.adminConsentFormsError = action.payload;
     },
-    updateAdminConsentForm: (state, action) => {
-      // Optimistic update - update the form in the array
+    updateAdminConsentFormSuccess: (state, action) => {
+      // Update the consent form with the result from the API
       const { formType, updates } = action.payload;
-      const formIndex = state.adminConsentForms.findIndex(form => form.formType === formType);
-      if (formIndex !== -1) {
-        state.adminConsentForms[formIndex] = {
-          ...state.adminConsentForms[formIndex],
+      console.log('✅ Admin slice: Consent form updated successfully', formType, updates);
+      if (state.adminConsentForms[formType]) {
+        state.adminConsentForms[formType] = {
+          ...state.adminConsentForms[formType],
           ...updates,
-          updatedAt: new Date()
+          updatedAt: new Date().toISOString()
         };
       }
-    },
-    updateAdminConsentFormSuccess: (state, action) => {
-      // Confirmation that the update was successful
-      console.log('✅ Admin slice: Consent form updated successfully');
     },
     updateAdminConsentFormFailure: (state, action) => {
       // Revert optimistic update on failure
@@ -437,7 +433,6 @@ export const {
   fetchAdminConsentForms,
   fetchAdminConsentFormsSuccess,
   fetchAdminConsentFormsFailure,
-  updateAdminConsentForm,
   updateAdminConsentFormSuccess,
   updateAdminConsentFormFailure,
   clearAdminConsentFormsError,

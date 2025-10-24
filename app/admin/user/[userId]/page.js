@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasks } from '../../../../store/slices/adminSlice';
+import AdminConsentForms from '../../../../components/AdminConsentForms';
+import ConsentFormViewer from '../../../../components/ConsentFormViewer';
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
 import { useAdminAccess } from '../../../../hooks/useAccessControl';
 import Header from '../../../../components/Header';
@@ -216,6 +218,7 @@ export default function UserDetailPage() {
   const [savingProfile, setSavingProfile] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(1);
   const [selectedSideEffect, setSelectedSideEffect] = useState(null);
+  const [viewingConsentForm, setViewingConsentForm] = useState(null);
 
   // Access control - only Admin and Doctor can access
   useAdminAccess();
@@ -1031,6 +1034,7 @@ export default function UserDetailPage() {
 
   // Handle consent form updates
   const handleConsentFormUpdate = (formType, updates) => {
+
     dispatch(updateAdminConsentFormAction({ 
       userId: params.userId, 
       formType, 
@@ -1043,9 +1047,27 @@ export default function UserDetailPage() {
     handleConsentFormUpdate(formType, { enabled });
   };
 
-  // Handle unlocking consent forms
+  // Handle unlocking consent forms (both locked and completed)
   const handleUnlockConsentForm = (formType) => {
-    handleConsentFormUpdate(formType, { locked: false });
+    const form = consentForms[formType];
+    if (form?.complete) {
+      // Unlock completed form
+      handleConsentFormUpdate(formType, { complete: false });
+    } else if (form?.locked) {
+      // Unlock locked form
+      handleConsentFormUpdate(formType, { locked: false });
+    }
+  };
+
+  // Handle viewing consent forms
+  const handleViewConsentForm = (formType, formData) => {
+    console.log('Viewing consent form:', formType, formData);
+    setViewingConsentForm({ formType, formData });
+  };
+
+  // Handle closing the consent form viewer
+  const handleCloseConsentFormViewer = () => {
+    setViewingConsentForm(null);
   };
 
   // Handle side effect selection
@@ -1925,125 +1947,53 @@ export default function UserDetailPage() {
           </TabPanel>
 
           <TabPanel value={tabValue} index={1} id="consent-forms-content">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Consent Forms</Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<PictureAsPdf />}
-                onClick={() => generateTabPDF('Consent Forms', 'consent-forms-content')}
-                sx={{ textTransform: 'none' }}
-              >
-                Generate PDF
-              </Button>
-            </Box>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Consent Forms Management
-                    </Typography>
-                    
-                    {consentFormsLoading ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                        <CircularProgress />
-                        <Typography variant="body2" sx={{ ml: 2 }}>
-                          Loading consent forms...
-                        </Typography>
-                      </Box>
-                    ) : consentFormsError ? (
-                      <Alert severity="error" sx={{ mb: 2 }}>
-                        Error loading consent forms: {consentFormsError}
-                      </Alert>
-                    ) : !consentForms || Object.keys(consentForms).length === 0 ? (
-                      <Alert severity="info" sx={{ mb: 2 }}>
-                        No consent forms found for this user.
-                      </Alert>
-                    ) : (
-                      <Grid container spacing={2}>
-                        {Object.entries(consentForms).map(([formType, form]) => (
-                          <Grid item xs={12} md={6} lg={4} key={formType}>
-                            <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                <Typography variant="h6" sx={{ textTransform: 'capitalize' }}>
-                                  {formType.replace(/([A-Z])/g, ' $1').trim()}
-                                </Typography>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                  {form && (
-                                    <>
-                                      <Chip
-                                        label={form.enabled ? 'Enabled' : 'Disabled'} 
-                                        color={form.enabled ? 'success' : 'default'}
-                                        size="small"
-                                      />
-                                      {form.locked && (
-                                        <Chip 
-                                          label="Locked" 
-                                          color="warning"
-                                          size="small"
-                                        />
-                                      )}
-                                    </>
-                                  )}
-                                </Box>
-                              </Box>
-                              
-                              {form ? (
-                                <>
-                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                    Status: {form.enabled ? 'Active' : 'Inactive'}
-                                  </Typography>
-                                  
-                                  {form.createdAt && (
-                                    <Typography variant="caption" color="text.secondary" display="block">
-                                      Created: {formatDateTime(form.createdAt)}
-                                    </Typography>
-                                  )}
-                                  
-                                  {form.updatedAt && (
-                                    <Typography variant="caption" color="text.secondary" display="block">
-                                      Updated: {formatDateTime(form.updatedAt)}
-                                    </Typography>
-                                  )}
-                                  
-                                  <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                    <Button
-                                      variant={form.enabled ? "outlined" : "contained"}
-                                      size="small"
-                                      color={form.enabled ? "error" : "success"}
-                                      onClick={() => handleToggleConsentForm(formType, !form.enabled)}
-                                    >
-                                      {form.enabled ? 'Disable' : 'Enable'}
-                                    </Button>
-                                    
-                                    {form.locked && (
-                                      <Button
-                                        variant="outlined"
-                                        size="small"
-                                        color="warning"
-                                        onClick={() => handleUnlockConsentForm(formType)}
-                                      >
-                                        Unlock
-                                      </Button>
-                                    )}
-                                  </Box>
-                                </>
-                              ) : (
-                                <Typography variant="body2" color="text.secondary">
-                                  No {formType} consent form found
-                                </Typography>
-                              )}
-                            </Paper>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </TabPanel>
+            {viewingConsentForm ? (
+              <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6">
+                    Viewing {viewingConsentForm.formType} Consent Form
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    onClick={handleCloseConsentFormViewer}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Back to Forms
+                  </Button>
+                </Box>
+                <ConsentFormViewer
+                  formType={viewingConsentForm.formType}
+                  formData={viewingConsentForm.formData}
+                  formatDateTime={formatDateTime}
+                  inline={true}
+                />
+              </Box>
+            ) : (
+              <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6">Consent Forms</Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<PictureAsPdf />}
+                    onClick={() => generateTabPDF('Consent Forms', 'consent-forms-content')}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Generate PDF
+                  </Button>
+                </Box>
+                <AdminConsentForms
+                  consentForms={consentForms}
+                  consentFormsLoading={consentFormsLoading}
+                  consentFormsError={consentFormsError}
+                  onToggleConsentForm={handleToggleConsentForm}
+                  onUnlockConsentForm={handleUnlockConsentForm}
+                  onViewConsentForm={handleViewConsentForm}
+                  formatDateTime={formatDateTime}
+                />
+              </Box>
+            )}
+           </TabPanel>
 
           <TabPanel value={tabValue} index={2} id="side-effects-content">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -2997,6 +2947,7 @@ export default function UserDetailPage() {
         )}
 
       </Container>
+
     </>
   );
 }

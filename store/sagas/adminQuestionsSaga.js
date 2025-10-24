@@ -1,4 +1,4 @@
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { call, put, takeEvery, all } from 'redux-saga/effects';
 import { 
   fetchAdminQuestionsSuccess, 
   fetchAdminQuestionsFailure,
@@ -94,8 +94,8 @@ function* deleteAdminQuestionSaga(action) {
     const { userId, questionId } = action.payload;
     console.log('🔄 Admin Questions Saga: Starting question deletion for user:', userId, 'questionId:', questionId);
     
-    // First, do optimistic update to remove from UI immediately
-    yield put(deleteAdminQuestion({ questionId }));
+    // Note: Optimistic update removed to prevent infinite loop
+    // The UI will be updated when the API call succeeds
     
     const result = yield call(deleteAdminQuestionFromDatabase, userId, questionId);
     
@@ -122,24 +122,11 @@ export function* watchDeleteAdminQuestion() {
   yield takeEvery('admin/deleteAdminQuestion', deleteAdminQuestionSaga);
 }
 
-// Debug watcher to catch all admin actions
-export function* watchAllAdminActions() {
-  console.log('🔧 Setting up debug watcher for all admin actions');
-  yield takeEvery('admin/deleteAdminQuestion', function* (action) {
-    console.log('🔍 DEBUG: Delete admin question action caught:', action.type, action);
-  });
-  yield takeEvery('admin/fetchAdminQuestions', function* (action) {
-    console.log('🔍 DEBUG: Fetch admin questions action caught:', action.type, action);
-  });
-}
 
 export default function* adminQuestionsSaga() {
-  console.log('🔧 Admin Questions Saga: Starting saga setup');
-  console.log('🔧 Admin Questions Saga: Setting up fetch watcher');
-  yield watchFetchAdminQuestions();
-  console.log('🔧 Admin Questions Saga: Setting up delete watcher');
-  yield watchDeleteAdminQuestion();
-  console.log('🔧 Admin Questions Saga: Setting up debug watcher');
-  yield watchAllAdminActions();
+  yield all([
+    watchFetchAdminQuestions(),
+    watchDeleteAdminQuestion(),
+  ]);
   console.log('🔧 Admin Questions Saga: All watchers set up');
 }

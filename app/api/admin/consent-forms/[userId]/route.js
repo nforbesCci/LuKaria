@@ -4,6 +4,18 @@ import { getDatabase } from '../../../../../lib/mongodb';
 
 export const dynamic = 'force-dynamic';
 
+// Handle preflight requests
+export async function OPTIONS(request) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 export async function GET(request, { params }) {
   try {
     // Get admin user session
@@ -12,7 +24,14 @@ export async function GET(request, { params }) {
     if (!session || !session.user) {
       return NextResponse.json(
         { error: 'Unauthorized - Please log in' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          }
+        }
       );
     }
 
@@ -63,10 +82,39 @@ export async function GET(request, { params }) {
       mounjaro: mounjaroConsentDocs ? 'found' : 'not found'
     });
 
+    // Debug: Log the actual properties of each form
+    if (telehealthDocs) {
+      console.log('📊 Telehealth form properties:', {
+        available: telehealthDocs.available,
+        locked: telehealthDocs.locked,
+        complete: telehealthDocs.complete
+      });
+    }
+    if (photographConsentDocs) {
+      console.log('📊 Photograph form properties:', {
+        available: photographConsentDocs.available,
+        locked: photographConsentDocs.locked,
+        complete: photographConsentDocs.complete
+      });
+    }
+    if (mounjaroConsentDocs) {
+      console.log('📊 Mounjaro form properties:', {
+        available: mounjaroConsentDocs.available,
+        locked: mounjaroConsentDocs.locked,
+        complete: mounjaroConsentDocs.complete
+      });
+    }
+
     return NextResponse.json({
       success: true,
       consentForms: consentDocs,
       userId: targetUserId
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
     });
 
   } catch (error) {
@@ -76,7 +124,14 @@ export async function GET(request, { params }) {
         error: 'Failed to fetch consent forms',
         details: error.message 
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }
+      }
     );
   }
 }
@@ -89,7 +144,14 @@ export async function PUT(request, { params }) {
     if (!session || !session.user) {
       return NextResponse.json(
         { error: 'Unauthorized - Please log in' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          }
+        }
       );
     }
 
@@ -106,7 +168,9 @@ export async function PUT(request, { params }) {
     }
 
     const targetUserId = params.userId;
-    const { formType, enabled, locked } = await request.json();
+    const { formType, enabled, complete } = await request.json();
+
+    const db = await getDatabase('lukaria');
 
     if (!formType) {
       return NextResponse.json(
@@ -115,25 +179,46 @@ export async function PUT(request, { params }) {
       );
     }
 
-    console.log('🔧 Admin updating consent form:', { targetUserId, formType, enabled, locked });
+    let result = null;
+    
+    // Build update object based on provided parameters
+    const updateFields = {};
+    if (enabled !== undefined) updateFields.available = enabled;
+    if (complete !== undefined) updateFields.complete = complete;
+    
+    if (formType === 'telehealth') {
+      const telehealthCollection = db.collection('TelehealthCollection');
+      result = await telehealthCollection.updateOne(
+        { userId: targetUserId },
+        { $set: updateFields }
+      );
+    }
 
-    // Connect to MongoDB
-    const db = await getDatabase('lukaria');
-    const consentCollection = db.collection('consent');
+    if (formType === 'photograph') {
+      const photographCollection = db.collection('PhotographConsentCollection');
+      result = await photographCollection.updateOne(
+        { userId: targetUserId },
+        { $set: updateFields }
+      );
+    }
+    
+    if (formType === 'mounjaro') {
+      const mounjaroCollection = db.collection('MounjaroConsentCollection');
+      result = await mounjaroCollection.updateOne(
+        { userId: targetUserId },
+        { $set: updateFields }
+      );
+    }
 
-    // Update the consent form
-    const updateData = {};
-    if (enabled !== undefined) updateData.enabled = enabled;
-    if (locked !== undefined) updateData.locked = locked;
-    updateData.updatedAt = new Date();
+    console.log('🔧 Admin updating consent form:', { targetUserId, formType, enabled, locked, complete, updateFields });
 
-    const result = await consentCollection.updateOne(
-      { 
-        userId: targetUserId,
-        formType: formType
-      },
-      { $set: updateData }
-    );
+    // Check if result was set (form type matched)
+    if (!result) {
+      return NextResponse.json(
+        { error: 'Invalid form type' },
+        { status: 400 }
+      );
+    }
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
@@ -150,6 +235,12 @@ export async function PUT(request, { params }) {
       formType,
       enabled,
       locked
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
     });
 
   } catch (error) {
@@ -159,7 +250,14 @@ export async function PUT(request, { params }) {
         error: 'Failed to update consent form',
         details: error.message 
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }
+      }
     );
   }
 }

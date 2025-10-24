@@ -30,6 +30,7 @@ export async function GET(request) {
       // Create a new document for this user
       const newDocument = {
         userId: userId,
+        complete: false,
         available: false,
         createdAt: new Date(),
         updatedAt: new Date()

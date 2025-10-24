@@ -115,10 +115,13 @@ export async function POST(request) {
 
 export async function PUT(request) {
   try {
+    console.log('🔧 PUT /api/pre-appointment-tasks - Starting request');
+    
     // Get user session
     const session = await getSession();
     
     if (!session || !session.user) {
+      console.log('❌ PUT /api/pre-appointment-tasks - No session found');
       return NextResponse.json(
         { error: 'Unauthorized - Please log in' },
         { status: 401 }
@@ -126,9 +129,15 @@ export async function PUT(request) {
     }
 
     const userId = session.user.sub;
-    const { taskKey, completed, notes, taskData } = await request.json();
+    console.log('🔧 PUT /api/pre-appointment-tasks - User ID:', userId);
+    
+    const requestBody = await request.json();
+    console.log('🔧 PUT /api/pre-appointment-tasks - Request body:', requestBody);
+    
+    const { taskKey, completed, notes, taskData } = requestBody;
 
     if (!taskKey) {
+      console.log('❌ PUT /api/pre-appointment-tasks - No task key provided');
       return NextResponse.json(
         { error: 'Task key is required' },
         { status: 400 }
@@ -151,6 +160,8 @@ export async function PUT(request) {
     if (completed !== undefined) updateData.completed = completed;
     if (notes !== undefined) updateData.notes = notes;
 
+    console.log('🔧 PUT /api/pre-appointment-tasks - Update data:', updateData);
+
     const result = await preAppointmentTasksCollection.updateOne(
       { 
         userId: userId,
@@ -162,15 +173,19 @@ export async function PUT(request) {
 
     console.log('✅ User pre-appointment task updated successfully:', result);
 
-    return NextResponse.json({
+    const response = {
       success: true,
       message: 'Pre-appointment task updated successfully',
       taskKey,
       updatedFields: updateData
-    });
+    };
+    
+    console.log('🔧 PUT /api/pre-appointment-tasks - Response:', response);
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('❌ Error updating user pre-appointment task:', error);
+    console.error('❌ Error stack:', error.stack);
     return NextResponse.json(
       { 
         error: 'Failed to update pre-appointment task',
