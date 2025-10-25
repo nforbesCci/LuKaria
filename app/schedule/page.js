@@ -43,12 +43,8 @@ export default function Schedule() {
       return;
     }
     
-    // Mark technology test as complete when user accesses schedule page
-    dispatch(updatePreAppointmentTaskAction({ 
-      taskKey: 'testTechnology', 
-      completed: true 
-    }));
-  }, [router, dispatch, scheduleCompleted, isScheduled]);
+
+  }, [router, scheduleCompleted, isScheduled]);
 
   // Load schedule data from database when page loads
   useEffect(() => {

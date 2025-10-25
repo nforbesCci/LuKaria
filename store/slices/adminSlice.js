@@ -10,17 +10,6 @@ const initialState = {
   loading: false,
   error: null,
   
-  // Pagination and filtering
-  searchTerm: '',
-  statusFilter: 'all',
-  page: 0,
-  rowsPerPage: 10,
-  sort: 'created_at:1',
-  
-  // UI state
-  selectedUser: null,
-  editDialogOpen: false,
-  
   // Admin meals data
   adminMeals: {},
   adminMealsLoading: false,
@@ -36,16 +25,11 @@ const initialState = {
   adminAppointmentTasksLoading: false,
   adminAppointmentTasksError: null,
   
-  // Admin pre-appointment tasks data
-  adminPreAppointmentTasks: [],
-  adminPreAppointmentTasksLoading: false,
-  adminPreAppointmentTasksError: null,
-  
   // Admin profile data
   adminProfile: null,
   adminProfileLoading: false,
   adminProfileError: null,
-  medicalProfileStatus: null,
+  medicalProfileStatus: false,
   
   // Admin medications data
   adminMedications: [],
@@ -66,13 +50,18 @@ const initialState = {
   adminQuestions: [],
   adminQuestionsLoading: false,
   adminQuestionsError: null,
+  
+  // Admin pre-appointment tasks data
+  adminPreAppointmentTasks: [],
+  adminPreAppointmentTasksLoading: false,
+  adminPreAppointmentTasksError: null,
 };
 
 const adminSlice = createSlice({
   name: 'admin',
   initialState,
   reducers: {
-    // User data actions
+    // User list reducers
     setUsers: (state, action) => {
       state.users = action.payload;
     },
@@ -88,62 +77,21 @@ const adminSlice = createSlice({
     setLength: (state, action) => {
       state.length = action.payload;
     },
-    setPaginationData: (state, action) => {
-      const { total, start, limit, length } = action.payload;
-      state.totalUsers = total || 0;
-      state.start = start || 0;
-      state.limit = limit || 10;
-      state.length = length || 0;
-    },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
     setError: (state, action) => {
       state.error = action.payload;
     },
-    clearError: (state) => {
-      state.error = null;
-    },
     
-    // Search and filter actions
-    setSearchTerm: (state, action) => {
-      state.searchTerm = action.payload;
-      state.page = 0; // Reset to first page when searching
-    },
-    setStatusFilter: (state, action) => {
-      state.statusFilter = action.payload;
-      state.page = 0; // Reset to first page when filtering
-    },
-    setPage: (state, action) => {
-      state.page = action.payload;
-    },
-    setRowsPerPage: (state, action) => {
-      state.rowsPerPage = action.payload;
-      state.page = 0; // Reset to first page when changing rows per page
-    },
-    setSort: (state, action) => {
-      state.sort = action.payload;
-    },
-    
-    // UI actions
-    setSelectedUser: (state, action) => {
-      state.selectedUser = action.payload;
-    },
-    setEditDialogOpen: (state, action) => {
-      state.editDialogOpen = action.payload;
-    },
-    
-    // Admin meals actions
-    fetchAdminMeals: (state, action) => {
+    // Admin meals reducers
+    fetchAdminMeals: (state) => {
       state.adminMealsLoading = true;
       state.adminMealsError = null;
     },
     fetchAdminMealsSuccess: (state, action) => {
       state.adminMealsLoading = false;
-      state.adminMeals = action.payload.meals || {};
-      state.adminMealsError = null;
-      console.log('🔄 Admin slice: fetchAdminMealsSuccess called with payload:', action.payload);
-      console.log('🔄 Admin slice: Setting adminMeals to:', action.payload.meals);
+      state.adminMeals = action.payload;
     },
     fetchAdminMealsFailure: (state, action) => {
       state.adminMealsLoading = false;
@@ -153,24 +101,31 @@ const adminSlice = createSlice({
       state.adminMealsError = null;
     },
     
-    // Admin consent forms actions
-    fetchAdminConsentForms: (state, action) => {
+    // Admin consent forms reducers
+    fetchAdminConsentForms: (state) => {
       state.adminConsentFormsLoading = true;
       state.adminConsentFormsError = null;
     },
     fetchAdminConsentFormsSuccess: (state, action) => {
       state.adminConsentFormsLoading = false;
       state.adminConsentForms = action.payload.consentForms || {};
-      state.adminConsentFormsError = null;
     },
     fetchAdminConsentFormsFailure: (state, action) => {
       state.adminConsentFormsLoading = false;
       state.adminConsentFormsError = action.payload;
     },
-    updateAdminConsentFormSuccess: (state, action) => {
-      // Update the consent form with the result from the API
+    updateAdminConsentForm: (state, action) => {
       const { formType, updates } = action.payload;
-      console.log('✅ Admin slice: Consent form updated successfully', formType, updates);
+      if (state.adminConsentForms[formType]) {
+        state.adminConsentForms[formType] = {
+          ...state.adminConsentForms[formType],
+          ...updates,
+          updatedAt: new Date().toISOString()
+        };
+      }
+    },
+    updateAdminConsentFormSuccess: (state, action) => {
+      const { formType, updates } = action.payload;
       if (state.adminConsentForms[formType]) {
         state.adminConsentForms[formType] = {
           ...state.adminConsentForms[formType],
@@ -180,112 +135,60 @@ const adminSlice = createSlice({
       }
     },
     updateAdminConsentFormFailure: (state, action) => {
-      // Revert optimistic update on failure
       state.adminConsentFormsError = action.payload;
     },
     clearAdminConsentFormsError: (state) => {
       state.adminConsentFormsError = null;
     },
     
-    // Admin appointment tasks actions
-    fetchAdminAppointmentTasks: (state, action) => {
+    // Admin appointment tasks reducers
+    fetchAdminAppointmentTasks: (state) => {
       state.adminAppointmentTasksLoading = true;
       state.adminAppointmentTasksError = null;
     },
     fetchAdminAppointmentTasksSuccess: (state, action) => {
       state.adminAppointmentTasksLoading = false;
-      state.adminAppointmentTasks = action.payload.appointmentTasks || [];
-      state.adminAppointmentTasksError = null;
+      state.adminAppointmentTasks = action.payload;
     },
     fetchAdminAppointmentTasksFailure: (state, action) => {
       state.adminAppointmentTasksLoading = false;
       state.adminAppointmentTasksError = action.payload;
     },
     createAdminAppointmentTask: (state, action) => {
-      // Optimistic update - add the new task to the array
-      const { task } = action.payload;
-      if (task) {
-        state.adminAppointmentTasks.unshift(task);
-      }
-    },
-    createAdminAppointmentTaskSuccess: (state, action) => {
-      // Confirmation that the task was created successfully
-      console.log('✅ Admin slice: Appointment task created successfully');
-    },
-    createAdminAppointmentTaskFailure: (state, action) => {
-      // Revert optimistic update on failure
-      state.adminAppointmentTasksError = action.payload;
+      state.adminAppointmentTasks.push(action.payload);
     },
     updateAdminAppointmentTask: (state, action) => {
-      // Optimistic update - update the task in the array
       const { taskId, updates } = action.payload;
       const taskIndex = state.adminAppointmentTasks.findIndex(task => task._id === taskId);
       if (taskIndex !== -1) {
         state.adminAppointmentTasks[taskIndex] = {
           ...state.adminAppointmentTasks[taskIndex],
-          ...updates,
-          updatedAt: new Date()
+          ...updates
         };
       }
-    },
-    updateAdminAppointmentTaskSuccess: (state, action) => {
-      // Confirmation that the update was successful
-      console.log('✅ Admin slice: Appointment task updated successfully');
-    },
-    updateAdminAppointmentTaskFailure: (state, action) => {
-      // Revert optimistic update on failure
-      state.adminAppointmentTasksError = action.payload;
     },
     clearAdminAppointmentTasksError: (state) => {
       state.adminAppointmentTasksError = null;
     },
     
-    // Admin pre-appointment tasks actions
-    fetchAdminPreAppointmentTasks: (state, action) => {
-      state.adminPreAppointmentTasksLoading = true;
-      state.adminPreAppointmentTasksError = null;
-    },
-    fetchAdminPreAppointmentTasksSuccess: (state, action) => {
-      state.adminPreAppointmentTasksLoading = false;
-      state.adminPreAppointmentTasks = action.payload.preAppointmentTasks || [];
-      state.adminPreAppointmentTasksError = null;
-    },
-    fetchAdminPreAppointmentTasksFailure: (state, action) => {
-      state.adminPreAppointmentTasksLoading = false;
-      state.adminPreAppointmentTasksError = action.payload;
-    },
-    clearAdminPreAppointmentTasksError: (state) => {
-      state.adminPreAppointmentTasksError = null;
-    },
-    
-    // Admin profile actions
-    fetchAdminProfile: (state, action) => {
+    // Admin profile reducers
+    fetchAdminProfile: (state) => {
       state.adminProfileLoading = true;
       state.adminProfileError = null;
     },
     fetchAdminProfileSuccess: (state, action) => {
       state.adminProfileLoading = false;
-      state.adminProfile = action.payload.profile;
-      state.medicalProfileStatus = action.payload.medicalProfileStatus;
-      state.adminProfileError = null;
+      state.adminProfile = action.payload;
     },
     fetchAdminProfileFailure: (state, action) => {
       state.adminProfileLoading = false;
       state.adminProfileError = action.payload;
     },
     checkMedicalProfileTask: (state, action) => {
-      // This action is handled by the saga
+      state.medicalProfileStatus = action.payload;
     },
     checkMedicalProfileTaskSuccess: (state, action) => {
-      // Update medical profile status
-      if (state.medicalProfileStatus) {
-        state.medicalProfileStatus.completed = action.payload.completed;
-        if (action.payload.completed) {
-          state.medicalProfileStatus.fields = action.payload.fields;
-        } else {
-          state.medicalProfileStatus.missingFields = action.payload.missingFields;
-        }
-      }
+      state.medicalProfileStatus = action.payload;
     },
     checkMedicalProfileTaskFailure: (state, action) => {
       state.adminProfileError = action.payload;
@@ -294,65 +197,85 @@ const adminSlice = createSlice({
       state.adminProfileError = null;
     },
     
-    // Admin medications actions
-    fetchAdminMedications: (state, action) => {
+    // Admin medications reducers
+    fetchAdminMedications: (state) => {
       state.adminMedicationsLoading = true;
       state.adminMedicationsError = null;
     },
     fetchAdminMedicationsSuccess: (state, action) => {
       state.adminMedicationsLoading = false;
-      state.adminMedications = action.payload.medications;
-      state.adminMedicationsError = null;
+      state.adminMedications = action.payload;
     },
     fetchAdminMedicationsFailure: (state, action) => {
       state.adminMedicationsLoading = false;
       state.adminMedicationsError = action.payload;
     },
+    updateAdminMedication: (state, action) => {
+      const { medicationId, updates } = action.payload;
+      const medicationIndex = state.adminMedications.findIndex(med => med._id === medicationId);
+      if (medicationIndex !== -1) {
+        state.adminMedications[medicationIndex] = {
+          ...state.adminMedications[medicationIndex],
+          ...updates
+        };
+      }
+    },
     clearAdminMedicationsError: (state) => {
       state.adminMedicationsError = null;
     },
     
-    // Admin measurements actions
-    fetchAdminMeasurements: (state, action) => {
+    // Admin measurements reducers
+    fetchAdminMeasurements: (state) => {
       state.adminMeasurementsLoading = true;
       state.adminMeasurementsError = null;
     },
     fetchAdminMeasurementsSuccess: (state, action) => {
       state.adminMeasurementsLoading = false;
-      state.adminMeasurements = action.payload.measurements;
-      state.adminMeasurementsError = null;
+      state.adminMeasurements = action.payload;
     },
     fetchAdminMeasurementsFailure: (state, action) => {
       state.adminMeasurementsLoading = false;
       state.adminMeasurementsError = action.payload;
     },
+    updateAdminMeasurement: (state, action) => {
+      const { measurementId, updates } = action.payload;
+      const measurementIndex = state.adminMeasurements.findIndex(meas => meas._id === measurementId);
+      if (measurementIndex !== -1) {
+        state.adminMeasurements[measurementIndex] = {
+          ...state.adminMeasurements[measurementIndex],
+          ...updates
+        };
+      }
+    },
     clearAdminMeasurementsError: (state) => {
       state.adminMeasurementsError = null;
     },
     
-    // Admin side effects actions
-    fetchAdminSideEffects: (state, action) => {
+    // Admin side effects reducers
+    fetchAdminSideEffects: (state) => {
       state.adminSideEffectsLoading = true;
       state.adminSideEffectsError = null;
     },
     fetchAdminSideEffectsSuccess: (state, action) => {
       state.adminSideEffectsLoading = false;
-      state.adminSideEffects = action.payload.sideEffects;
-      state.adminSideEffectsError = null;
+      state.adminSideEffects = action.payload;
     },
     fetchAdminSideEffectsFailure: (state, action) => {
       state.adminSideEffectsLoading = false;
       state.adminSideEffectsError = action.payload;
     },
-    clearAdminSideEffectsError: (state) => {
-      state.adminSideEffectsError = null;
-    },
     updateAdminSideEffect: (state, action) => {
-      // This action is handled by the saga
+      const { sideEffectId, updates } = action.payload;
+      const sideEffectIndex = state.adminSideEffects.findIndex(se => se._id === sideEffectId);
+      if (sideEffectIndex !== -1) {
+        state.adminSideEffects[sideEffectIndex] = {
+          ...state.adminSideEffects[sideEffectIndex],
+          ...updates
+        };
+      }
     },
     updateAdminSideEffectSuccess: (state, action) => {
       const { sideEffectId, updates } = action.payload;
-      // Update the specific side effect in the list
       const sideEffectIndex = state.adminSideEffects.findIndex(se => se._id === sideEffectId);
       if (sideEffectIndex !== -1) {
         state.adminSideEffects[sideEffectIndex] = {
@@ -364,47 +287,46 @@ const adminSlice = createSlice({
     updateAdminSideEffectFailure: (state, action) => {
       state.adminSideEffectsError = action.payload;
     },
+    clearAdminSideEffectsError: (state) => {
+      state.adminSideEffectsError = null;
+    },
     
-    // Admin questions actions
-    fetchAdminQuestions: (state, action) => {
+    // Admin questions reducers
+    fetchAdminQuestions: (state) => {
       state.adminQuestionsLoading = true;
       state.adminQuestionsError = null;
     },
     fetchAdminQuestionsSuccess: (state, action) => {
       state.adminQuestionsLoading = false;
-      state.adminQuestions = action.payload.questions;
-      state.adminQuestionsError = null;
+      state.adminQuestions = action.payload;
     },
     fetchAdminQuestionsFailure: (state, action) => {
       state.adminQuestionsLoading = false;
       state.adminQuestionsError = action.payload;
     },
-    clearAdminQuestionsError: (state) => {
-      state.adminQuestionsError = null;
-    },
     deleteAdminQuestion: (state, action) => {
-      // Optimistic update - remove the question from the array
       const { questionId } = action.payload;
       state.adminQuestions = state.adminQuestions.filter(q => q._id !== questionId);
     },
-    deleteAdminQuestionSuccess: (state, action) => {
-      // Question already removed optimistically
-      console.log('✅ Admin Slice: Question deleted successfully', action.payload);
-    },
-    deleteAdminQuestionFailure: (state, action) => {
-      // Revert optimistic update on failure
-      state.adminQuestionsError = action.payload;
+    clearAdminQuestionsError: (state) => {
+      state.adminQuestionsError = null;
     },
     
-    // Reset actions
-    resetFilters: (state) => {
-      state.searchTerm = '';
-      state.statusFilter = 'all';
-      state.page = 0;
-      state.sort = 'created_at:1';
+    // Admin pre-appointment tasks reducers
+    fetchAdminPreAppointmentTasks: (state) => {
+      state.adminPreAppointmentTasksLoading = true;
+      state.adminPreAppointmentTasksError = null;
     },
-    resetAdmin: (state) => {
-      return { ...initialState };
+    fetchAdminPreAppointmentTasksSuccess: (state, action) => {
+      state.adminPreAppointmentTasksLoading = false;
+      state.adminPreAppointmentTasks = action.payload;
+    },
+    fetchAdminPreAppointmentTasksFailure: (state, action) => {
+      state.adminPreAppointmentTasksLoading = false;
+      state.adminPreAppointmentTasksError = action.payload;
+    },
+    clearAdminPreAppointmentTasksError: (state) => {
+      state.adminPreAppointmentTasksError = null;
     },
   },
 });
@@ -415,17 +337,8 @@ export const {
   setStart,
   setLimit,
   setLength,
-  setPaginationData,
   setLoading,
   setError,
-  clearError,
-  setSearchTerm,
-  setStatusFilter,
-  setPage,
-  setRowsPerPage,
-  setSort,
-  setSelectedUser,
-  setEditDialogOpen,
   fetchAdminMeals,
   fetchAdminMealsSuccess,
   fetchAdminMealsFailure,
@@ -433,6 +346,7 @@ export const {
   fetchAdminConsentForms,
   fetchAdminConsentFormsSuccess,
   fetchAdminConsentFormsFailure,
+  updateAdminConsentForm,
   updateAdminConsentFormSuccess,
   updateAdminConsentFormFailure,
   clearAdminConsentFormsError,
@@ -440,16 +354,8 @@ export const {
   fetchAdminAppointmentTasksSuccess,
   fetchAdminAppointmentTasksFailure,
   createAdminAppointmentTask,
-  createAdminAppointmentTaskSuccess,
-  createAdminAppointmentTaskFailure,
   updateAdminAppointmentTask,
-  updateAdminAppointmentTaskSuccess,
-  updateAdminAppointmentTaskFailure,
   clearAdminAppointmentTasksError,
-  fetchAdminPreAppointmentTasks,
-  fetchAdminPreAppointmentTasksSuccess,
-  fetchAdminPreAppointmentTasksFailure,
-  clearAdminPreAppointmentTasksError,
   fetchAdminProfile,
   fetchAdminProfileSuccess,
   fetchAdminProfileFailure,
@@ -460,39 +366,32 @@ export const {
   fetchAdminMedications,
   fetchAdminMedicationsSuccess,
   fetchAdminMedicationsFailure,
+  updateAdminMedication,
   clearAdminMedicationsError,
   fetchAdminMeasurements,
   fetchAdminMeasurementsSuccess,
   fetchAdminMeasurementsFailure,
+  updateAdminMeasurement,
   clearAdminMeasurementsError,
   fetchAdminSideEffects,
   fetchAdminSideEffectsSuccess,
   fetchAdminSideEffectsFailure,
-  clearAdminSideEffectsError,
   updateAdminSideEffect,
   updateAdminSideEffectSuccess,
   updateAdminSideEffectFailure,
+  clearAdminSideEffectsError,
   fetchAdminQuestions,
   fetchAdminQuestionsSuccess,
   fetchAdminQuestionsFailure,
-  clearAdminQuestionsError,
   deleteAdminQuestion,
-  deleteAdminQuestionSuccess,
-  deleteAdminQuestionFailure,
-  resetFilters,
-  resetAdmin,
+  clearAdminQuestionsError,
+  fetchAdminPreAppointmentTasks,
+  fetchAdminPreAppointmentTasksSuccess,
+  fetchAdminPreAppointmentTasksFailure,
+  clearAdminPreAppointmentTasksError,
 } = adminSlice.actions;
 
 // Action creators for sagas
-export const fetchUsers = () => ({
-  type: 'admin/fetchUsers',
-});
-
-export const enableUserAccount = (payload) => ({
-  type: 'admin/enableUserAccount',
-  payload,
-});
-
 export const fetchAdminMealsAction = (payload) => ({
   type: 'admin/fetchAdminMeals',
   payload,
@@ -538,8 +437,18 @@ export const fetchAdminMedicationsAction = (payload) => ({
   payload,
 });
 
+export const updateAdminMedicationAction = (payload) => ({
+  type: 'admin/updateAdminMedication',
+  payload,
+});
+
 export const fetchAdminMeasurementsAction = (payload) => ({
   type: 'admin/fetchAdminMeasurements',
+  payload,
+});
+
+export const updateAdminMeasurementAction = (payload) => ({
+  type: 'admin/updateAdminMeasurement',
   payload,
 });
 
@@ -560,6 +469,16 @@ export const fetchAdminQuestionsAction = (payload) => ({
 
 export const deleteAdminQuestionAction = (payload) => ({
   type: 'admin/deleteAdminQuestion',
+  payload,
+});
+
+export const fetchAdminPreAppointmentTasksAction = (payload) => ({
+  type: 'admin/fetchAdminPreAppointmentTasks',
+  payload,
+});
+
+export const updateAdminPreAppointmentTaskAction = (payload) => ({
+  type: 'admin/updateAdminPreAppointmentTask',
   payload,
 });
 

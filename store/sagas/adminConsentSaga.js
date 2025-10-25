@@ -6,6 +6,7 @@ import {
   updateAdminConsentFormFailure,
   fetchAdminConsentFormsAction
 } from '../slices/adminSlice';
+import { updatePreAppointmentTaskSuccess, updatePreAppointmentTaskFailure } from '../slices/appointmentSlice';
 
 // API call to fetch consent forms for a specific user (admin function)
 function* fetchAdminConsentFormsFromDatabase(userId) {
@@ -108,6 +109,60 @@ function* updateAdminConsentFormSaga(action) {
   }
 }
 
+// API call to update pre-appointment task in database
+function* updateAdminPreAppointmentTaskInDatabase(userId, taskKey, completed) {
+  try {
+    console.log('🔧 Admin Consent Saga: Updating pre-appointment task in database', { userId, taskKey, completed });
+    
+    const response = yield call(fetch, `/api/admin/pre-appointment-tasks/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        taskKey,
+        completed
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = yield response.json();
+      console.error('❌ Admin Consent Saga: API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorData.details || errorData.error || 'Unknown error'}`);
+    }
+
+    const result = yield response.json();
+    console.log('✅ Admin Consent Saga: Pre-appointment task updated successfully', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Admin Consent Saga: Error updating pre-appointment task in database:', error);
+    throw error;
+  }
+}
+
+// Saga to handle admin pre-appointment task updates
+function* updateAdminPreAppointmentTaskSaga(action) {
+  try {
+    const { userId, taskKey, completed } = action.payload;
+    console.log('🔄 Admin Consent Saga: Starting pre-appointment task update for user:', userId, 'taskKey:', taskKey, 'completed:', completed);
+    
+    const result = yield call(updateAdminPreAppointmentTaskInDatabase, userId, taskKey, completed);
+    
+    console.log('✅ Admin Consent Saga: Pre-appointment task updated successfully', result);
+    
+    yield put(updatePreAppointmentTaskSuccess({
+      userId,
+      taskKey,
+      completed,
+      result
+    }));
+  } catch (error) {
+    console.error('❌ Admin Consent Saga: Error updating pre-appointment task', error);
+    yield put(updatePreAppointmentTaskFailure(error.message));
+  }
+}
+
 // Watch for admin consent forms actions
 export function* watchFetchAdminConsentForms() {
   console.log('🔧 Admin Consent Saga: Setting up fetch watcher');
@@ -119,12 +174,17 @@ export function* watchUpdateAdminConsentForm() {
   yield takeEvery('admin/updateAdminConsentForm', updateAdminConsentFormSaga);
 }
 
+export function* watchUpdateAdminPreAppointmentTask() {
+  console.log('🔧 Admin Consent Saga: Setting up pre-appointment task watcher');
+  yield takeEvery('admin/updateAdminPreAppointmentTask', updateAdminPreAppointmentTaskSaga);
+}
 
 export default function* adminConsentSaga() {
   console.log('🔧 Admin Consent Saga: Starting saga setup');
   yield all([
     watchFetchAdminConsentForms(),
     watchUpdateAdminConsentForm(),
+    watchUpdateAdminPreAppointmentTask(),
   ]);
   console.log('🔧 Admin Consent Saga: All watchers set up');
 }

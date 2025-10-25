@@ -4,7 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasks } from '../../../../store/slices/adminSlice';
+import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction } from '../../../../store/slices/adminSlice';
 import AdminConsentForms from '../../../../components/AdminConsentForms';
 import ConsentFormViewer from '../../../../components/ConsentFormViewer';
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
@@ -240,7 +240,7 @@ export default function UserDetailPage() {
   useEffect(() => {
     if (params.userId) {
       console.log('🔄 Consultation completed, fetching pre-appointment tasks for user:', params.userId);
-      dispatch(fetchAdminPreAppointmentTasks({ userId: params.userId }));
+      dispatch(fetchAdminPreAppointmentTasksAction({ userId: params.userId }));
     }
   }, [params.userId, dbConsultationOccurred, dispatch]);
 
@@ -1045,12 +1045,67 @@ export default function UserDetailPage() {
   // Handle enabling/disabling consent forms
   const handleToggleConsentForm = (formType, enabled) => {
     handleConsentFormUpdate(formType, { enabled });
+
+    const completedCount = Object.values(consentForms)
+    .reduce((n, t) => n + ((t?.complete === true) && (t?.available === true)) , 0);
+
+    let availableCount = Object.values(consentForms)
+    .reduce((n, t) => n +  (t?.available === true) , 0);
+   
+    const form = consentForms[formType];
+
+    if(enabled){
+      availableCount++;
+    }else{
+      availableCount--;
+    }
+
+    if(completedCount === availableCount){
+      dispatch(updateAdminPreAppointmentTaskAction({ 
+        userId: params.userId, 
+        taskKey: 'completeConsentForms', 
+        completed: true 
+      }));
+    }else{
+      dispatch(updateAdminPreAppointmentTaskAction({ 
+        userId: params.userId, 
+        taskKey: 'completeConsentForms', 
+        completed: false 
+      }));
+    }
   };
 
   // Handle unlocking consent forms (both locked and completed)
   const handleUnlockConsentForm = (formType) => {
     const form = consentForms[formType];
-    handleConsentFormUpdate(formType, { complete: !form?.complete });
+    const updatedForm = handleConsentFormUpdate(formType, { complete: !form?.complete });
+
+    let completedCount = Object.values(consentForms)
+    .reduce((n, t) => n + ((t?.complete === true) && (t?.available === true)) , 0);
+
+    if(!form?.complete){
+      completedCount++;
+    }else{
+      completedCount--;
+    }
+    
+    const availableCount = Object.values(consentForms)
+    .reduce((n, t) => n +  (t?.available === true) , 0);
+
+
+    if(completedCount === availableCount){
+      dispatch(updateAdminPreAppointmentTaskAction({ 
+        userId: params.userId, 
+        taskKey: 'completeConsentForms', 
+        completed: true 
+      }));
+    }else{
+      dispatch(updateAdminPreAppointmentTaskAction({ 
+        userId: params.userId, 
+        taskKey: 'completeConsentForms', 
+        completed: false 
+      }));
+    }
   };
 
   // Handle viewing consent forms

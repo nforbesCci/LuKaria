@@ -72,7 +72,7 @@ function* savePhotographConsentSaga(action) {
     
     console.log('✅ Consent Saga: Photograph consent saved successfully', result);
     
-    yield put(savePhotographConsentSuccess(result));
+    yield put(savePhotographConsentSuccess(result.data));
   } catch (error) {
     console.error('❌ Consent Saga: Error saving photograph consent', error);
     yield put(savePhotographConsentFailure(error.message));
@@ -144,7 +144,7 @@ function* saveMounjaroConsentSaga(action) {
     
     console.log('✅ Consent Saga: Mounjaro consent saved successfully', result);
     
-    yield put(saveMounjaroConsentSuccess(result));
+    yield put(saveMounjaroConsentSuccess(result.data));
   } catch (error) {
     console.error('❌ Consent Saga: Error saving mounjaro consent', error);
     yield put(saveMounjaroConsentFailure(error.message));
@@ -240,7 +240,7 @@ function* saveTelehealthConsentSaga(action) {
     
     console.log('✅ Consent Saga: Telehealth consent saved successfully', result);
     
-    yield put(saveTelehealthConsentSuccess(result));
+    yield put(saveTelehealthConsentSuccess(result.data));
   } catch (error) {
     console.error('❌ Consent Saga: Error saving telehealth consent', error);
     yield put(saveTelehealthConsentFailure(error.message));

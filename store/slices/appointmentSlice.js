@@ -61,6 +61,10 @@ const appointmentSlice = createSlice({
         state.preAppointmentTasks[taskKey] = completed;
       }
     },
+    fetchPreAppointmentTaskFailure: (state, action) => {
+      state.preAppointmentTasks = null;
+      state.preAppointmentTasksError = action.payload;
+    },
     resetPreAppointmentTasks: (state) => {
       state.preAppointmentTasks = {
         completeMedicalProfile: false,
@@ -96,14 +100,32 @@ const appointmentSlice = createSlice({
     setAdminRescheduleSuccess: (state, action) => {
       state.adminRescheduleSuccess = action.payload;
     },
+
+    fetchPreAppointmentTasksSuccess: (state, action) => {
+      console.log('🔧 Slice: fetchPreAppointmentTasksSuccess called with payload:', action.payload);
+      
+      // Handle the tasks array from the API
+      const tasks = action.payload || [];
+      
+      // Create a set of completed task keys
+     
+      
+      // Update the preAppointmentTasks state
+      state.preAppointmentTasks = action.payload;
+      console.log('🔧 Slice: Updated preAppointmentTasks state:', state.preAppointmentTasks);
+    },
+    fetchPreAppointmentTasksFailure: (state, action) => {
+      state.preAppointmentTasks = null;
+      state.preAppointmentTasksError = action.payload;
+    },
     updatePreAppointmentTaskSuccess: (state, action) => {
-      // Handle successful pre-appointment task update
-      console.log('✅ Appointment Slice: Pre-appointment task updated successfully', action.payload);
+      // Handle successful update of pre-appointment task
+      state.preAppointmentTasks = { ...state.preAppointmentTasks, ...action.payload };
     },
     updatePreAppointmentTaskFailure: (state, action) => {
-      // Handle failed pre-appointment task update
-      console.error('❌ Appointment Slice: Pre-appointment task update failed', action.payload);
-    },
+      // Handle failed update of pre-appointment task
+      state.preAppointmentTasksError = action.payload;
+    },   
   },
 });
 
@@ -116,6 +138,7 @@ export const {
   clearBookingError,
   clearAppointments,
   updatePreAppointmentTask,
+  fetchPreAppointmentTask,
   resetPreAppointmentTasks,
   setQuestions,
   setQuestionsLoading,
@@ -124,6 +147,8 @@ export const {
   setAdminRescheduleSuccess,
   updatePreAppointmentTaskSuccess,
   updatePreAppointmentTaskFailure,
+  fetchPreAppointmentTasksSuccess,
+  fetchPreAppointmentTasksFailure,
 } = appointmentSlice.actions;
 
 // Action creators for sagas
@@ -165,6 +190,11 @@ export const adminRescheduleAppointment = (userId, appointmentData) => ({
 });
 
 // Action creators for pre-appointment tasks saga
+export const fetchPreAppointmentTaskAction = (payload) => ({
+  type: 'appointment/fetchPreAppointmentTask',
+  payload,
+});
+
 export const updatePreAppointmentTaskAction = (payload) => ({
   type: 'appointment/updatePreAppointmentTask',
   payload,
@@ -172,6 +202,13 @@ export const updatePreAppointmentTaskAction = (payload) => ({
 
 export const clearPreAppointmentTasksAction = (payload) => ({
   type: 'appointment/clearPreAppointmentTasks',
+  payload,
+});
+
+
+
+export const clearAppointmentTasks = (payload) => ({
+  type: 'appointment/clearAppointmentTasks',
   payload,
 });
 

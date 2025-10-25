@@ -1,12 +1,14 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import { 
   fetchAdminPreAppointmentTasksSuccess, 
-  fetchAdminPreAppointmentTasksFailure
+  fetchAdminPreAppointmentTasksFailure 
 } from '../slices/adminSlice';
 
-// API call to fetch pre-appointment tasks for a specific user (admin function)
+// API call to fetch admin pre-appointment tasks for a specific user
 function* fetchAdminPreAppointmentTasksFromDatabase(userId) {
   try {
+    console.log('🔧 Admin Pre-Appointment Tasks Saga: Fetching pre-appointment tasks for user:', userId);
+    
     const response = yield call(fetch, `/api/admin/pre-appointment-tasks/${userId}`, {
       method: 'GET',
       headers: {
@@ -21,9 +23,10 @@ function* fetchAdminPreAppointmentTasksFromDatabase(userId) {
     }
 
     const result = yield response.json();
+    console.log('✅ Admin Pre-Appointment Tasks Saga: Pre-appointment tasks fetched successfully', result);
     return result;
   } catch (error) {
-    console.error('Error fetching admin pre-appointment tasks from database:', error);
+    console.error('❌ Admin Pre-Appointment Tasks Saga: Error fetching pre-appointment tasks from database:', error);
     throw error;
   }
 }
@@ -38,10 +41,7 @@ function* fetchAdminPreAppointmentTasksSaga(action) {
     
     console.log('✅ Admin Pre-Appointment Tasks Saga: Pre-appointment tasks fetched successfully', result);
     
-    yield put(fetchAdminPreAppointmentTasksSuccess({
-      userId,
-      preAppointmentTasks: result.preAppointmentTasks || []
-    }));
+    yield put(fetchAdminPreAppointmentTasksSuccess(result.tasks));
   } catch (error) {
     console.error('❌ Admin Pre-Appointment Tasks Saga: Error fetching pre-appointment tasks', error);
     yield put(fetchAdminPreAppointmentTasksFailure(error.message));
@@ -50,10 +50,12 @@ function* fetchAdminPreAppointmentTasksSaga(action) {
 
 // Watch for admin pre-appointment tasks actions
 export function* watchFetchAdminPreAppointmentTasks() {
+  console.log('🔧 Admin Pre-Appointment Tasks Saga: Setting up fetch watcher');
   yield takeEvery('admin/fetchAdminPreAppointmentTasks', fetchAdminPreAppointmentTasksSaga);
 }
 
 export default function* adminPreAppointmentTasksSaga() {
+  console.log('🔧 Admin Pre-Appointment Tasks Saga: Starting saga setup');
   yield watchFetchAdminPreAppointmentTasks();
+  console.log('🔧 Admin Pre-Appointment Tasks Saga: All watchers set up');
 }
-

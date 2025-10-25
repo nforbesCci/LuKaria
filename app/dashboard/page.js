@@ -8,10 +8,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, loadAppointmentData, updatePreAppointmentTaskAction, loadQuestions, requestReschedule, setScheduleCompleted } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, fetchPreAppointmentTaskAction, loadAppointmentData, updatePreAppointmentTaskAction, loadQuestions, requestReschedule, setScheduleCompleted } from '../../store/slices/appointmentSlice';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { fetchMeasurements } from '../../store/slices/measurementsSlice';
-import { fetchPhotographConsent, fetchMounjaroConsent, fetchTelehealthConsent } from '../../store/slices/consentSlice';
 import { useScheduleProtection } from '../../hooks/useScheduleProtection';
 import { useBasicAccess } from '../../hooks/useAccessControl';
 import {
@@ -90,12 +89,12 @@ export default function Dashboard() {
     // Load measurements data using saga
     console.log('📊 Dashboard: Loading measurements data...');
     dispatch(fetchMeasurements());
+
+    // Load pre-appointment tasks using saga
+    console.log('📊 Dashboard: Loading pre-appointment tasks...');
+    dispatch(fetchPreAppointmentTaskAction());
     
-    // Load consent forms data using saga
-    console.log('📊 Dashboard: Loading consent forms data...');
-    dispatch(fetchPhotographConsent());
-    dispatch(fetchMounjaroConsent());
-    dispatch(fetchTelehealthConsent());
+
   }, [dispatch]);
 
   // Initialize schedule completion status from user metadata
@@ -115,40 +114,6 @@ export default function Dashboard() {
     }
   }, [currentAppointment, isScheduled, isScheduleCompleted]);
 
-  // Debug: Log profile data when it changes
-  useEffect(() => {
-    if (profileState.isLoaded && profileState.profile) {
-      console.log('👤 Dashboard: Profile loaded successfully:', profileState.profile);
-      
-      // If profile exists and has required fields, mark medical profile task as complete
-      const hasPreferredPhone = profileState.profile?.preferredPhone;
-      const hasDateOfBirth = profileState.profile?.dateOfBirth;
-      const hasParish = profileState.profile?.parish;
-      
-      const isProfileComplete = profileState.profile && hasPreferredPhone && hasDateOfBirth && hasParish;
-      
-      if (isProfileComplete) {
-        console.log('✅ Dashboard: Profile exists with required fields, marking medical profile task as complete');
-        dispatch(updatePreAppointmentTaskAction({ 
-          taskKey: 'completeMedicalProfile', 
-          completed: true 
-        }));
-      } else {
-        console.log('⚠️ Dashboard: Profile incomplete - missing required fields:', {
-          hasPreferredPhone,
-          hasDateOfBirth,
-          hasParish
-        });
-        dispatch(updatePreAppointmentTaskAction({ 
-          taskKey: 'completeMedicalProfile', 
-          completed: false 
-        }));
-      }
-    }
-    if (profileState.error) {
-      console.log('❌ Dashboard: Profile load error:', profileState.error);
-    }
-  }, [profileState.isLoaded, profileState.profile, profileState.error, dispatch]);
 
   // Debug: Log measurements data when it changes
   useEffect(() => {
@@ -176,10 +141,6 @@ export default function Dashboard() {
     }
   }, [questions]);
 
-  // Debug: Log preAppointmentTasks state
-  useEffect(() => {
-    console.log('📋 Dashboard: Pre-appointment tasks state:', preAppointmentTasks);
-  }, [preAppointmentTasks]);
 
   // Update consent forms task based on completion status
   useEffect(() => {
@@ -212,34 +173,24 @@ export default function Dashboard() {
 
   // Function to determine if all consent forms are completed
   const areAllConsentFormsComplete = () => {
-    if (!consentState.isLoaded) return false;
+   
     
     // Only checking telehealth consent since photograph and mounjaro are hidden
-    const telehealthComplete = consentState.telehealthConsent?.data?.complete === true;
+
     
-    console.log('📋 Dashboard: Consent forms completion status:', {
-      telehealth: telehealthComplete
-    });
-    
-    return telehealthComplete;
+    return preAppointmentTasks.completeConsentForms;
   };
 
   // Function to check if all pre-appointment tasks are complete
   const areAllPreAppointmentTasksComplete = () => {
     const profileComplete = preAppointmentTasks.completeMedicalProfile;
-    const questionsComplete = isPrepareQuestionsCompleted();
-    const consentFormsComplete = areAllConsentFormsComplete();
+    const questionsComplete = preAppointmentTasks.prepareQuestions;
+    const consentFormsComplete = preAppointmentTasks.completeConsentForms;
     const measurementsComplete = preAppointmentTasks.enterWeightHeight;
     
     const allComplete = profileComplete && questionsComplete && consentFormsComplete && measurementsComplete;
     
-    console.log('📋 Dashboard: All pre-appointment tasks status:', {
-      profile: profileComplete,
-      questions: questionsComplete,
-      consentForms: consentFormsComplete,
-      measurements: measurementsComplete,
-      allComplete
-    });
+
     
     return allComplete;
   };
@@ -284,9 +235,7 @@ export default function Dashboard() {
     // Hide the prepare questions component
     setShowPrepareQuestions(false);
     
-    // Log the completion
-    console.log('Prepare Questions data saved:', data);
-    console.log('Task completion will be determined by store state');
+
   };
 
   // Handler for going back from prepare questions
@@ -669,7 +618,7 @@ export default function Dashboard() {
                         }}
                       >
                         <Box sx={{ mr: 2 }}>
-                          {isPrepareQuestionsCompleted() ? (
+                          {preAppointmentTasks.prepareQuestions ? (
                             <CheckCircle sx={{ color: 'success.main' }} />
                           ) : (
                             <Close sx={{ color: 'error.main' }} />
@@ -680,8 +629,8 @@ export default function Dashboard() {
                             variant="subtitle1"
                             component="div"
                             sx={{
-                              color: isPrepareQuestionsCompleted() ? 'success.main' : 'error.main',
-                              fontWeight: isPrepareQuestionsCompleted() ? 'bold' : 'normal',
+                              color:  preAppointmentTasks.prepareQuestions ? 'success.main' : 'error.main',
+                              fontWeight: preAppointmentTasks.prepareQuestions ? 'bold' : 'normal',
                               mb: 0.5
                             }}
                           >
@@ -691,7 +640,7 @@ export default function Dashboard() {
                             variant="body2"
                             component="div"
                             sx={{
-                              color: isPrepareQuestionsCompleted() ? 'success.dark' : 'error.dark'
+                              color: preAppointmentTasks.prepareQuestions ? 'success.dark' : 'error.dark'
                             }}
                           >
                             {task.description}

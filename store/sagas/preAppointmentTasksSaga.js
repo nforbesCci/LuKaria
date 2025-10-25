@@ -1,7 +1,9 @@
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { all, call, put, takeEvery } from 'redux-saga/effects';
 import { 
   updatePreAppointmentTaskSuccess, 
   updatePreAppointmentTaskFailure,
+  fetchPreAppointmentTasksSuccess,
+  fetchPreAppointmentTasksFailure,
   clearAppointmentTasks
 } from '../slices/appointmentSlice';
 
@@ -55,6 +57,26 @@ function* createPreAppointmentTaskInDatabase(taskData) {
   }
 }
 
+function* fetchPreAppointmentTasksInDatabase() {
+  try {
+    const response = yield call(fetch, '/api/pre-appointment-tasks', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      const errorData = yield response.json();
+      console.error('❌ Pre-Appointment Tasks Saga: API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorData.details || errorData.error || 'Unknown error'}`);
+    }
+    const result = yield response.json();
+    return result;
+  }catch (error) { 
+    console.error('Error fetching pre-appointment tasks in database:', error);
+    throw error;
+  }
+}
 // API call to delete pre-appointment tasks
 function* deletePreAppointmentTasksInDatabase(taskKey) {
   try {
@@ -130,6 +152,35 @@ function* clearPreAppointmentTasksSaga(action) {
   }
 }
 
+function* fetchPreAppointmentTasksSaga(action) {
+  console.log('🔧 Pre-Appointment Tasks Saga: fetchPreAppointmentTasksSaga called', action);
+  try {
+    console.log('🔧 Pre-Appointment Tasks Saga: Calling fetchPreAppointmentTasksInDatabase...');
+    const result = yield call(fetchPreAppointmentTasksInDatabase);
+    const doneKeys = new Set(
+      result.tasks
+        .filter(t => t.completed === true)
+        .map(t => t.taskKey)
+    );
+
+    const preAppointmentTasks = {
+      enterWeightHeight: doneKeys.has('enterWeightHeight') || false,
+      completeMedicalProfile: doneKeys.has('completeMedicalProfile') || false,
+      prepareQuestions: doneKeys.has('prepareQuestions') || false,
+      completeConsentForms: doneKeys.has('completeConsentForms') || false    };
+
+    yield put(fetchPreAppointmentTasksSuccess(preAppointmentTasks));
+  } catch (error) {
+    console.error('❌ Pre-Appointment Tasks Saga: Error fetching pre-appointment tasks', error);
+    yield put(fetchPreAppointmentTasksFailure(error.message));
+  }
+}
+
+export function* watchFetchPreAppointmentTasks() {
+  console.log('🔧 Pre-Appointment Tasks Saga: Setting up fetchPreAppointmentTasks watcher');
+  yield takeEvery('appointment/fetchPreAppointmentTask', fetchPreAppointmentTasksSaga);
+}
+
 // Watch for pre-appointment task actions
 export function* watchUpdatePreAppointmentTask() {
   yield takeEvery('appointment/updatePreAppointmentTask', updatePreAppointmentTaskSaga);
@@ -140,7 +191,11 @@ export function* watchClearPreAppointmentTasks() {
 }
 
 export default function* preAppointmentTasksSaga() {
-  yield watchUpdatePreAppointmentTask();
-  yield watchClearPreAppointmentTasks();
+ console.log('🔧 Pre-Appointment Tasks Saga: Starting saga setup');
+ yield all([
+  watchUpdatePreAppointmentTask(),
+  watchClearPreAppointmentTasks(),
+  watchFetchPreAppointmentTasks(),
+ ]);
 }
 

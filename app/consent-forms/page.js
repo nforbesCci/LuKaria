@@ -18,6 +18,7 @@ import {
   resetTelehealthConsentSaveFlag,
   fetchTelehealthConsent
 } from '../../store/slices/consentSlice';
+import { updatePreAppointmentTaskAction } from '../../store/slices/appointmentSlice';
 import Header from '../../components/Header';
 import { useRouter } from 'next/navigation';
 import {
@@ -2086,6 +2087,17 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                             handleCompleteTelehealthConsent();
                           } else {
                             setActiveTab(Math.min(forms.length - 1, activeTab + 1));
+                          }
+                          if(forms.length === Object.values(consentForms).filter(v => v === true).length){
+                            dispatch(updatePreAppointmentTaskAction({ 
+                              taskKey: 'completeConsentForms', 
+                              completed: true 
+                            }));
+                          }else{
+                              dispatch(updatePreAppointmentTaskAction({ 
+                                taskKey: 'completeConsentForms', 
+                                completed: false 
+                              }));
                           }
                         }}
                         disabled={
