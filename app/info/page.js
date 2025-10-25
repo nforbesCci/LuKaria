@@ -331,22 +331,22 @@ export default function InfoPage() {
                         secondary={
                           <Box component="span" sx={{ display: 'block', mt: 1 }}>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
-                              Account Holder: KADRIA FAIRCLOUGH-STONE
+                              Account Holder: LuKaria Professional Group Limited
                             </Typography>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
-                              Bank Name: FCIB
+                              Bank Name: Scotiabank
                             </Typography>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
-                              Branch: NEW KINGSTON
+                              Branch: Constant Spring Road Branch
                             </Typography>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
-                              Branch Transit: 09676
+                              Branch Transit: 21725
                             </Typography>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
                               Account Type: Chequing
                             </Typography>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
-                              Account Number: 1002362428
+                              Account Number: 000081785
                             </Typography>
                           </Box>
                         }

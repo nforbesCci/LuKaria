@@ -24,7 +24,27 @@ const ACCESS_RULES = {
  */
 function hasRequiredGroup(userGroups, requiredGroups) {
   if (!userGroups || !Array.isArray(userGroups)) return false;
-  return requiredGroups.some(group => userGroups.includes(group));
+  
+  // Check for exact matches first
+  const exactMatch = requiredGroups.some(group => userGroups.includes(group));
+  if (exactMatch) return true;
+  
+  // Check for case-insensitive matches
+  const caseInsensitiveMatch = requiredGroups.some(requiredGroup => 
+    userGroups.some(userGroup => 
+      userGroup.toLowerCase() === requiredGroup.toLowerCase()
+    )
+  );
+  
+  // Check for partial matches (e.g., "doctor group" contains "doctor")
+  const partialMatch = requiredGroups.some(requiredGroup => 
+    userGroups.some(userGroup => 
+      userGroup.toLowerCase().includes(requiredGroup.toLowerCase())
+    )
+  );
+  
+  
+  return exactMatch || caseInsensitiveMatch || partialMatch;
 }
 
 /**
@@ -39,13 +59,7 @@ export function useBasicAccess() {
     if (!isLoading && user) {
       const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
       
-      console.log('🔐 Basic Access Check:', {
-        groups: userGroups,
-        hasAccess: hasRequiredGroup(userGroups, ACCESS_RULES.BASIC_ACCESS)
-      });
-
       if (!hasRequiredGroup(userGroups, ACCESS_RULES.BASIC_ACCESS)) {
-        console.log('❌ Access Denied: User does not have required group');
         router.push('/unauthorized');
       }
     }
@@ -77,28 +91,13 @@ export function useConsultationAccess() {
       const isAdmin = userGroups.includes('Admin');
       const isPatientWithConsultation = userGroups.includes('Patient') && consultationOccurred;
       
-      console.log('🔐 Consultation Access Check:', {
-        groups: userGroups,
-        consultationOccurred,
-        consultationFromMongoDB: profileState.profile?.user_metadata?.consultationOccurred,
-        consultationFromMetadata: user.user_metadata?.consultationOccurred,
-        consultationFromClaim: user['https://lukariagroup.com/user_metadata']?.consultationOccurred,
-        isAdmin,
-        isPatientWithConsultation,
-        hasAccess: isAdmin || isPatientWithConsultation
-      });
-
       // Admin has full access, Patient needs consultation
-
       if (profileState?.profile && !isAdmin && !isPatientWithConsultation && !consultationOccurred) {
         if (userGroups.includes('Patient') && !consultationOccurred) {
-          console.log('❌ Access Denied: Patient has not had consultation yet');
           router.push('/consultation-required');
         } else {
-          console.log('❌ Access Denied: User does not have required group');
           router.push('/unauthorized');
         }
-        
       }
     }
   }, [user, isLoading, profileState.profile, router]);
@@ -119,13 +118,7 @@ export function useAdminAccess() {
     if (!isLoading && user) {
       const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
       
-      console.log('🔐 Admin Access Check:', {
-        groups: userGroups,
-        hasAccess: hasRequiredGroup(userGroups, ACCESS_RULES.ADMIN_PORTAL)
-      });
-
       if (!hasRequiredGroup(userGroups, ACCESS_RULES.ADMIN_PORTAL)) {
-        console.log('❌ Access Denied: User is not Admin or Doctor');
         router.push('/unauthorized');
       }
     }
@@ -148,14 +141,6 @@ export function canAccessPage(user, pageType, profileData = null) {
                                user['https://lukariagroup.com/user_metadata']?.consultationOccurred ||
                                false;
 
-  console.log('🔐 canAccessPage check:', {
-    pageType,
-    userGroups,
-    consultationOccurred,
-    consultationFromProfile: profileData?.user_metadata?.consultationOccurred,
-    consultationFromMetadata: user.user_metadata?.consultationOccurred,
-    consultationFromClaim: user['https://lukariagroup.com/user_metadata']?.consultationOccurred,
-  });
 
   switch (pageType) {
     case 'basic':

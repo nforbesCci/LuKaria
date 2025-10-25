@@ -115,7 +115,7 @@ async function uploadToSharePoint(pdfBuffer, fileName) {
 }
 
 // Send email with PDF attachment
-async function sendEmailWithAttachment(pdfBuffer, fileName) {
+async function sendEmailWithAttachment(pdfBuffer, fileName, userEmail, userName) {
   try {
     const accessToken = await getAccessToken();
     console.log('Access token acquired for email');
@@ -130,7 +130,7 @@ async function sendEmailWithAttachment(pdfBuffer, fileName) {
     const base64Content = pdfBuffer.toString('base64');
     console.log('Email details:', {
       from: process.env.MS365_EMAIL_FROM,
-      to: "nfforbes@gmail.com",//process.env.MS365_EMAIL_TO,
+      to: userEmail,
       fileName,
       attachmentSize: base64Content.length
     });
@@ -140,16 +140,17 @@ async function sendEmailWithAttachment(pdfBuffer, fileName) {
       body: {
         contentType: 'HTML',
         content: `
-          <p>Dear Dr. Fairclough,</p>
-          <p>Please find attached the lab requisition form.</p>
-          <p>Best regards,<br>Svelte by LuKaria System</p>
+          <p>Dear ${userName},</p>
+          <p>Please find attached the lab requisition form for completion at your earliest convenience.</p>
+          <p>A Svelte by LuKaria team member will contact you as soon as our physician has received your results.</p>
+          <p>Best regards,<br>Svelte by LuKaria</p>
         `,
       },
       toRecipients: [
         {
           emailAddress: {
-            address: "nfforbes@gmail.com",
-            name: "Neil Forbes"
+            address: userEmail,
+            name: userName
           },
         },
       ],
@@ -190,7 +191,7 @@ async function sendEmailWithAttachment(pdfBuffer, fileName) {
 export async function POST(request) {
   try {
     console.log('PDF send API called');
-    const { pdfData, fileName } = await request.json();
+    const { pdfData, fileName, userInfo } = await request.json();
 
     if (!pdfData || !fileName) {
       console.error('Missing required fields:', { pdfData: !!pdfData, fileName: !!fileName });
@@ -210,7 +211,12 @@ export async function POST(request) {
 
     // Send email with attachment
     console.log('Starting email send...');
-    const result = await sendEmailWithAttachment(pdfBuffer, fileName);
+    const userEmail = userInfo?.email || userInfo?.user_metadata?.email;
+    const userName = userInfo?.name || userInfo?.user_metadata?.name || userInfo?.nickname || 'User';
+    if (!userEmail) {
+      throw new Error('User email not found in user info');
+    }
+    const result = await sendEmailWithAttachment(pdfBuffer, fileName, userEmail, userName);
     console.log('Email send completed');
 
     return NextResponse.json(result);

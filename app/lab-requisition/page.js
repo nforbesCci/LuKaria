@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, Fragment } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useAdminAccess } from '../../hooks/useAccessControl';
 import Header from '../../components/Header';
+import Image from 'next/image';
 import {
   Container,
   Typography,
@@ -19,10 +21,10 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Backdrop,
 } from '@mui/material';
 import {
   ArrowBack,
-  Save,
   PictureAsPdf,
   Send,
   MedicalServices,
@@ -31,12 +33,29 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearPdfState } from '../../store/slices/pdfSlice';
+import { fetchProfile } from '../../store/slices/profileSlice';
 
 export default function LabRequisition() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
+  
+  // Access control - only Admin and Doctor can access
+  useAdminAccess();
   const { isGenerating, isSending, error: pdfError, success: pdfSuccess } = useSelector(state => state.pdf);
+  const { profile, isLoading: profileLoading } = useSelector(state => state.profile);
+
+  // Check user roles for lab requisition access
+  const userRoles = user?.['https://lukariagroup.com/roles'] || [];
+  const hasLabAccess = userRoles.some(role => {
+    const roleLower = role.toLowerCase();
+    const isAdmin = roleLower === 'admin';
+    const isDoctor = roleLower === 'doctor';
+    const isDoctorGroup = roleLower === 'doctor group' || roleLower === 'doctors' || roleLower === 'doctor_group';
+    const isAdminGroup = roleLower === 'admin group' || roleLower === 'admins' || roleLower === 'admin_group';
+    
+    return isAdmin || isDoctor || isDoctorGroup || isAdminGroup;
+  });
 
   // Clear PDF state after success/error
   useEffect(() => {
@@ -47,6 +66,14 @@ export default function LabRequisition() {
       return () => clearTimeout(timer);
     }
   }, [pdfSuccess, pdfError, dispatch]);
+
+  // Fetch profile data when component loads
+  useEffect(() => {
+    if (mounted && user && !profile) {
+      console.log('🔄 Lab Requisition: Fetching profile data...');
+      dispatch(fetchProfile());
+    }
+  }, [mounted, user, profile, dispatch]);
 
   // Add print-specific styles
   useEffect(() => {
@@ -615,14 +642,14 @@ export default function LabRequisition() {
     });
   };
 
-  if (isLoading || !mounted) {
+  if (isLoading || !mounted || profileLoading) {
     return (
       <>
         <Header />
         <Container maxWidth="lg" sx={{ mt: 4, textAlign: 'center' }}>
           <CircularProgress />
           <Typography variant="h6" sx={{ mt: 1 }}>
-            Loading...
+            {profileLoading ? 'Loading patient profile...' : 'Loading...'}
           </Typography>
         </Container>
       </>
@@ -636,6 +663,28 @@ export default function LabRequisition() {
         <Container maxWidth="lg" sx={{ mt: 2 }}>
           <Alert severity="error">
             Error loading user: {error.message}
+          </Alert>
+        </Container>
+      </>
+    );
+  }
+
+  // Check if user has access to lab requisition
+  if (user && !hasLabAccess) {
+    return (
+      <>
+        <Header />
+        <Container maxWidth="lg" sx={{ mt: 4, textAlign: 'center' }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+              Access Denied
+            </Typography>
+            <Typography variant="body1">
+              You do not have permission to access the Lab Requisition page.
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              Only Admin and Doctor roles can access this page.
+            </Typography>
           </Alert>
         </Container>
       </>
@@ -751,13 +800,6 @@ export default function LabRequisition() {
           >
             {isGenerating || isSending ? <CircularProgress size={20} color="inherit" /> : 'Send'}
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Save />}
-            sx={{ textTransform: 'none' }}
-          >
-            Save
-          </Button>
         </Box>
 
         {/* Main Content - Patient Information in Own Row */}
@@ -863,6 +905,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Date of Birth"
+                    value={profile?.dateOfBirth || ''}
                     variant="standard"
                     InputProps={{ readOnly: true }}
                   />
@@ -870,7 +913,8 @@ export default function LabRequisition() {
                 <Grid item xs={12} sm={6} md={2.4}>
                   <TextField
                     fullWidth
-                    label="Patient ID"
+                    label="Sex"
+                    value={profile?.sex || ''}
                     variant="standard"
                     InputProps={{ readOnly: true }}
                   />
@@ -879,6 +923,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Phone Number"
+                    value={profile?.preferredPhone || ''}
                     variant="standard"
                     InputProps={{ readOnly: true }}
                   />
@@ -887,6 +932,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Address"
+                    value={profile?.homeAddress || ''}
                     multiline
                     rows={2}
                     variant="standard"
@@ -921,7 +967,7 @@ export default function LabRequisition() {
                         fullWidth
                         label="Telephone Number"
                         variant="standard"
-                        defaultValue="(876) 555-0123"
+                        defaultValue="18762903659"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -929,7 +975,6 @@ export default function LabRequisition() {
                         fullWidth
                         label="Fax Number"
                         variant="standard"
-                        defaultValue="(876) 555-0124"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -937,7 +982,7 @@ export default function LabRequisition() {
                         fullWidth
                         label="Registration Number"
                         variant="standard"
-                        defaultValue="JM12345"
+                        defaultValue="84608"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -947,7 +992,6 @@ export default function LabRequisition() {
                         multiline
                         rows={2}
                         variant="standard"
-                        defaultValue="123 Medical Plaza\nSuite 456\nKingston, Jamaica"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -975,9 +1019,16 @@ export default function LabRequisition() {
                         backgroundColor: '#f9f9f9'
                       }}
                     >
-                      <Typography variant="body2" color="text.secondary">
-                        Doctor's Signature
-                      </Typography>
+                      <Image
+                        src="/images/signature.png"
+                        alt="Doctor's Signature"
+                        width={120}
+                        height={40}
+                        style={{
+                          objectFit: 'contain',
+                          maxHeight: '40px'
+                        }}
+                      />
                     </Box>
                   </Box>
                 </CardContent>
@@ -997,7 +1048,6 @@ export default function LabRequisition() {
                         fullWidth
                         label="Doctor's Name"
                         variant="standard"
-                        defaultValue="Dr. Sarah Johnson"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -1005,7 +1055,6 @@ export default function LabRequisition() {
                         fullWidth
                         label="Telephone Number"
                         variant="standard"
-                        defaultValue="(876) 555-0123"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -1013,7 +1062,6 @@ export default function LabRequisition() {
                         fullWidth
                         label="Fax Number"
                         variant="standard"
-                        defaultValue="(876) 555-0124"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -1021,7 +1069,6 @@ export default function LabRequisition() {
                         fullWidth
                         label="Registration Number"
                         variant="standard"
-                        defaultValue="JM12345"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -1031,7 +1078,6 @@ export default function LabRequisition() {
                         multiline
                         rows={2}
                         variant="standard"
-                        defaultValue="123 Medical Plaza\nSuite 456\nKingston, Jamaica"
                       />
                     </Grid>
                     </Grid>
@@ -3777,6 +3823,35 @@ name="Routine (Results within 24-48 hours)"
         </Paper>
         </div>
       </Container>
+
+      {/* Wait Mask Overlay */}
+      <Backdrop
+        sx={{ 
+          color: '#fff', 
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)'
+        }}
+        open={isGenerating || isSending}
+      >
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          textAlign: 'center'
+        }}>
+          <CircularProgress 
+            size={60} 
+            color="inherit" 
+            sx={{ mb: 2 }}
+          />
+          <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
+            {isGenerating ? 'Generating PDF...' : 'Sending Email...'}
+          </Typography>
+          <Typography variant="body1" sx={{ opacity: 0.8 }}>
+            Please wait while we process your request
+          </Typography>
+        </Box>
+      </Backdrop>
     </>
   );
 }

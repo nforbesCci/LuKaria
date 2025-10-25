@@ -79,6 +79,7 @@ function* sendPdfSaga(action) {
     const payload = {
       pdfData: pdfBlob.base64Data,
       fileName: fileName || `Lab-Requisition-${new Date().toISOString().split('T')[0]}.pdf`,
+      userInfo: userInfo,
     };
 
     // Send to API route
