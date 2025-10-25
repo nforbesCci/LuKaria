@@ -238,7 +238,7 @@ export default function UserDetailPage() {
 
   // Fetch pre-appointment tasks when consultation is completed
   useEffect(() => {
-    if (params.userId && dbConsultationOccurred) {
+    if (params.userId) {
       console.log('🔄 Consultation completed, fetching pre-appointment tasks for user:', params.userId);
       dispatch(fetchAdminPreAppointmentTasks({ userId: params.userId }));
     }
@@ -1410,7 +1410,7 @@ export default function UserDetailPage() {
               </Grid>
               
               {/* Pre-Appointment Tasks Status */}
-              {dbConsultationOccurred && (
+              {(
                 <Box sx={{ mt: 3 }}>
                   {adminPreAppointmentTasksLoading ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
