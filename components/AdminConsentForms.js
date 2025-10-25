@@ -89,10 +89,7 @@ const AdminConsentForms = ({
                              Status: {form.available ? 'Active' : 'Inactive'}
                            </Typography>
                            
-                           {/* Debug: Show form properties */}
-                           <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                             Debug: locked={String(form.locked)}, complete={String(form.complete)}
-                           </Typography>
+                         
                           
                           {form.createdAt && (
                             <Typography variant="caption" color="text.secondary" display="block">
@@ -135,17 +132,6 @@ const AdminConsentForms = ({
                               </Button>
                             )}
                             
-                            {form.complete && (
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                color="info"
-                                onClick={() => onUnlockConsentForm(formType)}
-                              >
-                                Unlock Complete
-                              </Button>
-                            )}
-                            
                             {/* Test button - always show for debugging */}
                             <Button
                               variant="outlined"
@@ -153,10 +139,11 @@ const AdminConsentForms = ({
                               color="secondary"
                               onClick={() => {
                                 console.log('Test button clicked for form:', formType, form);
+                               
                                 onUnlockConsentForm(formType);
                               }}
                             >
-                              Test Unlock
+                               {form.complete ? 'Unlock' : 'Lock'}
                             </Button>
                           </Box>
                         </>

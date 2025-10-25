@@ -35,7 +35,8 @@ export async function POST(request) {
         educateSocialMedia: consentData.permissions?.educateSocialMedia,
       },
       specialRequests: consentData.specialRequests,
-      complete: consentData.complete === true ? true : false, // Use provided value or default to false
+      complete: consentData.complete === true ? true : false,
+      available: true, // Use provided value or default to false
       updatedAt: new Date(),
     };
 

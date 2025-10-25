@@ -900,11 +900,30 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
 
   // Ensure activeTab is within valid range
   useEffect(() => {
-    if (activeTab >= forms.length) {
-      console.log('⚠️ Active tab out of bounds, resetting to 0');
+    if (activeTab >= forms.length || activeTab < 0) {
+      console.log('⚠️ Active tab out of bounds, resetting to 0. Current activeTab:', activeTab, 'forms.length:', forms.length);
       setActiveTab(0);
     }
   }, [activeTab, forms.length]);
+
+  // Additional safety check when forms change
+  useEffect(() => {
+    if (forms.length > 0 && (activeTab >= forms.length || activeTab < 0)) {
+      console.log('⚠️ Forms changed, resetting activeTab to 0. Current activeTab:', activeTab, 'forms.length:', forms.length);
+      setActiveTab(0);
+    }
+  }, [forms.length]);
+
+  // Reset activeTab when forms are filtered and activeTab becomes invalid
+  useEffect(() => {
+    if (forms.length === 0) {
+      console.log('⚠️ No forms available, resetting activeTab to 0');
+      setActiveTab(0);
+    } else if (activeTab >= forms.length) {
+      console.log('⚠️ ActiveTab exceeds available forms, resetting to 0');
+      setActiveTab(0);
+    }
+  }, [forms, activeTab]);
 
   if (isLoading) {
     return (
@@ -1054,7 +1073,7 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
             variant={isMobile ? 'scrollable' : 'standard'}
             scrollButtons={isMobile ? 'auto' : false}
             allowScrollButtonsMobile
-            value={activeTab}
+            value={Math.max(0, Math.min(activeTab, forms.length - 1))}
             onChange={handleTabChange}
             sx={{
               borderRight: { xs: 0, md: 1 },
@@ -1249,7 +1268,7 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                           <Grid container spacing={3}>
                           {/* Question 1 */}
                           <Grid item xs={12}>
-                            <FormControl component="fieldset" disabled={isFormComplete}>
+                            <FormControl component="fieldset">
                               <FormLabel component="legend" sx={{ fontWeight: 500, color: 'text.primary', mb: 1 }}>
                                 To educate other patients within our practice
                               </FormLabel>

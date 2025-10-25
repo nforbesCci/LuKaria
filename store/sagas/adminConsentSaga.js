@@ -119,46 +119,12 @@ export function* watchUpdateAdminConsentForm() {
   yield takeEvery('admin/updateAdminConsentForm', updateAdminConsentFormSaga);
 }
 
-// Debug watcher to catch all admin consent actions
-export function* watchAllAdminConsentActions() {
-  console.log('🔧 Admin Consent Saga: Setting up debug watcher for all admin consent actions');
-  yield takeEvery('admin/updateAdminConsentForm', function* (action) {
-    console.log('🔍 DEBUG: Update admin consent form action caught:', action.type, action);
-  });
-  yield takeEvery('admin/fetchAdminConsentForms', function* (action) {
-    console.log('🔍 DEBUG: Fetch admin consent forms action caught:', action.type, action);
-  });
-}
-
-// Global action logger to catch all actions
-export function* watchAllActions() {
-  console.log('🔧 Admin Consent Saga: Setting up global action logger');
-  yield takeEvery('*', function* (action) {
-    if (action.type.includes('admin') && action.type.includes('Consent')) {
-      console.log('🔍 GLOBAL DEBUG: Admin consent action detected:', action.type, action);
-    }
-    // Also log any action that contains 'updateAdminConsentForm'
-    if (action.type.includes('updateAdminConsentForm')) {
-      console.log('🔍 GLOBAL DEBUG: updateAdminConsentForm action detected:', action.type, action);
-    }
-  });
-}
-
-// Test watcher to see if saga is working at all
-export function* watchTestActions() {
-  console.log('🔧 Admin Consent Saga: Setting up test watcher');
-  yield takeEvery('admin/fetchAdminConsentForms', function* (action) {
-    console.log('🔍 TEST: Fetch admin consent forms action caught by test watcher:', action.type, action);
-  });
-}
 
 export default function* adminConsentSaga() {
   console.log('🔧 Admin Consent Saga: Starting saga setup');
   yield all([
     watchFetchAdminConsentForms(),
     watchUpdateAdminConsentForm(),
-    watchAllAdminConsentActions(),
-    watchTestActions()
   ]);
   console.log('🔧 Admin Consent Saga: All watchers set up');
 }

@@ -29,7 +29,8 @@ export async function POST(request) {
       patientDOB: consentData.patientDOB,
       consentDate: consentData.consentDate,
       signature: consentData.signature,
-      complete: consentData.complete === true ? true : false, // Use provided value or default to false
+      complete: consentData.complete === true ? true : false,
+      available: true, // Use provided value or default to false
       updatedAt: new Date(),
     };
 

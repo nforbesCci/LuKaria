@@ -1,0 +1,73 @@
+{
+  "common": {
+    "save": "Save",
+    "complete": "Complete",
+    "clear": "Clear",
+    "patientName": "Patient Name",
+    "dateOfBirth": "Date of Birth",
+    "consentDate": "Consent Date",
+    "signature": "Signature",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "completed": "Completed",
+    "locked": "Locked",
+    "unlock": "Unlock",
+    "view": "View",
+    "edit": "Edit",
+    "close": "Close",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "instructions": {
+    "title": "Consent Forms",
+    "description": "Please review each consent form carefully. Use the tabs to navigate between forms. Check the box on each tab when you complete the form.",
+    "formCompleted": "This form has been completed and locked. No further edits can be made.",
+    "formSaved": "Form saved successfully!",
+    "formCompletedMessage": "Form completed and saved successfully!"
+  },
+  "forms": {
+    "photographConsent": {
+      "id": "photographConsent",
+      "title": "Photograph Consent",
+      "description": "Consent for use of Photographs",
+      "hasCustomFields": true,
+      "content": "Before and after photographs are important proofs of the success of your program. Many patients who are contemplating whether a weight loss program might be right for them find photographs useful. Images, including before and after photos, may be used for patient education and for advertising.\n\nSvelte by LuKaria will only use your photographs if you have given permission to do so. Names are not used, and identifying factors are masked when requested. These photos are stored in a secure server in compliance with Jamaica's Data Protection Act. They will be accessed by clinic staff and will not be sold or transferred to any other entity for purposes that have not been agreed to.",
+      "fields": {
+        "consentCheckbox": "I consent to the use of my photographs for medical and educational purposes",
+        "permissions": {
+          "label": "Permissions",
+          "options": {
+            "medicalEducation": "Medical education and training",
+            "marketing": "Marketing and advertising",
+            "research": "Research purposes",
+            "beforeAfter": "Before and after photos"
+          }
+        },
+        "specialRequests": {
+          "label": "Special Requests",
+          "placeholder": "Any special requests regarding photo usage..."
+        }
+      }
+    },
+    "mounjaroConsent": {
+      "id": "mounjaroConsent",
+      "title": "Mounjaro Consent",
+      "description": "Consent for Mounjaro (tirzepatide) treatment",
+      "hasCustomFields": true,
+      "content": "Purpose of Treatment:\nMounjaro is a human-based glucagon-like peptide-1 receptor agonist and Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.\n\nMounjaro is FDA approved for the management of Type 2 Diabetes, and is used off label for weight management in non-diabetic patients who are overweight or obese. It works by increasing insulin production and lowers glucagon secretion as well as targets areas in the brain that regulate appetite and food intake. Mounjaro also assists the body to store fat more efficiently.\n\nDo not take Mounjaro if:\n• You have a personal or family history of medullary thyroid carcinoma (Thyroid Cancer)\n• Multiple Endocrine Neoplasia syndrome type 2\n• You are pregnant or plan to become pregnant while taking this medicine\n• You are diabetic and/or taking any medications related to lowering your blood sugar levels without speaking with your endocrinologist. Specifically, if you are prescribed Insulin because the combination may increase your risk of hypoglycemia (low blood sugar) and dosage adjustments by your provider may be necessary\n• You have a history of Pancreatitis\n• You are allergic to BPC-157, Tirzepatide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®, Trulicity®, Victoza®, Wegovy®\n\nPossible Drug Interactions:\nAnti-diabetic agents, specifically: Insulin and Sulfonylureas (e.g., glyburide, glipizide, glimepiride, tolbutamide) due to the increased risk of hypoglycemia (low blood sugar). Do not take with other GLP-1 agonist medicines such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®,Trulicity®, Victoza®, Wegovy® (THIS IS NOT AN ALL-INCLUSIVE LIST). Please tell your provider about any medications that may lower your blood sugar.\n\nSide Effects:\nI understand that, like all medications, Mounjaro may cause side effects. These may include but are not limited to:\n• Nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, dyspepsia, dizziness, abdominal distension, belching, hypoglycemia, flatulence, gastroenteritis, and gastroesophageal reflux disease.\n• Subcutaneous Injections: common injection site reactions characterized by itching, burning at site of administration with or without thickening of the skin(welting)\n• Serious side effects: Pancreatitis, Cholecystitis, kidney problems, changes in vision (Diabetic retinopathy and NAION), low blood sugar (hypoglycemia), gastroparesis\n\nA very serious allergic reaction to this drug is rare. However, get medical help right away if you notice any symptoms of a serious allergic reaction, including rash, itching/swelling (especially of the face/tongue/throat), severe dizziness, trouble breathing. Report adverse side effects to your doctor.\n\nPrecautions:\n• In rodents, another GLP1 receptor agonist causes dose-dependent and treatment-duration dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether Tirzepatide causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans.\n• Acute pancreatitis, including fatal and non-fatal hemorrhagic or necrotizing pancreatitis, has been observed in patients treated with GLP-1 receptor agonists, including Tirzepatide.\n• Acute Gallbladder Disease: Treatment with Tirzepatide is associated with an increased occurrence of cholelithiasis and cholecystitis.\n• Acute Kidney Injury: There have been reports of acute kidney injury and worsening of chronic renal failure, which in some cases required hemodialysis, in patients treated with Tirzepatide.\n• Heart Rate Increase: Mean increases in resting heart rate of 1 to 4 beats per minute (bpm) were observed in Tirzepatide adult patients compared to placebo in clinical trials.\n\nMonitoring and Follow-up:\nI agree to undergo regular monitoring as recommended by my healthcare provider, which may include:\n• Blood sugar levels and HbA1c testing\n• Kidney function tests\n• Liver function tests\n• Thyroid function tests\n• Pregnancy testing\n• Follow-up visits to evaluate the effectiveness and adjust the treatment plan if necessary\n\nAlternatives to Mounjaro:\nI have been informed of alternative treatment options, which may include lifestyle changes (such as diet and exercise), other medications for type 2 diabetes or weight management, and surgical options for weight loss.\n\nConsent:\nBy signing below, I certify that I have read and understand the contents of this form. I acknowledge that:\n• I consent to initiating/continuing treatment with Mounjaro\n• I have had the opportunity to ask questions about Mounjaro and its potential risks and benefits.\n• I have a proper laboratory testing done prior to starting treatment\n• I am aware of the possible side effects and drug interactions and give my consent for treatment\n• I have informed the medical staff of any known allergies to drugs or other substances, and any past adverse reactions I've experienced. I have informed the medical staff of all medications and supplements I'm currently taking\n• I understand there are other ways and programs that can assist me in my desire to decrease my body weight and acknowledge that no guarantees have been made to me concerning my results.",
+      "fields": {
+        "consentCheckbox": "I consent to treatment with Mounjaro (tirzepatide)"
+      }
+    },
+    "telemedicineConsent": {
+      "id": "telemedicineConsent",
+      "title": "Telehealth Consent",
+      "description": "Consent for telehealth services",
+      "hasCustomFields": true,
+      "content": "I understand that my healthcare provider wishes me to engage in a telehealth appointment.\n\nI understand that the video conferencing technology that will be used to affect such an appointment will not be the same as a direct client/health care provider visit due to the fact that I will not be in the same room as my provider.\n\nI understand that a telehealth consultation has potential benefits including easier access to care and the convenience of meeting from a location of my choosing.\n\nI understand there are potential risks to this technology, including interruptions, unauthorized access, and technical difficulties. I understand that my health care provider or I can discontinue the telehealth consult/visit if it is felt that the videoconferencing connections are not adequate for the situation.\n\nConsent to Use Telehealth Services by Carepatron:\nTelehealth by Carepatron is the technology service we will use to conduct telehealth videoconferencing appointments. It is simple to use and there are no passwords required to log in. By signing this document, I acknowledge:\n\n• Telehealth by Carepatron is NOT an Emergency Service and in the event of an emergency, I will use a phone to call your local emergency telephone number.\n\n• Though my provider and I may be in direct, virtual contact through the Telehealth Service, neither Carepatron nor the Telehealth Service provides any medical or healthcare services or advice including, but not limited to, emergency or urgent medical services.\n\n• The Telehealth Services by Carepatron facilitates videoconferencing and is not responsible for the delivery of any healthcare, medical advice or care.\n\n• I do not assume that my provider has access to any or all of the technical information in the Telehealth by Carepatron – or that such information is current, accurate or up-to-date. I will not rely on my health care provider to have any of this information in the Telehealth by Carepatron.\n\n• To maintain confidentiality, I will not share my telehealth appointment link with anyone unauthorized to attend the appointment.",
+      "fields": {
+        "consentCheckbox": "I consent to participate in telehealth appointments"
+      }
+    }
+  }
+}

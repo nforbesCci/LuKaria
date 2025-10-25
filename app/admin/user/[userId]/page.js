@@ -1050,13 +1050,7 @@ export default function UserDetailPage() {
   // Handle unlocking consent forms (both locked and completed)
   const handleUnlockConsentForm = (formType) => {
     const form = consentForms[formType];
-    if (form?.complete) {
-      // Unlock completed form
-      handleConsentFormUpdate(formType, { complete: false });
-    } else if (form?.locked) {
-      // Unlock locked form
-      handleConsentFormUpdate(formType, { locked: false });
-    }
+    handleConsentFormUpdate(formType, { complete: !form?.complete });
   };
 
   // Handle viewing consent forms

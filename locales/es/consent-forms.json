@@ -1,0 +1,73 @@
+{
+  "common": {
+    "save": "Guardar",
+    "complete": "Completar",
+    "clear": "Limpiar",
+    "patientName": "Nombre del Paciente",
+    "dateOfBirth": "Fecha de Nacimiento",
+    "consentDate": "Fecha de Consentimiento",
+    "signature": "Firma",
+    "saving": "Guardando...",
+    "saved": "Guardado",
+    "completed": "Completado",
+    "locked": "Bloqueado",
+    "unlock": "Desbloquear",
+    "view": "Ver",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "next": "Siguiente",
+    "previous": "Anterior"
+  },
+  "instructions": {
+    "title": "Formularios de Consentimiento",
+    "description": "Por favor revise cada formulario de consentimiento cuidadosamente. Use las pestañas para navegar entre formularios. Marque la casilla en cada pestaña cuando complete el formulario.",
+    "formCompleted": "Este formulario ha sido completado y bloqueado. No se pueden hacer más ediciones.",
+    "formSaved": "¡Formulario guardado exitosamente!",
+    "formCompletedMessage": "¡Formulario completado y guardado exitosamente!"
+  },
+  "forms": {
+    "photographConsent": {
+      "id": "photographConsent",
+      "title": "Consentimiento Fotográfico",
+      "description": "Consentimiento para el uso de Fotografías",
+      "hasCustomFields": true,
+      "content": "Las fotografías antes y después son pruebas importantes del éxito de su programa. Muchos pacientes que están considerando si un programa de pérdida de peso podría ser adecuado para ellos encuentran útiles las fotografías. Las imágenes, incluyendo fotos antes y después, pueden ser utilizadas para educación del paciente y para publicidad.\n\nSvelte by LuKaria solo utilizará sus fotografías si ha dado permiso para hacerlo. Los nombres no se utilizan, y los factores identificativos se enmascaran cuando se solicita. Estas fotos se almacenan en un servidor seguro en cumplimiento de la Ley de Protección de Datos de Jamaica. Serán accedidas por el personal de la clínica y no serán vendidas o transferidas a ninguna otra entidad para propósitos que no hayan sido acordados.",
+      "fields": {
+        "consentCheckbox": "Consiento al uso de mis fotografías para propósitos médicos y educativos",
+        "permissions": {
+          "label": "Permisos",
+          "options": {
+            "medicalEducation": "Educación y entrenamiento médico",
+            "marketing": "Marketing y publicidad",
+            "research": "Propósitos de investigación",
+            "beforeAfter": "Fotos antes y después"
+          }
+        },
+        "specialRequests": {
+          "label": "Solicitudes Especiales",
+          "placeholder": "Cualquier solicitud especial respecto al uso de fotos..."
+        }
+      }
+    },
+    "mounjaroConsent": {
+      "id": "mounjaroConsent",
+      "title": "Consentimiento Mounjaro",
+      "description": "Consentimiento para tratamiento con Mounjaro (tirzepatida)",
+      "hasCustomFields": true,
+      "content": "Propósito del Tratamiento:\nMounjaro es un agonista del receptor del péptido-1 similar al glucagón humano y agonista del receptor del Polipéptido Insulinotrópico Dependiente de Glucosa (GIP) prescrito como adyuvante a una dieta reducida en calorías y aumento de la actividad física para el manejo crónico del peso en adultos con un índice de masa corporal (IMC) inicial que se considera fuera de un rango saludable.\n\nMounjaro está aprobado por la FDA para el manejo de la Diabetes Tipo 2, y se usa fuera de etiqueta para el manejo del peso en pacientes no diabéticos que tienen sobrepeso u obesidad. Funciona aumentando la producción de insulina y reduciendo la secreción de glucagón, así como dirigiendo áreas en el cerebro que regulan el apetito y la ingesta de alimentos. Mounjaro también ayuda al cuerpo a almacenar grasa de manera más eficiente.",
+      "fields": {
+        "consentCheckbox": "Consiento al tratamiento con Mounjaro (tirzepatida)"
+      }
+    },
+    "telemedicineConsent": {
+      "id": "telemedicineConsent",
+      "title": "Consentimiento de Telesalud",
+      "description": "Consentimiento para servicios de telesalud",
+      "hasCustomFields": true,
+      "content": "Entiendo que mi proveedor de atención médica desea que participe en una cita de telesalud.\n\nEntiendo que la tecnología de videoconferencia que se utilizará para efectuar dicha cita no será la misma que una visita directa cliente/proveedor de atención médica debido al hecho de que no estaré en la misma habitación que mi proveedor.\n\nEntiendo que una consulta de telesalud tiene beneficios potenciales incluyendo acceso más fácil a la atención y la conveniencia de reunirse desde una ubicación de mi elección.\n\nEntiendo que hay riesgos potenciales a esta tecnología, incluyendo interrupciones, acceso no autorizado, y dificultades técnicas. Entiendo que mi proveedor de atención médica o yo podemos discontinuar la consulta/visita de telesalud si se siente que las conexiones de videoconferencia no son adecuadas para la situación.",
+      "fields": {
+        "consentCheckbox": "Consiento a participar en citas de telesalud"
+      }
+    }
+  }
+}

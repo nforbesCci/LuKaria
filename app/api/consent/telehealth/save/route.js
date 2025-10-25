@@ -30,6 +30,7 @@ export async function POST(request) {
       consentDate: consentData.consentDate,
       signature: consentData.signature,
       complete: consentData.complete === true ? true : false,
+      available: true,
       updatedAt: new Date(),
     };
 

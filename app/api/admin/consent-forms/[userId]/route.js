@@ -168,7 +168,7 @@ export async function PUT(request, { params }) {
     }
 
     const targetUserId = params.userId;
-    const { formType, enabled, complete } = await request.json();
+    const { formType, enabled, locked, complete } = await request.json();
 
     const db = await getDatabase('lukaria');
 
@@ -184,6 +184,7 @@ export async function PUT(request, { params }) {
     // Build update object based on provided parameters
     const updateFields = {};
     if (enabled !== undefined) updateFields.available = enabled;
+    if (locked !== undefined) updateFields.locked = locked;
     if (complete !== undefined) updateFields.complete = complete;
     
     if (formType === 'telehealth') {
