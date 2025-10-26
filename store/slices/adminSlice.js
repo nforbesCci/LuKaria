@@ -10,6 +10,15 @@ const initialState = {
   loading: false,
   error: null,
   
+  // Pagination and filtering
+  page: 0,
+  rowsPerPage: 10,
+  searchTerm: '',
+  statusFilter: 'all',
+  sort: 'createdAt',
+  selectedUser: null,
+  editDialogOpen: false,
+  
   // Admin meals data
   adminMeals: {},
   adminMealsLoading: false,
@@ -82,6 +91,41 @@ const adminSlice = createSlice({
     },
     setError: (state, action) => {
       state.error = action.payload;
+    },
+    
+    // Pagination and filtering reducers
+    setPage: (state, action) => {
+      state.page = action.payload;
+    },
+    setRowsPerPage: (state, action) => {
+      state.rowsPerPage = action.payload;
+    },
+    setSearchTerm: (state, action) => {
+      state.searchTerm = action.payload;
+    },
+    setStatusFilter: (state, action) => {
+      state.statusFilter = action.payload;
+    },
+    setSort: (state, action) => {
+      state.sort = action.payload;
+    },
+    setSelectedUser: (state, action) => {
+      state.selectedUser = action.payload;
+    },
+    setEditDialogOpen: (state, action) => {
+      state.editDialogOpen = action.payload;
+    },
+    setPaginationData: (state, action) => {
+      const { page, rowsPerPage, totalUsers } = action.payload;
+      state.page = page;
+      state.rowsPerPage = rowsPerPage;
+      state.totalUsers = totalUsers;
+    },
+    resetFilters: (state) => {
+      state.searchTerm = '';
+      state.statusFilter = 'all';
+      state.page = 0;
+      state.sort = 'createdAt';
     },
     
     // Admin meals reducers
@@ -480,6 +524,55 @@ export const fetchAdminPreAppointmentTasksAction = (payload) => ({
 export const updateAdminPreAppointmentTaskAction = (payload) => ({
   type: 'admin/updateAdminPreAppointmentTask',
   payload,
+});
+
+// Pagination and filtering action creators
+export const setPage = (page) => ({
+  type: 'admin/setPage',
+  payload: page,
+});
+
+export const setRowsPerPage = (rowsPerPage) => ({
+  type: 'admin/setRowsPerPage',
+  payload: rowsPerPage,
+});
+
+export const setSearchTerm = (searchTerm) => ({
+  type: 'admin/setSearchTerm',
+  payload: searchTerm,
+});
+
+export const setStatusFilter = (statusFilter) => ({
+  type: 'admin/setStatusFilter',
+  payload: statusFilter,
+});
+
+export const setSort = (sort) => ({
+  type: 'admin/setSort',
+  payload: sort,
+});
+
+export const setSelectedUser = (selectedUser) => ({
+  type: 'admin/setSelectedUser',
+  payload: selectedUser,
+});
+
+export const setEditDialogOpen = (editDialogOpen) => ({
+  type: 'admin/setEditDialogOpen',
+  payload: editDialogOpen,
+});
+
+export const setPaginationData = (paginationData) => ({
+  type: 'admin/setPaginationData',
+  payload: paginationData,
+});
+
+export const resetFilters = () => ({
+  type: 'admin/resetFilters',
+});
+
+export const fetchUsers = () => ({
+  type: 'admin/fetchUsers',
 });
 
 export default adminSlice.reducer;

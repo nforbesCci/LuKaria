@@ -41,7 +41,7 @@ export default function Contact() {
       <SEO 
         title="Contact Us | Svelte by LuKaria"
         description="Get in touch with Svelte by LuKaria. Contact our patient care team for questions about virtual weight loss consultations, GLP-1 medications, and program enrollment."
-        keywords="contact weight loss clinic, Jamaica telehealth contact, virtual consultation contact, patient care support, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+        keywords="contact weight loss clinic, Jamaica telehealth contact, virtual consultation contact, patient care support, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/contact"
       />
       {/* Navigation Menu */}

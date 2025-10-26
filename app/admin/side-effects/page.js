@@ -230,7 +230,7 @@ export default function AdminSideEffectsPage() {
       <SEO 
         title="Side Effects Reports - Admin"
         description="View and manage patient side effects reports"
-        keywords="admin, side effects, reports, patient management, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+        keywords="admin, side effects, reports, patient management, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/admin/side-effects"
       />
       

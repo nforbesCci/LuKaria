@@ -59,7 +59,7 @@ export default function FAQ() {
       <SEO 
         title="FAQ - Frequently Asked Questions | Svelte by LuKaria"
         description="Common questions about GLP-1 medications, Mounjaro, weight loss treatment, virtual consultations, and program details. Get answers to your weight loss questions."
-        keywords="GLP-1 FAQ, Mounjaro questions, weight loss answers, virtual consultation FAQ, medical weight loss questions, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+        keywords="GLP-1 FAQ, Mounjaro questions, weight loss answers, virtual consultation FAQ, medical weight loss questions, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/faq"
       />
       {/* Navigation Menu */}

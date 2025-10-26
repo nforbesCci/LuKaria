@@ -47,38 +47,13 @@ export async function GET(request, { params }) {
       });
     }
 
-    // Check Medical Profile completion based on required fields
-    const medicalProfileFields = {
-      phoneNumber: profile.phoneNumber,
-      gender: profile.gender,
-      preferredPhoneNumber: profile.preferredPhoneNumber,
-      parish: profile.parish
-    };
 
-    const medicalProfileCompleted = 
-      medicalProfileFields.phoneNumber && 
-      medicalProfileFields.gender && 
-      medicalProfileFields.preferredPhoneNumber && 
-      medicalProfileFields.parish;
 
-    console.log('✅ Admin profile fetched successfully:', {
-      userId: targetUserId,
-      hasProfile: !!profile,
-      medicalProfileCompleted,
-      medicalProfileFields
-    });
 
     return NextResponse.json({
       success: true,
       profile,
-      userId: targetUserId,
-      medicalProfileStatus: {
-        completed: medicalProfileCompleted,
-        fields: medicalProfileFields,
-        missingFields: Object.entries(medicalProfileFields)
-          .filter(([key, value]) => !value)
-          .map(([key]) => key)
-      }
+      userId: targetUserId,     
     });
 
   } catch (error) {

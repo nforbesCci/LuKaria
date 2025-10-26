@@ -111,6 +111,13 @@ export default function AdminPage() {
     editDialogOpen,
   } = useSelector((state) => state.admin);
 
+  // Ensure pagination values are always defined
+  const safePage = page ?? 0;
+  const safeRowsPerPage = rowsPerPage ?? 10;
+  const safeTotalUsers = totalUsers ?? 0;
+  const safeSearchTerm = searchTerm ?? '';
+  const safeStatusFilter = statusFilter ?? 'all';
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -122,7 +129,7 @@ export default function AdminPage() {
     if (user && isAdmin) {
       dispatch({ type: 'admin/fetchUsers' });
     }
-  }, [user, isAdmin, page, rowsPerPage, searchTerm, statusFilter, sort, dispatch]);
+  }, [user, isAdmin, safePage, safeRowsPerPage, safeSearchTerm, safeStatusFilter, sort, dispatch]);
 
   const fetchUsers = () => {
     dispatch({ type: 'admin/fetchUsers' });
@@ -216,14 +223,30 @@ export default function AdminPage() {
     );
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
       <>
         <Header />
         <Container maxWidth="lg" sx={{ mt: 4 }}>
-          <Alert severity="error">
-            Error loading admin panel: {error.message}
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Unable to Load User Data
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {errorMessage}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              This is likely due to Auth0 Management API configuration issues. 
+              Please check your environment variables and Auth0 setup.
+            </Typography>
           </Alert>
+          <Button 
+            variant="contained" 
+            onClick={() => window.location.reload()}
+            sx={{ mt: 2 }}
+          >
+            Retry
+          </Button>
         </Container>
       </>
     );
@@ -328,7 +351,7 @@ export default function AdminPage() {
                 <TextField
                   fullWidth
                   placeholder="Search users by name, email, or nickname..."
-                  value={searchTerm}
+                  value={safeSearchTerm}
                   onChange={handleSearchChange}
                   InputProps={{
                     startAdornment: (
@@ -343,7 +366,7 @@ export default function AdminPage() {
                 <FormControl fullWidth>
                   <InputLabel>Status</InputLabel>
                   <Select
-                    value={statusFilter}
+                    value={safeStatusFilter}
                     onChange={handleStatusFilterChange}
                     label="Status"
                   >
@@ -485,10 +508,10 @@ export default function AdminPage() {
             </TableContainer>
             <TablePagination
               component="div"
-              count={totalUsers}
-              page={page}
+              count={safeTotalUsers}
+              page={safePage}
               onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
+              rowsPerPage={safeRowsPerPage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               rowsPerPageOptions={[5, 10, 25, 50]}
               labelDisplayedRows={({ from, to, count }) => {

@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
       <SEO 
         title="Privacy Policy | Svelte by LuKaria"
         description="Read Svelte by LuKaria's privacy policy. Learn how we protect your personal health information and maintain HIPAA compliance for our virtual weight loss clinic."
-        keywords="privacy policy, HIPAA compliance, patient privacy, telehealth privacy, medical data protection, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+        keywords="privacy policy, HIPAA compliance, patient privacy, telehealth privacy, medical data protection, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/privacy-policy"
       />
       {/* Navigation Menu */}

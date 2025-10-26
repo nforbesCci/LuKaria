@@ -43,64 +43,21 @@ function* fetchAdminProfileSaga(action) {
     yield put(fetchAdminProfileSuccess({
       userId,
       profile: result.profile,
-      medicalProfileStatus: result.medicalProfileStatus
     }));
 
-    // If medical profile is completed, trigger task completion check
-    if (result.medicalProfileStatus && result.medicalProfileStatus.completed) {
-      console.log('🎯 Medical Profile completed, checking task status');
-      yield put(checkMedicalProfileTaskSuccess({
-        userId,
-        completed: true,
-        fields: result.medicalProfileStatus.fields
-      }));
-    } else {
-      console.log('⚠️ Medical Profile incomplete, missing fields:', result.medicalProfileStatus?.missingFields);
-      yield put(checkMedicalProfileTaskSuccess({
-        userId,
-        completed: false,
-        missingFields: result.medicalProfileStatus?.missingFields || []
-      }));
-    }
+    
   } catch (error) {
     console.error('❌ Admin Profile Saga: Error fetching profile', error);
     yield put(fetchAdminProfileFailure(error.message));
   }
 }
 
-// Saga to handle medical profile task checking
-function* checkMedicalProfileTaskSaga(action) {
-  try {
-    const { userId, completed, fields, missingFields } = action.payload;
-    console.log('🔄 Admin Profile Saga: Checking medical profile task for user:', userId, 'completed:', completed);
-    
-    // Here you could dispatch additional actions to update appointment tasks
-    // or other systems based on the medical profile completion status
-    
-    if (completed) {
-      console.log('✅ Medical Profile task completed for user:', userId);
-      console.log('📋 Completed fields:', fields);
-    } else {
-      console.log('⚠️ Medical Profile task incomplete for user:', userId);
-      console.log('📋 Missing fields:', missingFields);
-    }
-    
-  } catch (error) {
-    console.error('❌ Admin Profile Saga: Error checking medical profile task', error);
-    yield put(checkMedicalProfileTaskFailure(error.message));
-  }
-}
 
 // Watch for admin profile actions
 export function* watchFetchAdminProfile() {
   yield takeEvery('admin/fetchAdminProfile', fetchAdminProfileSaga);
 }
 
-export function* watchCheckMedicalProfileTask() {
-  yield takeEvery('admin/checkMedicalProfileTask', checkMedicalProfileTaskSaga);
-}
-
 export default function* adminProfileSaga() {
   yield watchFetchAdminProfile();
-  yield watchCheckMedicalProfileTask();
 }

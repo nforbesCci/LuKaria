@@ -87,7 +87,8 @@ export const GET = withApiAuthRequired(async (req) => {
     const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page')) || 0;
     const perPage = parseInt(searchParams.get('per_page')) || 20;
-    const sort = searchParams.get('sort') || 'created_at:1';
+    const sort = searchParams.get('sort') || 'created_at';
+    const direction = searchParams.get('direction') || '1';
 
     console.log('📋 Query params:', { search, page, perPage, sort });
     console.log('🔧 Getting Auth0 Management Client...');
@@ -108,7 +109,7 @@ export const GET = withApiAuthRequired(async (req) => {
     const params = {
       page,
       per_page: perPage,
-      sort,
+      sort: `${sort}:${direction}`,
       include_totals: true,
     };
 

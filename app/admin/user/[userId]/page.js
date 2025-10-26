@@ -159,25 +159,8 @@ export default function UserDetailPage() {
     mealsLength: meals ? Object.keys(meals).length : 0
   });
 
-  // Debug when meals state changes
-  useEffect(() => {
-    console.log('🔄 Meals state changed:', {
-      meals,
-      mealsLoading,
-      mealsError,
-      hasData: meals && Object.keys(meals).length > 0
-    });
-  }, [meals, mealsLoading, mealsError]);
+ 
 
-  // Debug when admin profile state changes
-  useEffect(() => {
-    console.log('🔄 Admin profile state changed:', {
-      adminProfile,
-      adminProfileLoading,
-      adminProfileError,
-      medicalProfileStatus
-    });
-  }, [adminProfile, adminProfileLoading, adminProfileError, medicalProfileStatus]);
   const [tabValue, setTabValue] = useState(0);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -333,13 +316,7 @@ export default function UserDetailPage() {
     }
   }, [adminRescheduleSuccess]);
 
-  // Watch for booking errors
-  useEffect(() => {
-    if (bookingError) {
-      console.error('❌ Booking error detected:', bookingError);
-      alert(`Failed to save appointment: ${bookingError}`);
-    }
-  }, [bookingError]);
+ 
 
   const fetchUserData = async () => {
     setLoading(true);
@@ -472,23 +449,23 @@ export default function UserDetailPage() {
     // Initialize editable profile with data from adminProfile in store
     setEditableProfile({
       // Personal Information
-      phone_number: adminProfile?.preferredPhone || '',
-      address: adminProfile?.homeAddress || '',
-      birthdate: adminProfile?.dateOfBirth || '',
-      parish: adminProfile?.parish || '',
-      gender: adminProfile?.sex || '',
+      phone_number: adminProfile?.profile?.preferredPhone || '',
+      address: adminProfile?.profile?.homeAddress || '',
+      birthdate: adminProfile?.profile?.dateOfBirth || '',
+      parish: adminProfile?.profile?.parish || '',
+      gender: adminProfile?.profile?.sex || '',
       
       // Emergency Contact
-      nextOfKinName: adminProfile?.emergencyContactName || '',
-      nextOfKinPhone: adminProfile?.emergencyContactPhone || '',
-      nextOfKinRelationship: adminProfile?.emergencyContactRelationship || '',
+      nextOfKinName: adminProfile?.profile?.emergencyContactName || '',
+      nextOfKinPhone: adminProfile?.profile?.emergencyContactPhone || '',
+      nextOfKinRelationship: adminProfile?.profile?.emergencyContactRelationship || '',
       
       // Medical Information
-      medicalConditions: adminProfile?.medicalConditions || [],
-      otherMedicalCondition: adminProfile?.otherMedicalCondition || '',
-      hasAllergies: adminProfile?.hasAllergies || false,
-      allergicMedications: adminProfile?.allergicMedications || '',
-      currentMedications: adminProfile?.currentMedications || '',
+      medicalConditions: adminProfile?.profile?.medicalConditions || [],
+      otherMedicalCondition: adminProfile?.profile?.otherMedicalCondition || '',
+      hasAllergies: adminProfile?.profile?.hasAllergies || false,
+      allergicMedications: adminProfile?.profile?.allergicMedications || '',
+      currentMedications: adminProfile?.profile?.currentMedications || '',
     });
     
     setActiveWizardStep(0);
@@ -1724,16 +1701,16 @@ export default function UserDetailPage() {
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Phone sx={{ mr: 1, color: 'text.secondary' }} />
-                          <Typography variant="body2">{adminProfile?.preferredPhone || 'Not provided'}</Typography>
+                          <Typography variant="body2">{adminProfile?.profile?.preferredPhone || 'Not provided'}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
-                          <Typography variant="body2">{adminProfile?.homeAddress || 'Not provided'}</Typography>
+                          <Typography variant="body2">{adminProfile?.profile?.homeAddress || 'Not provided'}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <CalendarToday sx={{ mr: 1, color: '#877449' }} />
                           <Typography variant="body2">
-                            Born: {adminProfile?.dateOfBirth ? formatDate(adminProfile.dateOfBirth) : 'Not provided'}
+                            Born: {adminProfile?.profile?.dateOfBirth ? formatDate(adminProfile?.profile?.dateOfBirth) : 'Not provided'}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -1745,13 +1722,13 @@ export default function UserDetailPage() {
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
                           <Typography variant="body2">
-                            Parish: {adminProfile?.parish || 'Not provided'}
+                            Parish: {adminProfile?.profile?.parish || 'Not provided'}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Phone sx={{ mr: 1, color: 'text.secondary' }} />
                           <Typography variant="body2">
-                            Preferred Phone: {adminProfile?.preferredPhoneNumber || 'Not provided'}
+                            Preferred Phone: {adminProfile?.profile?.preferredPhoneNumber || 'Not provided'}
                           </Typography>
                         </Box>
                       </Stack>
@@ -1768,19 +1745,19 @@ export default function UserDetailPage() {
                         <Box>
                           <Typography variant="caption" color="text.secondary">Name</Typography>
                           <Typography variant="body2">
-                            {adminProfile?.emergencyContactName || 'Not provided'}
+                            {adminProfile?.profile?.emergencyContactName || 'Not provided'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Phone</Typography>
                           <Typography variant="body2">
-                            {adminProfile?.emergencyContactPhone || 'Not provided'}
+                            {adminProfile?.profile?.emergencyContactPhone || 'Not provided'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Relationship</Typography>
                           <Typography variant="body2">
-                            {adminProfile?.emergencyContactRelationship || 'Not provided'}
+                            {adminProfile?.profile?.emergencyContactRelationship || 'Not provided'}
                           </Typography>
                         </Box>
                       </Stack>
@@ -1797,22 +1774,22 @@ export default function UserDetailPage() {
                         <Box>
                           <Typography variant="caption" color="text.secondary">Medical Conditions</Typography>
                           <Typography variant="body2">
-                            {(adminProfile?.medicalConditions || []).length > 0
-                              ? (adminProfile?.medicalConditions || []).join(', ')
+                            {(adminProfile?.profile?.medicalConditions || []).length > 0
+                              ? (adminProfile?.profile?.medicalConditions || []).join(', ')
                               : 'None reported'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Current Medications</Typography>
                           <Typography variant="body2">
-                            {adminProfile?.currentMedications || 'None reported'}
+                            {adminProfile?.profile?.currentMedications || 'None reported'}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">Allergies</Typography>
                           <Typography variant="body2">
-                            {adminProfile?.hasAllergies
-                              ? adminProfile?.allergicMedications || 'Yes'
+                            {adminProfile?.profile?.hasAllergies
+                              ? adminProfile?.profile?.allergicMedications || 'Yes'
                               : 'None reported'}
                           </Typography>
                         </Box>
