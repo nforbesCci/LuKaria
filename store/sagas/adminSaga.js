@@ -8,6 +8,8 @@ import {
   setPaginationData,
   setLoading,
   setError,
+  enableUserAccountSuccessAction,
+  enableUserAccountFailureAction,
 } from '../slices/adminSlice';
 
 // Admin API saga
@@ -156,8 +158,7 @@ function* updateUserSaga(action) {
 // Enable/Disable user account saga - toggles consultationOccurred
 function* enableUserAccountSaga(action) {
   try {
-    yield put(setLoading(true));
-    yield put(setError(null));
+    console.log('🔧 Admin Saga: enableUserAccountSaga called');
     
     const { userId, consultationOccurred } = action.payload;
     
@@ -183,14 +184,16 @@ function* enableUserAccountSaga(action) {
     const data = yield call([response, 'json']);
     console.log(`✅ Admin Saga: Account ${consultationOccurred ? 'enabled' : 'disabled'} successfully:`, data);
     
-    // Optionally refresh the users list
-    // yield put({ type: 'admin/fetchUsers' });
+    // Dispatch success action
+    yield put(enableUserAccountSuccessAction({
+      userId,
+      consultationOccurred,
+      message: `Account ${consultationOccurred ? 'enabled' : 'disabled'} successfully`
+    }));
     
   } catch (error) {
     console.error('❌ Admin Saga: Error enabling account:', error);
-    yield put(setError(error.message));
-  } finally {
-    yield put(setLoading(false));
+    yield put(enableUserAccountFailureAction(error.message));
   }
 }
 

@@ -4,9 +4,14 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccount, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction } from '../../../../store/slices/adminSlice';
+import { enableUserAccountAction, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction } from '../../../../store/slices/adminSlice';
 import AdminConsentForms from '../../../../components/AdminConsentForms';
 import ConsentFormViewer from '../../../../components/ConsentFormViewer';
+import AdminQuestions from '../../../../components/AdminQuestions';
+import AdminMealTracker from '../../../../components/AdminMealTracker';
+import AdminSideEffects from '../../../../components/AdminSideEffects';
+import AdminWeightLogging from '../../../../components/AdminWeightLogging';
+import AdminMedicationTracker from '../../../../components/AdminMedicationTracker';
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
 import { useAdminAccess } from '../../../../hooks/useAccessControl';
 import Header from '../../../../components/Header';
@@ -200,7 +205,6 @@ export default function UserDetailPage() {
   });
   const [savingProfile, setSavingProfile] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(1);
-  const [selectedSideEffect, setSelectedSideEffect] = useState(null);
   const [viewingConsentForm, setViewingConsentForm] = useState(null);
 
   // Access control - only Admin and Doctor can access
@@ -227,7 +231,7 @@ export default function UserDetailPage() {
     }
   }, [params.userId, dbConsultationOccurred, dispatch]);
 
-  // Fetch meals when Meal Tracker tab is selected or week changes
+  // Fetch meals when Meal Tracker tab is selected
   useEffect(() => {
     if (tabValue === 5 && params.userId) { // Meal Tracker tab index
       // Calculate date range for the current week
@@ -241,7 +245,7 @@ export default function UserDetailPage() {
         endDate 
       }));
     }
-  }, [tabValue, currentWeek, dispatch, params.userId]);
+  }, [tabValue, dispatch, params.userId]);
 
   // Fetch medications when Medication Tracker tab is selected
   useEffect(() => {
@@ -399,7 +403,7 @@ export default function UserDetailPage() {
       console.log(`${newStatus ? '🔓' : '🔒'} ${newStatus ? 'Enabling' : 'Disabling'} account for user:`, params.userId);
       
       // Dispatch saga to update consultationOccurred
-      dispatch(enableUserAccount({
+      dispatch(enableUserAccountAction({
         userId: params.userId,
         consultationOccurred: newStatus
       }));
@@ -1096,11 +1100,6 @@ export default function UserDetailPage() {
     setViewingConsentForm(null);
   };
 
-  // Handle side effect selection
-  const handleSideEffectClick = (sideEffect) => {
-    setSelectedSideEffect(selectedSideEffect?._id === sideEffect._id ? null : sideEffect);
-  };
-
   // Handle side effect review
   const handleReviewSideEffect = (sideEffectId) => {
     dispatch(updateAdminSideEffectAction({
@@ -1136,6 +1135,11 @@ export default function UserDetailPage() {
     console.log('🚀 Action object:', action);
     dispatch(action);
     console.log('🚀 Action dispatched successfully');
+  };
+
+  // Handle meal fetching for meal tracker component
+  const handleFetchMeals = (params) => {
+    dispatch(fetchAdminMealsAction(params));
   };
 
   // Get date range for a specific week
@@ -2022,952 +2026,59 @@ export default function UserDetailPage() {
            </TabPanel>
 
           <TabPanel value={tabValue} index={2} id="side-effects-content">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Side Effects</Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<PictureAsPdf />}
-                onClick={() => generateTabPDF('Side Effects', 'side-effects-content')}
-                sx={{ textTransform: 'none' }}
-              >
-                Generate PDF
-              </Button>
-            </Box>
-            {adminSideEffectsLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                <CircularProgress />
-                <Typography variant="body2" sx={{ ml: 2 }}>
-                  Loading side effects data...
-                </Typography>
-              </Box>
-            ) : adminSideEffectsError ? (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                Error loading side effects: {adminSideEffectsError}
-              </Alert>
-            ) : (
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Recent Side Effects - Last 4 Reports
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                        Click on any side effect to view detailed information
-                      </Typography>
-                      
-                      {adminSideEffects && adminSideEffects.length > 0 ? (
-                        <Stack spacing={2}>
-                          {adminSideEffects.map((sideEffect, index) => (
-                            <Box 
-                              key={index}
-                              sx={{ 
-                                p: 2, 
-                                border: '1px solid', 
-                                borderColor: selectedSideEffect?._id === sideEffect._id ? 'primary.main' : 'divider', 
-                                borderRadius: 2,
-                                backgroundColor: selectedSideEffect?._id === sideEffect._id ? 'primary.50' : 'background.paper',
-                                cursor: 'pointer',
-                                '&:hover': {
-                                  backgroundColor: 'action.hover',
-                                  borderColor: 'primary.main'
-                                }
-                              }}
-                              onClick={() => handleSideEffectClick(sideEffect)}
-                            >
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                <Typography variant="h6" color="primary">
-                                  {formatDate(sideEffect.createdAt)}
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Chip 
-                                    label={sideEffect.reviewed ? 'Reviewed' : 'Pending Review'} 
-                                    color={sideEffect.reviewed ? 'success' : 'warning'}
-                                    size="small"
-                                  />
-                                  <Typography variant="caption" color="text.secondary">
-                                    {selectedSideEffect?._id === sideEffect._id ? 'Selected' : 'Click to view details'}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                              
-                              <Typography variant="body2" color="text.secondary">
-                                {sideEffect.sideEffects?.length > 0 
-                                  ? `${sideEffect.sideEffects.length} side effect(s) reported`
-                                  : 'No specific side effects listed'
-                                }
-                              </Typography>
-                            </Box>
-                          ))}
-                        </Stack>
-                      ) : (
-                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                          <Typography variant="h6" color="text.secondary" gutterBottom>
-                            No side effects found
-                          </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            No side effects have been reported recently.
-                        </Typography>
-                        </Box>
-                      )}
-                  </CardContent>
-                </Card>
-              </Grid>
-
-                {/* Fixed Details Panel */}
-                {selectedSideEffect && (
-                  <Grid item xs={12}>
-                    <Card sx={{ 
-                      position: 'sticky', 
-                      bottom: 0, 
-                      zIndex: 1,
-                      backgroundColor: 'background.paper',
-                      border: '2px solid',
-                      borderColor: 'primary.main',
-                      boxShadow: 3
-                    }}>
-                  <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                          <Typography variant="h6" color="primary">
-                            Side Effect Details - {formatDate(selectedSideEffect.createdAt)}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            {!selectedSideEffect.reviewed && (
-                              <Button 
-                                variant="contained" 
-                                color="success"
-                                size="small" 
-                                onClick={() => handleReviewSideEffect(selectedSideEffect._id)}
-                              >
-                                Mark as Reviewed
-                              </Button>
-                            )}
-                            {selectedSideEffect.complete && (
-                              <Button 
-                                variant="contained" 
-                                color="warning"
-                                size="small" 
-                                onClick={() => handleOpenSideEffect(selectedSideEffect._id)}
-                              >
-                                Reopen
-                              </Button>
-                            )}
-                            <Button 
-                              variant="outlined" 
-                              size="small" 
-                              onClick={() => setSelectedSideEffect(null)}
-                            >
-                              Close Details
-                            </Button>
-                          </Box>
-                        </Box>
-
-                        {/* Review Status */}
-                        <Box sx={{ mb: 3 }}>
-                          <Chip 
-                            label={selectedSideEffect.reviewed ? 'Reviewed' : 'Pending Review'} 
-                            color={selectedSideEffect.reviewed ? 'success' : 'warning'}
-                            sx={{ mb: 1 }}
-                          />
-                          <Typography variant="body2" color="text.secondary">
-                            {selectedSideEffect.reviewed ? 'This report has been reviewed' : 'This report is pending review'}
-                          </Typography>
-                        </Box>
-
-                        {/* Report Information */}
-                        <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom>
-                            Report Information
-                    </Typography>
-                          <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="caption" color="text.secondary">Report ID</Typography>
-                            <Typography variant="body2" fontWeight="medium">
-                                {selectedSideEffect.reportId || 'Not available'}
-                            </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="caption" color="text.secondary">Report Date</Typography>
-                              <Typography variant="body2" fontWeight="medium">
-                                {selectedSideEffect.reportDate ? formatDate(selectedSideEffect.reportDate) : 'Not available'}
-                            </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="caption" color="text.secondary">Status</Typography>
-                              <Chip 
-                                label={selectedSideEffect.complete ? 'Complete' : 'Incomplete'} 
-                                color={selectedSideEffect.complete ? 'success' : 'warning'}
-                                size="small"
-                              />
-                            </Grid>
-                          </Grid>
-                          </Box>
-
-                        {/* Side Effects List */}
-                        {selectedSideEffect.sideEffects && selectedSideEffect.sideEffects.length > 0 ? (
-                          <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" gutterBottom>
-                              Reported Side Effects ({selectedSideEffect.sideEffects.length})
-                            </Typography>
-                            <Stack spacing={2}>
-                              {selectedSideEffect.sideEffects.map((effect, effectIndex) => (
-                                <Paper key={effectIndex} elevation={1} sx={{ p: 2 }}>
-                                  <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
-                                    {effect.name || 'Unnamed Side Effect'}
-                                  </Typography>
-                                  {effect.severity && (
-                                    <Chip 
-                                      label={`Severity: ${effect.severity}`} 
-                                      color={effect.severity === 'Mild' ? 'success' : effect.severity === 'Moderate' ? 'warning' : 'error'}
-                                      size="small"
-                                      sx={{ mb: 1 }}
-                                    />
-                                  )}
-                                  {effect.description && (
-                                    <Typography variant="body2" color="text.secondary">
-                                      {effect.description}
-                                    </Typography>
-                                  )}
-                                  {effect.duration && (
-                                    <Typography variant="caption" color="text.secondary">
-                                      Duration: {effect.duration}
-                                    </Typography>
-                                  )}
-                                </Paper>
-                        ))}
-                      </Stack>
-                          </Box>
-                    ) : (
-                          <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" gutterBottom>
-                              No Specific Side Effects Listed
-                            </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                              This report was submitted but no specific side effects were detailed.
-                      </Typography>
-                          </Box>
-                        )}
-
-                        {/* Other Side Effect */}
-                        {selectedSideEffect.otherSideEffect && (
-                          <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" gutterBottom>
-                              Other Side Effects
-                            </Typography>
-                            <Typography variant="body2">
-                              {selectedSideEffect.otherSideEffect}
-                            </Typography>
-                          </Box>
-                        )}
-
-                        {/* Appetite Information */}
-                        {selectedSideEffect.appetiteSuppressed && (
-                          <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" gutterBottom>
-                              Appetite Suppression
-                            </Typography>
-                            <Typography variant="body2">
-                              {selectedSideEffect.appetiteSuppressed}
-                            </Typography>
-                          </Box>
-                        )}
-
-                        {/* Treatment Concerns */}
-                        {selectedSideEffect.hasTreatmentConcerns && (
-                          <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" gutterBottom>
-                              Treatment Concerns
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                              Patient has treatment concerns: {selectedSideEffect.hasTreatmentConcerns}
-                            </Typography>
-                            {selectedSideEffect.treatmentConcerns && (
-                              <Typography variant="body2">
-                                <strong>Details:</strong> {selectedSideEffect.treatmentConcerns}
-                              </Typography>
-                            )}
-                          </Box>
-                        )}
-
-                        {/* Doctor Contact Request */}
-                        {selectedSideEffect.requestDoctorContact && (
-                          <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" gutterBottom>
-                              Doctor Contact Request
-                            </Typography>
-                            <Chip 
-                              label="Patient requested doctor contact" 
-                              color="info"
-                              sx={{ mb: 1 }}
-                            />
-                            {selectedSideEffect.contactMessage && (
-                              <Typography variant="body2" sx={{ mt: 1 }}>
-                                <strong>Message:</strong> {selectedSideEffect.contactMessage}
-                              </Typography>
-                            )}
-                          </Box>
-                        )}
-
-                        {/* Timestamps */}
-                        <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                          <Typography variant="caption" color="text.secondary">
-                            Report Date: {formatDate(selectedSideEffect.createdAt)}
-                          </Typography>
-                          {selectedSideEffect.updatedAt && (
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                              Last Updated: {formatDate(selectedSideEffect.updatedAt)}
-                            </Typography>
-                          )}
-                        </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-                )}
-            </Grid>
-            )}
+            <AdminSideEffects
+              adminSideEffects={adminSideEffects.sideEffects}
+              adminSideEffectsLoading={adminSideEffectsLoading}
+              adminSideEffectsError={adminSideEffectsError}
+              onGeneratePDF={generateTabPDF}
+              onReviewSideEffect={handleReviewSideEffect}
+              onOpenSideEffect={handleOpenSideEffect}
+              formatDate={formatDate}
+            />
           </TabPanel>
 
           <TabPanel value={tabValue} index={3} id="weight-logging-content">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Weight Logging</Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<PictureAsPdf />}
-                onClick={() => generateTabPDF('Weight Logging', 'weight-logging-content')}
-                sx={{ textTransform: 'none' }}
-              >
-                Generate PDF
-              </Button>
-            </Box>
-            {adminMeasurementsLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                <CircularProgress />
-                <Typography variant="body2" sx={{ ml: 2 }}>
-                  Loading measurement data...
-                </Typography>
-              </Box>
-            ) : adminMeasurementsError ? (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                Error loading measurements: {adminMeasurementsError}
-              </Alert>
-            ) : (
-            <Grid container spacing={3}>
-                {/* Summary Cards */}
-              <Grid item xs={12} md={4}>
-                <Card>
-                  <CardContent sx={{ textAlign: 'center' }}>
-                    <Scale sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-                    <Typography variant="h6" color="text.secondary">
-                        Latest Weight
-                    </Typography>
-                    <Typography variant="h4" color="primary">
-                        {adminMeasurements && adminMeasurements.length > 0 
-                          ? `${adminMeasurements[0].weight} kg` 
-                          : 'No data'}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card>
-                  <CardContent sx={{ textAlign: 'center' }}>
-                    <TrendingUp sx={{ fontSize: 40, color: 'secondary.main', mb: 1 }} />
-                    <Typography variant="h6" color="text.secondary">
-                        Latest BMI
-                    </Typography>
-                    <Typography variant="h4" color="secondary">
-                        {adminMeasurements && adminMeasurements.length > 0 
-                          ? adminMeasurements[0].bmi 
-                          : 'No data'}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card>
-                  <CardContent sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" color="text.secondary">
-                      Waist Circumference
-                    </Typography>
-                    <Typography variant="h4" color="success">
-                        {adminMeasurements && adminMeasurements.length > 0 
-                          ? `${adminMeasurements[0].waistCircumference} cm` 
-                          : 'No data'}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-                {/* Weight & BMI Progress Chart */}
-              <Grid item xs={12}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                        Weight & BMI Progress - Last 4 Weeks
-                    </Typography>
-                      {adminMeasurements && adminMeasurements.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                          <LineChart data={adminMeasurements}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <RechartsTooltip />
-                        <Legend />
-                        <Line yAxisId="left" type="monotone" dataKey="weight" stroke="#1976d2" strokeWidth={2} name="Weight (kg)" />
-                        <Line yAxisId="right" type="monotone" dataKey="bmi" stroke="#dc004e" strokeWidth={2} name="BMI" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                      ) : (
-                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                          <Typography variant="h6" color="text.secondary" gutterBottom>
-                            No measurement data found
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            No measurements were recorded in the last 4 weeks.
-                          </Typography>
-                        </Box>
-                      )}
-                  </CardContent>
-                </Card>
-              </Grid>
-
-                {/* Detailed Measurements List */}
-                <Grid item xs={12}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Recent Measurements
-                      </Typography>
-                      {adminMeasurements && adminMeasurements.length > 0 ? (
-                        <Stack spacing={2}>
-                          {adminMeasurements.slice(0, 10).map((measurement, index) => (
-                            <Box key={index} sx={{ 
-                              p: 2, 
-                              border: '1px solid', 
-                              borderColor: 'divider', 
-                              borderRadius: 2,
-                              backgroundColor: 'background.paper'
-                            }}>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                <Typography variant="h6" color="primary">
-                                  {formatDate(measurement.date)}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {measurement.time || 'No time recorded'}
-                                </Typography>
-                              </Box>
-                              
-                              <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">Weight</Typography>
-                                  <Typography variant="body2" fontWeight="medium">
-                                    {measurement.weight} kg
-                                  </Typography>
-            </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">BMI</Typography>
-                                  <Typography variant="body2" fontWeight="medium">
-                                    {measurement.bmi}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">Waist</Typography>
-                                  <Typography variant="body2" fontWeight="medium">
-                                    {measurement.waistCircumference} cm
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">Height</Typography>
-                                  <Typography variant="body2" fontWeight="medium">
-                                    {measurement.height} cm
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-                              
-                              {measurement.notes && (
-                                <Box sx={{ mt: 1 }}>
-                                  <Typography variant="caption" color="text.secondary">Notes</Typography>
-                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                    {measurement.notes}
-                                  </Typography>
-                                </Box>
-                              )}
-                            </Box>
-                          ))}
-                        </Stack>
-                      ) : (
-                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                          <Typography variant="h6" color="text.secondary" gutterBottom>
-                            No measurements found
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            No measurements were recorded in the last 4 weeks.
-                          </Typography>
-                        </Box>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-            )}
+            <AdminWeightLogging
+              adminMeasurements={adminMeasurements.measurements}
+              adminMeasurementsLoading={adminMeasurementsLoading}
+              adminMeasurementsError={adminMeasurementsError}
+              onGeneratePDF={generateTabPDF}
+              formatDate={formatDate}
+            />
           </TabPanel>
 
           <TabPanel value={tabValue} index={4} id="medication-tracker-content">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Medication Tracker</Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<PictureAsPdf />}
-                onClick={() => generateTabPDF('Medication Tracker', 'medication-tracker-content')}
-                sx={{ textTransform: 'none' }}
-              >
-                Generate PDF
-              </Button>
-            </Box>
-            {adminMedicationsLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                <CircularProgress />
-                <Typography variant="body2" sx={{ ml: 2 }}>
-                  Loading medication data...
-                </Typography>
-              </Box>
-            ) : adminMedicationsError ? (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                Error loading medications: {adminMedicationsError}
-              </Alert>
-            ) : (
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                        Medication Tracker - Last 4 Weeks
-                    </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                        Medication logs for the past 28 days
-                      </Typography>
-                      
-                      {adminMedications && adminMedications.length > 0 ? (
-                      <Stack spacing={2}>
-                          {adminMedications.map((medication, index) => (
-                            <Box key={index} sx={{ 
-                              p: 2, 
-                              border: '1px solid', 
-                              borderColor: 'divider', 
-                              borderRadius: 2,
-                              backgroundColor: 'background.paper'
-                            }}>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                <Typography variant="h6" color="primary">
-                                  {medication.medicationName}
-                              </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {formatDate(medication.date)}
-                                </Typography>
-                            </Box>
-                              
-                              <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">Dosage</Typography>
-                                  <Typography variant="body2">{medication.dosage || 'Not specified'}</Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">Frequency</Typography>
-                                  <Typography variant="body2">{medication.frequency || 'Not specified'}</Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">Time</Typography>
-                                  <Typography variant="body2">{medication.time || 'Not specified'}</Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
-                                  <Typography variant="caption" color="text.secondary">Status</Typography>
-                                  <Chip 
-                                    label={medication.taken ? 'Taken' : 'Missed'} 
-                                    color={medication.taken ? 'success' : 'error'}
-                                    size="small"
-                                  />
-                                </Grid>
-                              </Grid>
-                              
-                              {medication.notes && (
-                                <Box sx={{ mt: 1 }}>
-                                  <Typography variant="caption" color="text.secondary">Notes</Typography>
-                                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                    {medication.notes}
-                                  </Typography>
-                                </Box>
-                              )}
-                            </Box>
-                          ))}
-                        </Stack>
-                      ) : (
-                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                          <Typography variant="h6" color="text.secondary" gutterBottom>
-                            No medication logs found
-                          </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                            No medication entries were recorded in the last 4 weeks.
-                            </Typography>
-                        </Box>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-            )}
+            <AdminMedicationTracker
+              adminMedications={adminMedications.medications}
+              adminMedicationsLoading={adminMedicationsLoading}
+              adminMedicationsError={adminMedicationsError}
+              onGeneratePDF={generateTabPDF}
+              formatDate={formatDate}
+            />
           </TabPanel>
 
           <TabPanel value={tabValue} index={5} id="meal-tracker-content">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Meal Tracker</Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<PictureAsPdf />}
-                onClick={() => generateTabPDF('Meal Tracker', 'meal-tracker-content')}
-                sx={{ textTransform: 'none' }}
-              >
-                Generate PDF
-              </Button>
-            </Box>
-            <Grid container spacing={3}>
-              {/* Week Navigator */}
-              <Grid item xs={12}>
-                <Card>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                      <Box>
-                        <Typography variant="h6">
-                          Meal Tracker - Week {currentWeek} of 4
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {(() => {
-                            const dateRange = getWeekDateRange(currentWeek);
-                            return `${dateRange.start} to ${dateRange.end}`;
-                          })()}
-                            </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => setCurrentWeek(Math.max(1, currentWeek - 1))}
-                          disabled={currentWeek === 1}
-                          startIcon={<NavigateBefore />}
-                        >
-                          Previous Week
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => setCurrentWeek(Math.min(4, currentWeek + 1))}
-                          disabled={currentWeek === 4}
-                          endIcon={<NavigateNext />}
-                        >
-                          Next Week
-                        </Button>
-                      </Box>
-                    </Box>
-                    
-                    {/* Week Progress Indicator */}
-                    <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
-                      {[1, 2, 3, 4].map((week) => {
-                        const dateRange = getWeekDateRange(week);
-                        return (
-                          <Tooltip 
-                            key={week}
-                            title={`Week ${week}: ${dateRange.start} to ${dateRange.end}`}
-                            placement="top"
-                          >
-                            <Box
-                              sx={{
-                                flex: 1,
-                                height: 8,
-                                borderRadius: 1,
-                                backgroundColor: week <= currentWeek ? 'primary.main' : 'grey.300',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                '&:hover': {
-                                  backgroundColor: week <= currentWeek ? 'primary.dark' : 'grey.400',
-                                  height: 12
-                                }
-                              }}
-                              onClick={() => setCurrentWeek(week)}
-                            />
-                          </Tooltip>
-                        );
-                      })}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Weekly Meal Breakdown */}
-              <Grid item xs={12}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-                      Week {currentWeek} - Daily Meal Breakdown
-                      <Typography variant="body2" color="text.secondary" component="span" sx={{ ml: 1 }}>
-                        ({(() => {
-                          const dateRange = getWeekDateRange(currentWeek);
-                          return `${dateRange.start} to ${dateRange.end}`;
-                        })()})
-                      </Typography>
-                    </Typography>
-                    
-                    {mealsLoading ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                        <CircularProgress />
-                        <Typography variant="body2" sx={{ ml: 2 }}>
-                          Loading meal data...
-                        </Typography>
-                      </Box>
-                    ) : mealsError ? (
-                      <Alert severity="error" sx={{ mb: 2 }}>
-                        Error loading meals: {mealsError}
-                      </Alert>
-                    ) : (
-                      <Grid container spacing={2}>
-                        {(() => {
-                          const weekData = getWeekMealsData(currentWeek);
-                          const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                          
-                          return daysOfWeek.map((day, dayIndex) => {
-                            const dayData = weekData[day] || {
-                              breakfast: { name: 'No data', calories: 0 },
-                              lunch: { name: 'No data', calories: 0 },
-                              dinner: { name: 'No data', calories: 0 },
-                              snacks: { name: 'No data', calories: 0 }
-                            };
-                            
-                            const totalCalories = ((dayData.breakfast?.calories || 0) * (dayData.breakfast?.quantity || 1)) + 
-                                                 ((dayData.lunch?.calories || 0) * (dayData.lunch?.quantity || 1)) + 
-                                                 ((dayData.dinner?.calories || 0) * (dayData.dinner?.quantity || 1)) + 
-                                                 ((dayData.snacks?.calories || 0) * (dayData.snacks?.quantity || 1));
-                        
-                        return (
-                          <Grid item xs={12} md={6} lg={4} key={day}>
-                            <Paper elevation={1} sx={{ p: 2, height: '100%' }}>
-                              <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
-                                {day}
-                              </Typography>
-                              
-                              <Stack spacing={1.5}>
-                                {/* Breakfast */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="body2" color="text.secondary">
-                                    Breakfast
-                                  </Typography>
-                                  <Chip 
-                                    label={`${(dayData.breakfast?.calories || 0) * (dayData.breakfast?.quantity || 1)} cal`} 
-                                    size="small" 
-                                    color="primary" 
-                                    variant="outlined"
-                                  />
-                                </Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                                  {dayData.breakfast?.name || 'No data'}
-                                </Typography>
-                                
-                                {/* Lunch */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="body2" color="text.secondary">
-                                    Lunch
-                                  </Typography>
-                                  <Chip 
-                                    label={`${(dayData.lunch?.calories || 0) * (dayData.lunch?.quantity || 1)} cal`} 
-                                    size="small" 
-                                    color="primary" 
-                                    variant="outlined"
-                                  />
-                                </Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                                  {dayData.lunch?.name || 'No data'}
-                                </Typography>
-                                
-                                {/* Dinner */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="body2" color="text.secondary">
-                                    Dinner
-                                  </Typography>
-                                  <Chip 
-                                    label={`${(dayData.dinner?.calories || 0) * (dayData.dinner?.quantity || 1)} cal`} 
-                                    size="small" 
-                                    color="primary" 
-                                    variant="outlined"
-                                  />
-                                </Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                                  {dayData.dinner?.name || 'No data'}
-                                </Typography>
-                                
-                                {/* Snacks */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="body2" color="text.secondary">
-                                    Snacks
-                                  </Typography>
-                                  <Chip 
-                                    label={`${(dayData.snacks?.calories || 0) * (dayData.snacks?.quantity || 1)} cal`} 
-                                    size="small" 
-                                    color="primary" 
-                                    variant="outlined"
-                                  />
-                                </Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                                  {dayData.snacks?.name || 'No data'}
-                                </Typography>
-                                
-                                <Divider sx={{ my: 1 }} />
-                                
-                                {/* Total Calories */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="body2" fontWeight="medium">
-                                    Total
-                                  </Typography>
-                                  <Chip 
-                                    label={`${totalCalories} cal`} 
-                                    size="small" 
-                                    color="secondary"
-                                  />
-                                </Box>
-                              </Stack>
-                            </Paper>
-                          </Grid>
-                        );
-                      });
-                    })()}
-                      </Grid>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
+            <AdminMealTracker
+              meals={meals.meals}
+              mealsLoading={mealsLoading}
+              mealsError={mealsError}
+              currentWeek={currentWeek}
+              onWeekChange={setCurrentWeek}
+              onGeneratePDF={generateTabPDF}
+              onFetchMeals={handleFetchMeals}
+              userId={params.userId}
+            />
           </TabPanel>
 
           <TabPanel value={tabValue} index={6} id="questions-content">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Questions</Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<PictureAsPdf />}
-                onClick={() => generateTabPDF('Questions', 'questions-content')}
-                sx={{ textTransform: 'none' }}
-              >
-                Generate PDF
-              </Button>
-            </Box>
-            {adminQuestionsLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                <CircularProgress />
-                <Typography variant="body2" sx={{ ml: 2 }}>
-                  Loading questions data...
-                </Typography>
-              </Box>
-            ) : adminQuestionsError ? (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                Error loading questions: {adminQuestionsError}
-              </Alert>
-            ) : (
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Card>
-                    <CardContent>
-                     
-                      
-                      {adminQuestions && adminQuestions.length > 0 ? (
-                        <Stack spacing={2}>
-                          {adminQuestions.map((question, index) => (
-                            <Box 
-                              key={index}
-                              sx={{ 
-                                p: 2, 
-                                border: '1px solid', 
-                                borderColor: 'divider', 
-                                borderRadius: 2,
-                                backgroundColor: 'background.paper'
-                              }}
-                            >
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                <Typography variant="h6" color="primary">
-                                  {formatDate(question.createdAt)}
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  {question.answered ? (
-                                    <Chip 
-                                      label="Answered" 
-                                      color="success"
-                                      size="small"
-                                    />
-                                  ) : (
-                                    <Button
-                                      variant="outlined"
-                                      color="error"
-                                      size="small"
-                                      onClick={() => handleDeleteQuestion(question._id)}
-                                      sx={{ textTransform: 'none' }}
-                                    >
-                                      Delete
-                                    </Button>
-                                  )}
-                                </Box>
-                              </Box>
-                              
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                <strong>Question:</strong> {question.questions || 'No question text available'}
-                              </Typography>
-                              
-                              {question.category && (
-                                <Box sx={{ mb: 1 }}>
-                                  <Typography variant="caption" color="text.secondary">Category:</Typography>
-                                  <Chip 
-                                    label={question.category} 
-                                    size="small" 
-                                    variant="outlined"
-                                    sx={{ ml: 1 }}
-                                  />
-                                </Box>
-                              )}
-                              
-                              {question.answer && (
-                                <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
-                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                    <strong>Answer:</strong>
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    {question.answer}
-                                  </Typography>
-                                </Box>
-                              )}
-                              
-                              {question.answeredAt && (
-                                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                                  Answered on: {formatDate(question.answeredAt)}
-                                </Typography>
-                              )}
-                            </Box>
-                          ))}
-                        </Stack>
-                      ) : (
-                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                          <Typography variant="h6" color="text.secondary" gutterBottom>
-                            No questions found
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            No questions have been submitted recently.
-                          </Typography>
-                        </Box>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-            )}
+            <AdminQuestions
+              adminQuestions={adminQuestions.questions}
+              adminQuestionsLoading={adminQuestionsLoading}
+              adminQuestionsError={adminQuestionsError}
+              onDeleteQuestion={handleDeleteQuestion}
+              onGeneratePDF={generateTabPDF}
+              formatDate={formatDate}
+            />
           </TabPanel>
         </Card>
         )}

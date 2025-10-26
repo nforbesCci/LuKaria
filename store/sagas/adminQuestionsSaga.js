@@ -3,8 +3,8 @@ import {
   fetchAdminQuestionsSuccess, 
   fetchAdminQuestionsFailure,
   deleteAdminQuestion,
-  deleteAdminQuestionSuccess,
-  deleteAdminQuestionFailure
+  deleteAdminQuestionSuccessAction,
+  deleteAdminQuestionFailureAction
 } from '../slices/adminSlice';
 
 // API call to fetch questions for a specific user (admin function)
@@ -101,14 +101,14 @@ function* deleteAdminQuestionSaga(action) {
     
     console.log('✅ Admin Questions Saga: Question deleted successfully', result);
     
-    yield put(deleteAdminQuestionSuccess({
+    yield put(deleteAdminQuestionSuccessAction({
       userId,
       questionId,
       message: result.message
     }));
   } catch (error) {
     console.error('❌ Admin Questions Saga: Error deleting question', error);
-    yield put(deleteAdminQuestionFailure(error.message));
+    yield put(deleteAdminQuestionFailureAction(error.message));
   }
 }
 

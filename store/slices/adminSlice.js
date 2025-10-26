@@ -19,6 +19,10 @@ const initialState = {
   selectedUser: null,
   editDialogOpen: false,
   
+  // Enable/disable user account
+  enablingAccount: false,
+  enableAccountError: null,
+  
   // Admin meals data
   adminMeals: {},
   adminMealsLoading: false,
@@ -126,6 +130,20 @@ const adminSlice = createSlice({
       state.statusFilter = 'all';
       state.page = 0;
       state.sort = 'createdAt';
+    },
+    
+    // Enable/disable user account reducers
+    enableUserAccount: (state) => {
+      state.enablingAccount = true;
+      state.enableAccountError = null;
+    },
+    enableUserAccountSuccess: (state, action) => {
+      state.enablingAccount = false;
+      state.enableAccountError = null;
+    },
+    enableUserAccountFailure: (state, action) => {
+      state.enablingAccount = false;
+      state.enableAccountError = action.payload;
     },
     
     // Admin meals reducers
@@ -350,7 +368,14 @@ const adminSlice = createSlice({
     },
     deleteAdminQuestion: (state, action) => {
       const { questionId } = action.payload;
-      state.adminQuestions = state.adminQuestions.filter(q => q._id !== questionId);
+      state.adminQuestions.questions = state?.adminQuestions?.questions?.filter(q => q._id !== questionId);
+    },
+    deleteAdminQuestionSuccess: (state, action) => {
+      const { questionId } = action.payload;
+      state.adminQuestions.questions = state?.adminQuestions?.questions?.filter(q => q._id !== questionId);
+    },
+    deleteAdminQuestionFailure: (state, action) => {
+      state.adminQuestionsError = action.payload;
     },
     clearAdminQuestionsError: (state) => {
       state.adminQuestionsError = null;
@@ -428,6 +453,8 @@ export const {
   fetchAdminQuestionsSuccess,
   fetchAdminQuestionsFailure,
   deleteAdminQuestion,
+  deleteAdminQuestionSuccess,
+  deleteAdminQuestionFailure,
   clearAdminQuestionsError,
   fetchAdminPreAppointmentTasks,
   fetchAdminPreAppointmentTasksSuccess,
@@ -516,6 +543,16 @@ export const deleteAdminQuestionAction = (payload) => ({
   payload,
 });
 
+export const deleteAdminQuestionSuccessAction = (payload) => ({
+  type: 'admin/deleteAdminQuestionSuccess',
+  payload,
+});
+
+export const deleteAdminQuestionFailureAction = (payload) => ({
+  type: 'admin/deleteAdminQuestionFailure',
+  payload,
+});
+
 export const fetchAdminPreAppointmentTasksAction = (payload) => ({
   type: 'admin/fetchAdminPreAppointmentTasks',
   payload,
@@ -523,6 +560,21 @@ export const fetchAdminPreAppointmentTasksAction = (payload) => ({
 
 export const updateAdminPreAppointmentTaskAction = (payload) => ({
   type: 'admin/updateAdminPreAppointmentTask',
+  payload,
+});
+
+export const enableUserAccountAction = (payload) => ({
+  type: 'admin/enableUserAccount',
+  payload,
+});
+
+export const enableUserAccountSuccessAction = (payload) => ({
+  type: 'admin/enableUserAccountSuccess',
+  payload,
+});
+
+export const enableUserAccountFailureAction = (payload) => ({
+  type: 'admin/enableUserAccountFailure',
   payload,
 });
 

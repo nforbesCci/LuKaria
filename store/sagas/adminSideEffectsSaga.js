@@ -44,11 +44,7 @@ function* fetchAdminSideEffectsSaga(action) {
     
     const result = yield call(fetchAdminSideEffectsFromDatabase, userId, { limit });
     
-    console.log('✅ Admin Side Effects Saga: Side effects fetched successfully', result);
-    console.log('📋 Saga received side effects data:', {
-      sideEffectsCount: result.sideEffects ? result.sideEffects.length : 0,
-      sideEffectsSample: result.sideEffects ? result.sideEffects.slice(0, 2) : 'no side effects'
-    });
+    
     
     yield put(fetchAdminSideEffectsSuccess({
       userId,
