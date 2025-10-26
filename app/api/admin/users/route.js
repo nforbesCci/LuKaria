@@ -114,8 +114,8 @@ export const GET = withApiAuthRequired(async (req) => {
     };
 
     // Add search query if provided
-    if (search) {
-      params.q = `email:*${search}* OR name:*${search}* OR nickname:*${search}*`;
+    if (search.length >= 3) {
+      params.q = `email:${search} OR name:*${search}* OR nickname:*${search}*`;
     }
 
     console.log('📞 Calling Auth0 Management API with params:', params);
