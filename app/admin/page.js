@@ -75,17 +75,7 @@ export default function AdminPage() {
   useAdminAccess();
   const [mounted, setMounted] = useState(false);
 
-  // Debug: Log user object to see what's available
-  useEffect(() => {
-    if (user) {
-      console.log('User object:', user);
-      console.log('User groups (https://lukaria.com/groups):', user['https://lukaria.com/groups']);
-      console.log('User groups (groups):', user.groups);
-      console.log('User roles:', user.roles);
-      console.log('Custom claims:', user.customClaims);
-      console.log('All user properties:', Object.keys(user));
-    }
-  }, [user]);
+
 
   // Check if user is in doctor or admin group using processed custom claims
   const isAuthorized = user && 

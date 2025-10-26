@@ -224,10 +224,10 @@ export default function AboutUs() {
                   },
                 }}
               >
+                <Tab label="Meet Dr. Kadria Fairclough" />
                 <Tab label="MISSION" />
                 <Tab label="Our Vision" />
                 <Tab label="Our Approach" />
-                <Tab label="Meet Dr. Kadria Fairclough" />
                 <Tab label="Why Choose Us?" />
               </Tabs>
             </Paper>
@@ -253,10 +253,10 @@ export default function AboutUs() {
                   },
                 }}
               >
+                <Tab label="Meet Dr. Kadria" />
                 <Tab label="MISSION" />
                 <Tab label="Our Vision" />
                 <Tab label="Our Approach" />
-                <Tab label="Meet Dr. Kadria" />
                 <Tab label="Why Choose Us?" />
               </Tabs>
             </Paper>
@@ -266,53 +266,6 @@ export default function AboutUs() {
           <Grid item xs={12} md={9}>
             <Paper elevation={2} sx={{ p: 4, backgroundColor: '#1a1a1a', minHeight: 400 }}>
               {activeTab === 0 && (
-                <Box>
-                  <Typography variant="h4" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
-                    MISSION
-                  </Typography>
-                  <Divider sx={{ mb: 3, borderColor: '#877449' }} />
-                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8 }}>
-                    Svelte by LuKaria is a modern, virtual medical weight loss clinic dedicated to helping you become the healthiest version of yourself. We specialize in safe, clinically-proven weight loss using GLP-1 medications, delivered through a convenient, accessible online platform—so you can take control of your health on your terms.
-                  </Typography>
-                </Box>
-              )}
-
-              {activeTab === 1 && (
-                <Box>
-                  <Typography variant="h4" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
-                    Our Vision
-                  </Typography>
-                  <Divider sx={{ mb: 3, borderColor: '#877449' }} />
-                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8 }}>
-                    At Svelte by LuKaria, we believe that everyone deserves the opportunity to live a healthier, more vibrant life. Excess weight is more than just a number—it's a major risk factor for chronic illnesses such as diabetes, heart disease, and joint disorders. Our mission is to reduce those risks by making sustainable, medically supervised weight loss simple, personalized, and accessible—no matter where you are.
-                  </Typography>
-                </Box>
-              )}
-
-              {activeTab === 2 && (
-                <Box>
-                  <Typography variant="h4" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
-                    Our Approach
-                  </Typography>
-                  <Divider sx={{ mb: 3, borderColor: '#877449' }} />
-                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
-                    We combine evidence-based medicine with cutting-edge telehealth technology to deliver weight loss solutions that fit into your life. Using GLP-1 medications—proven to support appetite control and metabolic health—our team creates individualized treatment plans designed to help you shed weight safely and effectively, with ongoing support every step of the way.
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
-                    Our virtual model removes the barriers of traditional healthcare, offering you:
-                  </Typography>
-                  <Typography variant="body1" component="div" sx={{ color: '#877449', lineHeight: 1.8 }}>
-                    <ul>
-                      <li>Convenient online consultations</li>
-                      <li>Personalized prescription plans</li>
-                      <li>Continuous medical support and monitoring</li>
-                      <li>Discreet, home-based care</li>
-                    </ul>
-                  </Typography>
-                </Box>
-              )}
-
-              {activeTab === 3 && (
                 <Box>
                   <Typography variant="h4" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
                     Meet Dr. Kadria Fairclough
@@ -335,6 +288,53 @@ export default function AboutUs() {
                       Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss. Dr. Fairclough has always believed in patient-centred care which focuses on patient education and informed decision making. She possesses years of Canadian experience with Telehealth delivery.
                     </Typography>
                   </Box>
+                </Box>
+              )}
+
+              {activeTab === 1 && (
+                <Box>
+                  <Typography variant="h4" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
+                    MISSION
+                  </Typography>
+                  <Divider sx={{ mb: 3, borderColor: '#877449' }} />
+                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8 }}>
+                    Svelte by LuKaria is a modern, virtual medical weight loss clinic dedicated to helping you become the healthiest version of yourself. We specialize in safe, clinically-proven weight loss using GLP-1 medications, delivered through a convenient, accessible online platform—so you can take control of your health on your terms.
+                  </Typography>
+                </Box>
+              )}
+
+              {activeTab === 2 && (
+                <Box>
+                  <Typography variant="h4" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
+                    Our Vision
+                  </Typography>
+                  <Divider sx={{ mb: 3, borderColor: '#877449' }} />
+                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8 }}>
+                    At Svelte by LuKaria, we believe that everyone deserves the opportunity to live a healthier, more vibrant life. Excess weight is more than just a number—it's a major risk factor for chronic illnesses such as diabetes, heart disease, and joint disorders. Our mission is to reduce those risks by making sustainable, medically supervised weight loss simple, personalized, and accessible—no matter where you are.
+                  </Typography>
+                </Box>
+              )}
+
+              {activeTab === 3 && (
+                <Box>
+                  <Typography variant="h4" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
+                    Our Approach
+                  </Typography>
+                  <Divider sx={{ mb: 3, borderColor: '#877449' }} />
+                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                    We combine evidence-based medicine with cutting-edge telehealth technology to deliver weight loss solutions that fit into your life. Using GLP-1 medications—proven to support appetite control and metabolic health—our team creates individualized treatment plans designed to help you shed weight safely and effectively, with ongoing support every step of the way.
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                    Our virtual model removes the barriers of traditional healthcare, offering you:
+                  </Typography>
+                  <Typography variant="body1" component="div" sx={{ color: '#877449', lineHeight: 1.8 }}>
+                    <ul>
+                      <li>Convenient online consultations</li>
+                      <li>Personalized prescription plans</li>
+                      <li>Continuous medical support and monitoring</li>
+                      <li>Discreet, home-based care</li>
+                    </ul>
+                  </Typography>
                 </Box>
               )}
 

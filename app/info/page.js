@@ -208,6 +208,89 @@ export default function InfoPage() {
         </Box>
 
         <Grid container spacing={4}>
+          {/* What's Included Card */}
+          <Grid item xs={12}>
+            <Card sx={{ backgroundColor: '#1a1a1a' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Description sx={{ fontSize: 40, color: '#877449', mr: 1 }} />
+                  <Typography variant="h5" sx={{ color: '#877449', fontWeight: '600' }}>
+                    Svelte Member Benefits
+                  </Typography>
+                </Box>
+                <Divider sx={{ mb: 3, borderColor: '#877449' }} />
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
+                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
+                        Medical Care
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        Monthly virtual appointments with licensed physician.
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
+                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
+                        Medications
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        FDA-approved GLP-1 medications like Mounjaro, shipped directly to you.
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
+                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
+                        Support
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        Personalized guidance from our patient care team through out your journey.
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
+                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
+                        Monitoring
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        Regular health tracking and progress monitoring to ensure safe and effective weight loss.
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
+                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
+                        Resources
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        Access to nutritional and fitness support and educational materials.
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
+                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
+                        Referral Program
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#877449' }}>
+                        For each referral that starts the program receive an exclusive discount
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+
           {/* Pricing Card */}
           <Grid item xs={12} md={6}>
             <Card sx={{ height: '100%', backgroundColor: '#1a1a1a' }}>
@@ -355,89 +438,6 @@ export default function InfoPage() {
                     </ListItem>
                   </List>
                 </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* What's Included Card */}
-          <Grid item xs={12}>
-            <Card sx={{ backgroundColor: '#1a1a1a' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Description sx={{ fontSize: 40, color: '#877449', mr: 1 }} />
-                  <Typography variant="h5" sx={{ color: '#877449', fontWeight: '600' }}>
-                    Svelte Member Benefits
-                  </Typography>
-                </Box>
-                <Divider sx={{ mb: 3, borderColor: '#877449' }} />
-                
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
-                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                        Medical Care
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#877449' }}>
-                        Monthly virtual appointments with licensed physician.
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
-                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                        Medications
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#877449' }}>
-                        FDA-approved GLP-1 medications like Mounjaro, shipped directly to you.
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
-                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                        Support
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#877449' }}>
-                        Personalized guidance from our patient care team through out your journey.
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
-                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                        Monitoring
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#877449' }}>
-                        Regular health tracking and progress monitoring to ensure safe and effective weight loss.
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
-                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                        Resources
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#877449' }}>
-                        Access to nutritional and fitness support and educational materials.
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, backgroundColor: '#2C3E50', height: '100%' }}>
-                      <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                        Referral Program
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#877449' }}>
-                        For each referral that starts the program receive an exclusive discount
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                </Grid>
               </CardContent>
             </Card>
           </Grid>
