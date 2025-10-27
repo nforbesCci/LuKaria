@@ -33,7 +33,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearPdfState } from '../../store/slices/pdfSlice';
-import { fetchProfile } from '../../store/slices/profileSlice';
+import { fetchAdminProfileAction } from '../../store/slices/adminSlice';
 
 export default function LabRequisition() {
   const { user, isLoading, error } = useUser();
@@ -43,7 +43,11 @@ export default function LabRequisition() {
   // Access control - only Admin and Doctor can access
   useAdminAccess();
   const { isGenerating, isSending, error: pdfError, success: pdfSuccess } = useSelector(state => state.pdf);
-  const { profile, isLoading: profileLoading } = useSelector(state => state.profile);
+ 
+  const selectedUser = useSelector((state) => state.admin.selectedUser);
+  const profile = useSelector((state) => state.admin.adminProfile);
+  const profileLoading = useSelector((state) => state.admin.adminProfileLoading);
+    
 
   // Check user roles for lab requisition access
   const userRoles = user?.['https://lukariagroup.com/roles'] || [];
@@ -57,6 +61,8 @@ export default function LabRequisition() {
     return isAdmin || isDoctor || isDoctorGroup || isAdminGroup;
   });
 
+
+
   // Clear PDF state after success/error
   useEffect(() => {
     if (pdfSuccess || pdfError) {
@@ -67,13 +73,16 @@ export default function LabRequisition() {
     }
   }, [pdfSuccess, pdfError, dispatch]);
 
-  // Fetch profile data when component loads
+  // Fetch profile data when component loads or selected user changes
   useEffect(() => {
-    if (mounted && user && !profile) {
-      console.log('🔄 Lab Requisition: Fetching profile data...');
-      dispatch(fetchProfile());
+    if (mounted && selectedUser) {
+      // Refetch if no profile or if the selected user has changed
+      if (!profile || profile.userId !== selectedUser.user_id) {
+        console.log('🔄 Lab Requisition: Fetching admin profile data for selected user:', selectedUser.user_id);
+        dispatch(fetchAdminProfileAction({ userId: selectedUser.user_id }));
+      }
     }
-  }, [mounted, user, profile, dispatch]);
+  }, [mounted, selectedUser, profile, dispatch]);
 
   // Add print-specific styles
   useEffect(() => {
@@ -86,7 +95,7 @@ export default function LabRequisition() {
         #lab-requisition-content { padding: 2px !important; background: white !important; width: 100% !important; }
         #lab-requisition-content .pdf-header { display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 8px !important; padding: 4px !important; border-bottom: 2px solid #000 !important; }
         #lab-requisition-content .pdf-header img { height: 50px !important; width: auto !important; margin-right: 8px !important; }
-        #lab-requisition-content .pdf-header h4 { font-size: 1.8rem !important; color: #1976d2 !important; font-weight: bold !important; font-family: "Alex Brush", cursive !important; }
+        #lab-requisition-content .pdf-header h4 { font-size: 1.8rem !important; color: #877449 !important; font-weight: bold !important; font-family: "Alex Brush", cursive !important; }
         #lab-requisition-content * { 
           line-height: 0.6 !important; 
           margin: 0 !important; 
@@ -831,11 +840,11 @@ export default function LabRequisition() {
           />
           <Typography variant="h4" sx={{ 
             fontWeight: 'bold',
-            color: '#1976d2',
+            color: '#877449',
             fontFamily: '"Alex Brush", cursive',
             '@media print': {
               fontSize: '1.8rem !important',
-              color: '#1976d2 !important'
+              color: '#877449 !important'
             }
           }}>
             Svelte <span style={{ 
@@ -896,7 +905,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Patient Name"
-                    value={user.name || ''}
+                    value={profile?.profile?.name || ''}
                     variant="standard"
                     InputProps={{ readOnly: true }}
                   />
@@ -905,7 +914,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Date of Birth"
-                    value={profile?.dateOfBirth || ''}
+                    value={profile?.profile?.dateOfBirth || ''}
                     variant="standard"
                     InputProps={{ readOnly: true }}
                   />
@@ -914,7 +923,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Sex"
-                    value={profile?.sex || ''}
+                    value={profile?.profile?.sex || ''}
                     variant="standard"
                     InputProps={{ readOnly: true }}
                   />
@@ -923,7 +932,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Phone Number"
-                    value={profile?.preferredPhone || ''}
+                    value={profile?.profile?.preferredPhone || ''}
                     variant="standard"
                     InputProps={{ readOnly: true }}
                   />
@@ -932,7 +941,7 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Address"
-                    value={profile?.homeAddress || ''}
+                    value={profile?.profile?.homeAddress || ''}
                     multiline
                     rows={2}
                     variant="standard"
