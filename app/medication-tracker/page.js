@@ -42,7 +42,7 @@ import {
   CalendarToday,
   AccessTime,
 } from '@mui/icons-material';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function MedicationTracker() {
   const { user, isLoading, error } = useUser();
@@ -118,6 +118,7 @@ export default function MedicationTracker() {
       console.log('✅ Medication saved successfully, reloading all medications');
       
       // Reload all medications to get updated list
+      // The fetchAllMedications action will reset isSaved to prevent infinite loop
       dispatch(fetchAllMedications());
     }
   }, [medicationState.isSaved, medicationState.isLoading, dispatch]);
@@ -170,19 +171,6 @@ export default function MedicationTracker() {
       timestamp: new Date(`${entry.date}T${entry.time}`).getTime()
     }));
 
-  // Group by medication for frequency chart
-  const medicationFrequency = {};
-  medicationHistory.forEach(entry => {
-    if (!medicationFrequency[entry.medicationName]) {
-      medicationFrequency[entry.medicationName] = 0;
-    }
-    medicationFrequency[entry.medicationName]++;
-  });
-
-  const frequencyChartData = Object.entries(medicationFrequency).map(([medication, count]) => ({
-    medication,
-    count
-  }));
 
   const handleAddEntry = () => {
     setIsAddingEntry(true);
@@ -335,7 +323,7 @@ export default function MedicationTracker() {
                   Medication Tracker
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  {user.name || 'User'} • Track your medication intake and dosage
+                  {user.name || 'User'} • Track the administration of your weight loss medication
                 </Typography>
               </Box>
             </Box>
@@ -505,7 +493,7 @@ export default function MedicationTracker() {
         {/* Charts */}
         {chartData.length > 0 && (
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -515,40 +503,21 @@ export default function MedicationTracker() {
                     <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
-                      <YAxis />
+                      <YAxis label={{ value: 'Dosage (mg)', angle: -90, position: 'insideLeft' }} />
                       <Tooltip 
-                        formatter={(value, name) => [value, name === 'time' ? 'Time' : 'Dosage']}
+                        formatter={(value, name) => [`${value} mg`, 'Dosage']}
                         labelFormatter={(label) => `Date: ${label}`}
                       />
                       <Legend />
                       <Line 
                         type="monotone" 
-                        dataKey="time" 
+                        dataKey="dosage" 
                         stroke="#1976d2" 
                         strokeWidth={2}
-                        name="Time"
+                        name="Dosage (mg)"
                         dot={{ r: 4 }}
                       />
                     </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </Grid>
-            
-            <Grid item xs={12} md={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Medication Frequency
-                  </Typography>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={frequencyChartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="medication" angle={-45} textAnchor="end" height={80} />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="count" fill="#dc004e" />
-                    </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

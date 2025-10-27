@@ -48,6 +48,7 @@ const medicationSlice = createSlice({
     fetchAllMedications: (state) => {
       state.isLoading = true;
       state.error = null;
+      state.isSaved = false; // Reset save flag to prevent infinite loop
     },
     fetchAllMedicationsSuccess: (state, action) => {
       state.isLoading = false;

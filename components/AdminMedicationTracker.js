@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   Stack,
-  Chip,
 } from '@mui/material';
 import { PictureAsPdf } from '@mui/icons-material';
 
@@ -78,25 +77,17 @@ const AdminMedicationTracker = ({
                         </Box>
                         
                         <Grid container spacing={2}>
-                          <Grid item xs={12} sm={6} md={3}>
+                          <Grid item xs={12} sm={6} md={4}>
                             <Typography variant="caption" color="text.secondary">Dosage</Typography>
                             <Typography variant="body2">{medication.dosage || 'Not specified'}</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} md={3}>
+                          <Grid item xs={12} sm={6} md={4}>
                             <Typography variant="caption" color="text.secondary">Frequency</Typography>
                             <Typography variant="body2">{medication.frequency || 'Not specified'}</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} md={3}>
+                          <Grid item xs={12} sm={6} md={4}>
                             <Typography variant="caption" color="text.secondary">Time</Typography>
                             <Typography variant="body2">{medication.time || 'Not specified'}</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={6} md={3}>
-                            <Typography variant="caption" color="text.secondary">Status</Typography>
-                            <Chip 
-                              label={medication.taken ? 'Taken' : 'Missed'} 
-                              color={medication.taken ? 'success' : 'error'}
-                              size="small"
-                            />
                           </Grid>
                         </Grid>
                         
