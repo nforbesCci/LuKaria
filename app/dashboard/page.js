@@ -195,6 +195,20 @@ export default function Dashboard() {
     return allComplete;
   };
 
+  // Function to check if appointment date has passed
+  const isAppointmentPast = () => {
+    if (!currentAppointment) return false;
+    
+    const appointmentDate = currentAppointment.date || currentAppointment.startDate;
+    if (!appointmentDate) return false;
+    
+    const appointmentDateTime = new Date(appointmentDate);
+    const now = new Date();
+    
+    // Return true if appointment date is in the past
+    return appointmentDateTime < now;
+  };
+
   // Handler for weight/height entry completion
   const handleWeightHeightComplete = (data) => {
     // Mark the task as complete
@@ -348,17 +362,20 @@ export default function Dashboard() {
         {currentAppointment && (
           <Card sx={{ mb: 4, backgroundColor: '#1a1a1a' }}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CalendarToday sx={{ fontSize: 30, mr: 2, color: '#877449' }} />
-                <Box>
-                  <Typography variant="h5" gutterBottom color="primary">
-                    Upcoming Appointment
-                  </Typography>
-                </Box>
-              </Box>
+              {/* Only show appointment details if date has not passed */}
+              {!isAppointmentPast() && (
+                <>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CalendarToday sx={{ fontSize: 30, mr: 2, color: '#877449' }} />
+                    <Box>
+                      <Typography variant="h5" gutterBottom color="primary">
+                        Upcoming Appointment
+                      </Typography>
+                    </Box>
+                  </Box>
 
-              {/* Show appointment details if scheduled, otherwise show "not scheduled" message */}
-              {isScheduled && currentAppointment ? (
+                  {/* Show appointment details if scheduled, otherwise show "not scheduled" message */}
+                  {isScheduled && currentAppointment ? (
                 <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
                   <Box sx={{ 
                     display: 'flex', 
@@ -514,6 +531,8 @@ export default function Dashboard() {
                     </Button>
                   </Box>
                 </Paper>
+              )}
+                </>
               )}
 
               <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
