@@ -150,13 +150,25 @@ export const GET = withApiAuthRequired(async (req) => {
     console.log('✅ Auth0 API response received:', { 
       total: users.total, 
       length: users.length,
-      dataLength: users.data?.length 
+      dataLength: users.data?.length,
+      responseStart: users.response?.start,
+      page: page,
+      perPage: perPage
+    });
+
+    const calculatedStart = perPage * page;
+    const auth0Start = users.response?.start;
+    
+    console.log('🔢 Start calculation:', {
+      calculatedStart,
+      auth0Start,
+      willUse: auth0Start !== undefined ? auth0Start : calculatedStart
     });
 
     const responseData = {
       users: users.data,
       total: users.response.total,
-      start: users.response.start,
+      start: auth0Start !== undefined ? auth0Start : calculatedStart,
       limit: users.response.limit,
       length: users.response.length,
     };
@@ -165,7 +177,8 @@ export const GET = withApiAuthRequired(async (req) => {
       usersCount: responseData.users?.length,
       total: responseData.total,
       start: responseData.start,
-      limit: responseData.limit
+      limit: responseData.limit,
+      page: page
     });
     
     return Response.json(responseData);

@@ -94,7 +94,8 @@ function* fetchUsersSaga() {
       total: data.total || 0,
       start: data.start || 0,
       limit: data.limit || 10,
-      length: data.length || 0,
+      // Don't update length/rowsPerPage from API to prevent triggering useEffect
+      // length: data.length || 0,
     }));
     
   } catch (error) {
