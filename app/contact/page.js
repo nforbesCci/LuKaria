@@ -256,7 +256,8 @@ export default function Contact() {
               backgroundColor: '#36454F', 
               p: 0.625, 
               borderRadius: 2,
-              mb: 3
+              mb: 3,
+              display: 'none'
             }}>
               <Phone sx={{ 
                 fontSize: 48, 

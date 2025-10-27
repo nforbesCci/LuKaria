@@ -640,13 +640,22 @@ export default function LabRequisition() {
   };
 
   const sendPDF = () => {
-    const fileName = `Lab-Requisition-${user?.name?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+    const patientName = profile?.profile?.name || 'Patient';
+    const fileName = `Lab-Requisition-${patientName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    // Create user info object from admin profile
+    const userInfo = {
+      sub:  profile?.userId ,
+      name: profile?.profile?.name ,
+      email: profile?.profile?.userEmail,
+    };
+    
     dispatch({
       type: 'pdf/generateAndSendPdf',
       payload: {
         elementId: 'lab-requisition-content',
         fileName,
-        userInfo: user,
+        userInfo: userInfo,
       },
     });
   };
