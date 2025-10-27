@@ -1,3 +1,4 @@
+import { LensTwoTone } from '@mui/icons-material';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -120,10 +121,12 @@ const adminSlice = createSlice({
       state.editDialogOpen = action.payload;
     },
     setPaginationData: (state, action) => {
-      const { page, rowsPerPage, totalUsers } = action.payload;
+      const { page, length, total, limit, start } = action.payload;
       state.page = page;
-      state.rowsPerPage = rowsPerPage;
-      state.totalUsers = totalUsers;
+      state.start = start,
+      state.limit = limit,
+      state.rowsPerPage = length;
+      state.totalUsers = total;
     },
     resetFilters: (state) => {
       state.searchTerm = '';

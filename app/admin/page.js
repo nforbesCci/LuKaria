@@ -504,17 +504,7 @@ export default function AdminPage() {
               rowsPerPage={safeRowsPerPage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               rowsPerPageOptions={[5, 10, 25, 50]}
-              labelDisplayedRows={({ from, to, count }) => {
-                console.log('📊 Pagination display:', { 
-                  from, 
-                  to, 
-                  count, 
-                  totalUsers, 
-                  start, 
-                  limit, 
-                  length,
-                  usersLength: users.length 
-                });
+              labelDisplayedRows={({ from, to, count }) => {                
                 return `${from}-${to} of ${count}`;
               }}
             />
