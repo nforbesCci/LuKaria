@@ -2,6 +2,7 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
+import Script from 'next/script';
 import SEO from '../../components/SEO';
 import {
   Container,
@@ -34,6 +35,29 @@ export default function AboutUs() {
 
   return (
     <>
+      {/* Google Analytics */}
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          />
+          <Script
+            id="google-analytics"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+            }}
+          />
+        </>
+      )}
       <SEO 
         title="About Us - Our Mission | Svelte by LuKaria"
         description="Learn about Svelte by LuKaria and Dr. Kadria Fairclough. Virtual medical weight loss clinic dedicated to transforming lives through science-backed, compassionate care in Jamaica."

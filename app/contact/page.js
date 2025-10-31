@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import Script from 'next/script';
 import SEO from '../../components/SEO';
 import {
   Container,
@@ -38,6 +39,29 @@ export default function Contact() {
 
   return (
     <>
+      {/* Google Analytics */}
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          />
+          <Script
+            id="google-analytics"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+            }}
+          />
+        </>
+      )}
       <SEO 
         title="Contact Us | Svelte by LuKaria"
         description="Get in touch with Svelte by LuKaria. Contact our patient care team for questions about virtual weight loss consultations, GLP-1 medications, and program enrollment."

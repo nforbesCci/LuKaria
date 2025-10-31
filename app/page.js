@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
+import Script from 'next/script';
 import SEO from '../components/SEO';
 import {
   Container,
@@ -141,6 +142,29 @@ export default function Home() {
       <Head>
         <link rel="canonical" href="https://www.lukariagroup.com/" />
       </Head>
+      {/* Google Analytics */}
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          />
+          <Script
+            id="google-analytics"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+            }}
+          />
+        </>
+      )}
       <SEO 
         title="Svelte by LuKaria - Virtual Medical Weight Loss | GLP-1 Medications"
         description="Virtual medical weight loss clinic in Jamaica. GLP-1 medications like Mounjaro prescribed by licensed physicians. Flat monthly fee, no waiting rooms. Start your transformation today."

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import Script from 'next/script';
 import SEO from '../../components/SEO';
 import {
   Container,
@@ -56,6 +57,29 @@ export default function FAQ() {
 
   return (
     <>
+      {/* Google Analytics */}
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          />
+          <Script
+            id="google-analytics"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+            }}
+          />
+        </>
+      )}
       <SEO 
         title="FAQ - Frequently Asked Questions | Svelte by LuKaria"
         description="Common questions about GLP-1 medications, Mounjaro, weight loss treatment, virtual consultations, and program details. Get answers to your weight loss questions."
