@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -22,8 +22,10 @@ const AdminSideEffects = ({
   onReviewSideEffect,
   onOpenSideEffect,
   formatDate,
+  userData,
 }) => {
   const [selectedSideEffect, setSelectedSideEffect] = useState(null);
+  const sideEffectCardRef = useRef(null);
 
   // Handle side effect selection
   const handleSideEffectClick = (sideEffect) => {
@@ -42,6 +44,143 @@ const AdminSideEffects = ({
     onOpenSideEffect(sideEffectId);
     // Update local state to reflect the change
     setSelectedSideEffect(prev => prev ? { ...prev, complete: false } : null);
+  };
+
+  // Generate PDF for individual side effect card
+  const generateSideEffectPDF = async () => {
+    if (!selectedSideEffect) return;
+
+    try {
+      // Show loading message
+      const loadingMessage = document.createElement('div');
+      loadingMessage.style.position = 'fixed';
+      loadingMessage.style.top = '50%';
+      loadingMessage.style.left = '50%';
+      loadingMessage.style.transform = 'translate(-50%, -50%)';
+      loadingMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      loadingMessage.style.color = 'white';
+      loadingMessage.style.padding = '20px';
+      loadingMessage.style.borderRadius = '8px';
+      loadingMessage.style.zIndex = '9999';
+      loadingMessage.style.fontFamily = 'Arial, sans-serif';
+      loadingMessage.innerHTML = `Generating Side Effect PDF...<br><small>This may take a few moments</small>`;
+      document.body.appendChild(loadingMessage);
+
+      // Import jsPDF and html2canvas dynamically
+      const { default: jsPDF } = await import('jspdf');
+      const { default: html2canvas } = await import('html2canvas');
+      
+      // Create a new PDF document
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      // Add header
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Side Effect Report', 105, 20, { align: 'center' });
+      
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      const userName = userData?.name || userData?.email || 'Unknown User';
+      pdf.text(`User: ${userName}`, 105, 30, { align: 'center' });
+      pdf.text(`Report Date: ${formatDate(selectedSideEffect.createdAt)}`, 105, 35, { align: 'center' });
+      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 40, { align: 'center' });
+
+      // Find the card content element
+      const cardElement = sideEffectCardRef.current;
+      
+      if (cardElement) {
+        // Create a temporary container for the card content
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.top = '0';
+        tempContainer.style.width = '800px';
+        tempContainer.style.backgroundColor = '#ffffff';
+        tempContainer.style.padding = '20px';
+        tempContainer.style.fontFamily = 'Arial, sans-serif';
+        tempContainer.style.fontSize = '12px';
+        tempContainer.style.lineHeight = '1.4';
+        tempContainer.style.color = '#000000';
+        
+        // Clone the card content
+        const clonedContent = cardElement.cloneNode(true);
+        
+        // Remove buttons from cloned content
+        const buttons = clonedContent.querySelectorAll('button');
+        buttons.forEach(btn => btn.remove());
+        
+        tempContainer.appendChild(clonedContent);
+        document.body.appendChild(tempContainer);
+
+        try {
+          // Capture the content as canvas
+          const canvas = await html2canvas(tempContainer, {
+            scale: 1.5,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            width: tempContainer.scrollWidth,
+            height: tempContainer.scrollHeight,
+            windowWidth: tempContainer.scrollWidth,
+            windowHeight: tempContainer.scrollHeight,
+          });
+
+          // Calculate dimensions for A4
+          const imgWidth = 170; // A4 width minus margins
+          const pageHeight = 200; // A4 height minus margins for header
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          // If content is too tall, scale it down
+          if (imgHeight > pageHeight) {
+            const scaleFactor = pageHeight / imgHeight;
+            const scaledWidth = imgWidth * scaleFactor;
+            const scaledHeight = pageHeight;
+            const xOffset = (imgWidth - scaledWidth) / 2;
+            
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 20 + xOffset, 50, scaledWidth, scaledHeight);
+          } else {
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 20, 50, imgWidth, imgHeight);
+          }
+
+        } finally {
+          // Clean up temporary container
+          document.body.removeChild(tempContainer);
+        }
+      } else {
+        console.warn('Side effect card element not found');
+        // Add a message to PDF if content not found
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Content not available', 105, 100, { align: 'center' });
+      }
+
+      // Remove loading message
+      document.body.removeChild(loadingMessage);
+
+      // Generate filename with user info and date
+      const dateStr = new Date().toISOString().split('T')[0];
+      const fileName = `Side-Effect-Report-${userName.replace(/[^a-zA-Z0-9]/g, '-')}-${dateStr}.pdf`;
+
+      // Save the PDF
+      pdf.save(fileName);
+
+      // Show success message
+      alert(`Side Effect PDF generated successfully: ${fileName}`);
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Remove loading message if it exists
+      const loadingMessage = document.querySelector('div[style*="position: fixed"]');
+      if (loadingMessage) {
+        document.body.removeChild(loadingMessage);
+      }
+      alert('Error generating Side Effect PDF. Please try again.');
+    }
   };
 
   return (
@@ -143,15 +282,18 @@ const AdminSideEffects = ({
           {/* Fixed Details Panel */}
           {selectedSideEffect && (
             <Grid item xs={12}>
-              <Card sx={{ 
-                position: 'sticky', 
-                bottom: 0, 
-                zIndex: 1,
-                backgroundColor: 'background.paper',
-                border: '2px solid',
-                borderColor: 'primary.main',
-                boxShadow: 3
-              }}>
+              <Card 
+                ref={sideEffectCardRef}
+                sx={{ 
+                  position: 'sticky', 
+                  bottom: 0, 
+                  zIndex: 1,
+                  backgroundColor: 'background.paper',
+                  border: '2px solid',
+                  borderColor: 'primary.main',
+                  boxShadow: 3
+                }}
+              >
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6" color="primary">
@@ -169,14 +311,25 @@ const AdminSideEffects = ({
                         </Button>
                       )}
                       {selectedSideEffect.complete && (
-                        <Button 
-                          variant="contained" 
-                          color="warning"
-                          size="small" 
-                          onClick={() => handleOpenSideEffect(selectedSideEffect._id)}
-                        >
-                          Reopen
-                        </Button>
+                        <>
+                          <Button 
+                            variant="outlined" 
+                            color="primary"
+                            size="small" 
+                            startIcon={<PictureAsPdf />}
+                            onClick={generateSideEffectPDF}
+                          >
+                            Generate PDF
+                          </Button>
+                          <Button 
+                            variant="contained" 
+                            color="warning"
+                            size="small" 
+                            onClick={() => handleOpenSideEffect(selectedSideEffect._id)}
+                          >
+                            Reopen
+                          </Button>
+                        </>
                       )}
                       <Button 
                         variant="outlined" 

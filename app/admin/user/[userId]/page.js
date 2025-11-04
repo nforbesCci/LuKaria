@@ -2034,6 +2034,7 @@ export default function UserDetailPage() {
               onReviewSideEffect={handleReviewSideEffect}
               onOpenSideEffect={handleOpenSideEffect}
               formatDate={formatDate}
+              userData={userData}
             />
           </TabPanel>
 

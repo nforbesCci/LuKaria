@@ -27,7 +27,10 @@ export async function GET(request) {
 
     // Fetch all side effects reports for this user, sorted by most recent
     const sideEffects = await sideEffectsCollection
-      .find({ userId: userId })
+      .find({ 
+        userId: userId,
+        reviewed: false
+      })
       .sort({ createdAt: -1 })
       .toArray();
 
