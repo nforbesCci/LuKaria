@@ -490,41 +490,6 @@ export default function MedicationTracker() {
           </Card>
         ) : (
           <>
-        {/* Charts */}
-        {chartData.length > 0 && (
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Medication Timeline
-                  </Typography>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis label={{ value: 'Dosage (mg)', angle: -90, position: 'insideLeft' }} />
-                      <Tooltip 
-                        formatter={(value, name) => [`${value} mg`, 'Dosage']}
-                        labelFormatter={(label) => `Date: ${label}`}
-                      />
-                      <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="dosage" 
-                        stroke="#1976d2" 
-                        strokeWidth={2}
-                        name="Dosage (mg)"
-                        dot={{ r: 4 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        )}
-
         {/* Medication History */}
         <Card sx={{ mb: 4 }}>
           <CardContent sx={{ p: 4 }}>

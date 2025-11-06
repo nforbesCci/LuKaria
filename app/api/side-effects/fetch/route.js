@@ -29,7 +29,7 @@ export async function GET(request) {
     const sideEffects = await sideEffectsCollection
       .find({ 
         userId: userId,
-        reviewed: false
+        reviewed: { $ne: true } 
       })
       .sort({ createdAt: -1 })
       .toArray();

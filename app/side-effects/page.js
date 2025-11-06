@@ -31,6 +31,7 @@ import {
   Stepper,
   Step,
   StepLabel,
+  Backdrop,
 } from '@mui/material';
 import {
   Person,
@@ -288,6 +289,30 @@ export default function SideEffects() {
     );
   }
 
+  const shouldShowInitialLoadingMask = sideEffectsState.isLoading && !sideEffectsState.sideEffects;
+
+  if (shouldShowInitialLoadingMask) {
+    return (
+      <>
+        <Header />
+        <Backdrop
+          open
+          sx={{
+            color: '#fff',
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            flexDirection: 'column',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          }}
+        >
+          <CircularProgress color="inherit" />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Loading your side effects history...
+          </Typography>
+        </Backdrop>
+      </>
+    );
+  }
+
   // Check if form is complete and should be read-only
   const isFormComplete = formData.complete === true;
 
@@ -418,7 +443,7 @@ export default function SideEffects() {
               )}
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <FormControl component="fieldset" disabled={isFormComplete}>
+              <FormControl component="fieldset" disabled={isFormComplete}>
                     <FormLabel component="legend">Would you like your doctor to contact you?</FormLabel>
                     <RadioGroup
                       row
@@ -710,7 +735,7 @@ export default function SideEffects() {
                   }}
                   size="small"
                   variant="contained"
-                  disabled={isFormComplete}
+                  disabled={!isStepValid(activeStep)}
                 >
                   <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                     Next
@@ -799,7 +824,7 @@ export default function SideEffects() {
                 onClick={handleNext}
                 endIcon={<NavigateNext />}
                 sx={{ textTransform: 'none' }}
-                disabled={isFormComplete}
+                disabled={!isStepValid(activeStep)}
               >
                 Next
               </Button>
