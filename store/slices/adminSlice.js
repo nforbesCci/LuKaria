@@ -122,11 +122,21 @@ const adminSlice = createSlice({
     },
     setPaginationData: (state, action) => {
       const { page, length, total, limit, start } = action.payload;
-      if (page !== undefined) state.page = page;
-      if (limit !== undefined) state.limit = limit;
-      if (length !== undefined) state.rowsPerPage = length;
-      if (total !== undefined) state.totalUsers = total;
-      if (start !== undefined) state.start = start;
+      if (typeof page === 'number') {
+        state.page = page;
+      }
+      if (typeof start === 'number') {
+        state.start = start;
+      }
+      if (typeof limit === 'number') {
+        state.limit = limit;
+      }
+      if (typeof length === 'number' && length > 0) {
+        state.rowsPerPage = length;
+      }
+      if (typeof total === 'number') {
+        state.totalUsers = total;
+      }
     },
     resetFilters: (state) => {
       state.searchTerm = '';
