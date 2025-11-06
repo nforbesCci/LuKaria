@@ -1439,7 +1439,7 @@ export default function UserDetailPage() {
                       <Cancel sx={{ color: 'error.main', mr: 1 }} />
                     )}
                     <Typography variant="body2">
-                      Consultation: {dbConsultationOccurred ? 'Completed' : 'Not Completed'}
+                      Account: {dbConsultationOccurred ? 'Enabled' : 'Disabled'}
                     </Typography>
                   </Box>
                 </Grid>
