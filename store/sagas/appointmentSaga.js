@@ -1,10 +1,12 @@
-import { takeEvery, call, put, select } from 'redux-saga/effects';
+import { takeEvery, call, put, select, all } from 'redux-saga/effects';
 import {
   setCurrentAppointment,
+  clearCurrentAppointment,
   setScheduleCompleted,
   addAppointment,
   setBookingStatus,
   setBookingError,
+  setAppointmentLoaded,
   setQuestions,
   setQuestionsLoading,
   setQuestionsError,
@@ -110,10 +112,12 @@ function* completeSchedule(action) {
 // Handle loading appointment data from database
 function* loadAppointmentData() {
   try {
+    yield put(setAppointmentLoaded(false));
     // Load appointment data from database instead of localStorage
     yield call(checkAppointmentConfig);
   } catch (error) {
     console.error('Error loading appointment data:', error);
+    yield put(setAppointmentLoaded(true));
   }
 }
 
@@ -167,11 +171,13 @@ function* checkAppointmentConfig() {
     }
     
     yield put(setBookingStatus(false));
+    yield put(setAppointmentLoaded(true));
     
   } catch (error) {
     console.error('❌ Error checking appointment configuration:', error);
     yield put(setBookingStatus(false));
     yield put(setBookingError(error.message));
+    yield put(setAppointmentLoaded(true));
   }
 }
 
@@ -314,6 +320,32 @@ function* requestReschedule(action) {
     yield put(setBookingError(error.message));
   }
 }
+function* rescheduleAppointment(action) {
+  try {
+    console.log('🔄 Saga: Rescheduling appointment:', action.payload);
+    const appointmentData = action.payload;
+
+    if (!appointmentData) {
+      throw new Error('Appointment data is required to reschedule');
+    }
+
+    yield call(fetch, '/api/appointment/update', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ appointmentData }),
+    });
+
+
+    yield put(clearCurrentAppointment());
+    yield put(setScheduleCompleted(false));
+    yield put(setIsScheduled(false));
+  } catch (error) {
+    console.error('❌ Error rescheduling appointment:', error);
+    yield put(setBookingError(error.message));
+  }
+}
 
 // Handle admin reschedule appointment
 function* adminRescheduleAppointment(action) {
@@ -375,13 +407,16 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Watch for appointment actions
 export default function* appointmentSaga() {
-  yield takeEvery('appointment/bookAppointment', bookAppointment);
-  yield takeEvery('appointment/completeSchedule', completeSchedule);
-  yield takeEvery('appointment/loadAppointmentData', loadAppointmentData);
-  yield takeEvery('appointment/checkAppointmentConfig', checkAppointmentConfig);
-  yield takeEvery('appointment/loadQuestions', loadQuestions);
-  yield takeEvery('appointment/saveQuestions', saveQuestions);
-  yield takeEvery('appointment/requestReschedule', requestReschedule);
-  yield takeEvery('appointment/adminRescheduleAppointment', adminRescheduleAppointment);
+  yield all([
+    takeEvery('appointment/bookAppointment', bookAppointment),
+    takeEvery('appointment/completeSchedule', completeSchedule),
+    takeEvery('appointment/loadAppointmentData', loadAppointmentData),
+    takeEvery('appointment/checkAppointmentConfig', checkAppointmentConfig),
+    takeEvery('appointment/loadQuestions', loadQuestions),
+    takeEvery('appointment/saveQuestions', saveQuestions),
+    takeEvery('appointment/requestReschedule', requestReschedule),
+    takeEvery('appointment/rescheduleAppointment', rescheduleAppointment),
+    takeEvery('appointment/adminRescheduleAppointment', adminRescheduleAppointment),
+  ]);
 }
 

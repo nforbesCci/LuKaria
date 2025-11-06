@@ -15,6 +15,7 @@ const initialState = {
   isScheduleCompleted: false,
   bookingError: null,
   adminRescheduleSuccess: false,
+  appointmentLoaded: false,
   preAppointmentTasks: createDefaultPreAppointmentTasks(),
   preAppointmentTasksLoading: false,
   preAppointmentTasksLoaded: false,
@@ -42,6 +43,10 @@ const appointmentSlice = createSlice({
         state.isScheduleCompleted = true;
       }
     },
+    clearCurrentAppointment: (state) => {
+      state.currentAppointment = null;
+      state.isScheduleCompleted = false;
+    },
     addAppointment: (state, action) => {
       state.appointments.push(action.payload);
       state.currentAppointment = action.payload;
@@ -49,6 +54,9 @@ const appointmentSlice = createSlice({
     },
     setBookingStatus: (state, action) => {
       state.isBooking = action.payload;
+    },
+    setAppointmentLoaded: (state, action) => {
+      state.appointmentLoaded = action.payload;
     },
     setBookingError: (state, action) => {
       state.bookingError = action.payload;
@@ -151,8 +159,10 @@ const appointmentSlice = createSlice({
 export const {
   setScheduleCompleted,
   setCurrentAppointment,
+  clearCurrentAppointment,
   addAppointment,
   setBookingStatus,
+  setAppointmentLoaded,
   setBookingError,
   clearBookingError,
   clearAppointments,
@@ -202,6 +212,11 @@ export const saveQuestions = (questionsData) => ({
 export const requestReschedule = (appointmentId) => ({
   type: 'appointment/requestReschedule',
   payload: { appointmentId },
+});
+
+export const rescheduleAppointment = (appointmentData) => ({
+  type: 'appointment/rescheduleAppointment',
+  payload: appointmentData,
 });
 
 export const adminRescheduleAppointment = (userId, appointmentData) => ({

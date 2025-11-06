@@ -63,6 +63,7 @@ export async function POST(request) {
           type: appointmentData.type || 'consultation',
           length: appointmentData.length || '60',
           notes: appointmentData.notes || '',
+          isScheduled: true,
           rawData:{
             startDate: new Date(`${appointmentData.date.split('T')[0]}T${appointmentData.time}`),
             endDate: (() => {
@@ -105,7 +106,8 @@ export async function POST(request) {
           time: appointmentData.time,
           type: appointmentData.type,
           length: appointmentData.length,
-          notes: appointmentData.notes
+          notes: appointmentData.notes,
+          isScheduled: true
         },
         user: {
           name: updatedUser?.name,

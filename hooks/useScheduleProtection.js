@@ -12,9 +12,13 @@ export function useScheduleProtection() {
   const router = useRouter();
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
   const isScheduled = useAppSelector((state) => state.user.isScheduled);
+  const appointmentLoaded = useAppSelector((state) => state.appointment.appointmentLoaded);
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
   useEffect(() => {
+    if (!appointmentLoaded) {
+      return;
+    }
     // Only enforce schedule protection if:
     // 1. Schedule is NOT completed
     // 2. User is NOT already scheduled (isScheduled is false or undefined)
@@ -24,7 +28,7 @@ export function useScheduleProtection() {
       // Redirect back to schedule page
       router.push('/schedule');
     }
-  }, [scheduleCompleted, isScheduled, currentPath, router]);
+  }, [scheduleCompleted, isScheduled, currentPath, router, appointmentLoaded]);
 
   return { scheduleCompleted };
 }
@@ -35,15 +39,19 @@ export function useScheduleProtection() {
 export function useScheduleRedirect() {
   const router = useRouter();
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
+  const appointmentLoaded = useAppSelector((state) => state.appointment.appointmentLoaded);
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
   useEffect(() => {
+    if (!appointmentLoaded) {
+      return;
+    }
     // If schedule is completed and user is trying to access schedule page
     if (scheduleCompleted && currentPath === '/schedule') {
       // Redirect to dashboard
       router.push('/dashboard');
     }
-  }, [scheduleCompleted, currentPath, router]);
+  }, [scheduleCompleted, currentPath, router, appointmentLoaded]);
 
   return { scheduleCompleted };
 }

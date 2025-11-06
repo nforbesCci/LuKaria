@@ -107,6 +107,8 @@ function TabPanel({ children, value, index, id, ...other }) {
 export default function UserDetailPage() {
   const { user: currentUser, isLoading, error } = useUser();
   const params = useParams();
+  const rawUserId = params?.userId;
+  const userId = Array.isArray(rawUserId) ? rawUserId[0] : rawUserId;
   const router = useRouter();
   const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
@@ -215,84 +217,84 @@ export default function UserDetailPage() {
   }, []);
 
   useEffect(() => {
-    if (params.userId) {
+    if (userId) {
       fetchUserData();
       fetchDbProfile();
       // Fetch admin profile to check medical profile task completion
-      dispatch(fetchAdminProfileAction({ userId: params.userId }));
+      dispatch(fetchAdminProfileAction({ userId }));
     }
-  }, [params.userId, dispatch]);
+  }, [userId, dispatch]);
 
   // Fetch pre-appointment tasks when consultation is completed
   useEffect(() => {
-    if (params.userId) {
-      console.log('🔄 Consultation completed, fetching pre-appointment tasks for user:', params.userId);
-      dispatch(fetchAdminPreAppointmentTasksAction({ userId: params.userId }));
+    if (userId) {
+      console.log('🔄 Consultation completed, fetching pre-appointment tasks for user:', userId);
+      dispatch(fetchAdminPreAppointmentTasksAction({ userId }));
     }
-  }, [params.userId, dbConsultationOccurred, dispatch]);
+  }, [userId, dbConsultationOccurred, dispatch]);
 
   // Fetch meals when Meal Tracker tab is selected
   useEffect(() => {
-    if (tabValue === 5 && params.userId) { // Meal Tracker tab index
+    if (tabValue === 5 && userId) { // Meal Tracker tab index
       // Calculate date range for the current week
       const dateRange = getWeekDateRange(currentWeek);
       const startDate = dateRange.startDate.toISOString().split('T')[0];
       const endDate = dateRange.endDate.toISOString().split('T')[0];
       
       dispatch(fetchAdminMealsAction({ 
-        userId: params.userId, 
+        userId, 
         startDate, 
         endDate 
       }));
     }
-  }, [tabValue, dispatch, params.userId]);
+  }, [tabValue, dispatch, userId]);
 
   // Fetch medications when Medication Tracker tab is selected
   useEffect(() => {
-    if (tabValue === 4 && params.userId) { // Medication Tracker tab index
+    if (tabValue === 4 && userId) { // Medication Tracker tab index
       dispatch(fetchAdminMedicationsAction({ 
-        userId: params.userId, 
+        userId, 
         daysBack: 28 // Last 4 weeks
       }));
     }
-  }, [tabValue, params.userId, dispatch]);
+  }, [tabValue, userId, dispatch]);
 
   // Fetch measurements when Weight Logging tab is selected
   useEffect(() => {
-    if (tabValue === 3 && params.userId) { // Weight Logging tab index
+    if (tabValue === 3 && userId) { // Weight Logging tab index
       dispatch(fetchAdminMeasurementsAction({ 
-        userId: params.userId, 
+        userId, 
         daysBack: 28 // Last 4 weeks
       }));
     }
-  }, [tabValue, params.userId, dispatch]);
+  }, [tabValue, userId, dispatch]);
 
   // Fetch side effects when Side Effects tab is selected
   useEffect(() => {
-    if (tabValue === 2 && params.userId) { // Side Effects tab index
+    if (tabValue === 2 && userId) { // Side Effects tab index
       dispatch(fetchAdminSideEffectsAction({ 
-        userId: params.userId, 
+        userId, 
         limit: 4 // Last 4 side effects
       }));
     }
-  }, [tabValue, params.userId, dispatch]);
+  }, [tabValue, userId, dispatch]);
 
   // Fetch questions when Questions tab is selected
   useEffect(() => {
-    if (tabValue === 6 && params.userId) { // Questions tab index
+    if (tabValue === 6 && userId) { // Questions tab index
       dispatch(fetchAdminQuestionsAction({ 
-        userId: params.userId, 
+        userId, 
         limit: 10 // Last 10 questions
       }));
     }
-  }, [tabValue, params.userId, dispatch]);
+  }, [tabValue, userId, dispatch]);
 
   // Fetch consent forms when Consent Forms tab is selected
   useEffect(() => {
-    if (tabValue === 1 && params.userId) { // Consent Forms tab index
-      dispatch(fetchAdminConsentFormsAction({ userId: params.userId }));
+    if (tabValue === 1 && userId) { // Consent Forms tab index
+      dispatch(fetchAdminConsentFormsAction({ userId }));
     }
-  }, [tabValue, dispatch, params.userId]);
+  }, [tabValue, dispatch, userId]);
 
   // Watch for successful admin reschedule
   useEffect(() => {
@@ -325,10 +327,14 @@ export default function UserDetailPage() {
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      console.log('🔍 Fetching user data for ID:', params.userId);
+      if (!userId) {
+        throw new Error('No user specified');
+      }
+
+      console.log('🔍 Fetching user data for ID:', userId);
       
       // Fetch real user data from API
-      const response = await fetch(`/api/admin/users/${params.userId}`, {
+      const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -357,9 +363,13 @@ export default function UserDetailPage() {
 
   const fetchDbProfile = async () => {
     try {
-      console.log('🔍 Fetching DB profile for user:', params.userId);
+      if (!userId) {
+        throw new Error('No user specified');
+      }
+
+      console.log('🔍 Fetching DB profile for user:', userId);
       
-      const response = await fetch(`/api/admin/users/${params.userId}/profile`, {
+      const response = await fetch(`/api/admin/users/${userId}/profile`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -400,11 +410,15 @@ export default function UserDetailPage() {
     const newStatus = !currentStatus;
     
     try {
-      console.log(`${newStatus ? '🔓' : '🔒'} ${newStatus ? 'Enabling' : 'Disabling'} account for user:`, params.userId);
+      if (!userId) {
+        throw new Error('No user specified');
+      }
+
+      console.log(`${newStatus ? '🔓' : '🔒'} ${newStatus ? 'Enabling' : 'Disabling'} account for user:`, userId);
       
       // Dispatch saga to update consultationOccurred
       dispatch(enableUserAccountAction({
-        userId: params.userId,
+        userId,
         consultationOccurred: newStatus
       }));
       
@@ -429,11 +443,16 @@ export default function UserDetailPage() {
   };
 
   const handleSaveAppointment = () => {
-    console.log('📅 Initiating appointment save for user:', params.userId);
+    if (!userId) {
+      console.error('❌ Cannot save appointment: userId is missing');
+      return;
+    }
+
+    console.log('📅 Initiating appointment save for user:', userId);
     console.log('📋 Appointment data:', appointmentData);
     
     // Dispatch saga to save appointment
-    const decodedUserId = decodeURIComponent(params.userId);
+    const decodedUserId = decodeURIComponent(userId);
     dispatch(adminRescheduleAppointment(decodedUserId, {
       type: appointmentData.type,
       date: appointmentData.date,
@@ -447,7 +466,12 @@ export default function UserDetailPage() {
   };
 
   const handleEditProfile = () => {
-    console.log('✏️ Editing profile for user:', params.userId);
+    if (!userId) {
+      console.error('❌ Cannot edit profile: userId is missing');
+      return;
+    }
+
+    console.log('✏️ Editing profile for user:', userId);
     console.log('Current Admin Profile:', adminProfile);
     
     // Initialize editable profile with data from adminProfile in store
@@ -555,7 +579,11 @@ export default function UserDetailPage() {
   const handleSaveProfile = async () => {
     setSavingProfile(true);
     try {
-      console.log('💾 Saving profile for user:', params.userId);
+      if (!userId) {
+        throw new Error('No user specified');
+      }
+
+      console.log('💾 Saving profile for user:', userId);
       console.log('📋 Profile data:', editableProfile);
       
       // Prepare the full profile data
@@ -586,7 +614,7 @@ export default function UserDetailPage() {
         currentMedications: editableProfile.currentMedications,
       };
       
-      const response = await fetch(`/api/admin/users/${params.userId}/profile`, {
+      const response = await fetch(`/api/admin/users/${userId}/profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1015,9 +1043,13 @@ export default function UserDetailPage() {
 
   // Handle consent form updates
   const handleConsentFormUpdate = (formType, updates) => {
+    if (!userId) {
+      console.error('❌ Cannot update consent form: userId is missing');
+      return;
+    }
 
     dispatch(updateAdminConsentFormAction({ 
-      userId: params.userId, 
+      userId, 
       formType, 
       updates 
     }));
@@ -1025,6 +1057,11 @@ export default function UserDetailPage() {
 
   // Handle enabling/disabling consent forms
   const handleToggleConsentForm = (formType, enabled) => {
+    if (!userId) {
+      console.error('❌ Cannot toggle consent form: userId is missing');
+      return;
+    }
+
     handleConsentFormUpdate(formType, { enabled });
 
     const completedCount = Object.values(consentForms)
@@ -1043,13 +1080,13 @@ export default function UserDetailPage() {
 
     if(completedCount === availableCount){
       dispatch(updateAdminPreAppointmentTaskAction({ 
-        userId: params.userId, 
+        userId, 
         taskKey: 'completeConsentForms', 
         completed: true 
       }));
     }else{
       dispatch(updateAdminPreAppointmentTaskAction({ 
-        userId: params.userId, 
+        userId, 
         taskKey: 'completeConsentForms', 
         completed: false 
       }));
@@ -1058,6 +1095,11 @@ export default function UserDetailPage() {
 
   // Handle unlocking consent forms (both locked and completed)
   const handleUnlockConsentForm = (formType) => {
+    if (!userId) {
+      console.error('❌ Cannot unlock consent form: userId is missing');
+      return;
+    }
+
     const form = consentForms[formType];
     const updatedForm = handleConsentFormUpdate(formType, { complete: !form?.complete });
 
@@ -1076,13 +1118,13 @@ export default function UserDetailPage() {
 
     if(completedCount === availableCount){
       dispatch(updateAdminPreAppointmentTaskAction({ 
-        userId: params.userId, 
+        userId, 
         taskKey: 'completeConsentForms', 
         completed: true 
       }));
     }else{
       dispatch(updateAdminPreAppointmentTaskAction({ 
-        userId: params.userId, 
+        userId, 
         taskKey: 'completeConsentForms', 
         completed: false 
       }));
@@ -1102,8 +1144,13 @@ export default function UserDetailPage() {
 
   // Handle side effect review
   const handleReviewSideEffect = (sideEffectId) => {
+    if (!userId) {
+      console.error('❌ Cannot review side effect: userId is missing');
+      return;
+    }
+
     dispatch(updateAdminSideEffectAction({
-      userId: params.userId,
+      userId,
       sideEffectId,
       action: 'review',
       updates: { reviewed: true }
@@ -1112,8 +1159,13 @@ export default function UserDetailPage() {
 
   // Handle side effect open (set complete to false)
   const handleOpenSideEffect = (sideEffectId) => {
+    if (!userId) {
+      console.error('❌ Cannot open side effect: userId is missing');
+      return;
+    }
+
     dispatch(updateAdminSideEffectAction({
-      userId: params.userId,
+      userId,
       sideEffectId,
       action: 'open',
       updates: { complete: false, reviewed: false }
@@ -1122,14 +1174,19 @@ export default function UserDetailPage() {
 
   // Handle question deletion
   const handleDeleteQuestion = (questionId) => {
+    if (!userId) {
+      console.error('❌ Cannot delete question: userId is missing');
+      return;
+    }
+
     console.log('🚀 DISPATCHING DELETE ADMIN QUESTION ACTION!', { 
-      userId: params.userId, 
+      userId, 
       questionId 
     });
     
     // Dispatch the delete action to the saga
     const action = deleteAdminQuestionAction({ 
-      userId: params.userId, 
+      userId, 
       questionId 
     });
     console.log('🚀 Action object:', action);
@@ -2074,7 +2131,7 @@ export default function UserDetailPage() {
               onWeekChange={setCurrentWeek}
               onGeneratePDF={generateTabPDF}
               onFetchMeals={handleFetchMeals}
-              userId={params.userId}
+              userId={userId}
             />
           </TabPanel>
 

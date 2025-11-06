@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, fetchPreAppointmentTaskAction, loadAppointmentData, updatePreAppointmentTaskAction, loadQuestions, requestReschedule, setScheduleCompleted } from '../../store/slices/appointmentSlice';
+import { setCurrentAppointment, fetchPreAppointmentTaskAction, loadAppointmentData, updatePreAppointmentTaskAction, loadQuestions, requestReschedule,rescheduleAppointment, setScheduleCompleted } from '../../store/slices/appointmentSlice';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { fetchMeasurements } from '../../store/slices/measurementsSlice';
 import { useScheduleProtection } from '../../hooks/useScheduleProtection';
@@ -243,7 +243,11 @@ export default function Dashboard() {
     console.log('🔄 Dashboard: Reschedule requested for appointment:', currentAppointment);
     
     if (currentAppointment?._id) {
-      dispatch(requestReschedule(currentAppointment._id));
+      if(currentAppointment.type === 'review') {
+        dispatch(requestReschedule(currentAppointment._id));
+      } else {
+        dispatch(rescheduleAppointment(currentAppointment));
+      }
     } else {
       // If no appointment ID, still dispatch the action (saga will handle it)
       dispatch(requestReschedule(null));
@@ -371,20 +375,35 @@ export default function Dashboard() {
         {currentAppointment && (
           <Card sx={{ mb: 4, backgroundColor: '#1a1a1a' }}>
             <CardContent>
-              {/* Only show appointment details if date has not passed */}
-              {!isAppointmentPast() && (
-                <>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <CalendarToday sx={{ fontSize: 30, mr: 2, color: '#877449' }} />
-                    <Box>
-                      <Typography variant="h5" gutterBottom color="primary">
-                        Upcoming Appointment
-                      </Typography>
-                    </Box>
-                  </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <CalendarToday sx={{ fontSize: 30, mr: 2, color: '#877449' }} />
+                <Box>
+                  <Typography variant="h5" gutterBottom color="primary">
+                    {isAppointmentPast() ? 'Appointment Summary' : 'Upcoming Appointment'}
+                  </Typography>
+                  {isAppointmentPast() && (
+                    <Chip
+                      label="Missed Appointment"
+                      color="error"
+                      variant="outlined"
+                      size="small"
+                      sx={{ mt: 1, fontWeight: 600 }}
+                    />
+                  )}
+                </Box>
+              </Box>
 
-                  {/* Show appointment details if scheduled, otherwise show "not scheduled" message */}
-                  {isScheduled && currentAppointment ? (
+              {isAppointmentPast() && !currentAppointment.rescheduleRequested && (
+                <Alert
+                  severity="warning"
+                  sx={{ mb: 3, backgroundColor: 'rgba(255, 183, 77, 0.1)', border: '1px solid rgba(255, 183, 77, 0.4)' }}
+                >
+                  Appointment was missed — you should reschedule your appointment.
+                </Alert>
+              )}
+
+              {/* Show appointment details if scheduled, otherwise show "not scheduled" message */}
+              {isScheduled && currentAppointment ? (
                 <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
                   <Box sx={{ 
                     display: 'flex', 
@@ -540,8 +559,6 @@ export default function Dashboard() {
                     </Button>
                   </Box>
                 </Paper>
-              )}
-                </>
               )}
 
               {preAppointmentTasksLoading && (

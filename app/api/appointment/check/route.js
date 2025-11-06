@@ -59,7 +59,7 @@ export async function GET() {
 
     const appointmentData = {
       isScheduled,
-      scheduledAt: isScheduled ? (appointmentDate || userAppointment?.scheduledAt || new Date().toISOString()) : null,
+      scheduledAt: isScheduled ? (userAppointment?.scheduledAt || new Date().toISOString()) : null,
       appointmentDetails: isScheduled ? {
         _id: userAppointment?._id.toHexString(),
         time: appointmentTime,
