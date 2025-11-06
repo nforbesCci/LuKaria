@@ -1,5 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const createDefaultPreAppointmentTasks = () => ({
+  completeMedicalProfile: false,
+  prepareQuestions: false,
+  completeConsentForms: false,
+  enterWeightHeight: false,
+  testTechnology: false,
+});
+
 const initialState = {
   appointments: [],
   currentAppointment: null,
@@ -7,12 +15,10 @@ const initialState = {
   isScheduleCompleted: false,
   bookingError: null,
   adminRescheduleSuccess: false,
-  preAppointmentTasks: {
-    completeMedicalProfile: false,
-    prepareQuestions: false,
-    completeConsentForms: false,
-    enterWeightHeight: false,
-  },
+  preAppointmentTasks: createDefaultPreAppointmentTasks(),
+  preAppointmentTasksLoading: false,
+  preAppointmentTasksLoaded: false,
+  preAppointmentTasksError: null,
   questions: {
     questions: '',
     noQuestions: false,
@@ -62,16 +68,16 @@ const appointmentSlice = createSlice({
       }
     },
     fetchPreAppointmentTaskFailure: (state, action) => {
-      state.preAppointmentTasks = null;
+      state.preAppointmentTasks = createDefaultPreAppointmentTasks();
       state.preAppointmentTasksError = action.payload;
+      state.preAppointmentTasksLoading = false;
+      state.preAppointmentTasksLoaded = true;
     },
     resetPreAppointmentTasks: (state) => {
-      state.preAppointmentTasks = {
-        completeMedicalProfile: false,
-        prepareQuestions: false,
-        testTechnology: false,
-        enterWeightHeight: false,
-      };
+      state.preAppointmentTasks = createDefaultPreAppointmentTasks();
+      state.preAppointmentTasksLoading = false;
+      state.preAppointmentTasksLoaded = false;
+      state.preAppointmentTasksError = null;
     },
     setQuestions: (state, action) => {
       state.questions.questions = action.payload.questions || '';
@@ -113,19 +119,32 @@ const appointmentSlice = createSlice({
       // Update the preAppointmentTasks state
       state.preAppointmentTasks = action.payload;
       console.log('🔧 Slice: Updated preAppointmentTasks state:', state.preAppointmentTasks);
+      state.preAppointmentTasksLoading = false;
+      state.preAppointmentTasksLoaded = true;
+      state.preAppointmentTasksError = null;
     },
     fetchPreAppointmentTasksFailure: (state, action) => {
-      state.preAppointmentTasks = null;
+      state.preAppointmentTasks = createDefaultPreAppointmentTasks();
       state.preAppointmentTasksError = action.payload;
+      state.preAppointmentTasksLoading = false;
+      state.preAppointmentTasksLoaded = true;
     },
     updatePreAppointmentTaskSuccess: (state, action) => {
       // Handle successful update of pre-appointment task
       state.preAppointmentTasks = { ...state.preAppointmentTasks, ...action.payload };
+      state.preAppointmentTasksLoaded = true;
     },
     updatePreAppointmentTaskFailure: (state, action) => {
       // Handle failed update of pre-appointment task
       state.preAppointmentTasksError = action.payload;
     },   
+    setPreAppointmentTasksLoading: (state, action) => {
+      state.preAppointmentTasksLoading = action.payload;
+      if (action.payload) {
+        state.preAppointmentTasksLoaded = false;
+        state.preAppointmentTasksError = null;
+      }
+    },
   },
 });
 
@@ -149,6 +168,7 @@ export const {
   updatePreAppointmentTaskFailure,
   fetchPreAppointmentTasksSuccess,
   fetchPreAppointmentTasksFailure,
+  setPreAppointmentTasksLoading,
 } = appointmentSlice.actions;
 
 // Action creators for sagas

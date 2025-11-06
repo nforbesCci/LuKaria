@@ -4,7 +4,8 @@ import {
   updatePreAppointmentTaskFailure,
   fetchPreAppointmentTasksSuccess,
   fetchPreAppointmentTasksFailure,
-  clearAppointmentTasks
+  clearAppointmentTasks,
+  setPreAppointmentTasksLoading,
 } from '../slices/appointmentSlice';
 
 // API call to update pre-appointment task
@@ -155,6 +156,7 @@ function* clearPreAppointmentTasksSaga(action) {
 function* fetchPreAppointmentTasksSaga(action) {
   console.log('🔧 Pre-Appointment Tasks Saga: fetchPreAppointmentTasksSaga called', action);
   try {
+    yield put(setPreAppointmentTasksLoading(true));
     console.log('🔧 Pre-Appointment Tasks Saga: Calling fetchPreAppointmentTasksInDatabase...');
     const result = yield call(fetchPreAppointmentTasksInDatabase);
     const doneKeys = new Set(
@@ -173,6 +175,8 @@ function* fetchPreAppointmentTasksSaga(action) {
   } catch (error) {
     console.error('❌ Pre-Appointment Tasks Saga: Error fetching pre-appointment tasks', error);
     yield put(fetchPreAppointmentTasksFailure(error.message));
+  } finally {
+    yield put(setPreAppointmentTasksLoading(false));
   }
 }
 
