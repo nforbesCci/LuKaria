@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getDatabase } from '../../../../../lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,7 +113,7 @@ export async function PUT(request, { params }) {
     // Update the side effect
     const result = await sideEffectsCollection.updateOne(
       { 
-        _id: sideEffectId,
+        _id: new ObjectId(sideEffectId),
         userId: targetUserId
       },
       { 

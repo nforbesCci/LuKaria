@@ -44,7 +44,9 @@ export async function POST(request) {
     };
 
     // Insert the side effects report
-    const result = await sideEffectsCollection.insertOne(sideEffectsDocument);
+    const result = await sideEffectsCollection.updateOne(
+      { reportId: sideEffectsDocument.reportId }, 
+      { $set: sideEffectsDocument }, { upsert: true });
 
     console.log('✅ Side effects saved successfully:', result.insertedId);
 

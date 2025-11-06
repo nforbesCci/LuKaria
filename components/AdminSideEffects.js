@@ -246,7 +246,8 @@ const AdminSideEffects = ({
                           </Typography>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Chip 
-                              label={sideEffect.reviewed ? 'Reviewed' : 'Pending Review'} 
+                              label={sideEffect.reviewed ? 'Reviewed' : 
+                                !sideEffect.complete ? 'Sent back to user' : 'Pending Review'} 
                               color={sideEffect.reviewed ? 'success' : 'warning'}
                               size="small"
                             />

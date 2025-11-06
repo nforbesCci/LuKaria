@@ -166,43 +166,20 @@ export default function SideEffects() {
     try {
       // Get assigned doctor information from user metadata or a separate API
       const assignedDoctor = user.user_metadata?.assigned_doctor || {
-        name: 'Dr. Smith', // Default doctor - in real app, this would come from user's assigned doctor
-        email: 'doctor@healthcare.com'
+        name: 'Dr. Kadria Fairclough', // Default doctor - in real app, this would come from user's assigned doctor
+        email: 'kadriaf@lukariagroup.com'
       };
 
       const reportData = {
         ...formData,
         reportDate: new Date().toISOString(),
-        reportId: `SE-${Date.now()}`
+        reportId: formData.reportId || `SE-${Date.now()}`
       };
 
       // Save side effects to database using saga
       console.log('💾 Dispatching save side effects action:', reportData);
       dispatch(saveSideEffects(reportData));
 
-      // Send email to doctor via API endpoint
-      const response = await fetch('/api/send-side-effects-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          patient: {
-            name: user.name,
-            email: user.email,
-            id: user.sub
-          },
-          doctor: assignedDoctor,
-          reportData: reportData
-        })
-      });
-
-      if (response.ok) {
-        alert('Side effects report saved and sent to your doctor successfully!');
-        // Optionally reset form or mark as sent
-      } else {
-        throw new Error('Failed to send report');
-      }
     } catch (error) {
       console.error('Error sending report:', error);
       alert('Failed to send report. Please try again or contact support.');

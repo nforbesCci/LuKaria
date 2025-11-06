@@ -333,7 +333,7 @@ const adminSlice = createSlice({
     },
     fetchAdminSideEffectsSuccess: (state, action) => {
       state.adminSideEffectsLoading = false;
-      state.adminSideEffects = action.payload;
+      state.adminSideEffects = action.payload.sideEffects;
     },
     fetchAdminSideEffectsFailure: (state, action) => {
       state.adminSideEffectsLoading = false;

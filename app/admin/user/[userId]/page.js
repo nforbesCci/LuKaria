@@ -1116,7 +1116,7 @@ export default function UserDetailPage() {
       userId: params.userId,
       sideEffectId,
       action: 'open',
-      updates: { complete: false }
+      updates: { complete: false, reviewed: false }
     }));
   };
 
@@ -2027,7 +2027,7 @@ export default function UserDetailPage() {
 
           <TabPanel value={tabValue} index={2} id="side-effects-content">
             <AdminSideEffects
-              adminSideEffects={adminSideEffects.sideEffects}
+              adminSideEffects={adminSideEffects}
               adminSideEffectsLoading={adminSideEffectsLoading}
               adminSideEffectsError={adminSideEffectsError}
               onGeneratePDF={generateTabPDF}

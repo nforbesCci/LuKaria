@@ -1,4 +1,4 @@
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { all, call, put, takeEvery } from 'redux-saga/effects';
 import { 
   fetchAdminSideEffectsSuccess, 
   fetchAdminSideEffectsFailure,
@@ -117,6 +117,8 @@ export function* watchUpdateAdminSideEffect() {
 }
 
 export default function* adminSideEffectsSaga() {
-  yield watchFetchAdminSideEffects();
-  yield watchUpdateAdminSideEffect();
+  yield all([
+    watchFetchAdminSideEffects(),
+    watchUpdateAdminSideEffect()
+  ]);
 }
