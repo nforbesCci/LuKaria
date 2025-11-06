@@ -174,7 +174,7 @@ export default function UserDetailPage() {
   const [dbConsultationOccurred, setDbConsultationOccurred] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
   const [appointmentData, setAppointmentData] = useState({
-    type: 'consultation',
+    type: 'review',
     date: '',
     time: '',
     length: 30,
@@ -312,7 +312,7 @@ export default function UserDetailPage() {
       
       // Reset form
       setAppointmentData({
-        type: 'consultation',
+        type: 'review',
         date: '',
         time: '',
         length: 30,
@@ -1383,8 +1383,15 @@ export default function UserDetailPage() {
                       }
                     }
                     
+                    const normalizedType = existingAppointment.type?.toLowerCase();
+                    const defaultType = normalizedType === 'review'
+                      ? 'review'
+                      : normalizedType === 'consultation'
+                        ? 'review'
+                        : normalizedType || 'review';
+
                     setAppointmentData({
-                      type: existingAppointment.type || 'consultation',
+                      type: defaultType,
                       date: formattedDate,
                       time: existingAppointment.time || '',
                       length: existingAppointment.length || 30,
@@ -1399,7 +1406,7 @@ export default function UserDetailPage() {
                     console.log('ℹ️ No existing appointment found in DB, using defaults');
                     // Reset to defaults if no appointment exists
                     setAppointmentData({
-                      type: 'consultation',
+                      type: 'review',
                       date: '',
                       time: '',
                       length: 30,
@@ -1548,8 +1555,8 @@ export default function UserDetailPage() {
                       label="Appointment Type"
                       onChange={(e) => handleAppointmentChange('type', e.target.value)}
                     >
-                      <MenuItem value="consultation">Consultation</MenuItem>
                       <MenuItem value="review">Review</MenuItem>
+                      <MenuItem value="consultation">Consultation</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
