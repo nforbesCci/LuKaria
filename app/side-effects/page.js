@@ -5,6 +5,7 @@ import { useConsultationAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveSideEffects, fetchSideEffects } from '../../store/slices/sideEffectsSlice';
+import { useRef } from 'react';
 import Header from '../../components/Header';
 import {
   Container,
@@ -53,6 +54,9 @@ export default function SideEffects() {
   const sideEffectsState = useSelector((state) => state.sideEffects);
   const [mounted, setMounted] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [sendSuccess, setSendSuccess] = useState(false);
+  const [lastDoctorName, setLastDoctorName] = useState('');
+  const assignedDoctorRef = useRef(null);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     // Side effects checklist
@@ -114,6 +118,21 @@ export default function SideEffects() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (sideEffectsState.isSaved) {
+      setSendSuccess(true);
+      if (assignedDoctorRef.current) {
+        setLastDoctorName(assignedDoctorRef.current);
+      }
+    }
+  }, [sideEffectsState.isSaved]);
+
+  useEffect(() => {
+    if (formData.complete) {
+      setSendSuccess(true);
+    }
+  }, [formData.complete]);
+
   // Fetch side effects from database when component mounts
   useEffect(() => {
     if (user && mounted) {
@@ -170,6 +189,10 @@ export default function SideEffects() {
         name: 'Dr. Kadria Fairclough', // Default doctor - in real app, this would come from user's assigned doctor
         email: 'kadriaf@lukariagroup.com'
       };
+
+      assignedDoctorRef.current = assignedDoctor.name || 'your doctor';
+      setSendSuccess(false);
+      setLastDoctorName(assignedDoctorRef.current);
 
       const reportData = {
         ...formData,
@@ -496,6 +519,11 @@ export default function SideEffects() {
                 </>
               ) : (
                 <>
+                  {sendSuccess && lastDoctorName && (
+                    <Alert severity="success" sx={{ mb: 3 }}>
+                      Your report was successfully sent to {lastDoctorName}.
+                    </Alert>
+                  )}
                   <Typography variant="h6" gutterBottom>
                     Ready to send your side effects report?
                   </Typography>
@@ -744,7 +772,7 @@ export default function SideEffects() {
               ) : !isFormComplete ? (
                 <Button
                   onClick={handleSendToDoctor}
-                  disabled={isSending}
+                  disabled={isSending || sendSuccess}
                   startIcon={<Send />}
                   sx={{ 
                     textTransform: 'none',
@@ -802,7 +830,7 @@ export default function SideEffects() {
                 <Button
                   variant="contained"
                   onClick={handleSendToDoctor}
-                  disabled={isSending}
+                  disabled={isSending || sendSuccess}
                   startIcon={<Send />}
                   sx={{ textTransform: 'none' }}
                   size="large"
