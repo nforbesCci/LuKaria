@@ -720,7 +720,7 @@ export default function Home() {
                   <Box sx={{ mb: 3, color: '#877449', textAlign: 'left', maxWidth: '600px', mx: 'auto', position: 'relative', zIndex: 1 }}>
                     <Box component="ul" sx={{ pl: 2, mb: 0 }}>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>50% off consultation fees with our physician (a $4000 value)</strong>
+                        <strong>50% off consultation fees with our physician </strong>
                       </Typography>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
                         <strong>Receive a discount on your first 4 week supply of medication</strong>
