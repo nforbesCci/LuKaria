@@ -369,7 +369,7 @@ export default function Home() {
               zIndex: 10
             }}
           >
-            {[0, 1, 2].map((page) => (
+            {[0, 1, 2, 3].map((page) => (
               <Box
                 key={page}
                 onClick={() => setCurrentPage(page)}
@@ -731,48 +731,27 @@ export default function Home() {
                     </Box>
                   </Box>
                   
-                  {/* Button container */}
-                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+                  {/* Navigation button */}
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', zIndex: 1 }}>
                     <Button
                       variant="outlined"
+                      onClick={() => setCurrentPage(3)}
                       sx={{
-                        color: '#877449',
                         borderColor: '#877449',
+                        color: '#877449',
                         textTransform: 'none',
-                        px: 2,
-                        py: 1,
+                        px: 3,
+                        py: 1.25,
                         fontWeight: '600',
                         width: 'auto',
-                        display: { xs: 'none', md: 'block' },
                         '&:hover': {
                           borderColor: '#877449',
                           backgroundColor: 'rgba(212, 175, 55, 0.1)',
                           color: '#877449'
                         }
                       }}
-                      onClick={() => setCurrentPage(1)}
                     >
-                      Back
-                    </Button>
-                    
-                    <Button
-                      onClick={() => window.location.href = '/api/auth/login'}
-                      variant="contained"
-                      sx={{
-                        backgroundColor: '#877449',
-                        color: '#000000',
-                        textTransform: 'none',
-                        px: 2,
-                        py: 1,
-                        fontWeight: '600',
-                        width: 'auto',
-                        '&:hover': {
-                          backgroundColor: '#B8941F',
-                          color: '#000000'
-                        }
-                      }}
-                    >
-                      Let's Start
+                      Next
                     </Button>
                   </Box>
                 </Box>
@@ -819,6 +798,176 @@ export default function Home() {
               </Box>
             )}
 
+            {currentPage === 3 && (
+              <Box sx={{ width: '100%', height: 'calc(100% + 20px)', display: 'flex', gap: 2, p: 2 }}>
+                {/* Left Panel - Content */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    backgroundColor: { xs: 'rgba(0, 0, 0, 0.85)', md: '#000000' },
+                    backgroundImage: { xs: 'none', md: 'none' },
+                    backgroundSize: { xs: '400px 600px', md: 'auto' },
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    p: 4,
+                    borderRadius: 2,
+                    position: 'relative',
+                    color: '#877449',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: { xs: 'rgba(0, 0, 0, 0.7)', md: 'transparent' },
+                      borderRadius: 2,
+                      zIndex: 0,
+                    },
+                  }}
+                >
+                  <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 540 }}>
+                    <Box
+                      sx={{
+                        border: '1px solid #877449',
+                        borderRadius: 1,
+                        width: 'calc(100% - 40px)',
+                        maxWidth: 500,
+                        px: 3,
+                        py: 1.5,
+                        mx: 'auto',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        mb: 3,
+                      }}
+                    >
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 700,
+                          color: '#877449',
+                          textShadow: '1px 1px 2px rgba(0,0,0,0.6)',
+                          fontFamily: '"Alex Brush", cursive',
+                          fontSize: { xs: '1.4rem', sm: '2.125rem' },
+                        }}
+                      >
+                        How do I get started?
+                      </Typography>
+                    </Box>
+                    <Stack spacing={2} alignItems="center">
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
+                          fontWeight: 500,
+                          color: '#877449',
+                        }}
+                      >
+                        Browse through the site tabs to learn more about Svelte.
+                      </Typography>
+                      <Typography component="div" sx={{ fontSize: { xs: '1.12rem', sm: '1.4rem' }, color: '#877449' }}>⬇️</Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
+                          fontWeight: 500,
+                          color: '#877449',
+                        }}
+                      >
+                        Login to schedule your consultation.
+                      </Typography>
+                      <Typography component="div" sx={{ fontSize: { xs: '1.12rem', sm: '1.4rem' }, color: '#877449' }}>⬇️</Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
+                          fontWeight: 500,
+                          color: '#877449',
+                        }}
+                      >
+                        Speak with a physician to decide if a Svelte membership is right for you.
+                      </Typography>
+                      <Typography component="div" sx={{ fontSize: { xs: '1.12rem', sm: '1.4rem' }, color: '#877449' }}>⬇️</Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
+                          fontWeight: 500,
+                          color: '#877449',
+                        }}
+                      >
+                        Start your personalized weight loss journey and enjoy the benefits of Svelte membership.
+                      </Typography>
+                    </Stack>
+                    <Button
+                      variant="contained"
+                      onClick={() => (window.location.href = '/api/auth/login')}
+                      sx={{
+                        mt: 4,
+                        textTransform: 'none',
+                        backgroundColor: '#877449',
+                        color: '#000',
+                        fontWeight: 600,
+                        px: 3,
+                        py: 1.5,
+                        '&:hover': {
+                          backgroundColor: '#B8941F',
+                        },
+                      }}
+                    >
+                      Schedule Your Consultation
+                    </Button>
+                  </Box>
+                </Box>
+
+                {/* Right Panel - Background Image */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    backgroundImage: 'url(/images/weightloss5.png)',
+                    backgroundSize: '400px 600px',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    borderRadius: 2,
+                    display: { xs: 'none', md: 'flex' },
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                      borderRadius: 2,
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      zIndex: 1,
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
+                      px: 3,
+                    }}
+                  >
+                    Your next step begins here.
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
           </Box>
 
               
@@ -848,7 +997,7 @@ export default function Home() {
                 </Button>
           )}
 
-          {currentPage < 2 && (
+          {currentPage < 3 && (
             <Button
               onClick={() => setCurrentPage(currentPage + 1)}
               sx={{

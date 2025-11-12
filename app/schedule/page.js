@@ -256,7 +256,7 @@ export default function Schedule() {
                 Schedule Appointment
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Book your telemedicine consultation with a licensed physician
+                Book your telemedicine consultation speak with a licensed physician to see if this proram is right for you.
               </Typography>
             </Box>
           </Box>
