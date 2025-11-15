@@ -38,13 +38,25 @@ export async function POST(request) {
     const appointmentDocument = {
       userId,
       isScheduled: true,
-      time: appointmentData?.startDate ? new Date(appointmentData.startDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : null,
+      time: appointmentData?.startDate ? new Date(appointmentData.startDate).toLocaleTimeString("en-CA", { timeZone: "America/Jamaica",  hour: "2-digit", minute: "2-digit" }) : null,
       length: (appointmentData?.endDate && appointmentData?.startDate) ? 
         Math.round((new Date(appointmentData.endDate) - new Date(appointmentData.startDate)) / (1000 * 60)).toString() : '60',
-      date: appointmentData?.startDate ? new Date(appointmentData.startDate).toISOString().split('T')[0] : (appointmentData.date || appointmentData.appointmentDate),
+      date: appointmentData?.startDate ? new Date(appointmentData.startDate).toLocaleDateString("en-CA", {
+        timeZone: "America/Jamaica",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }) : (appointmentData.date || appointmentData.appointmentDate),
       provider: appointmentData.provider || appointmentData.practitioner || 'Default Provider',
       type: appointmentData.type || 'consultation',
-      scheduledAt: appointmentData.scheduledAt || new Date().toISOString(),
+      scheduledAt: appointmentData.scheduledAt || new Date().toLocaleDateString("en-CA", {
+        timeZone: "America/Jamaica",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       status: 'scheduled',
       updatedAt: new Date().toISOString(),
       userEmail: session.user.email,
