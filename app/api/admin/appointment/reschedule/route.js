@@ -48,6 +48,8 @@ export async function POST(request) {
       );
     }
 
+    const startDate = new Date(`${appointmentData.date.split('T')[0]}T${appointmentData.time}-05:00`);
+
     console.log('🔌 Reschedule API: Connecting to database');
     const db = await getDatabase();
     console.log('✅ Reschedule API: Database connected successfully');
@@ -58,14 +60,19 @@ export async function POST(request) {
       { userId: userId },
       {
         $set: {
-          date: appointmentData.date,
-          time: appointmentData.time,
+          date: new Date(startDate).toLocaleDateString("en-CA", {
+            timeZone: "America/Jamaica",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }), 
+          time: startDate ? new Date(startDate).toLocaleTimeString("en-CA", { timeZone: "America/Jamaica",  hour: "2-digit", minute: "2-digit" }) : null,
           type: appointmentData.type || 'consultation',
           length: appointmentData.length || '60',
           notes: appointmentData.notes || '',
           isScheduled: true,
           rawData:{
-            startDate: new Date(`${appointmentData.date.split('T')[0]}T${appointmentData.time}`),
+            startDate: startDate,
             endDate: (() => {
               const startDateTime = new Date(`${appointmentData.date.split('T')[0]}T${appointmentData.time}`);
               const lengthMinutes = parseInt(appointmentData.length || '60');

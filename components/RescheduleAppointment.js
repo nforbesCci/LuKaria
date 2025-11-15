@@ -57,8 +57,8 @@ export default function RescheduleAppointment({
   useEffect(() => {
     if (request) {
       setFormData({
-        date: request.date ? new Date(request.date) : null,
-        time: request.time ? new Date(`2000-01-01T${request.time}`) : null,
+        date: request.rawData.startDate ? new Date(request.rawData.startDate ) : null,
+        time: request.time ? new Date(request.rawData.startDate ) : null,
         type: request.type || 'consultation',
         length: request.length || '60',
         notes: ''
@@ -174,7 +174,7 @@ export default function RescheduleAppointment({
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                       <CalendarToday sx={{ mr: 1, color: '#877449', fontSize: 20 }} />
                       <Typography variant="body2">
-                        Current: {formatDate(request.date)}
+                        Current: {request.date}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>

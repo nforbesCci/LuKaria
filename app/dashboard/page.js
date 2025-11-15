@@ -504,7 +504,6 @@ export default function Dashboard() {
                   {/* Scheduled At */}
                   {currentAppointment.scheduledAt && (
                     <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 2 }}>
-                      Booked on: {new Date(currentAppointment.scheduledAt).toLocaleString()}
                     </Typography>
                   )}
                   

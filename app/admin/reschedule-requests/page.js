@@ -313,7 +313,7 @@ export default function RescheduleRequestsPage() {
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                               <CalendarToday sx={{ mr: 1, color: '#877449', fontSize: 20 }} />
                               <Typography variant="body2">
-                                {formatAppointmentDate(request.date)}
+                                {request.date}
                               </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
