@@ -980,19 +980,27 @@ export default function Profile() {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => setIsEditing(true)}
-                  startIcon={<Edit />}
+                  onClick={handleProfileSave}
+                  startIcon={<Save />}
+                  disabled={!areAllRequiredFieldsFilled() || profileState.isLoading}
                   sx={{ 
                     textTransform: 'none',
                     minWidth: { xs: 'auto', sm: '64px' },
-                    px: { xs: 1, sm: 2 }
+                    px: { xs: 1, sm: 2 },
+                    backgroundColor: areAllRequiredFieldsFilled() && !profileState.isLoading ? '#877449' : '#ccc',
+                    color: areAllRequiredFieldsFilled() && !profileState.isLoading ? '#000000' : '#666',
+                    '&:hover': {
+                      backgroundColor: areAllRequiredFieldsFilled() && !profileState.isLoading ? '#6b5d3a' : '#ccc',
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#ccc',
+                      color: '#666',
+                    }
                   }}
                   size="small"
                   variant="contained"
                 >
-                  <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                    Edit
-                  </Box>
+                  {profileState.isLoading ? 'Saving...' : 'Save'}
                 </Button>
               )}
             </Box>
