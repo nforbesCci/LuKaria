@@ -45,15 +45,10 @@ export default function NavigationDrawer() {
   const pathname = usePathname();
   const { user, isLoading } = useUser();
   
-  // Hide navigation drawer on privacy policy, terms, and about pages
-  if (pathname === '/privacy-policy' || pathname === '/terms' || pathname === '/about') {
-    return null;
-  }
-  
   // Redux state
   const scheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
   const profileState = useAppSelector((state) => state.profile);
-
+  
   // Debug: Log user object and profile to see what's available
   useEffect(() => {
     if (user) {
@@ -73,14 +68,19 @@ export default function NavigationDrawer() {
     });
   }, [profileState]);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Check if user is in doctor or admin group using processed custom claims
   const isAdmin = user && 
     // Check processed custom claims first
     (user?.groups && user.groups.some(item => item.toLowerCase() === "doctor" || item.toLowerCase() === "admin"));
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Hide navigation drawer on privacy policy, terms, and about pages
+  if (pathname === '/privacy-policy' || pathname === '/terms' || pathname === '/about') {
+    return null;
+  }
 
   const handleDrawerToggle = () => {
     setOpen(!open);
