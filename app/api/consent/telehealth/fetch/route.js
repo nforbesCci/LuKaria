@@ -41,7 +41,7 @@ export async function GET(request) {
       
       return NextResponse.json({
         success: true,
-        message: 'No telehealth consent found',
+        message: 'Telehealth consent created successfully',
         data: newDocument,
       });
     }
