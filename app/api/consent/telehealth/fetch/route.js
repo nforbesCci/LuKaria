@@ -31,7 +31,7 @@ export async function GET(request) {
       const newDocument = {
         userId: userId,
         complete: false,
-        available: false,
+        available: true,
         createdAt: new Date(),
         updatedAt: new Date()
       };
