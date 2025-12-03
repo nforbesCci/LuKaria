@@ -48,6 +48,28 @@ export async function POST(request, { params }) {
     );
     
     console.log('✅ API: consultationOccurred saved to MongoDB:', result);
+
+    const mounjaroConsentCollection      = db.collection('MounjaroConsentCollection');
+
+    let mounjaroConsentDocs = await mounjaroConsentCollection
+    .findOne({ userId: targetUserId });
+
+  if(mounjaroConsentDocs == null){
+    mounjaroConsentDocs = {
+      userId: targetUserId,
+      complete: false,
+      available: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    await mounjaroConsentCollection.insertOne(mounjaroConsentDocs);
+  } else{
+      mounjaroConsentDocs.available = consultationOccurred;
+      await mounjaroConsentCollection.updateOne(
+        { userId: params.userId },
+        { $set: { available: true } }
+      );
+    }
     
     return NextResponse.json({
       success: true,

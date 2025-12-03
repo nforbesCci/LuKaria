@@ -34,7 +34,7 @@ export async function GET(request, { params }) {
     // Connect to MongoDB
     const db = await getDatabase('lukaria');
     const profilesCollection = db.collection('profiles');
-
+    const appointmentsCollection = db.collection('appointments');
     // Fetch profile for the target user
     const profile = await profilesCollection.findOne({ userId: targetUserId });
 
@@ -47,12 +47,13 @@ export async function GET(request, { params }) {
       });
     }
 
-
+    const schedule = await appointmentsCollection.findOne({ userId: targetUserId });
 
 
     return NextResponse.json({
       success: true,
       profile,
+      schedule,
       userId: targetUserId,     
     });
 

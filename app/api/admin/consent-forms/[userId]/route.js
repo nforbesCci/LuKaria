@@ -56,21 +56,55 @@ export async function GET(request, { params }) {
     const telehealthCollection = db.collection('TelehealthCollection');
 
     // Fetch all consent forms for the target user
-    const telehealthDocs = await telehealthCollection
+    let telehealthDocs = await telehealthCollection
       .findOne({ userId: targetUserId });
+
+     if(telehealthDocs == null){
+      telehealthDocs = {
+        userId: targetUserId,
+        complete: false,
+        available: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      await telehealthCollection.insertOne(telehealthDocs);
+     }
+
+
 
     const photographConsentCollection = db.collection('PhotographConsentCollection');
 
     // Fetch all consent forms for the target user
-    const photographConsentDocs = await photographConsentCollection
+    let photographConsentDocs = await photographConsentCollection
       .findOne({ userId: targetUserId });
+
+      if(photographConsentDocs == null){
+        photographConsentDocs = {
+          userId: targetUserId,
+          complete: false,
+          available: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        await photographConsentCollection.insertOne(photographConsentDocs);
+      }
 
       const mounjaroConsentCollection      = db.collection('MounjaroConsentCollection');
 
       // Fetch all consent forms for the target user
-      const mounjaroConsentDocs = await mounjaroConsentCollection
+      let mounjaroConsentDocs = await mounjaroConsentCollection
         .findOne({ userId: targetUserId });
 
+      if(mounjaroConsentDocs == null){
+        mounjaroConsentDocs = {
+          userId: targetUserId,
+          complete: false,
+          available: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        await mounjaroConsentCollection.insertOne(mounjaroConsentDocs);
+      }
 
     const consentDocs = {telehealth : telehealthDocs,
       photograph:photographConsentDocs, 

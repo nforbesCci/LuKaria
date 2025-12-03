@@ -43,6 +43,7 @@ function* fetchAdminProfileSaga(action) {
     yield put(fetchAdminProfileSuccess({
       userId,
       profile: result.profile,
+      schedule: result.schedule,
     }));
 
     
