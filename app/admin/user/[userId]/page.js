@@ -1778,7 +1778,7 @@ export default function UserDetailPage() {
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <CalendarToday sx={{ mr: 1, color: '#877449' }} />
                           <Typography variant="body2">
-                            Born: {adminProfile?.profile?.dateOfBirth ? formatDate(adminProfile?.profile?.dateOfBirth) : 'Not provided'}
+                            Born: {adminProfile?.profile?.dateOfBirth ? adminProfile?.profile?.dateOfBirth : 'Not provided'}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -1871,19 +1871,19 @@ export default function UserDetailPage() {
                       <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
                         Appointment Information
                       </Typography>
-                      {dbProfile?.isScheduled ? (
+                      {adminProfile?.schedule?.isScheduled ? (
                         <Stack spacing={2}>
                           <Typography variant="body2">
-                            <strong>Date:</strong> {formatDate(dbProfile.date)}
+                            <strong>Date:</strong> {adminProfile?.schedule?.date}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Time:</strong> {dbProfile.time}
+                            <strong>Time:</strong> {adminProfile?.schedule?.time}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Type:</strong> {dbProfile.type}
+                            <strong>Type:</strong> {adminProfile?.schedule?.type}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Duration:</strong> {dbProfile.length} minutes
+                            <strong>Duration:</strong> {adminProfile?.schedule?.length} minutes
                           </Typography>
                           <Chip
                             label="Scheduled"
