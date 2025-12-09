@@ -52,11 +52,11 @@ export async function POST(request, { params }) {
     const mounjaroConsentCollection      = db.collection('MounjaroConsentCollection');
 
     let mounjaroConsentDocs = await mounjaroConsentCollection
-    .findOne({ userId: targetUserId });
+    .findOne({ userId: params.userId });
 
   if(mounjaroConsentDocs == null){
     mounjaroConsentDocs = {
-      userId: targetUserId,
+      userId: params.userId,
       complete: false,
       available: false,
       createdAt: new Date(),
