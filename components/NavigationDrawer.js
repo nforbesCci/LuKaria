@@ -32,6 +32,7 @@ import {
   Description,
   Schedule,
   Report,
+  VideoLibrary,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -113,6 +114,11 @@ export default function NavigationDrawer() {
         text: 'Consent Forms',
         icon: <Description />,
         path: '/consent-forms',
+      },
+      {
+        text: 'Videos',
+        icon: <VideoLibrary />,
+        path: '/videos',
       },
     ] : []),
     

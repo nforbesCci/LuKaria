@@ -602,7 +602,7 @@ export default function UserDetailPage() {
           has_allergies: editableProfile.hasAllergies,
           allergic_medications: editableProfile.allergicMedications,
           current_medications: editableProfile.currentMedications,
-          consultation_occurred: editableProfile.consultationOccurred,
+          consultationOccurred: editableProfile.consultationOccurred,
         },
         dateOfBirth: editableProfile.birthdate,
         preferredPhone: editableProfile.phone_number,
