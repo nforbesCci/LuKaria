@@ -494,6 +494,7 @@ export default function UserDetailPage() {
       hasAllergies: adminProfile?.profile?.hasAllergies || false,
       allergicMedications: adminProfile?.profile?.allergicMedications || '',
       currentMedications: adminProfile?.profile?.currentMedications || '',
+      consultationOccurred: adminProfile?.profile?.user_metadata?.consultationOccurred || false,
     });
     
     setActiveWizardStep(0);
@@ -601,7 +602,10 @@ export default function UserDetailPage() {
           has_allergies: editableProfile.hasAllergies,
           allergic_medications: editableProfile.allergicMedications,
           current_medications: editableProfile.currentMedications,
+          consultationOccurred: editableProfile.consultationOccurred,
         },
+        dateOfBirth: editableProfile.birthdate,
+        preferredPhone: editableProfile.phone_number,
         parish: editableProfile.parish,
         gender: editableProfile.gender,
         nextOfKinName: editableProfile.nextOfKinName,
@@ -632,11 +636,12 @@ export default function UserDetailPage() {
       // Refresh user data
       await fetchUserData();
       await fetchDbProfile();
+      dispatch(fetchAdminProfileAction({ userId }));
       
       // Close edit wizard
       setIsEditingProfile(false);
       setActiveWizardStep(0);
-      
+
       // Show success message
       alert('Profile updated successfully!');
       
