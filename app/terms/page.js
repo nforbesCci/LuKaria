@@ -175,7 +175,7 @@ export default function Terms() {
             >
               <Login sx={{ fontSize: 20 }} />
               <Box>
-                Login
+                Sign-up/Login
               </Box>
             </Box>
           )}

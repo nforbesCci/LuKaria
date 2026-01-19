@@ -210,7 +210,7 @@ export default function Contact() {
             >
               <Login sx={{ fontSize: 20 }} />
               <Box>
-                Login
+                Sign-up/Login
               </Box>
             </Box>
           )}

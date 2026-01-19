@@ -31,7 +31,7 @@ export async function POST(request) {
     const measurementDate = measurementsData.date ? new Date(measurementsData.date) : new Date();
     // Normalize to start of day for consistency
     measurementDate.setHours(0, 0, 0, 0);
-    const dateKey = measurementsData.date; // YYYY-MM-DD format
+    const dateKey = measurementDate.toISOString().split('T')[0]; // YYYY-MM-DD format
 
     console.log('📅 Measurements Save API: Date for measurement:', dateKey);
 

@@ -259,7 +259,7 @@ export default function Profile() {
       
       // Set which fields are from Auth0 and should be disabled
       setAuth0Fields({
-        name: hasAuth0Name,
+        name: false, // Always allow name to be editable
         preferredEmail: hasAuth0Email
       });
       
@@ -278,8 +278,8 @@ export default function Profile() {
       const profileData = profileState.profile;
       setFormData(prev => ({
         ...prev,
-        // Personal Information - Don't override Auth0 data for name and email
-        name: prev.name, // Keep Auth0 name if available
+        // Personal Information - Allow profile name to override Auth0 name
+        name: profileData.name || prev.name, // Use saved profile name if available, otherwise use Auth0 name
         preferredEmail: prev.preferredEmail, // Keep Auth0 email if available
         preferredPhone: profileData.preferredPhone || prev.preferredPhone,
         dateOfBirth: profileData.dateOfBirth || prev.dateOfBirth,
@@ -562,11 +562,7 @@ export default function Profile() {
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     variant="outlined"
                     error={!formData.name}
-                    helperText={auth0Fields.name ? 'This field is managed by your account settings' : (!formData.name ? 'Name is required' : '')}
-                    disabled={auth0Fields.name}
-                    InputProps={{
-                      startAdornment: auth0Fields.name ? <Lock sx={{ mr: 1, color: 'text.secondary' }} /> : null
-                    }}
+                    helperText={!formData.name ? 'Name is required' : ''}
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>

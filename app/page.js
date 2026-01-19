@@ -36,6 +36,7 @@ import {
   Star,
   Security,
   Speed,
+  WhatsApp,
 } from '@mui/icons-material';
 
 export default function Home() {
@@ -308,7 +309,7 @@ export default function Home() {
                           }
                         }}
                       >
-                        Login
+                        Sign-up/Login
                       </Button>
           )}
           
@@ -342,10 +343,89 @@ export default function Home() {
           textAlign: 'center',
           backgroundColor: '#ffffff',
           py: 3,
-          width: '100%'
+          width: '100%',
+          position: 'relative'
         }}
       >
-                  </Box>
+        {/* WhatsApp Link - Top Right */}
+        <Box
+          component="a"
+          href="https://wa.me/18762903659"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 2,
+            py: 1,
+            textDecoration: 'none',
+            borderRadius: 1,
+            backgroundColor: '#ffffff',
+            zIndex: 100,
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+            }
+          }}
+        >
+          <WhatsApp sx={{ 
+            fontSize: 28, 
+            color: '#25D366'
+          }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#25D366',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              display: { xs: 'none', sm: 'block' }
+            }}
+          >
+            876-290-3659
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Book a Consult Link - Above Carousel */}
+      <Box
+        sx={{
+          width: '100%',
+          backgroundColor: '#ffffff',
+          py: 3,
+          textAlign: 'center',
+          borderBottom: '1px solid #e0e0e0',
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: { xs: 1.5, sm: 2 }
+        }}
+      >
+        <Button
+          component="a"
+          href="https://calendly.com/kadriaf-lukariagroup"
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="contained"
+          sx={{
+            textTransform: 'none',
+            backgroundColor: '#877449',
+            color: '#000000',
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            px: 4,
+            py: 1.5,
+            '&:hover': {
+              backgroundColor: '#B8941F',
+            }
+          }}
+        >
+          Book a No obligation appointment
+        </Button>
+      </Box>
 
       {/* Lightbox - Full width */}
       <Box
