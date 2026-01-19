@@ -8,10 +8,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCurrentAppointment, fetchPreAppointmentTaskAction, loadAppointmentData, updatePreAppointmentTaskAction, loadQuestions, requestReschedule,rescheduleAppointment, setScheduleCompleted } from '../../store/slices/appointmentSlice';
+import { fetchPreAppointmentTaskAction, updatePreAppointmentTaskAction, loadQuestions } from '../../store/slices/appointmentSlice';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { fetchMeasurements } from '../../store/slices/measurementsSlice';
-import { useScheduleProtection } from '../../hooks/useScheduleProtection';
 import { useBasicAccess } from '../../hooks/useAccessControl';
 import {
   Container,
@@ -38,11 +37,8 @@ import {
   Login,
   PersonAdd,
   Visibility,
-  CalendarToday,
   Assignment,
   CheckCircleOutline,
-  Schedule,
-  MedicalServices,
   Close,
   Description,
 } from '@mui/icons-material';
@@ -56,9 +52,6 @@ export default function Dashboard() {
   const [showPrepareQuestions, setShowPrepareQuestions] = useState(false);
   
   // Redux state
-  const currentAppointment = useAppSelector((state) => state.appointment.currentAppointment);
-  const isScheduleCompleted = useAppSelector((state) => state.appointment.isScheduleCompleted);
-  const isScheduled = useAppSelector((state) => state.user.isScheduled);
   const preAppointmentTasks = useAppSelector((state) => state.appointment.preAppointmentTasks);
   const preAppointmentTasksLoading = useAppSelector((state) => state.appointment.preAppointmentTasksLoading);
   const preAppointmentTasksLoaded = useAppSelector((state) => state.appointment.preAppointmentTasksLoaded);
@@ -71,15 +64,9 @@ export default function Dashboard() {
 
   // Access control - only Admin and Patient can access
   useBasicAccess();
-  
-  // Schedule protection - prevent access to dashboard if schedule not completed
-  useScheduleProtection();
 
   useEffect(() => {
     setMounted(true);
-    // Load appointment data using saga
-    console.log('📊 Dashboard: Loading appointment data...');
-    dispatch(loadAppointmentData());
     
     // Load questions data using saga
     console.log('📊 Dashboard: Loading questions data...');
@@ -99,23 +86,6 @@ export default function Dashboard() {
     
 
   }, [dispatch]);
-
-  // Initialize schedule completion status from user metadata
-  useEffect(() => {
-    if (user?.user_metadata?.scheduled !== undefined) {
-      console.log('📅 Dashboard: Setting schedule completion from user_metadata.scheduled:', user.user_metadata.scheduled);
-      dispatch(setScheduleCompleted(user.user_metadata.scheduled));
-    }
-  }, [user, dispatch]);
-
-  // Debug: Log appointment data when it changes
-  useEffect(() => {
-    if (currentAppointment) {
-      console.log('📅 Dashboard: Current appointment data:', currentAppointment);
-      console.log('✅ Dashboard: isScheduled =', isScheduled);
-      console.log('✅ Dashboard: isScheduleCompleted =', isScheduleCompleted);
-    }
-  }, [currentAppointment, isScheduled, isScheduleCompleted]);
 
 
   // Debug: Log measurements data when it changes
@@ -204,20 +174,6 @@ export default function Dashboard() {
     return allComplete;
   };
 
-  // Function to check if appointment date has passed
-  const isAppointmentPast = () => {
-    if (!currentAppointment) return false;
-    
-    const appointmentDate = currentAppointment.date || currentAppointment.startDate;
-    if (!appointmentDate) return false;
-    
-    const appointmentDateTime = new Date(appointmentDate);
-    const now = new Date();
-    
-    // Return true if appointment date is in the past
-    return appointmentDateTime < now;
-  };
-
   // Handler for weight/height entry completion
   const handleWeightHeightComplete = (data) => {
     // Mark the task as complete
@@ -236,22 +192,6 @@ export default function Dashboard() {
   // Handler for going back from weight/height entry
   const handleWeightHeightBack = () => {
     setShowWeightHeightEntry(false);
-  };
-
-  // Handler for reschedule request
-  const handleReschedule = () => {
-    console.log('🔄 Dashboard: Reschedule requested for appointment:', currentAppointment);
-    
-    if (currentAppointment?._id) {
-      if(currentAppointment.type === 'review') {
-        dispatch(requestReschedule(currentAppointment._id));
-      } else {
-        dispatch(rescheduleAppointment(currentAppointment));
-      }
-    } else {
-      // If no appointment ID, still dispatch the action (saga will handle it)
-      dispatch(requestReschedule(null));
-    }
   };
 
   // Handler for prepare questions completion
@@ -371,399 +311,211 @@ export default function Dashboard() {
           Welcome to your dashboard, {user.name}!
         </Typography>
 
-        {/* Appointment Panel */}
-        {currentAppointment && (
-          <Card sx={{ mb: 4, backgroundColor: '#1a1a1a' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CalendarToday sx={{ fontSize: 30, mr: 2, color: '#877449' }} />
-                <Box>
-                  <Typography variant="h5" gutterBottom color="primary">
-                    {isAppointmentPast() ? 'Appointment Summary' : 'Upcoming Appointment'}
-                  </Typography>
-                  {isAppointmentPast() && (
-                    <Chip
-                      label="Missed Appointment"
-                      color="error"
-                      variant="outlined"
-                      size="small"
-                      sx={{ mt: 1, fontWeight: 600 }}
-                    />
-                  )}
-                </Box>
+        {/* Pre-Appointment Tasks */}
+        <Card sx={{ mb: 4, backgroundColor: '#1a1a1a' }}>
+          <CardContent>
+            {preAppointmentTasksLoading && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <CircularProgress size={20} />
+                <Typography variant="body2">Loading pre-appointment tasks...</Typography>
               </Box>
+            )}
 
-              {isAppointmentPast() && !currentAppointment.rescheduleRequested && (
-                <Alert
-                  severity="warning"
-                  sx={{ mb: 3, backgroundColor: 'rgba(255, 183, 77, 0.1)', border: '1px solid rgba(255, 183, 77, 0.4)' }}
-                >
-                  Appointment was missed — you should reschedule your appointment.
-                </Alert>
-              )}
+            {!preAppointmentTasksLoading && preAppointmentTasksError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Unable to load pre-appointment tasks. Please try again later.
+              </Alert>
+            )}
 
-              {/* Show appointment details if scheduled, otherwise show "not scheduled" message */}
-              {isScheduled && currentAppointment ? (
-                <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
-                  <Box sx={{ 
-                    display: 'flex', 
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'flex-start', sm: 'center' },
-                    justifyContent: { xs: 'flex-start', sm: 'space-between' },
-                    gap: { xs: 2, sm: 0 },
-                    mb: 2 
-                  }}>
-                    <Typography variant="h6">
-                      {currentAppointment.type ? 
-                        `${currentAppointment.type.toUpperCase()} Scheduled` : 
-                        'CONSULTATION Scheduled'}
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Chip label="Confirmed" color="success" size="small" />
-                      {currentAppointment.rescheduleRequested && (
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                          <Chip 
-                            label="Reschedule Requested" 
-                            color="warning" 
-                            size="small"
-                            sx={{
-                              backgroundColor: '#ff9800',
-                              color: '#000',
-                              fontWeight: 'bold',
-                            }}
-                          />
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              fontSize: '0.7rem',
-                              color: '#877449',
-                              fontStyle: 'italic'
-                            }}
-                          >
-                            A member of the Svelte team will contact you in 24 hours.
-                          </Typography>
-                        </Box>
-                      )}
-                      {areAllPreAppointmentTasksComplete() && (
-                        <Chip 
-                          label="Ready for appointment" 
-                          color="primary" 
-                          size="small"
-                          sx={{
-                            backgroundColor: '#877449',
-                            color: '#000',
-                            fontWeight: 'bold',
+            {preAppointmentTasksLoaded && !preAppointmentTasksError && (
+              <>
+                <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+                  <Assignment sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Pre-Appointment Tasks
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  {[
+                    {
+                      key: 'completeMedicalProfile',
+                      title: 'Complete Medical Profile',
+                      description: 'Update your health information and medical history',
+                      path: '/profile',
+                      icon: <Person />
+                    },
+                    {
+                      key: 'prepareQuestions',
+                      title: 'Prepare Questions',
+                      description: 'Write down any questions or concerns you\'d like to discuss',
+                      path: '/profile',
+                      icon: <Assignment />
+                    },
+                    {
+                      key: 'completeConsentForms',
+                      title: 'Complete Consent Forms',
+                      description: 'Review and sign required consent forms',
+                      path: '/consent-forms',
+                      icon: <Description />
+                    },
+                    {
+                      key: 'enterWeightHeight',
+                      title: 'Enter Weight and Height',
+                      description: 'Log your current weight and height measurements',
+                      path: '/weight-logging',
+                      icon: <Assignment />
+                    }
+                  ].map((task) => (
+                    <Grid item xs={12} sm={6} key={task.key}>
+                      {task.key === 'enterWeightHeight' ? (
+                        <Box
+                          onClick={() => setShowWeightHeightEntry(true)}
+                          sx={{ 
+                            display: 'flex',
+                            alignItems: 'center',
+                            p: 2,
+                            borderRadius: 1,
+                            cursor: 'pointer',
+                            border: '1px solid',
+                            borderColor: 'divider',
                             '&:hover': {
-                              backgroundColor: '#B8941F',
+                              backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                              borderColor: '#877449'
                             }
                           }}
-                        />
-                      )}
-                    </Box>
-                  </Box>
-                  
-                  {/* Appointment Date & Time */}
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    <strong>Date:</strong> {currentAppointment.date ? 
-                      new Date(currentAppointment.date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      }) : 
-                      currentAppointment.startDate ?
-                      new Date(currentAppointment.startDate).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      }) :
-                      'To be confirmed'}
-                  </Typography>
-                  
-                  {/* Appointment Time */}
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    <strong>Time:</strong> {currentAppointment.time || 
-                      (currentAppointment.startDate ? 
-                        new Date(currentAppointment.startDate).toLocaleTimeString('en-US', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        }) : 
-                        'To be confirmed')}
-                  </Typography>
-                  
-                  {/* Appointment Length */}
-                  <Typography variant="body2" sx={{ mb: 2 }}>
-                    <strong>Duration:</strong> {currentAppointment.length ? 
-                      `${currentAppointment.length} minutes` : 
-                      currentAppointment.endDate && currentAppointment.startDate ? 
-                        `${Math.round((new Date(currentAppointment.endDate) - new Date(currentAppointment.startDate)) / (1000 * 60))} minutes` : 
-                        '30 minutes'}
-                  </Typography>
-                  
-                  {/* Scheduled At */}
-                  {currentAppointment.scheduledAt && (
-                    <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 2 }}>
-                    </Typography>
-                  )}
-                  
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={handleReschedule}
-                      disabled={currentAppointment.rescheduleRequested === true}
-                      sx={{
-                        textTransform: 'none',
-                        borderColor: '#877449',
-                        color: '#877449',
-                        '&:hover': {
-                          borderColor: '#877449',
-                          backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                        },
-                        '&.Mui-disabled': {
-                          borderColor: '#555',
-                          color: '#888',
-                        }
-                      }}
-                    >
-                      Reschedule
-                    </Button>
-                  </Box>
-                </Paper>
-              ) : (
-                <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#2C3E50' }}>
-                  <Box sx={{ textAlign: 'center', py: 2 }}>
-                    <CalendarToday sx={{ fontSize: 48, color: '#877449', mb: 2 }} />
-                    <Typography variant="h6" sx={{ mb: 1 }}>
-                      No Appointment Scheduled
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      You don't have any upcoming appointments
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      component={Link}
-                      href="/schedule"
-                      sx={{
-                        textTransform: 'none',
-                        backgroundColor: '#877449',
-                        color: '#000',
-                        '&:hover': {
-                          backgroundColor: '#B8941F',
-                        }
-                      }}
-                    >
-                      Schedule Appointment
-                    </Button>
-                  </Box>
-                </Paper>
-              )}
-
-              {preAppointmentTasksLoading && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <CircularProgress size={20} />
-                  <Typography variant="body2">Loading pre-appointment tasks...</Typography>
-                </Box>
-              )}
-
-              {!preAppointmentTasksLoading && preAppointmentTasksError && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  Unable to load pre-appointment tasks. Please try again later.
-                </Alert>
-              )}
-
-              {preAppointmentTasksLoaded && !preAppointmentTasksError && (
-                <>
-                  <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-                    <Assignment sx={{ mr: 1, verticalAlign: 'middle' }} />
-                    Pre-Appointment Tasks
-                  </Typography>
-                  
-                  <Grid container spacing={2}>
-                    {[
-                      {
-                        key: 'completeMedicalProfile',
-                        title: 'Complete Medical Profile',
-                        description: 'Update your health information and medical history',
-                        path: '/profile',
-                        icon: <Person />
-                      },
-                      {
-                        key: 'prepareQuestions',
-                        title: 'Prepare Questions',
-                        description: 'Write down any questions or concerns you\'d like to discuss',
-                        path: '/profile',
-                        icon: <Assignment />
-                      },
-                      {
-                        key: 'completeConsentForms',
-                        title: 'Complete Consent Forms',
-                        description: 'Review and sign required consent forms',
-                        path: '/consent-forms',
-                        icon: <Description />
-                      },
-                      {
-                        key: 'enterWeightHeight',
-                        title: 'Enter Weight and Height',
-                        description: 'Log your current weight and height measurements',
-                        path: '/weight-logging',
-                        icon: <Assignment />
-                      }
-                    ].map((task) => (
-                      <Grid item xs={12} sm={6} key={task.key}>
-                        {task.key === 'enterWeightHeight' ? (
-                          <Box
-                            onClick={() => setShowWeightHeightEntry(true)}
-                            sx={{ 
-                              display: 'flex',
-                              alignItems: 'center',
-                              p: 2,
-                              borderRadius: 1,
-                              cursor: 'pointer',
-                              border: '1px solid',
-                              borderColor: 'divider',
-                              '&:hover': {
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                borderColor: '#877449'
-                              }
-                            }}
-                          >
-                            <Box sx={{ mr: 2 }}>
-                              {preAppointmentTasks[task.key] ? (
-                                <CheckCircle sx={{ color: 'success.main' }} />
-                              ) : (
-                                <Close sx={{ color: 'error.main' }} />
-                              )}
-                            </Box>
-                            <Box>
-                              <Typography 
-                                variant="subtitle1"
-                                component="div"
-                                sx={{
-                                  color: preAppointmentTasks[task.key] ? 'success.main' : 'error.main',
-                                  fontWeight: preAppointmentTasks[task.key] ? 'bold' : 'normal',
-                                  mb: 0.5
-                                }}
-                              >
-                                {task.title}
-                              </Typography>
-                              <Typography 
-                                variant="body2"
-                                component="div"
-                                sx={{
-                                  color: preAppointmentTasks[task.key] ? 'success.dark' : 'error.dark'
-                                }}
-                              >
-                                {task.description}
-                              </Typography>
-                            </Box>
+                        >
+                          <Box sx={{ mr: 2 }}>
+                            {preAppointmentTasks[task.key] ? (
+                              <CheckCircle sx={{ color: 'success.main' }} />
+                            ) : (
+                              <Close sx={{ color: 'error.main' }} />
+                            )}
                           </Box>
-                        ) : task.key === 'prepareQuestions' ? (
-                          <Box
-                            onClick={() => setShowPrepareQuestions(true)}
-                            sx={{ 
-                              display: 'flex',
-                              alignItems: 'center',
-                              p: 2,
-                              borderRadius: 1,
-                              cursor: 'pointer',
-                              border: '1px solid',
-                              borderColor: 'divider',
-                              '&:hover': {
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                borderColor: '#877449'
-                              }
-                            }}
-                          >
-                            <Box sx={{ mr: 2 }}>
-                              {preAppointmentTasks.prepareQuestions ? (
-                                <CheckCircle sx={{ color: 'success.main' }} />
-                              ) : (
-                                <Close sx={{ color: 'error.main' }} />
-                              )}
-                            </Box>
-                            <Box>
-                              <Typography 
-                                variant="subtitle1"
-                                component="div"
-                                sx={{
-                                  color:  preAppointmentTasks.prepareQuestions ? 'success.main' : 'error.main',
-                                  fontWeight: preAppointmentTasks.prepareQuestions ? 'bold' : 'normal',
-                                  mb: 0.5
-                                }}
-                              >
-                                {task.title}
-                              </Typography>
-                              <Typography 
-                                variant="body2"
-                                component="div"
-                                sx={{
-                                  color: preAppointmentTasks.prepareQuestions ? 'success.dark' : 'error.dark'
-                                }}
-                              >
-                                {task.description}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        ) : (
-                          <Link href={task.path} style={{ textDecoration: 'none' }}>
-                            <Box
-                              sx={{ 
-                                display: 'flex',
-                                alignItems: 'center',
-                                p: 2,
-                                borderRadius: 1,
-                                cursor: 'pointer',
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                '&:hover': {
-                                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                  borderColor: '#877449'
-                                }
+                          <Box>
+                            <Typography 
+                              variant="subtitle1"
+                              component="div"
+                              sx={{
+                                color: preAppointmentTasks[task.key] ? 'success.main' : 'error.main',
+                                fontWeight: preAppointmentTasks[task.key] ? 'bold' : 'normal',
+                                mb: 0.5
                               }}
                             >
-                              <Box sx={{ mr: 2 }}>
-                                {(task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? (
-                                  <CheckCircle sx={{ color: 'success.main' }} />
-                                ) : (
-                                  <Close sx={{ color: 'error.main' }} />
-                                )}
-                              </Box>
-                              <Box>
-                                <Typography 
-                                  variant="subtitle1"
-                                  component="div"
-                                  sx={{
-                                    color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.main' : 'error.main',
-                                    fontWeight: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'bold' : 'normal',
-                                    mb: 0.5
-                                  }}
-                                >
-                                  {task.title}
-                                </Typography>
-                                <Typography 
-                                  variant="body2"
-                                  component="div"
-                                  sx={{
-                                    color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.dark' : 'error.dark'
-                                  }}
-                                >
-                                  {task.description}
-                                </Typography>
-                              </Box>
+                              {task.title}
+                            </Typography>
+                            <Typography 
+                              variant="body2"
+                              component="div"
+                              sx={{
+                                color: preAppointmentTasks[task.key] ? 'success.dark' : 'error.dark'
+                              }}
+                            >
+                              {task.description}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ) : task.key === 'prepareQuestions' ? (
+                        <Box
+                          onClick={() => setShowPrepareQuestions(true)}
+                          sx={{ 
+                            display: 'flex',
+                            alignItems: 'center',
+                            p: 2,
+                            borderRadius: 1,
+                            cursor: 'pointer',
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            '&:hover': {
+                              backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                              borderColor: '#877449'
+                            }
+                          }}
+                        >
+                          <Box sx={{ mr: 2 }}>
+                            {preAppointmentTasks.prepareQuestions ? (
+                              <CheckCircle sx={{ color: 'success.main' }} />
+                            ) : (
+                              <Close sx={{ color: 'error.main' }} />
+                            )}
+                          </Box>
+                          <Box>
+                            <Typography 
+                              variant="subtitle1"
+                              component="div"
+                              sx={{
+                                color:  preAppointmentTasks.prepareQuestions ? 'success.main' : 'error.main',
+                                fontWeight: preAppointmentTasks.prepareQuestions ? 'bold' : 'normal',
+                                mb: 0.5
+                              }}
+                            >
+                              {task.title}
+                            </Typography>
+                            <Typography 
+                              variant="body2"
+                              component="div"
+                              sx={{
+                                color: preAppointmentTasks.prepareQuestions ? 'success.dark' : 'error.dark'
+                              }}
+                            >
+                              {task.description}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ) : (
+                        <Link href={task.path} style={{ textDecoration: 'none' }}>
+                          <Box
+                            sx={{ 
+                              display: 'flex',
+                              alignItems: 'center',
+                              p: 2,
+                              borderRadius: 1,
+                              cursor: 'pointer',
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              '&:hover': {
+                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                                borderColor: '#877449'
+                              }
+                            }}
+                          >
+                            <Box sx={{ mr: 2 }}>
+                              {(task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? (
+                                <CheckCircle sx={{ color: 'success.main' }} />
+                              ) : (
+                                <Close sx={{ color: 'error.main' }} />
+                              )}
                             </Box>
-                          </Link>
-                        )}
-                      </Grid>
-                    ))}
-                  </Grid>
-                </>
-              )}
-
-            </CardContent>
-          </Card>
-        )}
+                            <Box>
+                              <Typography 
+                                variant="subtitle1"
+                                component="div"
+                                sx={{
+                                  color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.main' : 'error.main',
+                                  fontWeight: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'bold' : 'normal',
+                                  mb: 0.5
+                                }}
+                              >
+                                {task.title}
+                              </Typography>
+                              <Typography 
+                                variant="body2"
+                                component="div"
+                                sx={{
+                                  color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.dark' : 'error.dark'
+                                }}
+                              >
+                                {task.description}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Link>
+                      )}
+                    </Grid>
+                  ))}
+                </Grid>
+              </>
+            )}
+          </CardContent>
+        </Card>
         
 
       </Container>
