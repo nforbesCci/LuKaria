@@ -27,6 +27,8 @@ import {
   Description,
   Info as InfoIcon,
   Login,
+  LocalShipping,
+  Payment,
 } from '@mui/icons-material';
 
 export default function InfoPage() {
@@ -454,6 +456,38 @@ export default function InfoPage() {
                             </Typography>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
                               Account Number: 000081785
+                            </Typography>
+                          </Box>
+                        }
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449', fontWeight: 600 }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ alignItems: 'flex-start' }}>
+                      <ListItemIcon sx={{ mt: 0.5 }}>
+                        <LocalShipping sx={{ color: '#877449' }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Cash on Delivery"
+                        secondary={
+                          <Box component="span" sx={{ display: 'block', mt: 1 }}>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Pay with cash when your order is delivered
+                            </Typography>
+                          </Box>
+                        }
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449', fontWeight: 600 }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ alignItems: 'flex-start' }}>
+                      <ListItemIcon sx={{ mt: 0.5 }}>
+                        <Payment sx={{ color: '#877449' }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Credit Cards"
+                        secondary={
+                          <Box component="span" sx={{ display: 'block', mt: 1 }}>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              We accept all major credit cards.
                             </Typography>
                           </Box>
                         }
