@@ -20,6 +20,14 @@ const AdminWeightLogging = ({
   onGeneratePDF,
   formatDate,
 }) => {
+  // Helper function to format values, replacing null/undefined with 'N/E'
+  const formatValue = (value, suffix = '') => {
+    if (value === null || value === undefined || value === 'null' || value === 'undefined') {
+      return 'N/E';
+    }
+    return `${value}${suffix}`;
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -58,7 +66,7 @@ const AdminWeightLogging = ({
                 </Typography>
                 <Typography variant="h4" color="primary">
                   {adminMeasurements && adminMeasurements.length > 0 
-                    ? `${adminMeasurements[0].weight} kg` 
+                    ? formatValue(adminMeasurements[0].weight, ' lbs') 
                     : 'No data'}
                 </Typography>
               </CardContent>
@@ -73,7 +81,7 @@ const AdminWeightLogging = ({
                 </Typography>
                 <Typography variant="h4" color="secondary">
                   {adminMeasurements && adminMeasurements.length > 0 
-                    ? adminMeasurements[0].bmi 
+                    ? formatValue(adminMeasurements[0].bmi) 
                     : 'No data'}
                 </Typography>
               </CardContent>
@@ -87,7 +95,7 @@ const AdminWeightLogging = ({
                 </Typography>
                 <Typography variant="h4" color="success">
                   {adminMeasurements && adminMeasurements.length > 0 
-                    ? `${adminMeasurements[0].waistCircumference} cm` 
+                    ? formatValue(adminMeasurements[0].waistCircumference, ' cm') 
                     : 'No data'}
                 </Typography>
               </CardContent>
@@ -103,14 +111,14 @@ const AdminWeightLogging = ({
                 </Typography>
                 {adminMeasurements && adminMeasurements.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={adminMeasurements}>
+                    <LineChart data={[...adminMeasurements].reverse()}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis yAxisId="left" />
                       <YAxis yAxisId="right" orientation="right" />
                       <RechartsTooltip />
                       <Legend />
-                      <Line yAxisId="left" type="monotone" dataKey="weight" stroke="#1976d2" strokeWidth={2} name="Weight (kg)" />
+                      <Line yAxisId="left" type="monotone" dataKey="weight" stroke="#1976d2" strokeWidth={2} name="Weight (lbs)" />
                       <Line yAxisId="right" type="monotone" dataKey="bmi" stroke="#dc004e" strokeWidth={2} name="BMI" />
                     </LineChart>
                   </ResponsiveContainer>
@@ -147,7 +155,7 @@ const AdminWeightLogging = ({
                       }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                           <Typography variant="h6" color="primary">
-                            {formatDate(measurement.date)}
+                            {measurement.dateKey}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
                             {measurement.time || 'No time recorded'}
@@ -158,25 +166,25 @@ const AdminWeightLogging = ({
                           <Grid item xs={12} sm={6} md={3}>
                             <Typography variant="caption" color="text.secondary">Weight</Typography>
                             <Typography variant="body2" fontWeight="medium">
-                              {measurement.weight} kg
+                              {formatValue(measurement.weight, ' lbs')}
                             </Typography>
                           </Grid>
                           <Grid item xs={12} sm={6} md={3}>
                             <Typography variant="caption" color="text.secondary">BMI</Typography>
                             <Typography variant="body2" fontWeight="medium">
-                              {measurement.bmi}
+                              {formatValue(measurement.bmi)}
                             </Typography>
                           </Grid>
                           <Grid item xs={12} sm={6} md={3}>
                             <Typography variant="caption" color="text.secondary">Waist</Typography>
                             <Typography variant="body2" fontWeight="medium">
-                              {measurement.waistCircumference} cm
+                              {formatValue(measurement.waistCircumference, ' cm')}
                             </Typography>
                           </Grid>
                           <Grid item xs={12} sm={6} md={3}>
                             <Typography variant="caption" color="text.secondary">Height</Typography>
                             <Typography variant="body2" fontWeight="medium">
-                              {measurement.height} cm
+                              {formatValue(measurement.height, ' cm')}
                             </Typography>
                           </Grid>
                         </Grid>
