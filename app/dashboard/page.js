@@ -50,6 +50,7 @@ export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
   const [showWeightHeightEntry, setShowWeightHeightEntry] = useState(false);
   const [showPrepareQuestions, setShowPrepareQuestions] = useState(false);
+  const [weightHeightEntryKey, setWeightHeightEntryKey] = useState(0); // Force remount on each open
   
   // Redux state
   const preAppointmentTasks = useAppSelector((state) => state.appointment.preAppointmentTasks);
@@ -182,8 +183,9 @@ export default function Dashboard() {
       completed: true 
     }));
     
-    // Hide the weight/height entry component
+    // Hide the weight/height entry component and increment key to force remount next time
     setShowWeightHeightEntry(false);
+    setWeightHeightEntryKey(prev => prev + 1);
     
     // In a real app, you might want to save the data to the backend
     console.log('Weight/Height data saved:', data);
@@ -192,6 +194,7 @@ export default function Dashboard() {
   // Handler for going back from weight/height entry
   const handleWeightHeightBack = () => {
     setShowWeightHeightEntry(false);
+    setWeightHeightEntryKey(prev => prev + 1);
   };
 
   // Handler for prepare questions completion
@@ -266,10 +269,12 @@ export default function Dashboard() {
 
   // Show WeightHeightEntry component if active
   if (showWeightHeightEntry) {
+    console.log('📝 Dashboard: Rendering WeightHeightEntry component with key:', weightHeightEntryKey);
     return (
       <>
         <Header />
         <WeightHeightEntry
+          key={`weight-height-entry-${weightHeightEntryKey}`} // Dynamic key forces remount each time
           onComplete={handleWeightHeightComplete}
           onBack={handleWeightHeightBack}
         />
@@ -368,7 +373,13 @@ export default function Dashboard() {
                     <Grid item xs={12} sm={6} key={task.key}>
                       {task.key === 'enterWeightHeight' ? (
                         <Box
-                          onClick={() => setShowWeightHeightEntry(true)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('📝 Dashboard: Clicked Enter Weight and Height, opening form...');
+                            setWeightHeightEntryKey(prev => prev + 1); // Increment key to force remount
+                            setShowWeightHeightEntry(true);
+                          }}
                           sx={{ 
                             display: 'flex',
                             alignItems: 'center',

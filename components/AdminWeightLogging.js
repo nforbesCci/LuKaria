@@ -184,7 +184,7 @@ const AdminWeightLogging = ({
                           <Grid item xs={12} sm={6} md={3}>
                             <Typography variant="caption" color="text.secondary">Height</Typography>
                             <Typography variant="body2" fontWeight="medium">
-                              {formatValue(measurement.height, ' cm')}
+                              {formatValue(measurement.heightFeet,' feet') +' ' + formatValue(measurement.heightInches, ' inches') }
                             </Typography>
                           </Grid>
                         </Grid>

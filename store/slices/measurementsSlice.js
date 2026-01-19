@@ -63,6 +63,9 @@ const measurementsSlice = createSlice({
     clearMeasurementsError: (state) => {
       state.error = null;
     },
+    clearSaveStatus: (state) => {
+      state.isSaved = false;
+    },
     resetMeasurements: (state) => {
       state.measurements = null;
       state.allMeasurements = [];
@@ -86,6 +89,7 @@ export const {
   fetchAllMeasurementsSuccess,
   fetchAllMeasurementsFailure,
   clearMeasurementsError,
+  clearSaveStatus,
   resetMeasurements,
 } = measurementsSlice.actions;
 
