@@ -228,7 +228,7 @@ export default function FAQ() {
             >
               <Login sx={{ fontSize: 20 }} />
               <Box>
-                Login
+                Sign-up/Login
               </Box>
             </Box>
           )}
