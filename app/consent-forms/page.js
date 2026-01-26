@@ -13,6 +13,10 @@ import {
   setMounjaroConsentChanges,
   resetMounjaroConsentSaveFlag,
   fetchMounjaroConsent,
+  saveSemaglutideConsent,
+  setSemaglutideConsentChanges,
+  resetSemaglutideConsentSaveFlag,
+  fetchSemaglutideConsent,
   saveTelehealthConsent,
   setTelehealthConsentChanges,
   resetTelehealthConsentSaveFlag,
@@ -69,11 +73,14 @@ export default function ConsentForms() {
     error: saveError, 
     photographConsent, 
     mounjaroConsent,
+    semaglutideConsent,
     telehealthConsent,
     isLoaded, 
     isFetching,
     mounjaroHasChanges,
     mounjaroIsSaved,
+    semaglutideHasChanges,
+    semaglutideIsSaved,
     telehealthHasChanges,
     telehealthIsSaved
   } = useSelector((state) => state.consent);
@@ -82,6 +89,8 @@ export default function ConsentForms() {
   const [isFormComplete, setIsFormComplete] = useState(false);
   const [wasMounjaroSaved, setWasMounjaroSaved] = useState(false);
   const [isMounjaroFormComplete, setIsMounjaroFormComplete] = useState(false);
+  const [wasSemaglutideSaved, setWasSemaglutideSaved] = useState(false);
+  const [isSemaglutideFormComplete, setIsSemaglutideFormComplete] = useState(false);
   const [wasTelehealthSaved, setWasTelehealthSaved] = useState(false);
   const [isTelehealthFormComplete, setIsTelehealthFormComplete] = useState(false);
 
@@ -91,6 +100,7 @@ export default function ConsentForms() {
     ozempicConsent: false,
     wegovyConsent: false,
     mounjaroConsent: false,
+    semaglutideConsent: false,
     telemedicineConsent: false,
   });
 
@@ -125,6 +135,17 @@ export default function ConsentForms() {
     setMounjaroConsentDate(formattedDate);
   };
 
+  // Patient information fields for Semaglutide Consent
+  const [semaglutidePatientName, setSemaglutidePatientName] = useState('');
+  const [semaglutidePatientDOB, setSemaglutidePatientDOB] = useState('');
+  const [semaglutideConsentDate, setSemaglutideConsentDate] = useState('');
+
+  const handleInsertSemaglutideTodayDate = () => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+    setSemaglutideConsentDate(formattedDate);
+  };
+
   // Patient information fields for Telehealth Consent
   const [telehealthPatientName, setTelehealthPatientName] = useState('');
   const [telehealthPatientDOB, setTelehealthPatientDOB] = useState('');
@@ -148,6 +169,11 @@ export default function ConsentForms() {
   const mounjaroCanvasRef = useRef(null);
   const [mounjaroIsDrawing, setMounjaroIsDrawing] = useState(false);
   const [mounjaroSignatureData, setMounjaroSignatureData] = useState(null);
+  
+  // Signature pad state for Semaglutide Consent
+  const semaglutideCanvasRef = useRef(null);
+  const [semaglutideIsDrawing, setSemaglutideIsDrawing] = useState(false);
+  const [semaglutideSignatureData, setSemaglutideSignatureData] = useState(null);
   
   // Signature pad state for Telehealth Consent
   const telehealthCanvasRef = useRef(null);
@@ -238,6 +264,8 @@ export default function ConsentForms() {
       dispatch(fetchPhotographConsent());
       console.log('Fetching mounjaro consent for user...');
       dispatch(fetchMounjaroConsent());
+      console.log('Fetching semaglutide consent for user...');
+      dispatch(fetchSemaglutideConsent());
       console.log('Fetching telehealth consent for user...');
       dispatch(fetchTelehealthConsent());
     }
@@ -389,6 +417,59 @@ export default function ConsentForms() {
     }
   }, [mounjaroSignatureData, activeTab]); // Re-run when switching tabs to ensure canvas is ready
 
+  // Populate Semaglutide form fields from store when data is loaded
+  useEffect(() => {
+    if (isLoaded && semaglutideConsent) {
+      console.log('📋 Loading semaglutide consent data into form:', semaglutideConsent);
+      const data = semaglutideConsent;
+      
+      // Check if form is already complete
+      if (data.complete === true) {
+        console.log('🔒 Semaglutide form is marked as complete - locking fields');
+        setIsSemaglutideFormComplete(true);
+        setConsentForms(prev => ({
+          ...prev,
+          semaglutideConsent: true
+        }));
+      }
+      
+      // Set patient information
+      if (data.patientName) {
+        setSemaglutidePatientName(data.patientName);
+      }
+      if (data.patientDOB) {
+        setSemaglutidePatientDOB(data.patientDOB);
+      }
+      if (data.consentDate) {
+        setSemaglutideConsentDate(data.consentDate);
+      }
+      
+      // Set signature if available
+      if (data.signature) {
+        setSemaglutideSignatureData(data.signature);
+      }
+      
+      console.log('✅ Semaglutide form populated with saved data');
+    }
+  }, [isLoaded, semaglutideConsent]);
+
+  // Draw semaglutide signature on canvas when signature data and canvas are both available
+  useEffect(() => {
+    if (semaglutideSignatureData && semaglutideCanvasRef.current) {
+      const canvas = semaglutideCanvasRef.current;
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      };
+      img.onerror = () => {
+        console.error('❌ Failed to load semaglutide signature image');
+      };
+      img.src = semaglutideSignatureData;
+    }
+  }, [semaglutideSignatureData, activeTab]);
+
   // Populate Telehealth form fields from store when data is loaded
   useEffect(() => {
     if (isLoaded && telehealthConsent) {
@@ -479,6 +560,19 @@ export default function ConsentForms() {
     }
   }, [mounjaroIsSaved, dispatch]);
 
+  // Show snackbar when semaglutide consent is saved
+  useEffect(() => {
+    if (semaglutideIsSaved) {
+      setWasSemaglutideSaved(true);
+      setSnackbarOpen(true);
+      dispatch(resetSemaglutideConsentSaveFlag());
+      
+      setTimeout(() => {
+        setWasSemaglutideSaved(false);
+      }, 3000);
+    }
+  }, [semaglutideIsSaved, dispatch]);
+
   // Show snackbar when telehealth consent is saved
   useEffect(() => {
     if (telehealthIsSaved) {
@@ -504,6 +598,11 @@ export default function ConsentForms() {
   // Mark changes when mounjaro consent fields change
   const markMounjaroConsentChanged = () => {
     dispatch(setMounjaroConsentChanges(true));
+  };
+
+  // Mark changes when semaglutide consent fields change
+  const markSemaglutideConsentChanged = () => {
+    dispatch(setSemaglutideConsentChanges(true));
   };
 
   // Mark changes when telehealth consent fields change
@@ -533,6 +632,17 @@ export default function ConsentForms() {
       mounjaroSignatureData !== null; // Signature present
     
     return isComplete;
+  };
+
+  // Check if semaglutide consent form is complete
+  const isSemaglutideConsentComplete = () => {
+    return (
+      consentForms['semaglutideConsent'] === true &&
+      semaglutidePatientName.trim() !== '' &&
+      semaglutidePatientDOB !== '' &&
+      semaglutideConsentDate !== '' &&
+      semaglutideSignatureData !== null
+    );
   };
 
   // Check if telehealth consent form is complete
@@ -608,9 +718,34 @@ export default function ConsentForms() {
   const handleCompleteMounjaroConsent = () => {
     if (isMounjaroConsentComplete()) {
       console.log('Completing mounjaro consent form...');
-      handleSaveMounjaroConsent(true); // Save with complete: true
+      handleSaveMounjaroConsent(true);
       
-      // Navigate to next tab after a short delay to allow save to complete
+      setTimeout(() => {
+        setActiveTab(Math.min(forms.length - 1, activeTab + 1));
+      }, 500);
+    }
+  };
+
+  // Handle saving semaglutide consent
+  const handleSaveSemaglutideConsent = (markAsComplete = false) => {
+    const consentData = {
+      patientName: semaglutidePatientName,
+      patientDOB: semaglutidePatientDOB,
+      consentDate: semaglutideConsentDate,
+      signature: semaglutideSignatureData,
+      complete: markAsComplete,
+    };
+    
+    console.log('Saving semaglutide consent:', consentData, 'Complete:', markAsComplete);
+    dispatch(saveSemaglutideConsent(consentData));
+  };
+
+  // Handle completing semaglutide consent
+  const handleCompleteSemaglutideConsent = () => {
+    if (isSemaglutideConsentComplete()) {
+      console.log('Completing semaglutide consent form...');
+      handleSaveSemaglutideConsent(true);
+      
       setTimeout(() => {
         setActiveTab(Math.min(forms.length - 1, activeTab + 1));
       }, 500);
@@ -670,6 +805,11 @@ export default function ConsentForms() {
     // Mark Mounjaro consent as changed if it's the mounjaro form
     if (formName === 'mounjaroConsent') {
       markMounjaroConsentChanged();
+    }
+    
+    // Mark Semaglutide consent as changed if it's the semaglutide form
+    if (formName === 'semaglutideConsent') {
+      markSemaglutideConsentChanged();
     }
     
     // Mark Telehealth consent as changed if it's the telehealth form
@@ -787,6 +927,7 @@ export default function ConsentForms() {
   // Get consent data from Redux store
   const photographConsentData = useSelector(state => state.consent.photographConsent);
   const mounjaroConsentData = useSelector(state => state.consent.mounjaroConsent);
+  const semaglutideConsentData = useSelector(state => state.consent.semaglutideConsent);
   const telehealthConsentData = useSelector(state => state.consent.telehealthConsent);
 
   // Define all possible consent forms
@@ -858,6 +999,62 @@ By signing below, I certify that I have read and understand the contents of this
 • I understand there are other ways and programs that can assist me in my desire to decrease my body weight and acknowledge that no guarantees have been made to me concerning my results.`,
     },
     {
+      id: 'semaglutideConsent',
+      title: 'Semaglutide Consent',
+      description: 'Consent for Semaglutide treatment',
+      hasCustomFields: true,
+      content: `Purpose of Treatment:
+Semaglutide is a human-based glucagon-like peptide-1 receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
+Semaglutide is FDA approved for the management of Type 2 Diabetes, and is used off label for weight management in non-diabetic patients who are overweight or obese. These medicines work by slowing gastric emptying time and stimulating the satiety center in the brain to reduce hunger and appetite.
+
+Do not take Semaglutide if:
+• You have a personal or family history of medullary thyroid carcinoma (Thyroid Cancer)
+• Multiple Endocrine Neoplasia syndrome type 2
+• You are pregnant or plan to become pregnant while taking this medicine
+• You are diabetic and/or taking any medications related to lowering your blood sugar levels without speaking with your endocrinologist. Specifically, if you are prescribed Insulin because the combination may increase your risk of hypoglycemia (low blood sugar) and dosage adjustments by your provider may be necessary
+• You have a history of Pancreatitis
+• You are allergic to Semaglutide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Mounjaro®, Ozempic®, Rybelsus®, Trulicity®, Victoza®, Wegovy®
+
+Possible Drug Interactions:
+Anti-diabetic agents, specifically: Insulin and Sulfonylureas (e.g., glyburide, glipizide, glimepiride, tolbutamide) due to the increased risk of hypoglycemia (low blood sugar). Do not take with other GLP-1 agonist medicines such as: Adlyxin®, Byeta®, Bydureon®, Rybelsus®,Trulicity®, Victoza®, or Wegovy® (THIS IS NOT AN ALL-INCLUSIVE LIST). Please tell your provider about any medications that may lower your blood sugar.
+
+Side Effects:
+I understand that, like all medications, Semaglutide may cause side effects. These may include but are not limited to:
+• Nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, dyspepsia, dizziness, abdominal distension, belching, hypoglycemia, flatulence, gastroenteritis, and gastroesophageal reflux disease.
+• Subcutaneous Injections: common injection site reactions characterized by itching, burning at site of administration with or without thickening of the skin (welting)
+• Serious side effects: Pancreatitis, Cholecystitis, kidney problems, changes in vision (Diabetic retinopathy and NAION), low blood sugar (hypoglycemia), gastroparesis
+
+A very serious allergic reaction to this drug is rare. However, get medical help right away if you notice any symptoms of a serious allergic reaction, including rash, itching/swelling (especially of the face/tongue/throat), severe dizziness, trouble breathing. Report adverse side effects to your doctor.
+
+Precautions:
+• In rodents, GLP-1 receptor agonists cause dose-dependent and treatment-duration dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether Semaglutide causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans.
+• Acute pancreatitis, including fatal and non-fatal hemorrhagic or necrotizing pancreatitis, has been observed in patients treated with GLP-1 receptor agonists, including Semaglutide.
+• Acute Gallbladder Disease: Treatment with Semaglutide is associated with an increased occurrence of cholelithiasis and cholecystitis.
+• Acute Kidney Injury: There have been reports of acute kidney injury and worsening of chronic renal failure, which in some cases required hemodialysis, in patients treated with Semaglutide.
+• Heart Rate Increase: Mean increases in resting heart rate have been observed in Semaglutide patients compared to placebo in clinical trials.
+
+Monitoring and Follow-up:
+I agree to undergo regular monitoring as recommended by my healthcare provider, which may include:
+• Blood sugar levels and HbA1c testing
+• Kidney function tests
+• Liver function tests
+• Thyroid function tests
+• Pregnancy testing
+• Follow-up visits to evaluate the effectiveness and adjust the treatment plan if necessary
+
+Alternatives to Semaglutide:
+I have been informed of alternative treatment options, which may include lifestyle changes (such as diet and exercise), other medications for type 2 diabetes or weight management, and surgical options for weight loss.
+
+Consent:
+By signing below, I certify that I have read and understand the contents of this form. I acknowledge that:
+• I consent to initiating/continuing treatment with Semaglutide
+• I have had the opportunity to ask questions about Semaglutide and its potential risks and benefits.
+• I have a proper laboratory testing done prior to starting treatment
+• I am aware of the possible side effects and drug interactions and give my consent for treatment
+• I have informed the medical staff of any known allergies to drugs or other substances, and any past adverse reactions I've experienced. I have informed the medical staff of all medications and supplements I'm currently taking
+• I understand there are other ways and programs that can assist me in my desire to decrease my body weight and acknowledge that no guarantees have been made to me concerning my results.`,
+    },
+    {
       id: 'telemedicineConsent',
       title: 'Telehealth Consent',
       description: 'Consent for telehealth services',
@@ -892,6 +1089,8 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
         return photographConsentData?.available === true;
       case 'mounjaroConsent':
         return mounjaroConsentData?.available === true;
+      case 'semaglutideConsent':
+        return semaglutideConsentData?.available === true;
       case 'telemedicineConsent':
         return telehealthConsentData?.available === true;
       default:
@@ -1196,7 +1395,7 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                         borderColor: 'divider'
                       }}
                     >
-                      {form.id === 'mounjaroConsent' ? (
+                      {(form.id === 'mounjaroConsent' || form.id === 'semaglutideConsent') ? (
                         <>
                           {(() => {
                             // Split content at page break points
@@ -1554,6 +1753,13 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                         </Alert>
                       )}
 
+                      {/* Form Complete Notice - Semaglutide */}
+                      {isSemaglutideFormComplete && form.id === 'semaglutideConsent' && (
+                        <Alert severity="info" icon={<CheckCircle />} sx={{ mb: 3 }}>
+                          <strong>This form has been completed and locked.</strong> No further edits can be made.
+                        </Alert>
+                      )}
+
                       {/* Consent Checkbox for Mounjaro - Above Patient Card */}
                       {form.id === 'mounjaroConsent' && (
                       <Card 
@@ -1765,6 +1971,244 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                                   ctx.closePath();
                                   setMounjaroSignatureData(e.target.toDataURL());
                                   markMounjaroConsentChanged();
+                                }}
+                                style={{
+                                  width: '100%',
+                                  height: '150px',
+                                  display: 'block'
+                                }}
+                              />
+                              <Typography 
+                                variant="caption" 
+                                sx={{ 
+                                  position: 'absolute',
+                                  bottom: 8,
+                                  left: 0,
+                                  right: 0,
+                                  textAlign: 'center',
+                                  color: 'text.secondary',
+                                  pointerEvents: 'none'
+                                }}
+                              >
+                                Sign above
+                              </Typography>
+                  </Box>
+                          </Grid>
+                        </Grid>
+                      </Card>
+                      )}
+
+                      {/* Consent Checkbox for Semaglutide - Above Patient Card */}
+                      {form.id === 'semaglutideConsent' && (
+                      <Card 
+                        elevation={2}
+                        sx={{
+                          p: 2,
+                          backgroundColor: consentForms[form.id] ? 'success.light' : 'background.paper',
+                          border: '2px solid',
+                          borderColor: consentForms[form.id] ? 'success.main' : 'divider',
+                            mb: 3,
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={consentForms[form.id]}
+                                onChange={() => handleConsentChange(form.id)}
+                                color="success"
+                                  disabled={isSemaglutideFormComplete}
+                                sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                              />
+                            }
+                            label={
+                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                  I have read and agree to this consent form and the declaration above
+                              </Typography>
+                            }
+                          />
+                          {consentForms[form.id] && signedDates[form.id] && (
+                            <Typography variant="caption" color="text.secondary">
+                              Signed: {signedDates[form.id]}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Card>
+                    )}
+                    
+                      {/* Patient Information Card - Semaglutide Consent */}
+                      {form.id === 'semaglutideConsent' && (
+                      <Card elevation={1} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider' }}>
+                        <Grid container spacing={3} className="patient-info-grid">
+                          <Grid item xs={12} md={6}>
+                            <TextField
+                              fullWidth
+                              label="Patient's Name as appears on ID"
+                              value={semaglutidePatientName}
+                              onChange={(e) => {
+                                setSemaglutidePatientName(e.target.value);
+                                markSemaglutideConsentChanged();
+                              }}
+                              placeholder="Enter patient's full name"
+                              disabled={isSemaglutideFormComplete}
+                            />
+                          </Grid>
+                          
+                          <Grid item xs={12} md={6}>
+                            <TextField
+                              fullWidth
+                              type="date"
+                              label="Patient's Date of Birth"
+                              value={semaglutidePatientDOB}
+                              onChange={(e) => {
+                                setSemaglutidePatientDOB(e.target.value);
+                                markSemaglutideConsentChanged();
+                              }}
+                              InputLabelProps={{
+                                shrink: true,
+                              }}
+                              inputProps={{
+                                max: "9999-12-31",
+                                min: "1900-01-01"
+                              }}
+                              disabled={isSemaglutideFormComplete}
+                            />
+                          </Grid>
+                          
+                          <Grid item xs={12} md={6}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
+                              <TextField
+                                fullWidth
+                                type="date"
+                                label="Date"
+                                value={semaglutideConsentDate}
+                                onChange={(e) => {
+                                  setSemaglutideConsentDate(e.target.value);
+                                  markSemaglutideConsentChanged();
+                                }}
+                                InputLabelProps={{
+                                  shrink: true,
+                                }}
+                                inputProps={{
+                                  max: "9999-12-31",
+                                  min: "1900-01-01"
+                                }}
+                                disabled={isSemaglutideFormComplete}
+                              />
+                      <Button
+                        variant="outlined"
+                                onClick={handleInsertSemaglutideTodayDate}
+                                disabled={isSemaglutideFormComplete}
+                                sx={{ 
+                                  textTransform: 'none',
+                                  minWidth: '120px',
+                                  height: '56px'
+                                }}
+                              >
+                                Today's Date
+                      </Button>
+                            </Box>
+                          </Grid>
+                          
+                          {/* Signature Area */}
+                          <Grid item xs={12}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
+                                Patient's Signature
+                              </Typography>
+                              {!isSemaglutideFormComplete && (
+                      <Button
+                                  size="small"
+                                  variant="outlined"
+                                  onClick={() => clearSignature(semaglutideCanvasRef.current)}
+                        sx={{
+                          textTransform: 'none',
+                                    fontSize: '0.75rem'
+                        }}
+                      >
+                                  Clear
+                      </Button>
+                              )}
+                    </Box>
+                            <Box 
+                              className="signature-container"
+                              sx={{ 
+                                border: '2px solid',
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                                backgroundColor: isSemaglutideFormComplete ? '#f5f5f5' : '#ffffff',
+                                position: 'relative',
+                                cursor: isSemaglutideFormComplete ? 'not-allowed' : 'crosshair',
+                                touchAction: isSemaglutideFormComplete ? 'auto' : 'none',
+                                pointerEvents: isSemaglutideFormComplete ? 'none' : 'auto'
+                              }}
+                            >
+                              <canvas
+                                ref={(canvas) => {
+                                  if (canvas && !canvas.dataset.initialized) {
+                                    semaglutideCanvasRef.current = canvas;
+                                    canvas.width = canvas.offsetWidth;
+                                    canvas.height = 150;
+                                    canvas.dataset.initialized = 'true';
+                                    initCanvas(canvas);
+                                  }
+                                }}
+                                onMouseDown={(e) => {
+                                  setSemaglutideIsDrawing(true);
+                                  const ctx = e.target.getContext('2d');
+                                  const rect = e.target.getBoundingClientRect();
+                                  const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+                                  const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+                                  ctx.beginPath();
+                                  ctx.moveTo(x, y);
+                                }}
+                                onMouseMove={(e) => {
+                                  if (!semaglutideIsDrawing) return;
+                                  e.preventDefault();
+                                  const ctx = e.target.getContext('2d');
+                                  const rect = e.target.getBoundingClientRect();
+                                  const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+                                  const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+                                  ctx.lineTo(x, y);
+                                  ctx.stroke();
+                                }}
+                                onMouseUp={(e) => {
+                                  setSemaglutideIsDrawing(false);
+                                  const ctx = e.target.getContext('2d');
+                                  ctx.closePath();
+                                  setSemaglutideSignatureData(e.target.toDataURL());
+                                  markSemaglutideConsentChanged();
+                                }}
+                                onMouseLeave={(e) => {
+                                  setSemaglutideIsDrawing(false);
+                                  const ctx = e.target.getContext('2d');
+                                  ctx.closePath();
+                                }}
+                                onTouchStart={(e) => {
+                                  setSemaglutideIsDrawing(true);
+                                  const ctx = e.target.getContext('2d');
+                                  const rect = e.target.getBoundingClientRect();
+                                  const x = e.touches?.[0]?.clientX - rect.left;
+                                  const y = e.touches?.[0]?.clientY - rect.top;
+                                  ctx.beginPath();
+                                  ctx.moveTo(x, y);
+                                }}
+                                onTouchMove={(e) => {
+                                  if (!semaglutideIsDrawing) return;
+                                  e.preventDefault();
+                                  const ctx = e.target.getContext('2d');
+                                  const rect = e.target.getBoundingClientRect();
+                                  const x = e.touches?.[0]?.clientX - rect.left;
+                                  const y = e.touches?.[0]?.clientY - rect.top;
+                                  ctx.lineTo(x, y);
+                                  ctx.stroke();
+                                }}
+                                onTouchEnd={(e) => {
+                                  setSemaglutideIsDrawing(false);
+                                  const ctx = e.target.getContext('2d');
+                                  ctx.closePath();
+                                  setSemaglutideSignatureData(e.target.toDataURL());
+                                  markSemaglutideConsentChanged();
                                 }}
                                 style={{
                                   width: '100%',
@@ -2051,6 +2495,8 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                             handleSavePhotographConsent();
                           } else if (form.id === 'mounjaroConsent') {
                             handleSaveMounjaroConsent();
+                          } else if (form.id === 'semaglutideConsent') {
+                            handleSaveSemaglutideConsent();
                           } else if (form.id === 'telemedicineConsent') {
                             handleSaveTelehealthConsent();
                           } else {
@@ -2062,6 +2508,8 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                             ? (!hasChanges || isSaving || isFormComplete) 
                             : form.id === 'mounjaroConsent'
                             ? (!mounjaroHasChanges || isSaving || isMounjaroFormComplete)
+                            : form.id === 'semaglutideConsent'
+                            ? (!semaglutideHasChanges || isSaving || isSemaglutideFormComplete)
                             : form.id === 'telemedicineConsent'
                             ? (!telehealthHasChanges || isSaving || isTelehealthFormComplete)
                             : activeTab === 0
@@ -2071,6 +2519,8 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                         {form.id === 'photographConsent' 
                           ? (isSaving ? 'Saving...' : 'Save') 
                           : form.id === 'mounjaroConsent'
+                          ? (isSaving ? 'Saving...' : 'Save')
+                          : form.id === 'semaglutideConsent'
                           ? (isSaving ? 'Saving...' : 'Save')
                           : form.id === 'telemedicineConsent'
                           ? (isSaving ? 'Saving...' : 'Save')
@@ -2083,6 +2533,8 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                             handleCompletePhotographConsent();
                           } else if (form.id === 'mounjaroConsent') {
                             handleCompleteMounjaroConsent();
+                          } else if (form.id === 'semaglutideConsent') {
+                            handleCompleteSemaglutideConsent();
                           } else if (form.id === 'telemedicineConsent') {
                             handleCompleteTelehealthConsent();
                           } else {
@@ -2105,6 +2557,8 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                             ? (!isPhotographConsentComplete() || isSaving || isFormComplete)
                             : form.id === 'mounjaroConsent'
                             ? (!isMounjaroConsentComplete() || isSaving || isMounjaroFormComplete)
+                            : form.id === 'semaglutideConsent'
+                            ? (!isSemaglutideConsentComplete() || isSaving || isSemaglutideFormComplete)
                             : form.id === 'telemedicineConsent'
                             ? (!isTelehealthConsentComplete() || isSaving || isTelehealthFormComplete)
                             : activeTab === forms.length - 1
@@ -2117,7 +2571,7 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                           }
                         }}
                       >
-                        {(form.id === 'photographConsent' || form.id === 'mounjaroConsent' || form.id === 'telemedicineConsent') && isSaving ? 'Completing...' : 'Complete'}
+                        {(form.id === 'photographConsent' || form.id === 'mounjaroConsent' || form.id === 'semaglutideConsent' || form.id === 'telemedicineConsent') && isSaving ? 'Completing...' : 'Complete'}
                       </Button>
         </Box>
                   </Box>
@@ -2145,9 +2599,11 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                 ? 'Telehealth consent completed and saved successfully!'
                 : wasMounjaroSaved
                   ? 'Mounjaro consent completed and saved successfully!'
-                  : wasCompleted 
-                    ? 'Photograph consent completed and saved successfully!' 
-                    : 'Photograph consent saved successfully!'}
+                  : wasSemaglutideSaved
+                    ? 'Semaglutide consent completed and saved successfully!'
+                    : wasCompleted 
+                      ? 'Photograph consent completed and saved successfully!' 
+                      : 'Photograph consent saved successfully!'}
           </Alert>
         </Snackbar>
       </Container>
