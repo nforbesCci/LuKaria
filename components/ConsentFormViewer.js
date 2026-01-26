@@ -94,6 +94,31 @@ const ConsentFormViewer = ({
           </Box>
         );
 
+      case 'semaglutide':
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Semaglutide Consent Form
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              <strong>Purpose of Treatment:</strong><br />
+              Semaglutide is a human-based glucagon-like peptide-1 receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Semaglutide is FDA approved for the management of Type 2 Diabetes, and is used off label for weight management in non-diabetic patients who are overweight or obese. These medicines work by slowing gastric emptying time and stimulating the satiety center in the brain to reduce hunger and appetite.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              <strong>Do not take Semaglutide if:</strong><br />
+              • You have a personal or family history of medullary thyroid carcinoma (Thyroid Cancer)<br />
+              • Multiple Endocrine Neoplasia syndrome type 2<br />
+              • You are pregnant or plan to become pregnant while taking this medicine<br />
+              • You are diabetic and/or taking any medications related to lowering your blood sugar levels without speaking with your endocrinologist
+              • You have a history of Pancreatitis<br />
+              • You are allergic to Semaglutide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Rybelsus®,Trulicity®, Victoza®, or Wegovy®<br />
+            </Typography>
+          </Box>
+        );
+
       default:
         return (
           <Typography variant="body2" color="text.secondary">

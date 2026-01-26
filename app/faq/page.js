@@ -25,7 +25,7 @@ import {
 export default function FAQ() {
   const { user } = useUser();
   const [mounted, setMounted] = useState(false);
-  const [expandedPanel, setExpandedPanel] = useState('ozempic');
+  const [expandedPanel, setExpandedPanel] = useState('mounjaro-what');
   const [activeTab, setActiveTab] = useState(0); // Default to Mounjaro (index 0)
 
   useEffect(() => {
@@ -38,6 +38,7 @@ export default function FAQ() {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    setExpandedPanel(newValue === 0 ? 'mounjaro-what' : 'semaglutide-what');
   };
 
 
@@ -82,8 +83,8 @@ export default function FAQ() {
       )}
       <SEO 
         title="FAQ - Frequently Asked Questions | Svelte by LuKaria"
-        description="Common questions about GLP-1 medications, Mounjaro, weight loss treatment, virtual consultations, and program details. Get answers to your weight loss questions."
-        keywords="GLP-1 FAQ, Mounjaro questions, weight loss answers, virtual consultation FAQ, medical weight loss questions, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+        description="Common questions about GLP-1 medications, Tirzepatide, weight loss treatment, virtual consultations, and program details. Get answers to your weight loss questions."
+        keywords="GLP-1 FAQ, Tirzepatide questions, weight loss answers, virtual consultation FAQ, medical weight loss questions, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/faq"
       />
       {/* Navigation Menu */}
@@ -274,12 +275,13 @@ export default function FAQ() {
                   },
                 }}
               >
-                <Tab label="Mounjaro" />
+                <Tab label="Tirzepatide" />
+                <Tab label="Semaglutide" />
               </Tabs>
             </Box>
 
             <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-            {/* Mounjaro Tab Content */}
+            {/* Tirzepatide Tab Content */}
             {activeTab === 0 && (
               <Box>
                 <Accordion 
@@ -303,12 +305,12 @@ export default function FAQ() {
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
-                      What is Mounjaro?
+                      What is Tirzepatide?
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
                     <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
-                      Mounjaro is a human-based glucagon-like peptide-1 receptor agonist and Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
+                      Tirzepatide is a human-based glucagon-like peptide-1 receptor agonist and Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
@@ -334,12 +336,12 @@ export default function FAQ() {
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
-                      How does Mounjaro Work?
+                      How does Tirzepatide Work?
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
                     <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
-                      Mounjaro works by regulating your blood sugar and decreasing how much food you eat. Mounjaro also assists the body to store fat more efficiently.
+                      Tirzepatide works by regulating your blood sugar and decreasing how much food you eat. Tirzepatide also assists the body to store fat more efficiently.
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
@@ -365,12 +367,12 @@ export default function FAQ() {
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
-                      How Do I Take Mounjaro?
+                      How Do I Take Tirzepatide?
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
                     <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
-                      Mounjaro is injected under the skin 1 time each week at any time of the day. It may be injected under the skin of the abdomen, thigh or back of the arm. You should alternate the injection site with each injection.
+                      Tirzepatide is injected under the skin 1 time each week at any time of the day. It may be injected under the skin of the abdomen, thigh or back of the arm. You should alternate the injection site with each injection.
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
@@ -396,12 +398,12 @@ export default function FAQ() {
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
-                      How much weight can I lose while taking Mounjaro?
+                      How much weight can I lose while taking Tirzepatide?
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
                     <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
-                      Individual results may vary. In studies with Mounjaro adults were able to lose up to 22.5% of their body weight.
+                      Individual results may vary. In studies with Tirzepatide adults were able to lose up to 22.5% of their body weight.
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
@@ -427,7 +429,7 @@ export default function FAQ() {
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
-                      What are the possible side effects of taking Mounjaro?
+                      What are the possible side effects of taking Tirzepatide?
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
@@ -451,6 +453,177 @@ export default function FAQ() {
               </Box>
             )}
 
+            {/* Semaglutide Tab Content */}
+            {activeTab === 1 && (
+              <Box>
+                <Accordion 
+                  expanded={expandedPanel === 'semaglutide-what'}
+                  onChange={handleAccordionChange('semaglutide-what')}
+                  sx={{ 
+                    backgroundColor: '#36454F',
+                    color: 'white',
+                    '&:before': { display: 'none' },
+                    '&.Mui-expanded': { margin: '0' }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
+                    aria-controls="semaglutide-what-content"
+                    id="semaglutide-what-header"
+                    sx={{ 
+                      backgroundColor: '#36454F',
+                      color: 'white',
+                      '&:hover': { backgroundColor: '#2C3E50' }
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
+                      What is Semaglutide?
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
+                    Semaglutide is a human-based glucagon-like peptide-1 receptor agonist (GLP1- RA) prescribed as an adjunct to a reduced-calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+
+                <Accordion
+                  expanded={expandedPanel === 'semaglutide-how-works'}
+                  onChange={handleAccordionChange('semaglutide-how-works')}
+                  sx={{ 
+                    backgroundColor: '#36454F',
+                    color: 'white',
+                    '&:before': { display: 'none' },
+                    '&.Mui-expanded': { margin: '0' }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
+                    aria-controls="semaglutide-how-works-content"
+                    id="semaglutide-how-works-header"
+                    sx={{ 
+                      backgroundColor: '#36454F',
+                      color: 'white',
+                      '&:hover': { backgroundColor: '#2C3E50' }
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
+                      How does Semaglutide Work?
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
+                    Semaglutide works by slowing gastric emptying time and stimulating the satiety center in the brain to reduce hunger and appetite.
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+
+                <Accordion
+                  expanded={expandedPanel === 'semaglutide-how-take'}
+                  onChange={handleAccordionChange('semaglutide-how-take')}
+                  sx={{ 
+                    backgroundColor: '#36454F',
+                    color: 'white',
+                    '&:before': { display: 'none' },
+                    '&.Mui-expanded': { margin: '0' }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
+                    aria-controls="semaglutide-how-take-content"
+                    id="semaglutide-how-take-header"
+                    sx={{ 
+                      backgroundColor: '#36454F',
+                      color: 'white',
+                      '&:hover': { backgroundColor: '#2C3E50' }
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
+                      How Do I Take Semaglutide?
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
+                    Semaglutide is injected under the skin 1 time each week at any time of the day. It may be injected under the skin of the abdomen, thigh or back of the arm. You should alternate the injection site with each injection
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+
+                <Accordion
+                  expanded={expandedPanel === 'semaglutide-weight-loss'}
+                  onChange={handleAccordionChange('semaglutide-weight-loss')}
+                  sx={{ 
+                    backgroundColor: '#36454F',
+                    color: 'white',
+                    '&:before': { display: 'none' },
+                    '&.Mui-expanded': { margin: '0' }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
+                    aria-controls="semaglutide-weight-loss-content"
+                    id="semaglutide-weight-loss-header"
+                    sx={{ 
+                      backgroundColor: '#36454F',
+                      color: 'white',
+                      '&:hover': { backgroundColor: '#2C3E50' }
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
+                      How much weight can I lose while taking Semaglutide?
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
+                    Individual results vary. In studies, adults taking Semaglutide lost up to 20% of their body weight.
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+
+                <Accordion
+                  expanded={expandedPanel === 'semaglutide-side-effects'}
+                  onChange={handleAccordionChange('semaglutide-side-effects')}
+                  sx={{ 
+                    backgroundColor: '#36454F',
+                    color: 'white',
+                    '&:before': { display: 'none' },
+                    '&.Mui-expanded': { margin: '0' }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore sx={{ color: '#877449' }} />}
+                    aria-controls="semaglutide-side-effects-content"
+                    id="semaglutide-side-effects-header"
+                    sx={{ 
+                      backgroundColor: '#36454F',
+                      color: 'white',
+                      '&:hover': { backgroundColor: '#2C3E50' }
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#877449' }}>
+                      What are the possible side effects of taking Semaglutide?
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ backgroundColor: '#36454F', color: 'white' }}>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, color: 'white' }}>
+                      The most common side effects include nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, dyspepsia, dizziness, abdominal distension, belching, hypoglycemia, flatulence, gastroenteritis, and gastroesophageal reflux disease.
+                    </Typography>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, mt: 2, color: 'white' }}>
+                      You may also experience common injection site reactions characterized by itching, burning at site of administration with or without thickening of the skin(welting).
+                    </Typography>
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, mt: 2, fontWeight: 600, color: 'white' }}>
+                      More serious side effects are possible with use. Talk to your doctor about possible serious side effects.
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+                
+                <Box sx={{ mt: 3, p: 2, backgroundColor: '#2C3E50', borderRadius: 1 }}>
+                  <Typography variant="body1" sx={{ color: '#877449', fontWeight: 600, textAlign: 'center' }}>
+                    Let your doctor know if you take birth control pills or are having a surgery or other procedure involving anaesthesia. Let your doctor know if you are pregnant or breastfeeding.
+                  </Typography>
+                </Box>
+              </Box>
+            )}
 
             </Box>
           </Card>

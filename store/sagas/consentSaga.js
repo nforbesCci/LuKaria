@@ -8,6 +8,10 @@ import {
   saveMounjaroConsentFailure,
   fetchMounjaroConsentSuccess,
   fetchMounjaroConsentFailure,
+  saveSemaglutideConsentSuccess,
+  saveSemaglutideConsentFailure,
+  fetchSemaglutideConsentSuccess,
+  fetchSemaglutideConsentFailure,
   saveTelehealthConsentSuccess,
   saveTelehealthConsentFailure,
   fetchTelehealthConsentSuccess,
@@ -206,6 +210,102 @@ export function* watchFetchMounjaroConsent() {
   yield takeEvery('consent/fetchMounjaroConsent', fetchMounjaroConsentSaga);
 }
 
+// API call to save semaglutide consent to MongoDB
+function* saveSemaglutideConsentToDatabase(consentData) {
+  try {
+    const response = yield call(fetch, '/api/consent/semaglutide/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(consentData),
+    });
+
+    if (!response.ok) {
+      const errorData = yield response.json();
+      console.error('❌ Consent Saga: API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorData.details || errorData.error || 'Unknown error'}`);
+    }
+
+    const result = yield response.json();
+    return result;
+  } catch (error) {
+    console.error('Error saving semaglutide consent to database:', error);
+    throw error;
+  }
+}
+
+// Saga to handle semaglutide consent saving
+function* saveSemaglutideConsentSaga(action) {
+  try {
+    console.log('🔄 Consent Saga: Starting semaglutide consent save...', action.payload);
+    
+    const result = yield call(saveSemaglutideConsentToDatabase, action.payload);
+    
+    console.log('✅ Consent Saga: Semaglutide consent saved successfully', result);
+    
+    yield put(saveSemaglutideConsentSuccess(result.data));
+  } catch (error) {
+    console.error('❌ Consent Saga: Error saving semaglutide consent', error);
+    yield put(saveSemaglutideConsentFailure(error.message));
+  }
+}
+
+// Watch for semaglutide consent save actions
+export function* watchSaveSemaglutideConsent() {
+  yield takeEvery('consent/saveSemaglutideConsent', saveSemaglutideConsentSaga);
+}
+
+// API call to fetch semaglutide consent from MongoDB
+function* fetchSemaglutideConsentFromDatabase() {
+  try {
+    const response = yield call(fetch, '/api/consent/semaglutide/fetch', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = yield response.json();
+      console.error('❌ Consent Saga: API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorData.details || errorData.error || 'Unknown error'}`);
+    }
+
+    const result = yield response.json();
+    return result;
+  } catch (error) {
+    console.error('Error fetching semaglutide consent from database:', error);
+    throw error;
+  }
+}
+
+// Saga to handle semaglutide consent fetching
+function* fetchSemaglutideConsentSaga(action) {
+  try {
+    console.log('🔄 Consent Saga: Starting semaglutide consent fetch...');
+    
+    const result = yield call(fetchSemaglutideConsentFromDatabase);
+    
+    console.log('✅ Consent Saga: Semaglutide consent fetched successfully');
+    console.log('Result structure:', {
+      success: result.success,
+      hasData: !!result.data,
+      dataKeys: result.data ? Object.keys(result.data) : []
+    });
+    
+    yield put(fetchSemaglutideConsentSuccess(result.data));
+  } catch (error) {
+    console.error('❌ Consent Saga: Error fetching semaglutide consent', error);
+    yield put(fetchSemaglutideConsentFailure(error.message));
+  }
+}
+
+// Watch for semaglutide consent fetch actions
+export function* watchFetchSemaglutideConsent() {
+  yield takeEvery('consent/fetchSemaglutideConsent', fetchSemaglutideConsentSaga);
+}
+
 // API call to save telehealth consent to MongoDB
 function* saveTelehealthConsentToDatabase(consentData) {
   try {
@@ -308,6 +408,8 @@ export default function* consentSaga() {
     watchFetchPhotographConsent(),
     watchSaveMounjaroConsent(),
     watchFetchMounjaroConsent(),
+    watchSaveSemaglutideConsent(),
+    watchFetchSemaglutideConsent(),
     watchSaveTelehealthConsent(),
     watchFetchTelehealthConsent(),
   ]);
