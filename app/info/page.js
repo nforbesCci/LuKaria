@@ -401,15 +401,7 @@ export default function InfoPage() {
                   </Box>
                 </Paper>
 
-                <Paper elevation={3} sx={{ p: 2, backgroundColor: '#36454F', border: '1px solid #877449' }}>
-                  <Typography variant="body2" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                    Limited time introductory offer 
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#877449' }}>
-                    • 50% Discount on initial consultation<br />
-                    • 5% discount on first month's medication
-                  </Typography>
-                </Paper>
+               
               </CardContent>
             </Card>
           </Grid>
