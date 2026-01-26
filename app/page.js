@@ -789,21 +789,16 @@ export default function Home() {
                     </Typography>
                   </Box>
                   
-                  {/* Limited time offer text */}
-                  <Box sx={{ mb: 2, color: '#877449', textAlign: 'center', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
-                    <Typography variant="h6" sx={{ color: '#877449', fontWeight: '600', fontSize: '1.1rem' }}>
-                      Limited Time Introductory Offers
-                    </Typography>
-                  </Box>
+                 
                   
                   {/* Exclusive offers bullet points */}
                   <Box sx={{ mb: 3, color: '#877449', textAlign: 'left', maxWidth: '600px', mx: 'auto', position: 'relative', zIndex: 1 }}>
                     <Box component="ul" sx={{ pl: 2, mb: 0 }}>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>50% off consultation fees with our physician </strong>
+                        <strong>Exclusive access to meal prep and delivery services</strong>
                       </Typography>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>Receive a discount on your first 4 week supply of medication</strong>
+                        <strong>Expertly curated add on options built for your journey</strong>
                       </Typography>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
                         <strong>Svelte referral program- receive premium benefits just for referring others</strong>
