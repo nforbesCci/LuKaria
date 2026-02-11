@@ -943,15 +943,15 @@ Svelte by LuKaria will only use your photographs if you have given permission to
     },
     {
       id: 'mounjaroConsent',
-      title: 'Mounjaro Consent',
-      description: 'Consent for Mounjaro (tirzepatide) treatment',
+      title: 'Tirzepatide Consent',
+      description: 'Consent for Tirzepatide treatment',
       hasCustomFields: true,
       content: `Purpose of Treatment:
-Mounjaro is a human-based glucagon-like peptide-1 receptor agonist and Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
+Tirzepatide is a human-based glucagon-like peptide-1 receptor agonist and Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist prescribed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
 
-Mounjaro is FDA approved for the management of Type 2 Diabetes, and is used off label for weight management in non-diabetic patients who are overweight or obese. It works by increasing insulin production and lowers glucagon secretion as well as targets areas in the brain that regulate appetite and food intake. Mounjaro also assists the body to store fat more efficiently.
+Tirzepatide is FDA approved for the management of Type 2 Diabetes, and is used off label for weight management in non-diabetic patients who are overweight or obese. It works by increasing insulin production and lowers glucagon secretion as well as targets areas in the brain that regulate appetite and food intake. Tirzepatide also assists the body to store fat more efficiently.
 
-Do not take Mounjaro if:
+Do not take Tirzepatide if:
 • You have a personal or family history of medullary thyroid carcinoma (Thyroid Cancer)
 • Multiple Endocrine Neoplasia syndrome type 2
 • You are pregnant or plan to become pregnant while taking this medicine
@@ -963,7 +963,7 @@ Possible Drug Interactions:
 Anti-diabetic agents, specifically: Insulin and Sulfonylureas (e.g., glyburide, glipizide, glimepiride, tolbutamide) due to the increased risk of hypoglycemia (low blood sugar). Do not take with other GLP-1 agonist medicines such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®,Trulicity®, Victoza®, Wegovy® (THIS IS NOT AN ALL-INCLUSIVE LIST). Please tell your provider about any medications that may lower your blood sugar.
 
 Side Effects:
-I understand that, like all medications, Mounjaro may cause side effects. These may include but are not limited to:
+I understand that, like all medications, Tirzepatide may cause side effects. These may include but are not limited to:
 • Nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, dyspepsia, dizziness, abdominal distension, belching, hypoglycemia, flatulence, gastroenteritis, and gastroesophageal reflux disease.
 • Subcutaneous Injections: common injection site reactions characterized by itching, burning at site of administration with or without thickening of the skin(welting)
 • Serious side effects: Pancreatitis, Cholecystitis, kidney problems, changes in vision (Diabetic retinopathy and NAION), low blood sugar (hypoglycemia), gastroparesis
@@ -986,13 +986,13 @@ I agree to undergo regular monitoring as recommended by my healthcare provider, 
 • Pregnancy testing
 • Follow-up visits to evaluate the effectiveness and adjust the treatment plan if necessary
 
-Alternatives to Mounjaro:
+Alternatives to Tirzepatide:
 I have been informed of alternative treatment options, which may include lifestyle changes (such as diet and exercise), other medications for type 2 diabetes or weight management, and surgical options for weight loss.
 
 Consent:
 By signing below, I certify that I have read and understand the contents of this form. I acknowledge that:
-• I consent to initiating/continuing treatment with Mounjaro
-• I have had the opportunity to ask questions about Mounjaro and its potential risks and benefits.
+• I consent to initiating/continuing treatment with Tirzepatide
+• I have had the opportunity to ask questions about Tirzepatide and its potential risks and benefits.
 • I have a proper laboratory testing done prior to starting treatment
 • I am aware of the possible side effects and drug interactions and give my consent for treatment
 • I have informed the medical staff of any known allergies to drugs or other substances, and any past adverse reactions I've experienced. I have informed the medical staff of all medications and supplements I'm currently taking
@@ -1013,7 +1013,7 @@ Do not take Semaglutide if:
 • You are pregnant or plan to become pregnant while taking this medicine
 • You are diabetic and/or taking any medications related to lowering your blood sugar levels without speaking with your endocrinologist. Specifically, if you are prescribed Insulin because the combination may increase your risk of hypoglycemia (low blood sugar) and dosage adjustments by your provider may be necessary
 • You have a history of Pancreatitis
-• You are allergic to Semaglutide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Mounjaro®, Ozempic®, Rybelsus®, Trulicity®, Victoza®, Wegovy®
+• You are allergic to Semaglutide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Tirzepatide, Ozempic®, Rybelsus®, Trulicity®, Victoza®, Wegovy®
 
 Possible Drug Interactions:
 Anti-diabetic agents, specifically: Insulin and Sulfonylureas (e.g., glyburide, glipizide, glimepiride, tolbutamide) due to the increased risk of hypoglycemia (low blood sugar). Do not take with other GLP-1 agonist medicines such as: Adlyxin®, Byeta®, Bydureon®, Rybelsus®,Trulicity®, Victoza®, or Wegovy® (THIS IS NOT AN ALL-INCLUSIVE LIST). Please tell your provider about any medications that may lower your blood sugar.

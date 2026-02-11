@@ -1,217 +1,76 @@
 'use client';
 
+import Link from 'next/link';
+import { useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Header from '../../components/Header';
-import WeightHeightEntry from '../../components/WeightHeightEntry';
-import PrepareQuestions from '../../components/PrepareQuestions';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { fetchPreAppointmentTaskAction, updatePreAppointmentTaskAction, loadQuestions } from '../../store/slices/appointmentSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProfile } from '../../store/slices/profileSlice';
-import { fetchMeasurements } from '../../store/slices/measurementsSlice';
-import { useBasicAccess } from '../../hooks/useAccessControl';
+import { canAccessPage, useBasicAccess } from '../../hooks/useAccessControl';
 import {
   Container,
   Typography,
   Card,
   CardContent,
+  CardActionArea,
   Button,
   Box,
-  Stack,
   Alert,
   CircularProgress,
   Grid,
-  Paper,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Chip,
 } from '@mui/material';
 import {
-  Person,
-  CheckCircle,
-  Warning,
   Login,
-  PersonAdd,
-  Visibility,
-  Assignment,
-  CheckCircleOutline,
-  Close,
+  Dashboard,
+  Person,
   Description,
+  Groups,
+  MedicalServices,
+  Scale,
+  Medication,
+  Restaurant,
+  AdminPanelSettings,
+  Schedule,
+  Report,
 } from '@mui/icons-material';
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const { user, isLoading, error } = useUser();
-  const router = useRouter();
   const dispatch = useAppDispatch();
-  const [mounted, setMounted] = useState(false);
-  const [showWeightHeightEntry, setShowWeightHeightEntry] = useState(false);
-  const [showPrepareQuestions, setShowPrepareQuestions] = useState(false);
-  const [weightHeightEntryKey, setWeightHeightEntryKey] = useState(0); // Force remount on each open
-  
-  // Redux state
-  const preAppointmentTasks = useAppSelector((state) => state.appointment.preAppointmentTasks);
-  const preAppointmentTasksLoading = useAppSelector((state) => state.appointment.preAppointmentTasksLoading);
-  const preAppointmentTasksLoaded = useAppSelector((state) => state.appointment.preAppointmentTasksLoaded);
-  const preAppointmentTasksError = useAppSelector((state) => state.appointment.preAppointmentTasksError);
-  const questions = useAppSelector((state) => state.appointment.questions);
   const profileState = useAppSelector((state) => state.profile);
-  const measurementsState = useAppSelector((state) => state.measurements);
-  const consentState = useAppSelector((state) => state.consent);
-
 
   // Access control - only Admin and Patient can access
   useBasicAccess();
 
   useEffect(() => {
-    setMounted(true);
-    
-    // Load questions data using saga
-    console.log('📊 Dashboard: Loading questions data...');
-    dispatch(loadQuestions());
-    
-    // Load profile data using saga
-    console.log('📊 Dashboard: Loading profile data...');
     dispatch(fetchProfile());
-    
-    // Load measurements data using saga
-    console.log('📊 Dashboard: Loading measurements data...');
-    dispatch(fetchMeasurements());
-
-    // Load pre-appointment tasks using saga
-    console.log('📊 Dashboard: Loading pre-appointment tasks...');
-    dispatch(fetchPreAppointmentTaskAction());
-    
-
   }, [dispatch]);
 
-
-  // Debug: Log measurements data when it changes
-  useEffect(() => {
-    if (measurementsState.isLoaded && measurementsState.measurements) {
-      console.log('📏 Dashboard: Measurements loaded successfully:', measurementsState.measurements);
-      
-      // If measurements exist, mark weight/height task as complete
-      if (measurementsState.measurements && measurementsState.measurements.exists) {
-        console.log('✅ Dashboard: Measurements exist, marking weight/height task as complete');
-        dispatch(updatePreAppointmentTaskAction({ 
-          taskKey: 'enterWeightHeight', 
-          completed: true 
-        }));
-      }
-    }
-    if (measurementsState.error) {
-      console.log('❌ Dashboard: Measurements load error:', measurementsState.error);
-    }
-  }, [measurementsState.isLoaded, measurementsState.measurements, measurementsState.error, dispatch]);
-
-  // Debug: Log questions data when it changes
-  useEffect(() => {
-    if (questions) {
-      console.log('❓ Dashboard: Questions data:', questions);
-    }
-  }, [questions]);
-
-
-  // Update consent forms task based on completion status
-  useEffect(() => {
-    if (consentState.isLoaded) {
-      // Only checking telehealth consent since photograph and mounjaro are hidden
-      const telehealthComplete = consentState.telehealthConsent?.data?.complete === true;
-      
-      console.log('✅ Dashboard: Consent forms completion status:', {
-        telehealth: telehealthComplete
-      });
-      
-      if (telehealthComplete) {
-        console.log('✅ Dashboard: Marking consent forms task as complete');
-        dispatch(updatePreAppointmentTaskAction({ 
-          taskKey: 'completeConsentForms', 
-          completed: true 
-        }));
-      }
-    }
-  }, [consentState.isLoaded, consentState.telehealthConsent, dispatch]);
-
-  // Function to determine if prepareQuestions task is completed
-  const isPrepareQuestionsCompleted = () => {
-    if (!questions) return false;
-    
-    // Check if user has questions or explicitly marked "no questions"
-    return (questions.questions && questions.questions.trim().length > 0) || 
-           questions.noQuestions === true;
-  };
-
-  // Function to determine if all consent forms are completed
-  const areAllConsentFormsComplete = () => {
-    if (!preAppointmentTasksLoaded || !preAppointmentTasks) {
-      return false;
-    }
-   
-    
-    // Only checking telehealth consent since photograph and mounjaro are hidden
-
-    
-    return preAppointmentTasks.completeConsentForms;
-  };
-
-  // Function to check if all pre-appointment tasks are complete
-  const areAllPreAppointmentTasksComplete = () => {
-    if (!preAppointmentTasksLoaded || !preAppointmentTasks) {
-      return false;
-    }
-    const profileComplete = preAppointmentTasks.completeMedicalProfile;
-    const questionsComplete = preAppointmentTasks.prepareQuestions;
-    const consentFormsComplete = preAppointmentTasks.completeConsentForms;
-    const measurementsComplete = preAppointmentTasks.enterWeightHeight;
-    
-    const allComplete = profileComplete && questionsComplete && consentFormsComplete && measurementsComplete;
-    
-
-    
-    return allComplete;
-  };
-
-  // Handler for weight/height entry completion
-  const handleWeightHeightComplete = (data) => {
-    // Mark the task as complete
-    dispatch(updatePreAppointmentTaskAction({ 
-      taskKey: 'enterWeightHeight', 
-      completed: true 
-    }));
-    
-    // Hide the weight/height entry component and increment key to force remount next time
-    setShowWeightHeightEntry(false);
-    setWeightHeightEntryKey(prev => prev + 1);
-    
-    // In a real app, you might want to save the data to the backend
-    console.log('Weight/Height data saved:', data);
-  };
-
-  // Handler for going back from weight/height entry
-  const handleWeightHeightBack = () => {
-    setShowWeightHeightEntry(false);
-    setWeightHeightEntryKey(prev => prev + 1);
-  };
-
-  // Handler for prepare questions completion
-  const handlePrepareQuestionsComplete = (data) => {
-    // Note: Task completion is now determined by store state, not manually set
-    // The isPrepareQuestionsCompleted() function will check if questions exist in store
-    
-    // Hide the prepare questions component
-    setShowPrepareQuestions(false);
-    
-
-  };
-
-  // Handler for going back from prepare questions
-  const handlePrepareQuestionsBack = () => {
-    setShowPrepareQuestions(false);
-  };
+  const navigationCards = [
+    ...(canAccessPage(user, 'basic', profileState.profile)
+      ? [
+          { text: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
+          { text: 'Profile', path: '/profile', icon: <Person /> },
+          { text: 'Consent Forms', path: '/consent-forms', icon: <Description /> },
+        ]
+      : []),
+    ...(canAccessPage(user, 'consultation', profileState.profile)
+      ? [
+          { text: 'Membership Area', path: '/membership', icon: <Groups /> },
+          { text: 'Side Effects', path: '/side-effects', icon: <MedicalServices /> },
+          { text: 'Weight Logging', path: '/weight-logging', icon: <Scale /> },
+          { text: 'Medication Tracker', path: '/medication-tracker', icon: <Medication /> },
+          { text: 'Meal Tracker', path: '/meal-tracker', icon: <Restaurant /> },
+        ]
+      : []),
+    ...(canAccessPage(user, 'admin', profileState.profile)
+      ? [
+          { text: 'Administration', path: '/admin', icon: <AdminPanelSettings /> },
+          { text: 'Reschedule Requests', path: '/admin/reschedule-requests', icon: <Schedule /> },
+          { text: 'Side Effects Reports', path: '/admin/side-effects', icon: <Report /> },
+        ]
+      : []),
+  ].filter((item) => item.path !== '/dashboard');
 
   if (isLoading) {
     return (
@@ -267,34 +126,6 @@ export default function Dashboard() {
     );
   }
 
-  // Show WeightHeightEntry component if active
-  if (showWeightHeightEntry) {
-    console.log('📝 Dashboard: Rendering WeightHeightEntry component with key:', weightHeightEntryKey);
-    return (
-      <>
-        <Header />
-        <WeightHeightEntry
-          key={`weight-height-entry-${weightHeightEntryKey}`} // Dynamic key forces remount each time
-          onComplete={handleWeightHeightComplete}
-          onBack={handleWeightHeightBack}
-        />
-      </>
-    );
-  }
-
-  // Show PrepareQuestions component if active
-  if (showPrepareQuestions) {
-    return (
-      <>
-        <Header />
-        <PrepareQuestions
-          onComplete={handlePrepareQuestionsComplete}
-          onBack={handlePrepareQuestionsBack}
-        />
-      </>
-    );
-  }
-
   return (
     <>
       <Header />
@@ -316,219 +147,56 @@ export default function Dashboard() {
           Welcome to your dashboard, {user.name}!
         </Typography>
 
-        {/* Pre-Appointment Tasks */}
         <Card sx={{ mb: 4, backgroundColor: '#1a1a1a' }}>
           <CardContent>
-            {preAppointmentTasksLoading && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <CircularProgress size={20} />
-                <Typography variant="body2">Loading pre-appointment tasks...</Typography>
-              </Box>
-            )}
-
-            {!preAppointmentTasksLoading && preAppointmentTasksError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                Unable to load pre-appointment tasks. Please try again later.
-              </Alert>
-            )}
-
-            {preAppointmentTasksLoaded && !preAppointmentTasksError && (
-              <>
-                <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-                  <Assignment sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Pre-Appointment Tasks
-                </Typography>
-                
-                <Grid container spacing={2}>
-                  {[
-                    {
-                      key: 'completeMedicalProfile',
-                      title: 'Complete Medical Profile',
-                      description: 'Update your health information and medical history',
-                      path: '/profile',
-                      icon: <Person />
-                    },
-                    {
-                      key: 'prepareQuestions',
-                      title: 'Prepare Questions',
-                      description: 'Write down any questions or concerns you\'d like to discuss',
-                      path: '/profile',
-                      icon: <Assignment />
-                    },
-                    {
-                      key: 'completeConsentForms',
-                      title: 'Complete Consent Forms',
-                      description: 'Review and sign required consent forms',
-                      path: '/consent-forms',
-                      icon: <Description />
-                    },
-                    {
-                      key: 'enterWeightHeight',
-                      title: 'Enter Weight and Height',
-                      description: 'Log your current weight and height measurements',
-                      path: '/weight-logging',
-                      icon: <Assignment />
-                    }
-                  ].map((task) => (
-                    <Grid item xs={12} sm={6} key={task.key}>
-                      {task.key === 'enterWeightHeight' ? (
-                        <Box
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('📝 Dashboard: Clicked Enter Weight and Height, opening form...');
-                            setWeightHeightEntryKey(prev => prev + 1); // Increment key to force remount
-                            setShowWeightHeightEntry(true);
-                          }}
-                          sx={{ 
-                            display: 'flex',
-                            alignItems: 'center',
-                            p: 2,
-                            borderRadius: 1,
-                            cursor: 'pointer',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            '&:hover': {
-                              backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                              borderColor: '#877449'
-                            }
-                          }}
+            <Typography variant="h6" gutterBottom sx={{ mb: 2, color: '#877449' }}>
+              Quick Navigation
+            </Typography>
+            <Grid container spacing={2}>
+              {navigationCards.map((item) => (
+                <Grid item xs={12} sm={6} md={4} key={item.path}>
+                  <Card
+                    sx={{
+                      height: '100%',
+                      minHeight: 180,
+                      backgroundColor: '#83754b',
+                      border: '1px solid rgba(135, 116, 73, 0.35)',
+                    }}
+                  >
+                    <CardActionArea
+                      component={Link}
+                      href={item.path}
+                      sx={{
+                        height: '100%',
+                        p: 3,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        '&:hover': { backgroundColor: 'rgba(212, 175, 55, 0.08)' },
+                      }}
+                    >
+                      <Box sx={{ color: '#FFFFFF', mb: 1 }}>
+                        {item.icon}
+                      </Box>
+                      <Box>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ color: '#FFFFFF', fontWeight: 600, fontSize: '1.5rem' }}
                         >
-                          <Box sx={{ mr: 2 }}>
-                            {preAppointmentTasks[task.key] ? (
-                              <CheckCircle sx={{ color: 'success.main' }} />
-                            ) : (
-                              <Close sx={{ color: 'error.main' }} />
-                            )}
-                          </Box>
-                          <Box>
-                            <Typography 
-                              variant="subtitle1"
-                              component="div"
-                              sx={{
-                                color: preAppointmentTasks[task.key] ? 'success.main' : 'error.main',
-                                fontWeight: preAppointmentTasks[task.key] ? 'bold' : 'normal',
-                                mb: 0.5
-                              }}
-                            >
-                              {task.title}
-                            </Typography>
-                            <Typography 
-                              variant="body2"
-                              component="div"
-                              sx={{
-                                color: preAppointmentTasks[task.key] ? 'success.dark' : 'error.dark'
-                              }}
-                            >
-                              {task.description}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ) : task.key === 'prepareQuestions' ? (
-                        <Box
-                          onClick={() => setShowPrepareQuestions(true)}
-                          sx={{ 
-                            display: 'flex',
-                            alignItems: 'center',
-                            p: 2,
-                            borderRadius: 1,
-                            cursor: 'pointer',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            '&:hover': {
-                              backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                              borderColor: '#877449'
-                            }
-                          }}
-                        >
-                          <Box sx={{ mr: 2 }}>
-                            {preAppointmentTasks.prepareQuestions ? (
-                              <CheckCircle sx={{ color: 'success.main' }} />
-                            ) : (
-                              <Close sx={{ color: 'error.main' }} />
-                            )}
-                          </Box>
-                          <Box>
-                            <Typography 
-                              variant="subtitle1"
-                              component="div"
-                              sx={{
-                                color:  preAppointmentTasks.prepareQuestions ? 'success.main' : 'error.main',
-                                fontWeight: preAppointmentTasks.prepareQuestions ? 'bold' : 'normal',
-                                mb: 0.5
-                              }}
-                            >
-                              {task.title}
-                            </Typography>
-                            <Typography 
-                              variant="body2"
-                              component="div"
-                              sx={{
-                                color: preAppointmentTasks.prepareQuestions ? 'success.dark' : 'error.dark'
-                              }}
-                            >
-                              {task.description}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Link href={task.path} style={{ textDecoration: 'none' }}>
-                          <Box
-                            sx={{ 
-                              display: 'flex',
-                              alignItems: 'center',
-                              p: 2,
-                              borderRadius: 1,
-                              cursor: 'pointer',
-                              border: '1px solid',
-                              borderColor: 'divider',
-                              '&:hover': {
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                borderColor: '#877449'
-                              }
-                            }}
-                          >
-                            <Box sx={{ mr: 2 }}>
-                              {(task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? (
-                                <CheckCircle sx={{ color: 'success.main' }} />
-                              ) : (
-                                <Close sx={{ color: 'error.main' }} />
-                              )}
-                            </Box>
-                            <Box>
-                              <Typography 
-                                variant="subtitle1"
-                                component="div"
-                                sx={{
-                                  color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.main' : 'error.main',
-                                  fontWeight: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'bold' : 'normal',
-                                  mb: 0.5
-                                }}
-                              >
-                                {task.title}
-                              </Typography>
-                              <Typography 
-                                variant="body2"
-                                component="div"
-                                sx={{
-                                  color: (task.key === 'completeConsentForms' ? areAllConsentFormsComplete() : preAppointmentTasks[task.key]) ? 'success.dark' : 'error.dark'
-                                }}
-                              >
-                                {task.description}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Link>
-                      )}
-                    </Grid>
-                  ))}
+                          {item.text}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Open {item.text.toLowerCase()}.
+                        </Typography>
+                      </Box>
+                    </CardActionArea>
+                  </Card>
                 </Grid>
-              </>
-            )}
+              ))}
+            </Grid>
           </CardContent>
         </Card>
-        
-
       </Container>
     </>
   );
