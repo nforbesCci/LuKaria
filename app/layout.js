@@ -106,6 +106,8 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
+        <script src="/index.html" />
+       
       </head>
             <body suppressHydrationWarning={true}>
               <UserProvider>
