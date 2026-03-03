@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { saveMeasurements, fetchMeasurements } from '../store/slices/measurementsSlice';
+import { saveMeasurements, fetchMeasurements, clearSaveStatus } from '../store/slices/measurementsSlice';
 import {
   Box,
   Typography,
@@ -24,42 +24,56 @@ import {
 } from '@mui/icons-material';
 
 export default function WeightHeightEntry({ onComplete, onBack }) {
+  console.log('📝 WeightHeightEntry: Component rendered/mounted');
   const [weight, setWeight] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
   const [heightInches, setHeightInches] = useState('');
+  const hasHandledSaveRef = React.useRef(false); // Track if we've handled a save in this mount
   
   const dispatch = useAppDispatch();
   const measurementsState = useAppSelector((state) => state.measurements);
 
-  // Load saved measurements when component mounts
+  // Reset save state when component mounts to prevent auto-closing from previous save
   useEffect(() => {
-    console.log('📊 Measurements: Loading measurements data...');
+    console.log('📊 Measurements: Component mounted, resetting save state...');
+    hasHandledSaveRef.current = false;
+    // Clear the isSaved flag to prevent auto-closing from a previous save
+    dispatch(clearSaveStatus());
     dispatch(fetchMeasurements());
-  }, [dispatch]);
+  }, [dispatch]); // Only run on mount
 
-  // Handle measurements save success/failure
+  // Handle measurements save success/failure - only trigger once per save
   useEffect(() => {
-    if (measurementsState.isSaved && measurementsState.measurements) {
+    if (measurementsState.isSaved && measurementsState.measurements && !hasHandledSaveRef.current) {
       console.log('✅ Measurements: Measurements saved successfully');
+      hasHandledSaveRef.current = true; // Mark that we've handled this save
+      // Refetch measurements to get the latest data
+      dispatch(fetchMeasurements());
       onComplete(measurementsState.measurements);
     }
     if (measurementsState.error) {
       console.error('❌ Measurements: Error saving measurements:', measurementsState.error);
       alert(`Error saving measurements: ${measurementsState.error}`);
     }
-  }, [measurementsState.isSaved, measurementsState.measurements, measurementsState.error, onComplete]);
+  }, [measurementsState.isSaved, measurementsState.measurements, measurementsState.error, onComplete, dispatch]);
 
-  // Load existing measurements data when fetched
+  // Load existing measurements data when fetched - always allow editing
   useEffect(() => {
     if (measurementsState.isLoaded && measurementsState.measurements && measurementsState.measurements.exists) {
       console.log('👤 Measurements: Loading existing measurements data from store:', measurementsState.measurements);
       
       const measurementsData = measurementsState.measurements.measurements;
+      // Always update form with latest data - user can edit and save again
       setWeight(measurementsData.weight?.toString() || '');
       setHeightFeet(measurementsData.heightFeet?.toString() || '');
       setHeightInches(measurementsData.heightInches?.toString() || '');
       
-      console.log('✅ Measurements: Form data updated with existing measurements');
+      console.log('✅ Measurements: Form data updated with existing measurements (editable)');
+    } else if (measurementsState.isLoaded && (!measurementsState.measurements || !measurementsState.measurements.exists)) {
+      // Reset form if no measurements exist
+      setWeight('');
+      setHeightFeet('');
+      setHeightInches('');
     }
   }, [measurementsState.isLoaded, measurementsState.measurements]);
 

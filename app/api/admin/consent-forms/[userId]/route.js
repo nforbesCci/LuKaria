@@ -106,14 +106,32 @@ export async function GET(request, { params }) {
         await mounjaroConsentCollection.insertOne(mounjaroConsentDocs);
       }
 
+      const semaglutideConsentCollection = db.collection('SemaglutideConsentCollection');
+
+      let semaglutideConsentDocs = await semaglutideConsentCollection
+        .findOne({ userId: targetUserId });
+
+      if (semaglutideConsentDocs == null) {
+        semaglutideConsentDocs = {
+          userId: targetUserId,
+          complete: false,
+          available: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        await semaglutideConsentCollection.insertOne(semaglutideConsentDocs);
+      }
+
     const consentDocs = {telehealth : telehealthDocs,
       photograph:photographConsentDocs, 
-      mounjaro: mounjaroConsentDocs};
+      mounjaro: mounjaroConsentDocs,
+      semaglutide: semaglutideConsentDocs};
 
     console.log('✅ Admin consent forms fetched successfully:', {
       telehealth: telehealthDocs ? 'found' : 'not found',
       photograph: photographConsentDocs ? 'found' : 'not found', 
-      mounjaro: mounjaroConsentDocs ? 'found' : 'not found'
+      mounjaro: mounjaroConsentDocs ? 'found' : 'not found',
+      semaglutide: semaglutideConsentDocs ? 'found' : 'not found'
     });
 
     // Debug: Log the actual properties of each form
@@ -136,6 +154,13 @@ export async function GET(request, { params }) {
         available: mounjaroConsentDocs.available,
         locked: mounjaroConsentDocs.locked,
         complete: mounjaroConsentDocs.complete
+      });
+    }
+    if (semaglutideConsentDocs) {
+      console.log('📊 Semaglutide form properties:', {
+        available: semaglutideConsentDocs.available,
+        locked: semaglutideConsentDocs.locked,
+        complete: semaglutideConsentDocs.complete
       });
     }
 
@@ -240,6 +265,14 @@ export async function PUT(request, { params }) {
     if (formType === 'mounjaro') {
       const mounjaroCollection = db.collection('MounjaroConsentCollection');
       result = await mounjaroCollection.updateOne(
+        { userId: targetUserId },
+        { $set: updateFields }
+      );
+    }
+
+    if (formType === 'semaglutide') {
+      const semaglutideCollection = db.collection('SemaglutideConsentCollection');
+      result = await semaglutideCollection.updateOne(
         { userId: targetUserId },
         { $set: updateFields }
       );

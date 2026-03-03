@@ -27,6 +27,8 @@ import {
   Description,
   Info as InfoIcon,
   Login,
+  LocalShipping,
+  Payment,
 } from '@mui/icons-material';
 
 export default function InfoPage() {
@@ -213,7 +215,7 @@ export default function InfoPage() {
             >
               <Login sx={{ fontSize: 20 }} />
               <Box>
-                Login
+                Sign-up/Login
               </Box>
             </Box>
           )}
@@ -262,7 +264,7 @@ export default function InfoPage() {
                         Medications
                       </Typography>
                       <Typography variant="body2" sx={{ color: '#877449' }}>
-                        FDA-approved GLP-1 medications like Mounjaro, shipped directly to you.
+                        FDA-approved GLP-1 medications like Mounjaro, delivered to you.
                       </Typography>
                     </Paper>
                   </Grid>
@@ -399,15 +401,7 @@ export default function InfoPage() {
                   </Box>
                 </Paper>
 
-                <Paper elevation={3} sx={{ p: 2, backgroundColor: '#36454F', border: '1px solid #877449' }}>
-                  <Typography variant="body2" sx={{ color: '#877449', fontWeight: '600', mb: 1 }}>
-                    Limited time introductory offer (ends Jan. 15, 2026)
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#877449' }}>
-                    • 50% Discount on initial consultation<br />
-                    • 5% discount on first month's medication
-                  </Typography>
-                </Paper>
+               
               </CardContent>
             </Card>
           </Grid>
@@ -454,6 +448,38 @@ export default function InfoPage() {
                             </Typography>
                             <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
                               Account Number: 000081785
+                            </Typography>
+                          </Box>
+                        }
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449', fontWeight: 600 }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ alignItems: 'flex-start' }}>
+                      <ListItemIcon sx={{ mt: 0.5 }}>
+                        <LocalShipping sx={{ color: '#877449' }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Cash on Delivery"
+                        secondary={
+                          <Box component="span" sx={{ display: 'block', mt: 1 }}>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              Pay with cash when your order is delivered
+                            </Typography>
+                          </Box>
+                        }
+                        primaryTypographyProps={{ variant: 'body2', color: '#877449', fontWeight: 600 }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ alignItems: 'flex-start' }}>
+                      <ListItemIcon sx={{ mt: 0.5 }}>
+                        <Payment sx={{ color: '#877449' }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Credit Cards"
+                        secondary={
+                          <Box component="span" sx={{ display: 'block', mt: 1 }}>
+                            <Typography variant="caption" sx={{ display: 'block', color: '#877449' }}>
+                              We accept all major credit cards.
                             </Typography>
                           </Box>
                         }

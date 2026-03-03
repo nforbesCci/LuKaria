@@ -32,7 +32,7 @@ import {
   Description,
   Schedule,
   Report,
-  VideoLibrary,
+  Groups,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -115,15 +115,15 @@ export default function NavigationDrawer() {
         icon: <Description />,
         path: '/consent-forms',
       },
-      {
-        text: 'Videos',
-        icon: <VideoLibrary />,
-        path: '/videos',
-      },
     ] : []),
     
     // Consultation required items - Admin or Patient with consultation
     ...(canAccessPage(user, 'consultation', profileState.profile) ? [
+      {
+        text: 'Membership Area',
+        icon: <Groups />,
+        path: '/membership',
+      },
       {
         text: 'Side Effects',
         icon: <MedicalServices />,

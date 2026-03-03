@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   photographConsent: null,
   mounjaroConsent: null,
+  semaglutideConsent: null,
   telehealthConsent: null,
   isLoading: false,
   isFetching: false,
@@ -12,6 +13,8 @@ const initialState = {
   isLoaded: false,
   mounjaroHasChanges: false,
   mounjaroIsSaved: false,
+  semaglutideHasChanges: false,
+  semaglutideIsSaved: false,
   telehealthHasChanges: false,
   telehealthIsSaved: false,
 };
@@ -99,6 +102,44 @@ const consentSlice = createSlice({
       state.isFetching = false;
       state.error = action.payload;
     },
+    // Semaglutide consent actions
+    saveSemaglutideConsent: (state, action) => {
+      state.isLoading = true;
+      state.error = null;
+      state.semaglutideIsSaved = false;
+    },
+    saveSemaglutideConsentSuccess: (state, action) => {
+      state.isLoading = false;
+      state.semaglutideConsent = action.payload;
+      state.semaglutideIsSaved = true;
+      state.semaglutideHasChanges = false;
+      state.error = null;
+    },
+    saveSemaglutideConsentFailure: (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+      state.semaglutideIsSaved = false;
+    },
+    setSemaglutideConsentChanges: (state, action) => {
+      state.semaglutideHasChanges = action.payload;
+    },
+    resetSemaglutideConsentSaveFlag: (state) => {
+      state.semaglutideIsSaved = false;
+    },
+    fetchSemaglutideConsent: (state) => {
+      state.isFetching = true;
+      state.error = null;
+    },
+    fetchSemaglutideConsentSuccess: (state, action) => {
+      state.isFetching = false;
+      state.semaglutideConsent = action.payload;
+      state.isLoaded = true;
+      state.error = null;
+    },
+    fetchSemaglutideConsentFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = action.payload;
+    },
     // Telehealth consent actions
     saveTelehealthConsent: (state, action) => {
       state.isLoading = true;
@@ -158,6 +199,14 @@ export const {
   fetchMounjaroConsent,
   fetchMounjaroConsentSuccess,
   fetchMounjaroConsentFailure,
+  saveSemaglutideConsent,
+  saveSemaglutideConsentSuccess,
+  saveSemaglutideConsentFailure,
+  setSemaglutideConsentChanges,
+  resetSemaglutideConsentSaveFlag,
+  fetchSemaglutideConsent,
+  fetchSemaglutideConsentSuccess,
+  fetchSemaglutideConsentFailure,
   saveTelehealthConsent,
   saveTelehealthConsentSuccess,
   saveTelehealthConsentFailure,

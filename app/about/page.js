@@ -205,7 +205,7 @@ export default function AboutUs() {
             >
               <Login sx={{ fontSize: 20 }} />
               <Box>
-                Login
+                Sign-up/Login
               </Box>
             </Box>
           )}

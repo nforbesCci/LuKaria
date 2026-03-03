@@ -36,6 +36,7 @@ import {
   Star,
   Security,
   Speed,
+  WhatsApp,
 } from '@mui/icons-material';
 
 export default function Home() {
@@ -308,7 +309,7 @@ export default function Home() {
                           }
                         }}
                       >
-                        Login
+                        Sign-up/Login
                       </Button>
           )}
           
@@ -342,10 +343,89 @@ export default function Home() {
           textAlign: 'center',
           backgroundColor: '#ffffff',
           py: 3,
-          width: '100%'
+          width: '100%',
+          position: 'relative'
         }}
       >
-                  </Box>
+        {/* WhatsApp Link - Top Right */}
+        <Box
+          component="a"
+          href="https://wa.me/18762903659"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 2,
+            py: 1,
+            textDecoration: 'none',
+            borderRadius: 1,
+            backgroundColor: '#ffffff',
+            zIndex: 100,
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+            }
+          }}
+        >
+          <WhatsApp sx={{ 
+            fontSize: 28, 
+            color: '#25D366'
+          }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#25D366',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              display: { xs: 'none', sm: 'block' }
+            }}
+          >
+            876-290-3659
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Book a Consult Link - Above Carousel */}
+      <Box
+        sx={{
+          width: '100%',
+          backgroundColor: '#ffffff',
+          py: 3,
+          textAlign: 'center',
+          borderBottom: '1px solid #e0e0e0',
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: { xs: 1.5, sm: 2 }
+        }}
+      >
+        <Button
+          component="a"
+          href="https://calendly.com/kadriaf-lukariagroup"
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="contained"
+          sx={{
+            textTransform: 'none',
+            backgroundColor: '#877449',
+            color: '#000000',
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            px: 4,
+            py: 1.5,
+            '&:hover': {
+              backgroundColor: '#B8941F',
+            }
+          }}
+        >
+          Book a No obligation appointment
+        </Button>
+      </Box>
 
       {/* Lightbox - Full width */}
       <Box
@@ -709,21 +789,16 @@ export default function Home() {
                     </Typography>
                   </Box>
                   
-                  {/* Limited time offer text */}
-                  <Box sx={{ mb: 2, color: '#877449', textAlign: 'center', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
-                    <Typography variant="h6" sx={{ color: '#877449', fontWeight: '600', fontSize: '1.1rem' }}>
-                      Limited Time Introductory Offers
-                    </Typography>
-                  </Box>
+                 
                   
                   {/* Exclusive offers bullet points */}
                   <Box sx={{ mb: 3, color: '#877449', textAlign: 'left', maxWidth: '600px', mx: 'auto', position: 'relative', zIndex: 1 }}>
                     <Box component="ul" sx={{ pl: 2, mb: 0 }}>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>50% off consultation fees with our physician </strong>
+                        <strong>Exclusive access to meal prep and delivery services</strong>
                       </Typography>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>Receive a discount on your first 4 week supply of medication</strong>
+                        <strong>Expertly curated add on options built for your journey</strong>
                       </Typography>
                       <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
                         <strong>Svelte referral program- receive premium benefits just for referring others</strong>
