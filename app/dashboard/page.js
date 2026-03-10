@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Header from '../../components/Header';
+import PageTitle from '../../components/PageTitle';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { canAccessPage, useBasicAccess } from '../../hooks/useAccessControl';
@@ -130,22 +131,11 @@ export default function DashboardPage() {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          gutterBottom 
-          textAlign="center" 
-          color="primary"
-          sx={{
-            fontSize: { xs: '1.25rem', sm: '3rem' },
-            fontWeight: 600
-          }}
-        >
-          Dashboard
-        </Typography>
-        <Typography variant="h5" textAlign="center" color="text.secondary" sx={{ mb: 4 }}>
-          Welcome to your dashboard, {user.name}!
-        </Typography>
+        <PageTitle
+          title="Dashboard"
+          subtitle={`Welcome to your dashboard, ${user.name}!`}
+          showBackButton={false}
+        />
 
         <Card sx={{ mb: 4, backgroundColor: '#1a1a1a' }}>
           <CardContent>

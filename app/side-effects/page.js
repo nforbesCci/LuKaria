@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { saveSideEffects, fetchSideEffects } from '../../store/slices/sideEffectsSlice';
 import { useRef } from 'react';
 import Header from '../../components/Header';
+import PageTitle from '../../components/PageTitle';
 import {
   Container,
   Typography,
@@ -620,35 +621,20 @@ export default function SideEffects() {
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Header Section */}
-        <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Avatar
-                sx={{ 
-                  width: 60, 
-                  height: 60, 
-                  mr: 3, 
-                  backgroundColor: 'warning.main' 
-                }}
-              >
-                <MedicalServices sx={{ fontSize: 30 }} />
-              </Avatar>
-              <Box>
-                <Typography 
-                  variant="h4" 
-                  gutterBottom 
-                  color="primary"
-                  sx={{
-                    fontSize: { xs: '1.25rem', sm: '2.125rem' },
-                    fontWeight: 600
-                  }}
-                >
-                  Side Effect Tracker
-                </Typography>
-              </Box>
-            </Box>
+        <PageTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar sx={{ width: 60, height: 60, mr: 3, backgroundColor: 'warning.main' }}>
+              <MedicalServices sx={{ fontSize: 30 }} />
+            </Avatar>
+            <Typography
+              variant="h4"
+              color="primary"
+              sx={{ fontSize: { xs: '1.25rem', sm: '2.125rem' }, fontWeight: 600 }}
+            >
+              Side Effect Tracker
+            </Typography>
           </Box>
-        </Paper>
+        </PageTitle>
 
         {/* Stepper Navigation - Desktop */}
         <Paper elevation={1} sx={{ p: 3, mb: 4, display: { xs: 'none', md: 'block' } }}>

@@ -24,6 +24,7 @@ import {
 } from '../../store/slices/consentSlice';
 import { updatePreAppointmentTaskAction } from '../../store/slices/appointmentSlice';
 import Header from '../../components/Header';
+import PageTitle from '../../components/PageTitle';
 import { useRouter } from 'next/navigation';
 import {
   Container,
@@ -1229,25 +1230,8 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
       <Header />
       <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
         {/* Header Section */}
-        <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Box>
-              <Typography 
-                variant="h4" 
-                gutterBottom 
-                color="primary"
-                sx={{
-                  fontSize: { xs: '1.5rem', sm: '2.125rem' },
-                  fontWeight: 600
-                }}
-              >
-                <Description sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Consent Forms
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Review and sign medical consent forms
-              </Typography>
-            </Box>
+        <PageTitle
+          actions={
             <Box sx={{ textAlign: 'right' }}>
               <Typography variant="h6" color="primary">
                 {completedForms} / {totalForms}
@@ -1256,8 +1240,23 @@ Telehealth by Carepatron is the technology service we will use to conduct telehe
                 Forms Completed
               </Typography>
             </Box>
+          }
+        >
+          <Box>
+            <Typography
+              variant="h4"
+              gutterBottom
+              color="primary"
+              sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, fontWeight: 600 }}
+            >
+              <Description sx={{ mr: 1, verticalAlign: 'middle' }} />
+              Consent Forms
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Review and sign medical consent forms
+            </Typography>
           </Box>
-        </Paper>
+        </PageTitle>
 
         {/* Instructions */}
         <Alert severity="info" sx={{ mb: 3 }}>
