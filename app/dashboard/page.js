@@ -52,6 +52,7 @@ export default function DashboardPage() {
       ? [
           { text: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
           { text: 'Profile', path: '/profile', icon: <Person /> },
+          { text: 'Book an appointment', path: 'https://calendly.com/kadriaf-lukariagroup', icon: <Schedule />, external: true },
           { text: 'Consent Forms', path: '/consent-forms', icon: <Description /> },
         ]
       : []),
@@ -154,8 +155,12 @@ export default function DashboardPage() {
                     }}
                   >
                     <CardActionArea
-                      component={Link}
+                      component={item.external ? 'a' : Link}
                       href={item.path}
+                      {...(item.external && {
+                        target: '_blank',
+                        rel: 'noopener noreferrer',
+                      })}
                       sx={{
                         height: '100%',
                         p: 3,
@@ -177,7 +182,7 @@ export default function DashboardPage() {
                           {item.text}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Open {item.text.toLowerCase()}.
+                          {item.external ? 'Open Calendly.' : `Open ${item.text.toLowerCase()}.`}
                         </Typography>
                       </Box>
                     </CardActionArea>

@@ -412,11 +412,11 @@ export default function Home() {
             Medically Supervised Weight Loss
           </Typography>
           <Typography variant="body1" sx={{ color: '#333', mb: 3, fontSize: '1rem', lineHeight: 1.6 }}>
-            Effective, physician-guided weight loss, including the use of GLP-1 medications (Ozempic, Wegovy, Mounjaro class).
+            Effective, physician-guided weight loss, including the use of GLP-1 medications (Ozempic, Wegovy, Mounjaro).
           </Typography>
           <Button
             component="a"
-            href="https://calendly.com/kadriaf-lukariagroup"
+            href="https://calendly.com/kadriaf-lukariagroup/30min"
             variant="contained"
             size="large"
             sx={{
@@ -574,7 +574,7 @@ export default function Home() {
           <Box sx={{ textAlign: 'center' }}>
             <Button
               component="a"
-              href="https://calendly.com/kadriaf-lukariagroup"
+              href="https://calendly.com/kadriaf-lukariagroup/30min"
               variant="contained"
               size="large"
               sx={{
