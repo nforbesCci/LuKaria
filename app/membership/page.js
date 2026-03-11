@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Header from '../../components/Header';
+import PageTitle from '../../components/PageTitle';
 import { useConsultationAccess } from '../../hooks/useAccessControl';
 import {
   Container,
@@ -140,23 +141,10 @@ export default function MembershipPage() {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          textAlign="center"
-          color="primary"
-          sx={{
-            fontSize: { xs: '1.5rem', sm: '3rem' },
-            fontWeight: 600,
-          }}
-        >
-          Membership Area
-        </Typography>
-
-        <Typography variant="h6" textAlign="center" color="text.secondary" sx={{ mb: 4 }}>
-          Exclusive resources and programs to support your long-term wellness journey.
-        </Typography>
+        <PageTitle
+          title="Membership Area"
+          subtitle="Exclusive resources and programs to support your long-term wellness journey."
+        />
 
         <Card sx={{ backgroundColor: '#1a1a1a' }}>
           <CardContent>

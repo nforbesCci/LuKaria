@@ -225,6 +225,30 @@ export default function InfoPage() {
       {/* Main Content */}
         <Container maxWidth="lg" sx={{ mt: 18, mb: 6 }}>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Button
+              component="a"
+              href="https://calendly.com/kadriaf-lukariagroup"
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="contained"
+              sx={{
+                textTransform: 'none',
+                backgroundColor: '#877449',
+                color: '#000000',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                px: 4,
+                py: 1.5,
+                mb: 3,
+                '&:hover': {
+                  backgroundColor: '#B8941F',
+                }
+              }}
+            >
+              Book a No obligation appointment
+            </Button>
+          </Box>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Typography variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
               Membership and Pricing
             </Typography>

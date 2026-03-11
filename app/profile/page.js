@@ -4,6 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useBasicAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect, useRef } from 'react';
 import Header from '../../components/Header';
+import PageTitle from '../../components/PageTitle';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -63,6 +64,7 @@ export default function Profile() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [showProfileView, setShowProfileView] = useState(false);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const hasFetchedProfile = useRef(false);
@@ -310,6 +312,27 @@ export default function Profile() {
       console.log('📝 Profile: No existing profile found, using Auth0 data only');
     }
   }, [profileState.isLoaded, profileState.profile]);
+
+  // When profile is loaded from server and has required fields, show profile summary first
+  useEffect(() => {
+    const p = profileState.profile;
+    if (
+      profileState.isLoaded &&
+      p &&
+      p.name &&
+      (p.preferredEmail || user?.email) &&
+      p.preferredPhone &&
+      p.dateOfBirth &&
+      p.sex &&
+      p.parish
+    ) {
+      setShowProfileView(true);
+    }
+  }, [
+    profileState.isLoaded,
+    profileState.profile,
+    user?.email,
+  ]);
 
   const medicalConditionsList = [
     'Hypertension',
@@ -825,35 +848,144 @@ export default function Profile() {
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Header Section */}
-        <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Avatar
-                src={user.picture}
-                alt={user.name}
-                sx={{ width: 60, height: 60, mr: 3 }}
+        <PageTitle
+          actions={
+            showProfileView ? (
+              <Button
+                variant="contained"
+                startIcon={<Edit />}
+                onClick={() => setShowProfileView(false)}
+                sx={{
+                  textTransform: 'none',
+                  backgroundColor: '#877449',
+                  color: '#000',
+                  '&:hover': { backgroundColor: '#6b5d3a' },
+                }}
               >
-                <Person sx={{ fontSize: 30 }} />
-              </Avatar>
-              <Box>
-                <Typography 
-                  variant="h4" 
-                  gutterBottom 
-                  color="primary"
-                  sx={{
-                    fontSize: { xs: '1.25rem', sm: '2.125rem' },
-                    fontWeight: 600
-                  }}
-                >
-                  Medical Profile
-                </Typography>
-              </Box>
-            </Box>
-            <Box>
-            </Box>
+                Edit Profile
+              </Button>
+            ) : undefined
+          }
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar
+              src={user.picture}
+              alt={user.name}
+              sx={{ width: 60, height: 60, mr: 3 }}
+            >
+              <Person sx={{ fontSize: 30 }} />
+            </Avatar>
+            <Typography
+              variant="h4"
+              color="primary"
+              sx={{
+                fontSize: { xs: '1.25rem', sm: '2.125rem' },
+                fontWeight: 600,
+              }}
+            >
+              Medical Profile
+            </Typography>
           </Box>
-        </Paper>
+        </PageTitle>
 
+        {/* Profile summary view when profile is configured */}
+        {showProfileView ? (
+          <Card sx={{ mb: 4 }}>
+            <CardContent sx={{ p: 4 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ color: 'primary.main', mb: 2 }}>
+                    Personal Information
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption" color="text.secondary">Full Name</Typography>
+                  <Typography variant="body1">{formData.name}</Typography>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="caption" color="text.secondary">Date of Birth</Typography>
+                  <Typography variant="body1">{formData.dateOfBirth}</Typography>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography variant="caption" color="text.secondary">Sex</Typography>
+                  <Typography variant="body1">{formData.sex ? String(formData.sex).charAt(0).toUpperCase() + formData.sex.slice(1) : '—'}</Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption" color="text.secondary">Preferred Phone</Typography>
+                  <Typography variant="body1">{formData.preferredPhone}</Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption" color="text.secondary">Preferred Email</Typography>
+                  <Typography variant="body1">{formData.preferredEmail}</Typography>
+                </Grid>
+                <Grid item xs={12} md={8}>
+                  <Typography variant="caption" color="text.secondary">Home Address</Typography>
+                  <Typography variant="body1">{formData.homeAddress || '—'}</Typography>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Typography variant="caption" color="text.secondary">Parish</Typography>
+                  <Typography variant="body1">{formData.parish}</Typography>
+                </Grid>
+
+                <Grid item xs={12} sx={{ pt: 2 }}>
+                  <Typography variant="h6" sx={{ color: 'primary.main', mb: 2 }}>
+                    Emergency Contact
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Typography variant="caption" color="text.secondary">Name</Typography>
+                  <Typography variant="body1">{formData.nextOfKinName || '—'}</Typography>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Typography variant="caption" color="text.secondary">Phone</Typography>
+                  <Typography variant="body1">{formData.nextOfKinPhone || '—'}</Typography>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Typography variant="caption" color="text.secondary">Relationship</Typography>
+                  <Typography variant="body1">{formData.nextOfKinRelationship || '—'}</Typography>
+                </Grid>
+
+                <Grid item xs={12} sx={{ pt: 2 }}>
+                  <Typography variant="h6" sx={{ color: 'primary.main', mb: 2 }}>
+                    Medical History
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="caption" color="text.secondary">Medical Conditions</Typography>
+                  <Typography variant="body1">
+                    {formData.medicalConditions?.length > 0 ? formData.medicalConditions.join(', ') : '—'}
+                    {formData.otherMedicalCondition ? ` (${formData.otherMedicalCondition})` : ''}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sx={{ pt: 2 }}>
+                  <Typography variant="h6" sx={{ color: 'primary.main', mb: 2 }}>
+                    Medications & Allergies
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="caption" color="text.secondary">Allergies</Typography>
+                  <Typography variant="body1">{formData.hasAllergies ? 'Yes' : 'No'}</Typography>
+                </Grid>
+                {formData.hasAllergies && (
+                  <Grid item xs={12}>
+                    <Typography variant="caption" color="text.secondary">Allergic medications</Typography>
+                    <Typography variant="body1">{formData.allergicMedications || '—'}</Typography>
+                  </Grid>
+                )}
+                <Grid item xs={12}>
+                  <Typography variant="caption" color="text.secondary">Current medications</Typography>
+                  <Typography variant="body1">{formData.currentMedications || '—'}</Typography>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
         {/* Wizard Stepper - Desktop */}
         <Paper elevation={1} sx={{ p: 3, mb: 4, display: { xs: 'none', md: 'block' } }}>
           <Stepper activeStep={activeStep} alternativeLabel>
@@ -1069,6 +1201,8 @@ export default function Profile() {
             )}
           </Box>
         </Paper>
+          </>
+        )}
       </Container>
     </>
   );

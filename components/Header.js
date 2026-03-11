@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
@@ -15,6 +16,10 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { LogoutOutlined, Person } from '@mui/icons-material';
+
+const BANNER_HEIGHT = 48;
+const APP_BAR_HEIGHT = 64;
+const HEADER_TOTAL_HEIGHT = BANNER_HEIGHT + APP_BAR_HEIGHT;
 
 export default function Header() {
   const { user, isLoading } = useUser();
@@ -45,17 +50,63 @@ export default function Header() {
     return true;
   };
 
-  // Always render the header structure consistently
+  const linkSx = {
+    color: '#000000',
+    fontWeight: '600',
+    cursor: 'pointer',
+    '&:hover': { textDecoration: 'underline' },
+  };
+
   return (
-    <AppBar 
-      position="static" 
-      elevation={1}
-      sx={{
-        backgroundColor: '#000000',
-        borderBottom: '1px solid rgba(255,255,255,0.1)'
-      }}
-    >
-      <Toolbar sx={{ justifyContent: 'space-between', px: 3 }}>
+    <>
+      {/* Top origin banner - same as public pages */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: BANNER_HEIGHT,
+          backgroundColor: '#877449',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 3,
+          zIndex: 1001,
+          borderBottom: '1px solid rgba(0,0,0,0.1)',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Typography component={Link} href="/" variant="body2" sx={linkSx}>
+            Home
+          </Typography>
+          <Typography component={Link} href="/info" variant="body2" sx={linkSx}>
+            Info
+          </Typography>
+          <Typography component={Link} href="/faq" variant="body2" sx={linkSx}>
+            FAQ
+          </Typography>
+          <Typography component={Link} href="/contact" variant="body2" sx={linkSx}>
+            Contact
+          </Typography>
+          <Typography component={Link} href="/about" variant="body2" sx={linkSx}>
+            About Us
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Main app bar - fixed below banner */}
+      <AppBar
+        position="fixed"
+        elevation={1}
+        sx={{
+          top: BANNER_HEIGHT,
+          backgroundColor: '#000000',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          zIndex: 1000,
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'space-between', px: 3, minHeight: { xs: 56, sm: APP_BAR_HEIGHT } }}>
         {/* Logo and Title on the left - always rendered */}
         <Box sx={{ 
           display: 'flex', 
@@ -124,6 +175,10 @@ export default function Header() {
           )}
         </Box>
       </Toolbar>
-    </AppBar>
+      </AppBar>
+
+      {/* Spacer so page content starts below the fixed header */}
+      <Box sx={{ height: HEADER_TOTAL_HEIGHT }} />
+    </>
   );
 }

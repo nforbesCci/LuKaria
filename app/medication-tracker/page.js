@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveMedication, fetchAllMedications } from '../../store/slices/medicationSlice';
 import Header from '../../components/Header';
+import PageTitle from '../../components/PageTitle';
 import {
   Container,
   Typography,
@@ -68,6 +69,8 @@ export default function MedicationTracker() {
   // Common medications list
   const commonMedications = [
     'Mounjaro',
+    'Tirzepatide',
+    'Semaglutide',
     'Other'
   ];
 
@@ -297,52 +300,41 @@ export default function MedicationTracker() {
       <Header />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Header Section */}
-        <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Avatar
-                sx={{ 
-                  width: 60, 
-                  height: 60, 
-                  mr: 3, 
-                  backgroundColor: 'primary.main' 
-                }}
-              >
-                <Medication sx={{ fontSize: 30 }} />
-              </Avatar>
-              <Box>
-                <Typography 
-                  variant="h4" 
-                  gutterBottom 
-                  color="primary"
-                  sx={{
-                    fontSize: { xs: '1.25rem', sm: '2.125rem' },
-                    fontWeight: 600
-                  }}
-                >
-                  Medication Tracker
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {user.name || 'User'} • Track the administration of your weight loss medication
-                </Typography>
-              </Box>
-            </Box>
+        <PageTitle
+          actions={
             <Button
               variant="contained"
               startIcon={<Add />}
               onClick={handleAddEntry}
-              sx={{ 
+              sx={{
                 textTransform: 'none',
                 minWidth: { xs: 'auto', sm: '64px' },
-                px: { xs: 1, sm: 2 }
+                px: { xs: 1, sm: 2 },
               }}
             >
-              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                Log Medication
-              </Box>
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>Log Medication</Box>
             </Button>
+          }
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar sx={{ width: 60, height: 60, mr: 3, backgroundColor: 'primary.main' }}>
+              <Medication sx={{ fontSize: 30 }} />
+            </Avatar>
+            <Box>
+              <Typography
+                variant="h4"
+                gutterBottom
+                color="primary"
+                sx={{ fontSize: { xs: '1.25rem', sm: '2.125rem' }, fontWeight: 600 }}
+              >
+                Medication Tracker
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {user.name || 'User'} • Track the administration of your weight loss medication
+              </Typography>
+            </Box>
           </Box>
-        </Paper>
+        </PageTitle>
 
         {/* Log Medication Form */}
         {isAddingEntry ? (

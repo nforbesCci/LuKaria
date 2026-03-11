@@ -247,16 +247,19 @@ export default function NavigationDrawer() {
         open={open}
         onClose={pinned ? undefined : handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
+          keepMounted: true,
+          hideBackdrop: pinned,
         }}
         sx={{
           display: { xs: 'block' },
+          ...(pinned && { pointerEvents: 'none' }),
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: DRAWER_WIDTH,
             backgroundColor: '#000000',
             borderRight: '1px solid',
             borderColor: 'divider',
+            ...(pinned && { pointerEvents: 'auto' }),
           },
         }}
       >
