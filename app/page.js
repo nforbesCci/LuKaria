@@ -18,6 +18,7 @@ import {
   Alert,
   CircularProgress,
   Grid,
+  Paper,
   Avatar,
   Chip,
   List,
@@ -37,12 +38,14 @@ import {
   Security,
   Speed,
   WhatsApp,
+  ChatBubbleOutline,
+  Medication,
+  Assignment,
 } from '@mui/icons-material';
 
 export default function Home() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0); // Start with page 0
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const router = useRouter();
 
@@ -340,23 +343,22 @@ export default function Home() {
         sx={{
           mt: 14,
           mb: 0,
-          textAlign: 'center',
           backgroundColor: '#ffffff',
           py: 3,
           width: '100%',
-          position: 'relative'
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          px: 2,
         }}
       >
-        {/* WhatsApp Link - Top Right */}
+        {/* WhatsApp Link - Right */}
         <Box
           component="a"
           href="https://wa.me/18762903659"
           target="_blank"
           rel="noopener noreferrer"
           sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -389,714 +391,207 @@ export default function Home() {
         </Box>
       </Box>
 
-      {/* Book a Consult Link - Above Carousel */}
+      {/* 1. Hero Section */}
       <Box
         sx={{
           width: '100%',
-          backgroundColor: '#ffffff',
-          py: 3,
-          textAlign: 'center',
-          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: '#faf8f5',
+          py: { xs: 4, md: 6 },
+          px: 2,
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
+          flexDirection: { xs: 'column', md: 'row' },
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: { xs: 1.5, sm: 2 }
+          justifyContent: 'space-between',
+          gap: 4,
+          minHeight: { md: 480 },
         }}
       >
-        <Button
-          component="a"
-          href="https://calendly.com/kadriaf-lukariagroup"
-          target="_blank"
-          rel="noopener noreferrer"
-          variant="contained"
-          sx={{
-            textTransform: 'none',
-            backgroundColor: '#877449',
-            color: '#000000',
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            px: 4,
-            py: 1.5,
-            '&:hover': {
-              backgroundColor: '#B8941F',
-            }
-          }}
-        >
-          Book a No obligation appointment
-        </Button>
-      </Box>
-
-      {/* Lightbox - Full width */}
-      <Box
-                  sx={{ 
-          width: '100%',
-          height: '600px',
-          backgroundColor: '#ffffff',
-                    position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
-          {/* Navigation Dots - Top */}
-          <Box
-            sx={{ 
-              position: 'absolute',
-              top: 5,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              display: 'flex',
-              gap: 1,
-              zIndex: 10
+        <Box sx={{ flex: 1, maxWidth: { md: 520 }, order: { xs: 1, md: 1 } }}>
+          <Typography variant="h3" sx={{ color: '#000', fontWeight: 700, fontFamily: 'serif', mb: 2, fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' } }}>
+            Medically Supervised Weight Loss
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#333', mb: 3, fontSize: '1rem', lineHeight: 1.6 }}>
+            Effective, physician-guided weight loss, including the use of GLP-1 medications (Ozempic, Wegovy, Mounjaro class).
+          </Typography>
+          <Button
+            component="a"
+            href="https://calendly.com/kadriaf-lukariagroup"
+            variant="contained"
+            size="large"
+            sx={{
+              textTransform: 'none',
+              backgroundColor: '#877449',
+              color: '#000',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              px: 4,
+              py: 1.5,
+              mb: 0,
+              '&:hover': { backgroundColor: '#B8941F' },
             }}
           >
-            {[0, 1, 2, 3].map((page) => (
-              <Box
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                sx={{ 
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  backgroundColor: currentPage === page ? '#877449' : '#ddd',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s ease'
-                }}
-              />
-            ))}
-          </Box>
-
-          {/* Lightbox Content */}
+            Start Your Svelte Journey
+          </Button>
+          <Typography variant="caption" sx={{ display: 'block', color: '#555', mt: 0.5, mb: 1 }}>
+            Free no obligation consultation
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#555', fontStyle: 'italic' }}>
+            Lose Weight & Feel Your Best with Svelte by LuKaria
+          </Typography>
+        </Box>
+        <Box sx={{ flex: 1, maxWidth: { md: 480 }, display: 'flex', justifyContent: 'center', order: { xs: 0, md: 2 } }}>
           <Box
+            component="img"
+            src="/images/kadria_no_background.png"
+            alt="Dr. Kadria Fairclough"
             sx={{
               width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-              alignItems: 'center',
-                    justifyContent: 'center',
-              p: 2,
-              textAlign: 'center',
-              position: 'relative'
+              maxWidth: 400,
+              height: 'auto',
+              objectFit: 'contain',
             }}
-          >
-            {currentPage === 0 && (
-              <Box sx={{ width: '100%', height: 'calc(100% + 20px)', display: 'flex', gap: 2, p: 2 }}>
-                {/* Left Panel - Content */}
-                <Box sx={{ 
-                  flex: 1, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  justifyContent: 'center', 
-                  backgroundColor: { xs: 'rgba(0, 0, 0, 0.8)', md: '#000000' },
-                  backgroundImage: { xs: 'url(/images/weightloss1.png)', md: 'none' },
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  p: 4, 
-                  borderRadius: 2,
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: { xs: 'rgba(0, 0, 0, 0.6)', md: 'transparent' },
-                    borderRadius: 2,
-                    zIndex: 0,
-                  }
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, mb: 2, position: 'relative', zIndex: 1 }}>
-                    <span className="MuiTypography-root MuiTypography-h1 Svelte_large css-14vokww-MuiTypography-root" style={{ color: 'white', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
-                      Svelte
-                    </span>
-                    <span className="MuiTypography-root MuiTypography-body1 svelte_post_script css-1r5vudv-MuiTypography-root" style={{ marginTop: '210px', textAlign: 'center', color: 'white', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
-                      by LuKaria
-                    </span>
-                  </Box>
-                  <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span 
-                      className="MuiTypography-root MuiTypography-body1 svelte_post_script css-1r5vudv-MuiTypography-root" 
-                      style={{ 
-                        fontStyle: 'italic',
-                        display: 'block',
-                        mb: 2,
-                        color: 'white',
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                        textAlign: 'center'
-                      }}
-                    >
-                      "Slender and elegantly slim"
-                    </span>
-                    <span 
-                      className="MuiTypography-root MuiTypography-body1 svelte_post_script css-1r5vudv-MuiTypography-root" 
-                      style={{ 
-                        fontSize: '1.2rem',
-                        fontWeight: '600',
-                        display: 'block',
-                        mb: 2,
-                        color: 'white',
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                        textAlign: 'center'
-                      }}
-                    >
-                      Your Weight Loss Journey Redefined
-                    </span>
-                    <span 
-                      className="MuiTypography-root MuiTypography-body1 svelte_post_script css-1r5vudv-MuiTypography-root" 
-                      style={{ 
-                        fontSize: '0.9rem',
-                        textAlign: 'center',
-                        maxWidth: '300px',
-                        display: 'block',
-                        mb: 3,
-                        margin: '0 auto',
-                        color: 'white',
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
-                      }}
-                    >
-                      Are you ready to get started on your expertly curated weight loss journey
-                    </span>
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        color: '#877449',
-                        borderColor: '#877449',
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        textTransform: 'none',
-                        fontSize: '1rem',
-                        fontWeight: '600',
-                        px: 2,
-                        py: 1,
-                        mt: 2,
-                        width: 'auto',
-                        alignSelf: 'center',
-                        display: { xs: 'none', md: 'block' },
-                        '&:hover': {
-                          borderColor: '#877449',
-                          backgroundColor: 'rgba(212, 175, 55, 0.2)',
-                          color: '#877449'
-                        }
-                      }}
-                      onClick={() => setCurrentPage(1)}
-                    >
-                      Continue
-                    </Button>
-                  </Box>
-                </Box>
+            onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.png'; }}
+          />
+        </Box>
+      </Box>
 
-                {/* Right Panel - Background Image */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    backgroundImage: 'url(/images/weightloss1.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    borderRadius: 2,
-                    display: { xs: 'none', md: 'flex' },
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      borderRadius: 2,
-                    }
-                  }}
-                >
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      color: 'white',
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      zIndex: 1,
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
-                      px: 3
-                    }}
-                  >
-                    Start Your Weight Loss Journey Today
-                  </Typography>
-                </Box>
-              </Box>
-            )}
+      {/* 2. Meet Your Doctor */}
+      <Box sx={{ width: '100%', backgroundColor: '#f5f3ef', py: 6, px: 2 }}>
+        <Container maxWidth="md">
+          <Typography variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, mb: 0.5 }}>
+            Meet Your Doctor
+          </Typography>
+          <Typography variant="h5" sx={{ color: '#000', fontWeight: 700, mb: 3 }}>
+            Dr. Kadria Fairclough, MD
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { sm: 'center' }, gap: 3 }}>
+            <Box
+              component="img"
+              src="/images/kadria_no_background.png"
+              alt="Dr. Kadria Fairclough"
+              sx={{
+                width: { xs: 220, sm: 240 },
+                height: { xs: 220, sm: 240 },
+                borderRadius: '50%',
+                objectFit: 'cover',
+                objectPosition: 'center 15%',
+                flexShrink: 0,
+              }}
+              onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.png'; }}
+            />
+            <Typography variant="body1" sx={{ color: '#333', lineHeight: 1.7 }}>
+              Dr. Kadria Fairclough is a board certified physician with over 15 years of experience helping patients achieve their health and wellness goals. At Svelte by LuKaria, she specializes in medically supervised weight loss and GLP-1 treatments ensuring safe, effective, and personalized care.
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
 
-            {currentPage === 1 && (
-              <Box sx={{ width: '100%', height: 'calc(100% + 20px)', display: 'flex', gap: 2, p: 2 }}>
-                {/* Left Panel - Content */}
-                <Box sx={{ 
-                  flex: 1, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  justifyContent: 'center', 
-                  backgroundColor: { xs: 'rgba(0, 0, 0, 0.8)', md: '#000000' },
-                  backgroundImage: { xs: 'url(/images/weightloss4.png)', md: 'none' },
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  p: 4, 
-                  borderRadius: 2, 
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: { xs: 'rgba(0, 0, 0, 0.6)', md: 'transparent' },
-                    borderRadius: 2,
-                    zIndex: 0,
-                  }
-                }}>
-                  {/* Header */}
-                  <Box sx={{ position: 'absolute', top: 20, left: 20, right: 20, height: 60, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #877449', zIndex: 1 }}>
-                    <Typography variant="h6" className="Svelte_logo" sx={{ color: '#877449', fontWeight: '600' }}>
-                      Why Svelte?
-                  </Typography>
-                </Box>
-                  
-                  <Box sx={{ mb: 4, color: '#877449', textAlign: 'left', maxWidth: '600px', mx: 'auto', mt: 10, position: 'relative', zIndex: 1 }}>
-                 <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Convenient virtual platform</strong>
-                   </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Physician guidance and monitoring</strong>
-                   </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Familiar and trusted brands like Mounjaro</strong>
-                   </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Medications delivered to you</strong>
-                   </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Flat monthly fee - does not change with changing dose</strong>
-                   </Typography>
-                   <Typography component="li" variant="body1" sx={{ mb: 2, color: '#877449', lineHeight: 1.6 }}>
-                     <strong>Exclusive Svelte membership with special offers and premium benefits</strong>
-                   </Typography>
-                 </Box>
-                  </Box>
-              
-                  {/* Button container */}
-                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        color: '#877449',
-                        borderColor: '#877449',
-                        textTransform: 'none',
-                        px: 2,
-                        py: 1,
-                        fontWeight: '600',
-                        width: 'auto',
-                        display: { xs: 'none', sm: 'block' },
-                        '&:hover': {
-                          borderColor: '#877449',
-                          backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                          color: '#877449'
-                        }
-                      }}
-                      onClick={() => setCurrentPage(2)}
-                    >
-                      Next
-                    </Button>
-                  </Box>
-                </Box>
+      {/* 3. How the Program Works */}
+      <Box sx={{ width: '100%', backgroundColor: '#faf8f5', py: 6, px: 2 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, textAlign: 'center', mb: 4 }}>
+            How the Program Works
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
+                <ChatBubbleOutline sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
+                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>1-on-1 Consultation</Typography>
+                <Typography variant="body2" sx={{ color: '#333' }}>
+                  Discuss your health history, weight loss goals, and develop a personalized plan that fits your needs.
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
+                <Medication sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
+                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>GLP-1 Medication</Typography>
+                <Typography variant="body2" sx={{ color: '#333' }}>
+                  Access to FDA-approved GLP-1 medications like Ozempic, Wegovy, and Mounjaro (if appropriate) to support your weight loss.
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
+                <HealthAndSafety sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
+                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Ongoing Support</Typography>
+                <Typography variant="body2" sx={{ color: '#333' }}>
+                  Receive continuous monitoring, guidance, and encouragement to ensure safe and effective results.
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
+                <VideoCall sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
+                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Virtual Appointments</Typography>
+                <Typography variant="body2" sx={{ color: '#333' }}>
+                  Convenient secure virtual check-ins with Dr. Fairclough from the comfort of your home.
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
 
-                {/* Right Panel - Background Image */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    backgroundImage: 'url(/images/weightloss4.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    borderRadius: 2,
-                    display: { xs: 'none', md: 'flex' },
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      borderRadius: 2,
-                    }
-                  }}
-                >
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      color: 'white',
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      zIndex: 1,
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
-                      px: 3
-                    }}
-                  >
-                    Why Choose Svelte?
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            {currentPage === 2 && (
-              <Box sx={{ width: '100%', height: 'calc(100% + 20px)', display: 'flex', gap: 2, p: 2 }}>
-                {/* Left Panel - Content */}
-                <Box sx={{ 
-                  flex: 1, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  justifyContent: 'center', 
-                  backgroundColor: { xs: 'rgba(0, 0, 0, 0.8)', md: '#000000' },
-                  backgroundImage: { xs: 'url(/images/weightloss2.jpg)', md: 'none' },
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  p: 4, 
-                  borderRadius: 2, 
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: { xs: 'rgba(0, 0, 0, 0.6)', md: 'transparent' },
-                    borderRadius: 2,
-                    zIndex: 0,
-                  }
-                }}>
-                  {/* Header */}
-                  <Box sx={{ position: 'absolute', top: 20, left: 20, right: 20, height: 60, backgroundColor: 'rgba(212, 175, 55, 0.1)', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #877449', zIndex: 1 }}>
-                    <Typography variant="h6" className="Svelte_logo" sx={{ color: '#877449', fontWeight: '600' }}>
-                      Exclusive Offers
+      {/* 4. Final CTA */}
+      <Box sx={{ width: '100%', backgroundColor: '#f5f3ef', py: 6, px: 2, position: 'relative' }}>
+        <Container maxWidth="md">
+          <Typography variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 1 }}>
+            Ready To Transform Your Health? Start Your Svelte Journey Today!
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#333', textAlign: 'center', mb: 4 }}>
+            Schedule your initial consultation and begin your medically guided weight loss journey now.
+          </Typography>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={0} sx={{ p: 2, border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff', height: '100%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                  <Security sx={{ fontSize: 32, color: '#877449', mt: 0.25 }} />
+                  <Box>
+                    <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Clinically Proven</Typography>
+                    <Typography variant="body2" sx={{ color: '#333' }}>
+                      Safe and effective GLP-1 medications, backed by research.
                     </Typography>
                   </Box>
-                  
-                 
-                  
-                  {/* Exclusive offers bullet points */}
-                  <Box sx={{ mb: 3, color: '#877449', textAlign: 'left', maxWidth: '600px', mx: 'auto', position: 'relative', zIndex: 1 }}>
-                    <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>Exclusive access to meal prep and delivery services</strong>
-                      </Typography>
-                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>Expertly curated add on options built for your journey</strong>
-                      </Typography>
-                      <Typography component="li" variant="body1" sx={{ mb: { xs: 1.25, sm: 2 }, color: '#877449', lineHeight: 1.6 }}>
-                        <strong>Svelte referral program- receive premium benefits just for referring others</strong>
-                      </Typography>
-                    </Box>
-                  </Box>
-                  
-                  {/* Navigation button */}
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => setCurrentPage(3)}
-                      sx={{
-                        borderColor: '#877449',
-                        color: '#877449',
-                        textTransform: 'none',
-                        px: 3,
-                        py: 1.25,
-                        fontWeight: '600',
-                        width: 'auto',
-                        '&:hover': {
-                          borderColor: '#877449',
-                          backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                          color: '#877449'
-                        }
-                      }}
-                    >
-                      Next
-                    </Button>
+                </Box>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={0} sx={{ p: 2, border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff', height: '100%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                  <Assignment sx={{ fontSize: 32, color: '#877449', mt: 0.25 }} />
+                  <Box>
+                    <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Ongoing Monitoring</Typography>
+                    <Typography variant="body2" sx={{ color: '#333' }}>
+                      Regular follow-up and adjustments for optimal weight loss results.
+                    </Typography>
                   </Box>
                 </Box>
-
-                {/* Right Panel - Background Image */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    backgroundImage: 'url(/images/weightloss2.jpg)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    borderRadius: 2,
-                    display: { xs: 'none', md: 'flex' },
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      borderRadius: 2,
-                    }
-                  }}
-                >
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      color: 'white',
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      zIndex: 1,
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
-                      px: 3
-                    }}
-                  >
-                    Start Your Journey Today
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            {currentPage === 3 && (
-              <Box sx={{ width: '100%', height: 'calc(100% + 20px)', display: 'flex', gap: 2, p: 2 }}>
-                {/* Left Panel - Content */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    backgroundColor: { xs: 'rgba(0, 0, 0, 0.85)', md: '#000000' },
-                    backgroundImage: { xs: 'none', md: 'none' },
-                    backgroundSize: { xs: '400px 600px', md: 'auto' },
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    p: 4,
-                    borderRadius: 2,
-                    position: 'relative',
-                    color: '#877449',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: { xs: 'rgba(0, 0, 0, 0.7)', md: 'transparent' },
-                      borderRadius: 2,
-                      zIndex: 0,
-                    },
-                  }}
-                >
-                  <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 540 }}>
-                    <Box
-                      sx={{
-                        border: '1px solid #877449',
-                        borderRadius: 1,
-                        width: 'calc(100% - 40px)',
-                        maxWidth: 500,
-                        px: 3,
-                        py: 1.5,
-                        mx: 'auto',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        mb: 3,
-                      }}
-                    >
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          fontWeight: 700,
-                          color: '#877449',
-                          textShadow: '1px 1px 2px rgba(0,0,0,0.6)',
-                          fontFamily: '"Alex Brush", cursive',
-                          fontSize: { xs: '1.4rem', sm: '2.125rem' },
-                        }}
-                      >
-                        How do I get started?
-                      </Typography>
-                    </Box>
-                    <Stack spacing={2} alignItems="center">
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
-                          fontWeight: 500,
-                          color: '#877449',
-                        }}
-                      >
-                        Browse through the site tabs to learn more about Svelte.
-                      </Typography>
-                      <Typography component="div" sx={{ fontSize: { xs: '1.12rem', sm: '1.4rem' }, color: '#877449' }}>⬇️</Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
-                          fontWeight: 500,
-                          color: '#877449',
-                        }}
-                      >
-                        Login to schedule your consultation.
-                      </Typography>
-                      <Typography component="div" sx={{ fontSize: { xs: '1.12rem', sm: '1.4rem' }, color: '#877449' }}>⬇️</Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
-                          fontWeight: 500,
-                          color: '#877449',
-                        }}
-                      >
-                        Speak with a physician to decide if a Svelte membership is right for you.
-                      </Typography>
-                      <Typography component="div" sx={{ fontSize: { xs: '1.12rem', sm: '1.4rem' }, color: '#877449' }}>⬇️</Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: { xs: '0.88rem', sm: '1.1rem' },
-                          fontWeight: 500,
-                          color: '#877449',
-                        }}
-                      >
-                        Start your personalized weight loss journey and enjoy the benefits of Svelte membership.
-                      </Typography>
-                    </Stack>
-                    <Button
-                      variant="contained"
-                      onClick={() => (window.location.href = '/api/auth/login')}
-                      sx={{
-                        mt: 4,
-                        textTransform: 'none',
-                        backgroundColor: '#877449',
-                        color: '#000',
-                        fontWeight: 600,
-                        px: 3,
-                        py: 1.5,
-                        '&:hover': {
-                          backgroundColor: '#B8941F',
-                        },
-                      }}
-                    >
-                      Schedule Your Consultation
-                    </Button>
-                  </Box>
-                </Box>
-
-                {/* Right Panel - Background Image */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    backgroundImage: 'url(/images/weightloss5.png)',
-                    backgroundSize: '400px 600px',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    borderRadius: 2,
-                    display: { xs: 'none', md: 'flex' },
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      borderRadius: 2,
-                    },
-                  }}
-                >
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      color: 'white',
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      zIndex: 1,
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
-                      px: 3,
-                    }}
-                  >
-                    Your next step begins here.
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-          </Box>
-
-              
-          {/* Navigation Arrows */}
-          {currentPage > 0 && (
-                <Button
-              onClick={() => setCurrentPage(currentPage - 1)}
-                  sx={{ 
-                position: 'absolute',
-                left: 20,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                minWidth: 40,
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                backgroundColor: 'white',
-                color: '#877449',
-                zIndex: 10,
-                fontSize: '1.2rem',
-                    '&:hover': {
-                  backgroundColor: 'white'
-                }
-              }}
-            >
-              ←
-                </Button>
-          )}
-
-          {currentPage < 3 && (
+              </Paper>
+            </Grid>
+          </Grid>
+          <Box sx={{ textAlign: 'center' }}>
             <Button
-              onClick={() => setCurrentPage(currentPage + 1)}
+              component="a"
+              href="https://calendly.com/kadriaf-lukariagroup"
+              variant="contained"
+              size="large"
               sx={{
-                position: 'absolute',
-                right: 20,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                minWidth: 40,
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                backgroundColor: '#2b2b2b',
-                color: 'white',
-                zIndex: 10,
-                fontSize: '1.2rem',
-                '&:hover': {
-                  backgroundColor: '#2b2b2b'
-                }
+                textTransform: 'none',
+                backgroundColor: '#877449',
+                color: '#000',
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                px: 4,
+                py: 1.5,
+                '&:hover': { backgroundColor: '#B8941F' },
               }}
             >
-              →
+              Get Started
             </Button>
-          )}
           </Box>
+        </Container>
+      </Box>
     </>
   );
 }
