@@ -462,7 +462,7 @@ export default function Home() {
             Meet Your Doctor
           </Typography>
           <Typography variant="h5" sx={{ color: '#000', fontWeight: 700, mb: 3 }}>
-            Dr. Kadria Fairclough, MD
+            Dr. Kadria Fairclough, Bsc, BMedSci, MBBS, LMCC.
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { sm: 'center' }, gap: 3 }}>
             <Box
@@ -480,7 +480,7 @@ export default function Home() {
               onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.png'; }}
             />
             <Typography variant="body1" sx={{ color: '#333', lineHeight: 1.7 }}>
-              Dr. Kadria Fairclough is a board certified physician with over 15 years of experience helping patients achieve their health and wellness goals. At Svelte by LuKaria, she specializes in medically supervised weight loss and GLP-1 treatments ensuring safe, effective, and personalized care.
+              Dr. Kadria Fairclough is a licensed physician with over 15 years of experience helping patients achieve their health and wellness goals. At Svelte by LuKaria, she specializes in medically supervised weight loss and GLP-1 treatments ensuring safe, effective, and personalized care.
             </Typography>
           </Box>
         </Container>
