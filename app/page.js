@@ -383,7 +383,6 @@ export default function Home() {
               color: '#25D366',
               fontWeight: 600,
               fontSize: '0.9rem',
-              display: { xs: 'none', sm: 'block' }
             }}
           >
             876-290-3659
@@ -508,7 +507,7 @@ export default function Home() {
                 <Medication sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
                 <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>GLP-1 Medication</Typography>
                 <Typography variant="body2" sx={{ color: '#333' }}>
-                  Access to FDA-approved GLP-1 medications like Ozempic, Wegovy, and Mounjaro (if appropriate) to support your weight loss.
+                  Access to FDA-approved GLP-1 medications like Ozempic, Wegovy, and tirzepatide (if appropriate) to support your weight loss.
                 </Typography>
               </Paper>
             </Grid>
