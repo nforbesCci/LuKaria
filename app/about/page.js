@@ -59,9 +59,9 @@ export default function AboutUs() {
         </>
       )}
       <SEO 
-        title="About Us - Our Mission | Svelte by LuKaria"
-        description="Learn about Svelte by LuKaria and Dr. Kadria Fairclough. Virtual medical weight loss clinic dedicated to transforming lives through science-backed, compassionate care in Jamaica."
-        keywords="Dr. Kadria Fairclough, Svelte by LuKaria, weight loss doctor Jamaica, lifestyle medicine, obesity management, virtual clinic, Kadria, Kadria Fairclough"
+        title="About Us - Doctor-Guided Care | Svelte by LuKaria"
+        description="Meet Dr. Kadria Fairclough. Medical weight loss Jamaica with doctor-guided care. Svelte by LuKaria offers GLP-1 weight loss, Ozempic, Mounjaro and Tirzepatide through virtual consultations."
+        keywords="Dr. Kadria Fairclough, medical weight loss Jamaica, doctor-guided care, GLP-1 weight loss, weight loss doctor Jamaica, virtual clinic Jamaica, obesity management, Ozempic, Mounjaro, Tirzepatide"
         canonical="https://www.lukariagroup.com/about"
       />
       {/* Navigation Menu */}
@@ -140,6 +140,9 @@ export default function AboutUs() {
             }}
           >
             About Us
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
+            Blog
           </Typography>
         </Box>
       </Box>

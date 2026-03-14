@@ -7,9 +7,17 @@
   <!-- Homepage -->
   <url>
     <loc>https://www.lukariagroup.com/</loc>
-    <lastmod>2025-10-13</lastmod>
+    <lastmod>2025-03-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+
+  <!-- Google Ads Landing Page -->
+  <url>
+    <loc>https://www.lukariagroup.com/ads</loc>
+    <lastmod>2025-03-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <!-- Info Page -->
@@ -33,6 +41,14 @@
     <loc>https://www.lukariagroup.com/contact</loc>
     <lastmod>2025-10-13</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog Page -->
+  <url>
+    <loc>https://www.lukariagroup.com/blog</loc>
+    <lastmod>2025-03-12</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 

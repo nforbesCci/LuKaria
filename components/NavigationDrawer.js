@@ -33,6 +33,7 @@ import {
   Schedule,
   Report,
   Groups,
+  Article,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -78,8 +79,8 @@ export default function NavigationDrawer() {
     // Check processed custom claims first
     (user?.groups && user.groups.some(item => item.toLowerCase() === "doctor" || item.toLowerCase() === "admin"));
 
-  // Hide navigation drawer on privacy policy, terms, and about pages
-  if (pathname === '/privacy-policy' || pathname === '/terms' || pathname === '/about') {
+  // Hide navigation drawer on privacy policy, terms, about, and ads pages
+  if (pathname === '/privacy-policy' || pathname === '/terms' || pathname === '/about' || pathname === '/ads') {
     return null;
   }
 
@@ -154,6 +155,11 @@ export default function NavigationDrawer() {
         path: '/admin',
       },
       {
+        text: 'Manage Blog',
+        icon: <Article />,
+        path: '/blog',
+      },
+      {
         text: 'Reschedule Requests',
         icon: <Schedule />,
         path: '/admin/reschedule-requests',
@@ -203,6 +209,11 @@ export default function NavigationDrawer() {
 
   // Hide navigation drawer on Info page
   if (pathname === '/info') {
+    return null;
+  }
+
+  // Hide navigation drawer on Blog page (uses its own nav)
+  if (pathname === '/blog' || pathname?.startsWith?.('/blog/')) {
     return null;
   }
 

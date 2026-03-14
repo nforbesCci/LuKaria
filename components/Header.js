@@ -92,6 +92,9 @@ export default function Header() {
           <Typography component={Link} href="/about" variant="body2" sx={linkSx}>
             About Us
           </Typography>
+          <Typography component={Link} href="/blog" variant="body2" sx={linkSx}>
+            Blog
+          </Typography>
         </Box>
       </Box>
 

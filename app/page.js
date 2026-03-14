@@ -169,10 +169,10 @@ export default function Home() {
           />
         </>
       )}
-      <SEO 
-        title="Svelte by LuKaria - Virtual Medical Weight Loss | GLP-1 Medications"
-        description="Virtual medical weight loss clinic in Jamaica. GLP-1 medications like tirzepatide prescribed by licensed physicians. Flat monthly fee, no waiting rooms. Start your transformation today."
-        keywords="weight loss Jamaica, GLP-1 medications, tirzepatide, virtual weight loss clinic, telemedicine Jamaica, online doctor, medical weight loss, obesity treatment, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+      <SEO
+        title="Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria"
+        description="Medical weight loss Jamaica with doctor-guided care. GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide. Physician-supervised virtual consultations. Flat monthly fee, no waiting rooms."
+        keywords="medical weight loss Jamaica, doctor-guided care, GLP-1 weight loss, Ozempic Jamaica, Mounjaro Jamaica, Tirzepatide, Semaglutide, virtual weight loss clinic, telemedicine Jamaica, weight loss centre Jamaica, obesity treatment, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com"
       />
       {/* Navigation Menu */}
@@ -251,6 +251,18 @@ export default function Home() {
             onClick={() => window.location.href = '/about'}
           >
             About Us
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#000000', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            onClick={() => window.location.href = '/blog'}
+          >
+            Blog
           </Typography>
         </Box>
       </Box>

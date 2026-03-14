@@ -69,9 +69,9 @@ export default function InfoPage() {
         </>
       )}
       <SEO 
-        title="Payment Information | Svelte by LuKaria"
-        description="Transparent pricing for Svelte by LuKaria weight loss program. It includes physician appointments, GLP-1 medications, and support. Special introductory offers available."
-        keywords="weight loss pricing, GLP-1 cost, Mounjaro price Jamaica, medical weight loss program cost, affordable weight loss, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+        title="Pricing | Medical Weight Loss Jamaica | Svelte by LuKaria"
+        description="Transparent pricing for medical weight loss Jamaica. Svelte by LuKaria GLP-1 weight loss program includes physician appointments, Ozempic, Mounjaro, Tirzepatide. Doctor-guided care with flat monthly fee."
+        keywords="medical weight loss pricing Jamaica, GLP-1 weight loss cost, Ozempic Mounjaro price Jamaica, weight loss program cost, doctor-guided care pricing, affordable weight loss Jamaica, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/info"
       />
       {/* Navigation Menu */}
@@ -150,6 +150,9 @@ export default function InfoPage() {
             onClick={() => window.location.href = '/about'}
           >
             About Us
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
+            Blog
           </Typography>
         </Box>
       </Box>

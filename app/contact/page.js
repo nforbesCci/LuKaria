@@ -62,10 +62,10 @@ export default function Contact() {
           />
         </>
       )}
-      <SEO 
-        title="Contact Us | Svelte by LuKaria"
-        description="Get in touch with Svelte by LuKaria. Contact our patient care team for questions about virtual weight loss consultations, GLP-1 medications, and program enrollment."
-        keywords="contact weight loss clinic, Jamaica telehealth contact, virtual consultation contact, patient care support, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+      <SEO
+        title="Contact Us | Medical Weight Loss Jamaica | Svelte by LuKaria"
+        description="Contact Svelte by LuKaria for medical weight loss Jamaica. Get in touch about doctor-guided GLP-1 weight loss, Ozempic, Mounjaro, Tirzepatide consultations and program enrollment."
+        keywords="contact weight loss clinic Jamaica, medical weight loss contact, GLP-1 weight loss consultation, doctor-guided care contact, telehealth Jamaica, patient care support, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/contact"
       />
       {/* Navigation Menu */}
@@ -144,6 +144,9 @@ export default function Contact() {
             onClick={() => window.location.href = '/about'}
           >
             About Us
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
+            Blog
           </Typography>
         </Box>
       </Box>

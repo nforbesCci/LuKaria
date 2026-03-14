@@ -27,10 +27,10 @@ export default function Terms() {
 
   return (
     <>
-      <SEO 
-        title="Terms and Conditions | Svelte by LuKaria"
-        description="Read the terms and conditions for using Svelte by LuKaria virtual weight loss services. Understand your rights and responsibilities as a patient."
-        keywords="terms and conditions, service agreement, patient terms, telehealth terms, medical services agreement, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+      <SEO
+        title="Terms and Conditions | Medical Weight Loss Jamaica | Svelte by LuKaria"
+        description="Terms and conditions for Svelte by LuKaria medical weight loss Jamaica. Your rights and responsibilities for doctor-guided GLP-1 weight loss and telehealth services."
+        keywords="terms and conditions, medical weight loss agreement, patient terms Jamaica, telehealth terms, doctor-guided care terms, medical services agreement, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/terms"
       />
       {/* Navigation Menu */}

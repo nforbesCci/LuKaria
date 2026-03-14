@@ -5,10 +5,12 @@ User-agent: *
 Allow: /
 
 # Specific pages
+Allow: /ads
 Allow: /info
 Allow: /faq
 Allow: /contact
 Allow: /about
+Allow: /blog
 Allow: /privacy-policy
 Allow: /terms
 

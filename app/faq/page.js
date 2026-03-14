@@ -81,10 +81,10 @@ export default function FAQ() {
           />
         </>
       )}
-      <SEO 
-        title="FAQ - Frequently Asked Questions | Svelte by LuKaria"
-        description="Common questions about GLP-1 medications, Tirzepatide, weight loss treatment, virtual consultations, and program details. Get answers to your weight loss questions."
-        keywords="GLP-1 FAQ, Tirzepatide questions, weight loss answers, virtual consultation FAQ, medical weight loss questions, Jamaica, Kadria, Kadria Fairclough, Dr. Kadria Fairclough"
+      <SEO
+        title="FAQ - GLP-1 Weight Loss Questions | Svelte by LuKaria"
+        description="FAQ about medical weight loss Jamaica, GLP-1 weight loss, Ozempic, Mounjaro, Tirzepatide. Doctor-guided care answers for virtual consultations and weight loss program details."
+        keywords="GLP-1 weight loss FAQ, Ozempic Mounjaro questions, medical weight loss Jamaica FAQ, Tirzepatide answers, doctor-guided care FAQ, weight loss clinic Jamaica, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/faq"
       />
       {/* Navigation Menu */}
@@ -163,6 +163,9 @@ export default function FAQ() {
             onClick={() => window.location.href = '/about'}
           >
             About Us
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
+            Blog
           </Typography>
         </Box>
       </Box>

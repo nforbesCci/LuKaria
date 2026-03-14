@@ -7,28 +7,27 @@ import './globals.css';
 
 export const metadata = {
   title: {
-    default: 'Svelte by LuKaria - Virtual Medical Weight Loss | GLP-1 Medications',
+    default: 'Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria',
     template: '%s | Svelte by LuKaria'
   },
-  description: 'Virtual medical weight loss clinic offering GLP-1 medications like Mounjaro. Licensed physicians provide personalized weight loss plans through secure telehealth in Jamaica. Start your transformation today.',
+  description: 'Medical weight loss Jamaica with doctor-guided care. Svelte by LuKaria offers virtual GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide. Safe, physician-supervised weight management from home.',
   keywords: [
-    'weight loss',
-    'GLP-1 medications',
-    'Mounjaro',
-    'virtual healthcare',
-    'telemedicine',
-    'medical weight loss',
+    'medical weight loss Jamaica',
+    'doctor-guided care',
+    'GLP-1 weight loss',
+    'Ozempic Jamaica',
+    'Mounjaro Jamaica',
+    'Tirzepatide',
+    'Semaglutide',
+    'virtual weight loss clinic',
+    'telemedicine Jamaica',
+    'weight loss centre Jamaica',
     'obesity treatment',
-    'Jamaica healthcare',
     'weight management',
+    'physician-supervised weight loss',
     'telehealth Jamaica',
-    'online doctor consultation',
-    'prescription weight loss',
     'Svelte',
     'LuKaria',
-    'lifestyle medicine',
-    'metabolic health',
-    'Kadria',
     'Kadria Fairclough',
     'Dr. Kadria Fairclough'
   ],
@@ -50,8 +49,8 @@ export const metadata = {
     type: 'website',
     locale: 'en_JM',
     url: 'https://www.lukariagroup.com',
-    title: 'Svelte by LuKaria - Virtual Medical Weight Loss',
-    description: 'Virtual medical weight loss clinic offering GLP-1 medications. Licensed physicians provide personalized care through secure telehealth in Jamaica.',
+    title: 'Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria',
+    description: 'Medical weight loss Jamaica with doctor-guided care. GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide. Physician-supervised virtual consultations.',
     siteName: 'Svelte by LuKaria',
     images: [
       {
@@ -64,8 +63,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Svelte by LuKaria - Virtual Medical Weight Loss',
-    description: 'Virtual medical weight loss clinic offering GLP-1 medications in Jamaica.',
+    title: 'Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria',
+    description: 'Medical weight loss Jamaica with doctor-guided care. GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide.',
     images: ['/images/Lukaria_logo.png'],
   },
   verification: {
