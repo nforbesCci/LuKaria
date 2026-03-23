@@ -169,6 +169,8 @@ export default function AboutUs() {
             component="img"
             src="/images/Lukaria_logo_small.png"
             alt="Lukaria Logo"
+            width={48}
+            height={48}
             sx={{
               width: 48,
               height: 48,
@@ -303,6 +305,8 @@ export default function AboutUs() {
                       component="img"
                       src="/images/kadria.png"
                       alt="Dr. Kadria Fairclough"
+                      width={250}
+                      height={250}
                       sx={{
                         width: { xs: '100%', md: 250 },
                         maxWidth: 250,

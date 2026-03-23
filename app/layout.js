@@ -119,6 +119,25 @@ export default function RootLayout({ children }) {
                   description: 'Medical weight loss Jamaica with doctor-guided care.',
                   publisher: { '@id': 'https://www.lukariagroup.com/#organization' },
                   inLanguage: 'en-JM',
+                  potentialAction: [
+                    {
+                      '@type': 'ReserveAction',
+                      name: 'Book a free consultation',
+                      target: {
+                        '@type': 'EntryPoint',
+                        urlTemplate: 'https://calendly.com/kadriaf-lukariagroup/30min',
+                        actionPlatform: [
+                          'http://schema.org/DesktopWebPlatform',
+                          'http://schema.org/MobileWebPlatform',
+                        ],
+                      },
+                    },
+                    {
+                      '@type': 'ContactAction',
+                      name: 'Contact Svelte by LuKaria',
+                      target: 'https://www.lukariagroup.com/contact',
+                    },
+                  ],
                 },
                 {
                   '@type': 'ImageObject',
@@ -160,8 +179,10 @@ export default function RootLayout({ children }) {
                   jobTitle: 'Physician',
                   credential: ['BSc', 'BMedSci', 'MBBS', 'LMCC'],
                   worksFor: { '@id': 'https://www.lukariagroup.com/#organization' },
-                  description: 'Licensed physician with over 15 years of experience, specializing in medically supervised weight loss and lifestyle medicine.',
+                  description:
+                    'Licensed physician with over 15 years of experience, specializing in medically supervised weight loss and lifestyle medicine. Extensive telehealth experience serving patients in Jamaica and Canada.',
                   knowsAbout: ['Weight Management', 'Obesity Medicine', 'Lifestyle Medicine'],
+                  sameAs: ['https://www.lukariagroup.com/about'],
                 },
               ],
             }),

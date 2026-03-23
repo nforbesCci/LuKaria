@@ -12,21 +12,45 @@ const staticRoutes = [
   { url: `${BASE_URL}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.5 },
 ];
 
-export default async function sitemap() {
-  let blogPosts = [];
-  try {
-    const { getDatabase } = await import('../lib/mongodb');
-    const db = await getDatabase();
-    const posts = await db.collection('blogPosts').find({}).project({ _id: 1, updatedAt: 1, createdAt: 1 }).toArray();
-    blogPosts = posts.map((p) => ({
-      url: `${BASE_URL}/blog/${String(p._id)}`,
-      lastModified: p.updatedAt || p.createdAt || new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    }));
-  } catch (err) {
-    console.error('Sitemap: Failed to fetch blog posts, using static routes only', err?.message || err);
-  }
+function withTimeout(promise, ms, label = 'operation') {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+    ),
+  ]);
+}
 
-  return [...staticRoutes, ...blogPosts];
+async function fetchBlogRoutesForSitemap() {
+  const { getDatabase } = await import('../lib/mongodb');
+  const db = await withTimeout(getDatabase(), 12000, 'MongoDB getDatabase');
+  const posts = await withTimeout(
+    db.collection('blogPosts').find({}).project({ _id: 1, updatedAt: 1, createdAt: 1 }).toArray(),
+    12000,
+    'MongoDB blogPosts query'
+  );
+  return posts.map((p) => ({
+    url: `${BASE_URL}/blog/${String(p._id)}`,
+    lastModified: p.updatedAt || p.createdAt || new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }));
+}
+
+/**
+ * Never throw: production sitemaps must return 200 with at least static URLs.
+ */
+export default async function sitemap() {
+  try {
+    let blogPosts = [];
+    try {
+      blogPosts = await fetchBlogRoutesForSitemap();
+    } catch (err) {
+      console.error('Sitemap: Failed to fetch blog posts, using static routes only', err?.message || err);
+    }
+    return [...staticRoutes, ...blogPosts];
+  } catch (fatal) {
+    console.error('Sitemap: fatal error, returning static routes only', fatal?.message || fatal);
+    return staticRoutes;
+  }
 }

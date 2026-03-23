@@ -4,6 +4,25 @@
 User-agent: *
 Allow: /
 
+# AI / LLM crawlers (Generative Engine Optimization)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
 # Specific pages
 Allow: /ads
 Allow: /info
@@ -34,4 +53,3 @@ Disallow: /api/
 
 # Sitemap location
 Sitemap: https://www.lukariagroup.com/sitemap.xml
-

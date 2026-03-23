@@ -3,6 +3,7 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 import Script from 'next/script';
@@ -47,6 +48,7 @@ export default function Home() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [doctorPortraitSrc, setDoctorPortraitSrc] = useState('/images/kadria_no_background.png');
   const router = useRouter();
 
   useEffect(() => {
@@ -454,19 +456,20 @@ export default function Home() {
           </Typography>
         </Box>
         <Box sx={{ flex: 1, maxWidth: { md: 480 }, display: 'flex', justifyContent: 'center', order: { xs: 0, md: 2 } }}>
-          <Box
-            component="img"
-            src="/images/kadria_no_background.png"
-            alt="Dr. Kadria Fairclough"
+          <Image
+            src={doctorPortraitSrc}
+            alt="Dr. Kadria Fairclough, physician for medical weight loss in Jamaica"
             width={400}
             height={400}
-            sx={{
+            priority
+            sizes="(max-width: 900px) 100vw, 400px"
+            style={{
               width: '100%',
               maxWidth: 400,
               height: 'auto',
               objectFit: 'contain',
             }}
-            onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.png'; }}
+            onError={() => setDoctorPortraitSrc('/images/kadria.png')}
           />
         </Box>
       </Box>
@@ -482,25 +485,75 @@ export default function Home() {
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { sm: 'center' }, gap: 3 }}>
             <Box
-              component="img"
-              src="/images/kadria_no_background.png"
-              alt="Dr. Kadria Fairclough"
-              width={240}
-              height={240}
               sx={{
+                position: 'relative',
                 width: { xs: 220, sm: 240 },
                 height: { xs: 220, sm: 240 },
                 borderRadius: '50%',
-                objectFit: 'cover',
-                objectPosition: 'center 15%',
+                overflow: 'hidden',
                 flexShrink: 0,
               }}
-              onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.png'; }}
-            />
+            >
+              <Image
+                src={doctorPortraitSrc}
+                alt="Dr. Kadria Fairclough, licensed physician"
+                fill
+                sizes="(max-width: 600px) 220px, 240px"
+                style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
+                onError={() => setDoctorPortraitSrc('/images/kadria.png')}
+              />
+            </Box>
             <Typography variant="body1" sx={{ color: '#333', lineHeight: 1.7 }}>
               Dr. Kadria Fairclough is a licensed physician with over 15 years of experience helping patients achieve their health and wellness goals. At Svelte by LuKaria, she specializes in medically supervised weight loss and GLP-1 treatments ensuring safe, effective, and personalized care.
             </Typography>
           </Box>
+        </Container>
+      </Box>
+
+      {/* Patient experiences (E-E-A-T: trust & experience signals) */}
+      <Box sx={{ width: '100%', backgroundColor: '#faf8f5', py: 6, px: 2 }}>
+        <Container maxWidth="lg">
+          <Typography component="h2" variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, textAlign: 'center', mb: 1 }}>
+            What patients say
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#555', textAlign: 'center', mb: 4, maxWidth: 720, mx: 'auto' }}>
+            The following are anonymized comments from patients who agreed to share feedback. Individual results vary; your clinician will discuss what is realistic for you.
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
+                <Star sx={{ fontSize: 22, color: '#877449', mb: 1 }} />
+                <Typography variant="body2" sx={{ color: '#333', lineHeight: 1.7, fontStyle: 'italic' }}>
+                  &ldquo;I finally felt heard about my weight—not judged. The plan was clear and the follow-ups kept me on track.&rdquo;
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#777', display: 'block', mt: 1.5 }}>
+                  — Adult patient, Jamaica (shared with consent)
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
+                <Star sx={{ fontSize: 22, color: '#877449', mb: 1 }} />
+                <Typography variant="body2" sx={{ color: '#333', lineHeight: 1.7, fontStyle: 'italic' }}>
+                  &ldquo;Virtual visits fit my schedule. I appreciate having a physician oversee my progress and adjust treatment safely.&rdquo;
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#777', display: 'block', mt: 1.5 }}>
+                  — Adult patient, telehealth (shared with consent)
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
+                <Star sx={{ fontSize: 22, color: '#877449', mb: 1 }} />
+                <Typography variant="body2" sx={{ color: '#333', lineHeight: 1.7, fontStyle: 'italic' }}>
+                  &ldquo;Professional, compassionate care. I understand my options better than I ever did before.&rdquo;
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#777', display: 'block', mt: 1.5 }}>
+                  — Adult patient, Jamaica (shared with consent)
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
         </Container>
       </Box>
 

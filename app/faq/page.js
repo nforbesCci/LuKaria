@@ -193,6 +193,8 @@ export default function FAQ() {
             component="img"
             src="/images/Lukaria_logo_small.png"
             alt="Lukaria Logo"
+            width={48}
+            height={48}
             sx={{
               width: 48,
               height: 48,
@@ -252,11 +254,41 @@ export default function FAQ() {
               sx={{
                 fontSize: { xs: '1.5rem', sm: '2.5rem' },
                 fontWeight: 600,
-                mb: 4,
+                mb: 2,
                 color: '#877449'
               }}
             >
               Frequently Asked Questions
+            </Typography>
+
+            <Typography
+              variant="body1"
+              component="div"
+              sx={{
+                color: '#e0e0e0',
+                lineHeight: 1.75,
+                mb: 4,
+                maxWidth: 900,
+                mx: 'auto',
+                textAlign: 'left',
+              }}
+            >
+              <Typography component="p" variant="body1" sx={{ color: '#e0e0e0', mb: 2 }}>
+                Welcome to the Svelte by LuKaria FAQ. Here we answer common questions about medically supervised weight loss in Jamaica,
+                GLP-1–based therapies (including brands you may have heard of, such as Mounjaro and medicines containing semaglutide), and how our
+                virtual, doctor-guided program works. This information is for general education only—it does not replace personalized medical advice.
+                Always follow the directions of your prescribing physician.
+              </Typography>
+              <Typography component="p" variant="body1" sx={{ color: '#e0e0e0', mb: 2 }}>
+                Dr. Kadria Fairclough and our team focus on safety, informed consent, and realistic expectations. Whether you are exploring
+                options for the first time or comparing programs, the sections below cover how consultations work, what to expect from treatment,
+                side effects to discuss with your doctor, and how telehealth fits into ongoing care. Use the tabs to jump between medication
+                topics, and expand any question for a concise answer. If you do not see your question listed, contact us—we are happy to help
+                during a scheduled visit.
+              </Typography>
+              <Typography component="p" variant="body1" sx={{ color: '#b0b0b0', fontSize: '0.9rem' }}>
+                <strong style={{ color: '#877449' }}>Note:</strong> Medication names and indications change; your clinician will recommend what is appropriate for your health profile and local availability.
+              </Typography>
             </Typography>
 
             {/* Tab Menu */}
