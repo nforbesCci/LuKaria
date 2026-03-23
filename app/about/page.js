@@ -220,7 +220,7 @@ export default function AboutUs() {
       {/* Main Content */}
       <Container maxWidth="lg" sx={{ mt: 18, mb: 6 }}>
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
+          <Typography component="h1" variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
             About Svelte by LuKaria
           </Typography>
         </Box>

@@ -252,7 +252,7 @@ export default function InfoPage() {
             </Button>
           </Box>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Typography variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
+            <Typography component="h1" variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
               Membership and Pricing
             </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
