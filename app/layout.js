@@ -54,7 +54,7 @@ export const metadata = {
     siteName: 'Svelte by LuKaria',
     images: [
       {
-        url: '/images/Lukaria_logo.png',
+        url: 'https://www.lukariagroup.com/images/Lukaria_logo.png',
         width: 1200,
         height: 630,
         alt: 'Svelte by LuKaria Logo',
@@ -65,7 +65,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria',
     description: 'Medical weight loss Jamaica with doctor-guided care. GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide.',
-    images: ['/images/Lukaria_logo.png'],
+    images: ['https://www.lukariagroup.com/images/Lukaria_logo.png'],
   },
   verification: {
     google: 'TAAk9hGtQmi6UwNq4n4g8UrBCM2w91kIZU0ndvLHlKw',
@@ -105,8 +105,48 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
-        <script src="/index.html" />
-       
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  '@id': 'https://www.lukariagroup.com/#organization',
+                  name: 'Svelte by LuKaria',
+                  url: 'https://www.lukariagroup.com',
+                  logo: { '@id': 'https://www.lukariagroup.com/#logo' },
+                  contactPoint: {
+                    '@type': 'ContactPoint',
+                    telephone: '+1-876-290-3659',
+                    contactType: 'customer service',
+                    areaServed: 'JM',
+                    availableLanguage: 'English',
+                  },
+                },
+                {
+                  '@type': 'MedicalOrganization',
+                  '@id': 'https://www.lukariagroup.com/#localbusiness',
+                  name: 'Svelte by LuKaria',
+                  description: 'Medical weight loss clinic in Jamaica with doctor-guided care. Physician-supervised weight loss programs.',
+                  url: 'https://www.lukariagroup.com',
+                  telephone: '+1-876-290-3659',
+                  email: 'svelte@lukariagroup.com',
+                  address: { '@type': 'PostalAddress', addressCountry: 'JM', addressRegion: 'Jamaica' },
+                  areaServed: { '@type': 'Country', name: 'Jamaica' },
+                },
+                {
+                  '@type': 'Physician',
+                  name: 'Dr. Kadria Fairclough',
+                  jobTitle: 'Physician',
+                  worksFor: { '@id': 'https://www.lukariagroup.com/#organization' },
+                  description: 'Licensed physician specializing in medically supervised weight loss.',
+                },
+              ],
+            }),
+          }}
+        />
       </head>
             <body suppressHydrationWarning={true}>
               <UserProvider>

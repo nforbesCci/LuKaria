@@ -108,6 +108,23 @@ export default function BlogPostPage() {
         description={post.content?.slice(0, 160) || 'Blog post from Svelte by LuKaria'}
         canonical={`https://www.lukariagroup.com/blog/${post._id}`}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: post.title,
+            description: post.content?.slice(0, 160),
+            datePublished: post.createdAt,
+            dateModified: post.updatedAt || post.createdAt,
+            author: { '@type': 'Person', name: post.authorName },
+            publisher: { '@type': 'Organization', name: 'Svelte by LuKaria', url: 'https://www.lukariagroup.com' },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://www.lukariagroup.com/blog/${post._id}` },
+            ...(post.imageUrl && { image: `https://www.lukariagroup.com${post.imageUrl}` }),
+          }),
+        }}
+      />
       {/* Top Navigation Menu */}
       <Box
         sx={{
