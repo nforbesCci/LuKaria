@@ -3,6 +3,7 @@ import ThemeProvider from '../components/ThemeProvider';
 import NavigationDrawer from '../components/NavigationDrawer';
 import ClientLayout from '../components/ClientLayout';
 import ReduxProvider from '../components/ReduxProvider';
+import { REGISTERED_OFFICE, OFFICE_OPENING_HOURS_SCHEMA } from '../lib/business';
 import './globals.css';
 
 export const metadata = {
@@ -83,7 +84,6 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js" async></script>        
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -165,12 +165,20 @@ export default function RootLayout({ children }) {
                   '@type': 'MedicalOrganization',
                   '@id': 'https://www.lukariagroup.com/#localbusiness',
                   name: 'Svelte by LuKaria',
-                  description: 'Medical weight loss clinic in Jamaica with doctor-guided care. Physician-supervised weight loss programs.',
+                  description:
+                    'Medical weight loss clinic in Jamaica with doctor-guided care. Physician-supervised weight loss programs. Registered office in Kingston; care delivered virtually with in-person visits by arrangement.',
                   url: 'https://www.lukariagroup.com',
                   telephone: '+1-876-290-3659',
                   email: 'svelte@lukariagroup.com',
-                  address: { '@type': 'PostalAddress', addressCountry: 'JM', addressRegion: 'Jamaica' },
+                  address: {
+                    '@type': 'PostalAddress',
+                    streetAddress: REGISTERED_OFFICE.streetAddress,
+                    addressLocality: REGISTERED_OFFICE.addressLocality,
+                    addressRegion: REGISTERED_OFFICE.addressRegion,
+                    addressCountry: REGISTERED_OFFICE.addressCountry,
+                  },
                   areaServed: { '@type': 'Country', name: 'Jamaica' },
+                  openingHoursSpecification: OFFICE_OPENING_HOURS_SCHEMA,
                 },
                 {
                   '@type': 'Physician',

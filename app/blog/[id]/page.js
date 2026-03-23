@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Script from 'next/script';
 import SEO from '../../../components/SEO';
+import { getYouTubeEmbedUrl, getYouTubeVideoId } from '../../../lib/business';
+import { normalizePostVideos } from '../../../lib/blog-videos';
 import {
   Container,
   Typography,
@@ -98,6 +100,9 @@ export default function BlogPostPage() {
     );
   }
 
+  const postVideos = normalizePostVideos(post);
+  const isVideoBlog = postVideos.length > 0;
+
   return (
     <>
       {process.env.NEXT_PUBLIC_GA_ID && (
@@ -122,6 +127,16 @@ export default function BlogPostPage() {
             publisher: { '@type': 'Organization', name: 'Svelte by LuKaria', url: 'https://www.lukariagroup.com' },
             mainEntityOfPage: { '@type': 'WebPage', '@id': `https://www.lukariagroup.com/blog/${post._id}` },
             ...(post.imageUrl && { image: `https://www.lukariagroup.com${post.imageUrl}` }),
+            ...(postVideos.length > 0 && {
+              associatedMedia: postVideos.map((v) => ({
+                '@type': 'VideoObject',
+                name: v.title || post.title,
+                embedUrl: getYouTubeEmbedUrl(v.url),
+                ...(getYouTubeVideoId(v.url) && {
+                  thumbnailUrl: `https://img.youtube.com/vi/${getYouTubeVideoId(v.url)}/mqdefault.jpg`,
+                }),
+              })),
+            }),
           }),
         }}
       />
@@ -222,6 +237,45 @@ export default function BlogPostPage() {
       <Box sx={{ mt: 16, mb: 6, px: 2 }}>
         <Container maxWidth="md">
           <Paper elevation={2} sx={{ p: 4, backgroundColor: '#1a1a1a' }}>
+            <Typography variant="overline" sx={{ color: isVideoBlog ? '#B8941F' : '#877449', display: 'block', mb: 1 }}>
+              {isVideoBlog ? 'Video blog' : 'Article'}
+            </Typography>
+            <Typography variant="h4" sx={{ color: '#877449', fontWeight: 600, mb: 2 }}>
+              {post.title}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#877449', opacity: 0.8, mb: 3 }}>
+              {new Date(post.createdAt).toLocaleDateString()} • {post.authorName}
+            </Typography>
+            {postVideos.map((v, idx) =>
+              getYouTubeEmbedUrl(v.url) ? (
+                <Box key={`${v.url}-${idx}`} sx={{ mb: 3 }}>
+                  {v.title ? (
+                    <Typography variant="h6" sx={{ color: '#877449', fontWeight: 600, mb: 1.5 }}>
+                      {v.title}
+                    </Typography>
+                  ) : null}
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: '100%',
+                      pt: '56.25%',
+                      borderRadius: 1,
+                      overflow: 'hidden',
+                      bgcolor: '#000',
+                    }}
+                  >
+                    <Box
+                      component="iframe"
+                      src={getYouTubeEmbedUrl(v.url)}
+                      title={v.title || `Video ${idx + 1}: ${post.title}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                    />
+                  </Box>
+                </Box>
+              ) : null
+            )}
             {post.imageUrl && (
               <Box
                 component="img"
@@ -230,12 +284,6 @@ export default function BlogPostPage() {
                 sx={{ width: '100%', maxHeight: 400, objectFit: 'cover', borderRadius: 1, mb: 3 }}
               />
             )}
-            <Typography variant="h4" sx={{ color: '#877449', fontWeight: 600, mb: 2 }}>
-              {post.title}
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#877449', opacity: 0.8, mb: 3 }}>
-              {new Date(post.createdAt).toLocaleDateString()} • {post.authorName}
-            </Typography>
             <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
               {post.content}
             </Typography>

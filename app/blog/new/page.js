@@ -11,13 +11,19 @@ import {
   Button,
   CircularProgress,
   Alert,
+  IconButton,
+  Paper,
 } from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
+
+const emptyVideoRow = () => ({ title: '', url: '' });
 
 export default function BlogNewPage() {
   const router = useRouter();
   const { user } = useUser();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [videoEntries, setVideoEntries] = useState([emptyVideoRow()]);
   const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -30,15 +36,33 @@ export default function BlogNewPage() {
     ))
   );
 
+  const addVideoRow = () => setVideoEntries((rows) => [...rows, emptyVideoRow()]);
+  const removeVideoRow = (index) => {
+    setVideoEntries((rows) =>
+      rows.length <= 1 ? [emptyVideoRow()] : rows.filter((_, j) => j !== index)
+    );
+  };
+  const setVideoField = (index, field, value) => {
+    setVideoEntries((rows) => {
+      const next = [...rows];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
     setSaving(true);
     setError('');
     try {
+      const payload = videoEntries
+        .filter((v) => v.url.trim())
+        .map((v) => ({ title: v.title.trim(), url: v.url.trim() }));
       const formData = new FormData();
       formData.append('title', title.trim());
       formData.append('content', content.trim());
+      formData.append('videosJson', JSON.stringify(payload));
       if (imageFile) formData.append('image', imageFile);
       const res = await fetch('/api/blog', {
         method: 'POST',
@@ -79,7 +103,7 @@ export default function BlogNewPage() {
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
           fullWidth
-          label="Title"
+          label="Post title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
@@ -95,6 +119,50 @@ export default function BlogNewPage() {
           required
           sx={{ mb: 2 }}
         />
+
+        <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: 600, mb: 1 }}>
+          Video blogs (optional)
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
+          Add one or more YouTube URLs with a title for each video. Posts with at least one valid video appear under &quot;Video blogs&quot; on the blog index.
+        </Typography>
+        {videoEntries.map((row, index) => (
+          <Paper key={index} variant="outlined" sx={{ p: 2, mb: 2, borderColor: '#877449' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="body2" sx={{ color: '#877449', fontWeight: 600 }}>
+                Video {index + 1}
+              </Typography>
+              <IconButton size="small" onClick={() => removeVideoRow(index)} aria-label="Remove video" sx={{ color: '#877449' }}>
+                <Delete />
+              </IconButton>
+            </Box>
+            <TextField
+              fullWidth
+              label="Video title"
+              placeholder="e.g. Introduction to our weight loss program"
+              value={row.title}
+              onChange={(e) => setVideoField(index, 'title', e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="YouTube URL or video ID"
+              placeholder="https://www.youtube.com/watch?v=... or 11-character ID"
+              value={row.url}
+              onChange={(e) => setVideoField(index, 'url', e.target.value)}
+            />
+          </Paper>
+        ))}
+        <Button
+          type="button"
+          startIcon={<Add />}
+          onClick={addVideoRow}
+          sx={{ mb: 3, color: '#877449', borderColor: '#877449' }}
+          variant="outlined"
+        >
+          Add another video
+        </Button>
+
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" sx={{ mb: 1 }}>Image (optional)</Typography>
           <input

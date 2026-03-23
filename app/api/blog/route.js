@@ -4,6 +4,7 @@ import { getDatabase } from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { parseVideosJsonFromForm, sanitizeStoredVideos } from '../../../lib/blog-videos';
 
 function isDoctorOrAdmin(session) {
   const groups = session?.user?.groups || session?.user?.['https://lukariagroup.com/roles'] || [];
@@ -49,6 +50,7 @@ export async function POST(request) {
     const title = formData.get('title');
     const content = formData.get('content');
     const imageFile = formData.get('image');
+    const videos = sanitizeStoredVideos(parseVideosJsonFromForm(formData));
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
@@ -72,6 +74,8 @@ export async function POST(request) {
       title,
       content,
       imageUrl,
+      videos,
+      videoUrl: videos[0]?.url ?? null,
       authorId: session.user.sub,
       authorName: session.user.name || 'Doctor',
       createdAt: new Date(),

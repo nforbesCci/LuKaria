@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Script from 'next/script';
 import {
   Box,
   Typography,
@@ -248,6 +249,11 @@ export default function BarcodeScanner({ onProductSelect, onClose }) {
   };
 
   return (
+    <>
+      <Script
+        src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"
+        strategy="lazyOnload"
+      />
     <Box>
       {/* Header Section */}
       <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
@@ -516,6 +522,7 @@ export default function BarcodeScanner({ onProductSelect, onClose }) {
         </Card>
       )}
     </Box>
+    </>
   );
 }
 

@@ -16,7 +16,9 @@ import {
   CircularProgress,
   Button,
 } from '@mui/material';
-import { Article, Add, Login } from '@mui/icons-material';
+import { Article, Add, Login, OndemandVideo } from '@mui/icons-material';
+import { getYouTubeVideoId } from '../../lib/business';
+import { normalizePostVideos } from '../../lib/blog-videos';
 
 export default function BlogPage() {
   const { user } = useUser();
@@ -176,52 +178,121 @@ export default function BlogPage() {
               No blog posts yet. Check back soon!
             </Typography>
           ) : (
-            <Grid container spacing={3}>
-              {posts.map((post) => (
-                <Grid item xs={12} sm={6} md={4} key={post._id}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      backgroundColor: '#1a1a1a',
-                      border: '1px solid #877449',
-                    }}
-                  >
-                    <CardActionArea
-                      component="a"
-                      href={`/blog/${post._id}`}
-                      sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
+            <>
+              {(() => {
+                const videoPosts = posts.filter((p) => normalizePostVideos(p).length > 0);
+                const articlePosts = posts.filter((p) => normalizePostVideos(p).length === 0);
+                const PostCard = ({ post, isVideo }) => {
+                  const firstVideo = normalizePostVideos(post)[0];
+                  const thumbId = firstVideo?.url ? getYouTubeVideoId(firstVideo.url) : null;
+                  return (
+                  <Grid item xs={12} sm={6} md={4} key={post._id}>
+                    <Card
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: '#1a1a1a',
+                        border: '1px solid #877449',
+                      }}
                     >
-                      {post.imageUrl ? (
-                        <CardMedia
-                          component="img"
-                          height="180"
-                          image={post.imageUrl}
-                          alt={post.title}
-                          sx={{ objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <Box sx={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#2C3E50' }}>
-                          <Article sx={{ fontSize: 64, color: '#877449' }} />
-                        </Box>
-                      )}
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography variant="h6" sx={{ color: '#877449', fontWeight: 600, mb: 1 }}>
-                          {post.title}
+                      <CardActionArea
+                        component="a"
+                        href={`/blog/${post._id}`}
+                        sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
+                      >
+                        {isVideo && thumbId ? (
+                          <Box
+                            sx={{
+                              height: 180,
+                              position: 'relative',
+                              backgroundColor: '#000',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Box
+                              component="img"
+                              src={`https://img.youtube.com/vi/${thumbId}/mqdefault.jpg`}
+                              alt=""
+                              sx={{ width: '100%', height: 180, objectFit: 'cover', opacity: 0.85 }}
+                            />
+                            <OndemandVideo
+                              sx={{
+                                position: 'absolute',
+                                fontSize: 56,
+                                color: '#877449',
+                                filter: 'drop-shadow(0 0 4px #000)',
+                              }}
+                            />
+                          </Box>
+                        ) : post.imageUrl ? (
+                          <CardMedia
+                            component="img"
+                            height="180"
+                            image={post.imageUrl}
+                            alt={post.title}
+                            sx={{ objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <Box sx={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#2C3E50' }}>
+                            <Article sx={{ fontSize: 64, color: '#877449' }} />
+                          </Box>
+                        )}
+                        <CardContent sx={{ flexGrow: 1 }}>
+                          <Typography variant="overline" sx={{ color: isVideo ? '#B8941F' : '#877449', display: 'block', mb: 0.5 }}>
+                            {isVideo ? 'Video blog' : 'Article'}
+                          </Typography>
+                          <Typography variant="h6" sx={{ color: '#877449', fontWeight: 600, mb: 1 }}>
+                            {post.title}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#877449', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {post.content}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#877449', opacity: 0.8, display: 'block', mt: 1 }}>
+                            {new Date(post.createdAt).toLocaleDateString()} • {post.authorName}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
+                );
+                };
+                return (
+                  <>
+                    {videoPosts.length > 0 && (
+                      <Box sx={{ mb: 6 }}>
+                        <Typography variant="h4" sx={{ color: '#877449', fontFamily: 'sans-serif', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <OndemandVideo sx={{ fontSize: 36 }} />
+                          Video blogs
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#877449', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                          {post.content}
+                        <Typography variant="body2" sx={{ color: '#877449', opacity: 0.9, mb: 3 }}>
+                          Posts with an embedded YouTube video from our team.
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.8, display: 'block', mt: 1 }}>
-                          {new Date(post.createdAt).toLocaleDateString()} • {post.authorName}
+                        <Grid container spacing={3}>
+                          {videoPosts.map((post) => (
+                            <PostCard key={post._id} post={post} isVideo />
+                          ))}
+                        </Grid>
+                      </Box>
+                    )}
+                    {articlePosts.length > 0 && (
+                      <Box>
+                        <Typography variant="h4" sx={{ color: '#877449', fontFamily: 'sans-serif', mb: 3 }}>
+                          Articles
                         </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+                        <Grid container spacing={3}>
+                          {articlePosts.map((post) => (
+                            <PostCard key={post._id} post={post} isVideo={false} />
+                          ))}
+                        </Grid>
+                      </Box>
+                    )}
+                  </>
+                );
+              })()}
+            </>
           )}
         </Container>
       </Box>

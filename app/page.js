@@ -2,7 +2,7 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
@@ -11,88 +11,41 @@ import SEO from '../components/SEO';
 import {
   Container,
   Typography,
-  Card,
-  CardContent,
   Button,
   Box,
-  Stack,
   Alert,
   CircularProgress,
-  Grid,
-  Paper,
-  Avatar,
-  Chip,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
 } from '@mui/material';
-import {
-  Login,
-  Person,
-  Dashboard,
-  LocalPharmacy,
-  VideoCall,
-  HealthAndSafety,
-  CheckCircle,
-  Star,
-  Security,
-  Speed,
-  WhatsApp,
-  ChatBubbleOutline,
-  Medication,
-  Assignment,
-} from '@mui/icons-material';
+import { Login, WhatsApp } from '@mui/icons-material';
+
+const HomeBelowFold = dynamic(() => import('../components/home/HomeBelowFold'), {
+  loading: () => (
+    <Box sx={{ minHeight: 320, display: 'flex', justifyContent: 'center', alignItems: 'center', py: 6 }}>
+      <CircularProgress size={32} sx={{ color: '#877449' }} aria-label="Loading section" />
+    </Box>
+  ),
+  ssr: true,
+});
 
 export default function Home() {
   const { user, isLoading, error } = useUser();
-  const [mounted, setMounted] = useState(false);
-  const [shouldRedirect, setShouldRedirect] = useState(false);
   const [doctorPortraitSrc, setDoctorPortraitSrc] = useState('/images/kadria_no_background.png');
   const router = useRouter();
 
+  // Redirect logged-in users without blocking marketing LCP for visitors
   useEffect(() => {
-      setMounted(true);
-  }, []);
-
-  // Handle redirect after component is mounted to prevent hydration issues
-  useEffect(() => {
-    if (mounted && user && !shouldRedirect) {
-      setShouldRedirect(true);
-      
-      // Get user groups
-      const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-      console.log('🔐 Login Redirect - User groups:', userGroups);
-      
-      // Check if user is ONLY in Doctor group (not Admin or Patient)
-      const isOnlyDoctor = userGroups.includes('Doctor') && 
-                          !userGroups.includes('Admin') && 
-                          !userGroups.includes('Patient');
-      
-      if (isOnlyDoctor) {
-        console.log('👨‍⚕️ User is Doctor only - redirecting to Administration');
-        router.push('/admin');
-      } else {
-        console.log('👤 User is Patient/Admin - redirecting to Dashboard');
-        router.push('/dashboard');
-      }
+    if (isLoading || !user) return;
+    const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
+    const isOnlyDoctor =
+      userGroups.includes('Doctor') &&
+      !userGroups.includes('Admin') &&
+      !userGroups.includes('Patient');
+    if (isOnlyDoctor) {
+      router.push('/admin');
+    } else {
+      router.push('/dashboard');
     }
-  }, [user, mounted, router, shouldRedirect]);
-
-
-  // Don't render until mounted to prevent hydration mismatch
-  if (!mounted || isLoading) {
-    return (
-      <>
-        <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Loading...
-          </Typography>
-        </Container>
-      </>
-    );
-  }
+  }, [user, isLoading, router]);
 
   if (error) {
     console.error('Auth0 Error:', error);
@@ -122,22 +75,20 @@ export default function Home() {
     );
   }
 
-  // Show redirect message for logged-in users
-  if (user || shouldRedirect) {
-    const userGroups = user?.groups || user?.['https://lukariagroup.com/roles'] || [];
-    const isOnlyDoctor = userGroups.includes('Doctor') && 
-                        !userGroups.includes('Admin') && 
-                        !userGroups.includes('Patient');
-    
+  // Session resolved and user is logged in — show brief redirect state (not while Auth0 is still loading)
+  if (!isLoading && user) {
+    const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
+    const isOnlyDoctor =
+      userGroups.includes('Doctor') &&
+      !userGroups.includes('Admin') &&
+      !userGroups.includes('Patient');
     return (
-      <>
-        <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            {isOnlyDoctor ? 'Redirecting to Administration...' : 'Redirecting to Dashboard...'}
-          </Typography>
-        </Container>
-      </>
+      <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          {isOnlyDoctor ? 'Redirecting to Administration...' : 'Redirecting to Dashboard...'}
+        </Typography>
+      </Container>
     );
   }
 
@@ -510,159 +461,7 @@ export default function Home() {
         </Container>
       </Box>
 
-      {/* Patient experiences (E-E-A-T: trust & experience signals) */}
-      <Box sx={{ width: '100%', backgroundColor: '#faf8f5', py: 6, px: 2 }}>
-        <Container maxWidth="lg">
-          <Typography component="h2" variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, textAlign: 'center', mb: 1 }}>
-            What patients say
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#555', textAlign: 'center', mb: 4, maxWidth: 720, mx: 'auto' }}>
-            The following are anonymized comments from patients who agreed to share feedback. Individual results vary; your clinician will discuss what is realistic for you.
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
-              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
-                <Star sx={{ fontSize: 22, color: '#877449', mb: 1 }} />
-                <Typography variant="body2" sx={{ color: '#333', lineHeight: 1.7, fontStyle: 'italic' }}>
-                  &ldquo;I finally felt heard about my weight—not judged. The plan was clear and the follow-ups kept me on track.&rdquo;
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#777', display: 'block', mt: 1.5 }}>
-                  — Adult patient, Jamaica (shared with consent)
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
-                <Star sx={{ fontSize: 22, color: '#877449', mb: 1 }} />
-                <Typography variant="body2" sx={{ color: '#333', lineHeight: 1.7, fontStyle: 'italic' }}>
-                  &ldquo;Virtual visits fit my schedule. I appreciate having a physician oversee my progress and adjust treatment safely.&rdquo;
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#777', display: 'block', mt: 1.5 }}>
-                  — Adult patient, telehealth (shared with consent)
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
-                <Star sx={{ fontSize: 22, color: '#877449', mb: 1 }} />
-                <Typography variant="body2" sx={{ color: '#333', lineHeight: 1.7, fontStyle: 'italic' }}>
-                  &ldquo;Professional, compassionate care. I understand my options better than I ever did before.&rdquo;
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#777', display: 'block', mt: 1.5 }}>
-                  — Adult patient, Jamaica (shared with consent)
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* 3. How the Program Works */}
-      <Box sx={{ width: '100%', backgroundColor: '#faf8f5', py: 6, px: 2 }}>
-        <Container maxWidth="lg">
-          <Typography component="h2" variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, textAlign: 'center', mb: 4 }}>
-            How the Program Works
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
-                <ChatBubbleOutline sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>1-on-1 Consultation</Typography>
-                <Typography variant="body2" sx={{ color: '#333' }}>
-                  Discuss your health history, weight loss goals, and develop a personalized plan that fits your needs.
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
-                <Medication sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>GLP-1 Medication</Typography>
-                <Typography variant="body2" sx={{ color: '#333' }}>
-                  Access to FDA-approved GLP-1 medications like Ozempic, Wegovy, and tirzepatide (if appropriate) to support your weight loss.
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
-                <HealthAndSafety sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Ongoing Support</Typography>
-                <Typography variant="body2" sx={{ color: '#333' }}>
-                  Receive continuous monitoring, guidance, and encouragement to ensure safe and effective results.
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
-                <VideoCall sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Virtual Appointments</Typography>
-                <Typography variant="body2" sx={{ color: '#333' }}>
-                  Convenient secure virtual check-ins with Dr. Fairclough from the comfort of your home.
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* 4. Final CTA */}
-      <Box sx={{ width: '100%', backgroundColor: '#f5f3ef', py: 6, px: 2, position: 'relative' }}>
-        <Container maxWidth="md">
-          <Typography component="h2" variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 1 }}>
-            Ready To Transform Your Health? Start Your Svelte Journey Today!
-          </Typography>
-          <Typography variant="body1" sx={{ color: '#333', textAlign: 'center', mb: 4 }}>
-            Schedule your initial consultation and begin your medically guided weight loss journey now.
-          </Typography>
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={6}>
-              <Paper elevation={0} sx={{ p: 2, border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff', height: '100%' }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                  <Security sx={{ fontSize: 32, color: '#877449', mt: 0.25 }} />
-                  <Box>
-                    <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Clinically Proven</Typography>
-                    <Typography variant="body2" sx={{ color: '#333' }}>
-                      Safe and effective GLP-1 medications, backed by research.
-                    </Typography>
-                  </Box>
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper elevation={0} sx={{ p: 2, border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff', height: '100%' }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                  <Assignment sx={{ fontSize: 32, color: '#877449', mt: 0.25 }} />
-                  <Box>
-                    <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Ongoing Monitoring</Typography>
-                    <Typography variant="body2" sx={{ color: '#333' }}>
-                      Regular follow-up and adjustments for optimal weight loss results.
-                    </Typography>
-                  </Box>
-                </Box>
-              </Paper>
-            </Grid>
-          </Grid>
-          <Box sx={{ textAlign: 'center' }}>
-            <Button
-              component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/30min"
-              variant="contained"
-              size="large"
-              sx={{
-                textTransform: 'none',
-                backgroundColor: '#877449',
-                color: '#000',
-                fontWeight: 600,
-                fontSize: '1.1rem',
-                px: 4,
-                py: 1.5,
-                '&:hover': { backgroundColor: '#B8941F' },
-              }}
-            >
-              Get Started
-            </Button>
-          </Box>
-        </Container>
-      </Box>
+      <HomeBelowFold />
     </>
   );
 }

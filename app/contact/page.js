@@ -17,7 +17,10 @@ import {
   Email,
   Phone,
   WhatsApp,
+  Place,
+  Schedule,
 } from '@mui/icons-material';
+import { REGISTERED_OFFICE_DISPLAY, OFFICE_HOURS_DISPLAY } from '../../lib/business';
 
 export default function Contact() {
   const { user } = useUser();
@@ -64,10 +67,11 @@ export default function Contact() {
       )}
       <SEO
         title="Contact Us | Medical Weight Loss Jamaica | Svelte by LuKaria"
-        description="Contact Svelte by LuKaria for medical weight loss Jamaica. Get in touch about doctor-guided GLP-1 weight loss, Ozempic, Mounjaro, Tirzepatide consultations and program enrollment."
+        description="Contact Svelte by LuKaria for medical weight loss Jamaica. Registered office Kingston. Doctor-guided GLP-1 weight loss, Ozempic, Mounjaro, Tirzepatide consultations and program enrollment."
         keywords="contact weight loss clinic Jamaica, medical weight loss contact, GLP-1 weight loss consultation, doctor-guided care contact, telehealth Jamaica, patient care support, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/contact"
       />
+      {/* NAP for local SEO: full address only on this page (not homepage) */}
       {/* Navigation Menu */}
       <Box
         sx={{ 
@@ -241,6 +245,37 @@ export default function Contact() {
             </Typography>
 
             <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center' }}>
+            <Box sx={{
+              backgroundColor: '#36454F',
+              p: 2,
+              borderRadius: 2,
+              mb: 3,
+              textAlign: 'left',
+            }}>
+              <Place sx={{ fontSize: 40, color: '#877449', mb: 1, display: 'block', mx: 'auto' }} />
+              <Typography variant="h5" sx={{ color: '#877449', fontWeight: 600, mb: 1, textAlign: 'center' }}>
+                Registered office
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'white', mb: 2, textAlign: 'center', lineHeight: 1.6 }}>
+                {REGISTERED_OFFICE_DISPLAY}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
+                <Schedule sx={{ fontSize: 22, color: '#877449', mt: 0.25 }} />
+                <Box>
+                  <Typography variant="subtitle2" sx={{ color: '#877449', fontWeight: 600 }}>
+                    Office hours
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'white' }}>
+                    {OFFICE_HOURS_DISPLAY}
+                  </Typography>
+                </Box>
+              </Box>
+              <Typography variant="caption" sx={{ color: '#aaa', display: 'block', lineHeight: 1.5 }}>
+                Medical care is delivered virtually. This address is for correspondence and verification; it is not a walk-in clinic.
+                In-person visits only by prior arrangement.
+              </Typography>
+            </Box>
+
             <Box sx={{ 
               backgroundColor: '#36454F', 
               p: 0.625, 
