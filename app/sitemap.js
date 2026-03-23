@@ -22,11 +22,16 @@ function withTimeout(promise, ms, label = 'operation') {
 }
 
 async function fetchBlogRoutesForSitemap() {
+  // Skip MongoDB when env not set; avoids import-time throw from lib/mongodb
+  if (!process.env.MONGODB_URI) {
+    return [];
+  }
   const { getDatabase } = await import('../lib/mongodb');
-  const db = await withTimeout(getDatabase(), 12000, 'MongoDB getDatabase');
+  // 5s timeout: beat common serverless limits (~10s) so we return static before platform kills us
+  const db = await withTimeout(getDatabase(), 5000, 'MongoDB getDatabase');
   const posts = await withTimeout(
     db.collection('blogPosts').find({}).project({ _id: 1, updatedAt: 1, createdAt: 1 }).toArray(),
-    12000,
+    5000,
     'MongoDB blogPosts query'
   );
   return posts.map((p) => ({
