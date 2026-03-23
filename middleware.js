@@ -8,7 +8,7 @@ export default function middleware(req) {
   const { pathname } = req.nextUrl;
   
   // Allow public paths without authentication
-  if (publicPaths.includes(pathname) || pathname.startsWith('/blog')) {
+  if (publicPaths.includes(pathname) || pathname.startsWith('/blog') || pathname === '/sitemap.xml') {
     return NextResponse.next();
   }
   
