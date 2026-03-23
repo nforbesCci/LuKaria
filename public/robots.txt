@@ -29,6 +29,8 @@ Allow: /info
 Allow: /faq
 Allow: /contact
 Allow: /about
+Allow: /glp-1-weight-loss
+Allow: /testimonials
 Allow: /blog
 Allow: /privacy-policy
 Allow: /terms

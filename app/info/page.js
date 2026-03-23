@@ -1,9 +1,10 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Script from 'next/script';
 import SEO from '../../components/SEO';
+import PublicTopMenu from '../../components/PublicTopMenu';
 import {
   Container,
   Typography,
@@ -33,15 +34,6 @@ import {
 
 export default function InfoPage() {
   const { user } = useUser();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <>
@@ -69,93 +61,12 @@ export default function InfoPage() {
         </>
       )}
       <SEO 
-        title="Pricing | Medical Weight Loss Jamaica | Svelte by LuKaria"
+        title="Pricing | Medical Weight Loss Jamaica"
         description="Transparent pricing for medical weight loss Jamaica. Svelte by LuKaria GLP-1 weight loss program includes physician appointments, GLP-1 medications. Doctor-guided care with flat monthly fee."
         keywords="medical weight loss pricing Jamaica, GLP-1 weight loss cost, Ozempic Mounjaro price Jamaica, weight loss program cost, doctor-guided care pricing, affordable weight loss Jamaica, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/info"
       />
-      {/* Navigation Menu */}
-      <Box
-        sx={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 48,
-          backgroundColor: '#877449',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          zIndex: 1001,
-          borderBottom: '1px solid rgba(0,0,0,0.1)'
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/'}
-          >
-            Home
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            Info
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/faq'}
-          >
-            FAQ
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/contact'}
-          >
-            Contact
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/about'}
-          >
-            About Us
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
-            Blog
-          </Typography>
-        </Box>
-      </Box>
+      <PublicTopMenu currentPath="/info" />
 
       {/* Top Navigation Bar */}
       <Box

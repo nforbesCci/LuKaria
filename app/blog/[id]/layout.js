@@ -13,7 +13,7 @@ export async function generateMetadata({ params }) {
     if (!post) {
       return { title: 'Blog Post | Svelte by LuKaria' };
     }
-    const title = `${post.title} | Blog | Svelte by LuKaria`;
+    const title = `${post.title} | Blog`;
     const desc =
       (post.content || '').replace(/\s+/g, ' ').trim().slice(0, 160) ||
       'Blog post from Svelte by LuKaria';

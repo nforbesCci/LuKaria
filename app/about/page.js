@@ -1,9 +1,10 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Script from 'next/script';
 import SEO from '../../components/SEO';
+import PublicTopMenu from '../../components/PublicTopMenu';
 import {
   Container,
   Typography,
@@ -18,20 +19,11 @@ import { Login } from '@mui/icons-material';
 
 export default function AboutUs() {
   const { user } = useUser();
-  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <>
@@ -59,93 +51,12 @@ export default function AboutUs() {
         </>
       )}
       <SEO 
-        title="About Us - Doctor-Guided Care | Svelte by LuKaria"
+        title="About Us - Doctor-Guided Care"
         description="Meet Dr. Kadria Fairclough. Medical weight loss Jamaica with doctor-guided care. Svelte by LuKaria offers GLP-1 weight loss, Ozempic, Mounjaro and Tirzepatide through virtual consultations."
         keywords="Dr. Kadria Fairclough, medical weight loss Jamaica, doctor-guided care, GLP-1 weight loss, weight loss doctor Jamaica, virtual clinic Jamaica, obesity management, Ozempic, Mounjaro, Tirzepatide"
         canonical="https://www.lukariagroup.com/about"
       />
-      {/* Navigation Menu */}
-      <Box
-        sx={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 48,
-          backgroundColor: '#877449',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          zIndex: 1001,
-          borderBottom: '1px solid rgba(0,0,0,0.1)'
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/'}
-          >
-            Home
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/info'}
-          >
-            Info
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/faq'}
-          >
-            FAQ
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/contact'}
-          >
-            Contact
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            About Us
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
-            Blog
-          </Typography>
-        </Box>
-      </Box>
+      <PublicTopMenu currentPath="/about" />
 
       {/* Top Navigation Bar */}
       <Box
@@ -317,6 +228,9 @@ export default function AboutUs() {
                     />
                     <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, flex: 1 }}>
                       Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss. Dr. Fairclough has always believed in patient-centred care which focuses on patient education and informed decision making. She possesses years of Canadian experience with Telehealth delivery.
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#877449', lineHeight: 1.8, flex: 1 }}>
+                      Dr. Fairclough is MBBS and LMCC credentialed, and provides Jamaica-focused virtual care with medically supervised treatment plans and follow-up in line with local patient safety expectations.
                     </Typography>
                   </Box>
                 </Box>

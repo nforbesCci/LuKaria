@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Script from 'next/script';
 import SEO from '../../../components/SEO';
+import PublicTopMenu from '../../../components/PublicTopMenu';
 import { getYouTubeEmbedUrl, getYouTubeVideoId } from '../../../lib/business';
 import { normalizePostVideos, isVideoBlogPost } from '../../../lib/blog-videos';
 import { toIsoDateString } from '../../../lib/seo-helpers';
@@ -131,6 +132,9 @@ export default function BlogPostPage() {
             author: {
               '@type': 'Person',
               name: post.authorName || 'Doctor',
+              ...(post.authorName && /kadria fairclough/i.test(post.authorName)
+                ? { url: 'https://www.lukariagroup.com/about' }
+                : {}),
             },
             publisher: {
               '@type': 'Organization',
@@ -151,10 +155,12 @@ export default function BlogPostPage() {
               '@type': 'WebPage',
               '@id': `https://www.lukariagroup.com/blog/${post._id}`,
             },
-            ...(post.imageUrl && {
+            ...((post.imageUrl || (isVideoBlog && postVideos[0]?.url)) && {
               image: {
                 '@type': 'ImageObject',
-                url: `https://www.lukariagroup.com${post.imageUrl}`,
+                url: post.imageUrl
+                  ? `https://www.lukariagroup.com${post.imageUrl}`
+                  : `https://img.youtube.com/vi/${getYouTubeVideoId(postVideos[0].url)}/mqdefault.jpg`,
               },
             }),
             ...(postVideos.length > 0 && {
@@ -170,32 +176,7 @@ export default function BlogPostPage() {
           }),
         }}
       />
-      {/* Top Navigation Menu */}
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 48,
-          backgroundColor: '#877449',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          zIndex: 1001,
-          borderBottom: '1px solid rgba(0,0,0,0.1)',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Typography variant="body2" sx={{ color: '#000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => (window.location.href = '/')}>Home</Typography>
-          <Typography variant="body2" sx={{ color: '#000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => (window.location.href = '/info')}>Info</Typography>
-          <Typography variant="body2" sx={{ color: '#000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => (window.location.href = '/faq')}>FAQ</Typography>
-          <Typography variant="body2" sx={{ color: '#000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => (window.location.href = '/contact')}>Contact</Typography>
-          <Typography variant="body2" sx={{ color: '#000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => (window.location.href = '/about')}>About Us</Typography>
-          <Typography variant="body2" sx={{ color: '#000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => (window.location.href = '/blog')}>Blog</Typography>
-        </Box>
-      </Box>
+      <PublicTopMenu currentPath="/blog" />
 
       {/* Top Navigation Bar - Logo and Login */}
       <Box

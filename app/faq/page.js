@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Script from 'next/script';
 import SEO from '../../components/SEO';
+import PublicTopMenu from '../../components/PublicTopMenu';
 import {
   Container,
   Typography,
@@ -12,7 +13,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  CircularProgress,
   Alert,
   Tabs,
   Tab,
@@ -24,13 +24,8 @@ import {
 
 export default function FAQ() {
   const { user } = useUser();
-  const [mounted, setMounted] = useState(false);
   const [expandedPanel, setExpandedPanel] = useState('mounjaro-what');
   const [activeTab, setActiveTab] = useState(0); // Default to Mounjaro (index 0)
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedPanel(isExpanded ? panel : false);
@@ -40,21 +35,6 @@ export default function FAQ() {
     setActiveTab(newValue);
     setExpandedPanel(newValue === 0 ? 'mounjaro-what' : 'semaglutide-what');
   };
-
-
-  // Don't render until mounted to prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <>
-        <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Loading...
-          </Typography>
-        </Container>
-      </>
-    );
-  }
 
   return (
     <>
@@ -82,93 +62,12 @@ export default function FAQ() {
         </>
       )}
       <SEO
-        title="FAQ - GLP-1 Weight Loss Questions | Svelte by LuKaria"
+        title="FAQ - GLP-1 Weight Loss Questions"
         description="FAQ about medical weight loss Jamaica, GLP-1 weight loss, Ozempic, Mounjaro, Tirzepatide. Doctor-guided care answers for virtual consultations and weight loss program details."
         keywords="GLP-1 weight loss FAQ, Ozempic Mounjaro questions, medical weight loss Jamaica FAQ, Tirzepatide answers, doctor-guided care FAQ, weight loss clinic Jamaica, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/faq"
       />
-      {/* Navigation Menu */}
-      <Box
-        sx={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 48,
-          backgroundColor: '#877449',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          zIndex: 1001,
-          borderBottom: '1px solid rgba(0,0,0,0.1)'
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/'}
-          >
-            Home
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/info'}
-          >
-            Info
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            FAQ
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/contact'}
-          >
-            Contact
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/about'}
-          >
-            About Us
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
-            Blog
-          </Typography>
-        </Box>
-      </Box>
+      <PublicTopMenu currentPath="/faq" />
 
       {/* Top Navigation Bar */}
       <Box

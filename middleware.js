@@ -9,6 +9,8 @@ const publicPaths = [
   '/faq',
   '/contact',
   '/about',
+  '/glp-1-weight-loss',
+  '/testimonials',
   '/blog',
   '/information',
   '/unauthorized',

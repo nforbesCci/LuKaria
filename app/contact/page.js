@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Script from 'next/script';
 import SEO from '../../components/SEO';
+import PublicTopMenu from '../../components/PublicTopMenu';
 import {
   Container,
   Typography,
@@ -72,88 +73,7 @@ export default function Contact() {
         canonical="https://www.lukariagroup.com/contact"
       />
       {/* NAP for local SEO: full address only on this page (not homepage) */}
-      {/* Navigation Menu */}
-      <Box
-        sx={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 48,
-          backgroundColor: '#877449',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          zIndex: 1001,
-          borderBottom: '1px solid rgba(0,0,0,0.1)'
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/'}
-          >
-            Home
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/info'}
-          >
-            Info
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/faq'}
-          >
-            FAQ
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            Contact
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/about'}
-          >
-            About Us
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#000000', fontWeight: '600', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.location.href = '/blog'}>
-            Blog
-          </Typography>
-        </Box>
-      </Box>
+      <PublicTopMenu currentPath="/contact" />
 
       {/* Top Navigation Bar */}
       <Box

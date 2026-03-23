@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch } from '../store/hooks';
 import { fetchProfile } from '../store/slices/profileSlice';
+import PublicTopMenu from './PublicTopMenu';
 import {
   AppBar,
   Toolbar,
@@ -50,53 +50,9 @@ export default function Header() {
     return true;
   };
 
-  const linkSx = {
-    color: '#000000',
-    fontWeight: '600',
-    cursor: 'pointer',
-    '&:hover': { textDecoration: 'underline' },
-  };
-
   return (
     <>
-      {/* Top origin banner - same as public pages */}
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: BANNER_HEIGHT,
-          backgroundColor: '#877449',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          zIndex: 1001,
-          borderBottom: '1px solid rgba(0,0,0,0.1)',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Typography component={Link} href="/" variant="body2" sx={linkSx}>
-            Home
-          </Typography>
-          <Typography component={Link} href="/info" variant="body2" sx={linkSx}>
-            Info
-          </Typography>
-          <Typography component={Link} href="/faq" variant="body2" sx={linkSx}>
-            FAQ
-          </Typography>
-          <Typography component={Link} href="/contact" variant="body2" sx={linkSx}>
-            Contact
-          </Typography>
-          <Typography component={Link} href="/about" variant="body2" sx={linkSx}>
-            About Us
-          </Typography>
-          <Typography component={Link} href="/blog" variant="body2" sx={linkSx}>
-            Blog
-          </Typography>
-        </Box>
-      </Box>
+      <PublicTopMenu currentPath={pathname || ''} />
 
       {/* Main app bar - fixed below banner */}
       <AppBar

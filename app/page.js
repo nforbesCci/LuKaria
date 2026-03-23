@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 import Script from 'next/script';
 import SEO from '../components/SEO';
+import PublicTopMenu from '../components/PublicTopMenu';
 import {
   Container,
   Typography,
@@ -128,97 +129,7 @@ export default function Home() {
         keywords="medical weight loss Jamaica, doctor-guided care, GLP-1 weight loss, Ozempic Jamaica, Mounjaro Jamaica, Tirzepatide, Semaglutide, virtual weight loss clinic, telemedicine Jamaica, weight loss centre Jamaica, obesity treatment, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com"
       />
-      {/* Navigation Menu */}
-      <Box
-        sx={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 48,
-          backgroundColor: '#877449',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          zIndex: 1001,
-          borderBottom: '1px solid rgba(0,0,0,0.1)'
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-          >
-            Home
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/info'}
-          >
-            Info
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/faq'}
-          >
-            FAQ
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/contact'}
-          >
-            Contact
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/about'}
-          >
-            About Us
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#000000', 
-              fontWeight: '600',
-              cursor: 'pointer',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-            onClick={() => window.location.href = '/blog'}
-          >
-            Blog
-          </Typography>
-        </Box>
-      </Box>
+      <PublicTopMenu currentPath="/" />
 
       {/* Top Navigation Bar */}
       <Box

@@ -15,7 +15,26 @@ Svelte by LuKaria is a medical weight loss clinic based in Jamaica, offering doc
 - Website: https://www.lukariagroup.com
 
 ## Location
-Jamaica
+- Kingston, St. Andrew, Jamaica
 
 ## Key People
 - Dr. Kadria Fairclough - Licensed physician specializing in weight loss and lifestyle medicine
+
+## Hours
+- Monday-Friday: 9:00 AM - 5:00 PM (Jamaica time)
+
+## Care Model
+- Virtual-first telehealth consultations across Jamaica
+- Registered office for correspondence/verification; no routine walk-in service
+
+## Key Service URLs
+- https://www.lukariagroup.com/info
+- https://www.lukariagroup.com/faq
+- https://www.lukariagroup.com/about
+- https://www.lukariagroup.com/blog
+- https://www.lukariagroup.com/contact
+- https://www.lukariagroup.com/glp-1-weight-loss
+- https://www.lukariagroup.com/testimonials
+
+## Last Updated
+- 2026-03-23

@@ -79,8 +79,15 @@ export default function NavigationDrawer() {
     // Check processed custom claims first
     (user?.groups && user.groups.some(item => item.toLowerCase() === "doctor" || item.toLowerCase() === "admin"));
 
-  // Hide navigation drawer on privacy policy, terms, about, and ads pages
-  if (pathname === '/privacy-policy' || pathname === '/terms' || pathname === '/about' || pathname === '/ads') {
+  // Hide navigation drawer on public marketing pages
+  if (
+    pathname === '/privacy-policy' ||
+    pathname === '/terms' ||
+    pathname === '/about' ||
+    pathname === '/ads' ||
+    pathname === '/glp-1-weight-loss' ||
+    pathname === '/testimonials'
+  ) {
     return null;
   }
 
