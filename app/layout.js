@@ -4,6 +4,7 @@ import NavigationDrawer from '../components/NavigationDrawer';
 import ClientLayout from '../components/ClientLayout';
 import ReduxProvider from '../components/ReduxProvider';
 import { REGISTERED_OFFICE, OFFICE_OPENING_HOURS_SCHEMA } from '../lib/business';
+import { getOrganizationSameAs, getPhysicianSameAs } from '../lib/seo-constants';
 import './globals.css';
 
 export const metadata = {
@@ -83,7 +84,10 @@ export default function RootLayout({ children }) {
         <meta name="emotion-insertion-point" content="" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap"
+          rel="stylesheet"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -110,7 +114,10 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@graph': [
+              '@graph': (() => {
+                const orgSameAs = getOrganizationSameAs();
+                const physicianSameAs = getPhysicianSameAs();
+                return [
                 {
                   '@type': 'WebSite',
                   '@id': 'https://www.lukariagroup.com/#website',
@@ -160,6 +167,7 @@ export default function RootLayout({ children }) {
                     availableLanguage: 'English',
                     email: 'svelte@lukariagroup.com',
                   },
+                  ...(orgSameAs.length ? { sameAs: orgSameAs } : {}),
                 },
                 {
                   '@type': 'MedicalOrganization',
@@ -179,6 +187,7 @@ export default function RootLayout({ children }) {
                   },
                   areaServed: { '@type': 'Country', name: 'Jamaica' },
                   openingHoursSpecification: OFFICE_OPENING_HOURS_SCHEMA,
+                  ...(orgSameAs.length ? { sameAs: orgSameAs } : {}),
                 },
                 {
                   '@type': 'Physician',
@@ -190,9 +199,11 @@ export default function RootLayout({ children }) {
                   description:
                     'Licensed physician with over 15 years of experience, specializing in medically supervised weight loss and lifestyle medicine. Extensive telehealth experience serving patients in Jamaica and Canada.',
                   knowsAbout: ['Weight Management', 'Obesity Medicine', 'Lifestyle Medicine'],
-                  sameAs: ['https://www.lukariagroup.com/about'],
+                  url: 'https://www.lukariagroup.com/about',
+                  ...(physicianSameAs.length ? { sameAs: physicianSameAs } : {}),
                 },
-              ],
+              ];
+              })(),
             }),
           }}
         />

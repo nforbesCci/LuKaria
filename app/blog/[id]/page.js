@@ -6,7 +6,8 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import Script from 'next/script';
 import SEO from '../../../components/SEO';
 import { getYouTubeEmbedUrl, getYouTubeVideoId } from '../../../lib/business';
-import { normalizePostVideos } from '../../../lib/blog-videos';
+import { normalizePostVideos, isVideoBlogPost } from '../../../lib/blog-videos';
+import { toIsoDateString } from '../../../lib/seo-helpers';
 import {
   Container,
   Typography,
@@ -101,7 +102,7 @@ export default function BlogPostPage() {
   }
 
   const postVideos = normalizePostVideos(post);
-  const isVideoBlog = postVideos.length > 0;
+  const isVideoBlog = isVideoBlogPost(post);
 
   return (
     <>
@@ -119,14 +120,43 @@ export default function BlogPostPage() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Article',
+            '@id': `https://www.lukariagroup.com/blog/${post._id}#article`,
             headline: post.title,
             description: post.content?.slice(0, 160),
-            datePublished: post.createdAt,
-            dateModified: post.updatedAt || post.createdAt,
-            author: { '@type': 'Person', name: post.authorName },
-            publisher: { '@type': 'Organization', name: 'Svelte by LuKaria', url: 'https://www.lukariagroup.com' },
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://www.lukariagroup.com/blog/${post._id}` },
-            ...(post.imageUrl && { image: `https://www.lukariagroup.com${post.imageUrl}` }),
+            url: `https://www.lukariagroup.com/blog/${post._id}`,
+            inLanguage: 'en-JM',
+            articleSection: isVideoBlog ? 'Video blog' : 'Articles',
+            datePublished: toIsoDateString(post.createdAt),
+            dateModified: toIsoDateString(post.updatedAt || post.createdAt),
+            author: {
+              '@type': 'Person',
+              name: post.authorName || 'Doctor',
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: 'Svelte by LuKaria',
+              url: 'https://www.lukariagroup.com',
+              logo: {
+                '@type': 'ImageObject',
+                url: 'https://www.lukariagroup.com/images/Lukaria_logo.png',
+              },
+            },
+            isPartOf: {
+              '@type': 'WebSite',
+              '@id': 'https://www.lukariagroup.com/#website',
+              name: 'Svelte by LuKaria',
+              url: 'https://www.lukariagroup.com',
+            },
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': `https://www.lukariagroup.com/blog/${post._id}`,
+            },
+            ...(post.imageUrl && {
+              image: {
+                '@type': 'ImageObject',
+                url: `https://www.lukariagroup.com${post.imageUrl}`,
+              },
+            }),
             ...(postVideos.length > 0 && {
               associatedMedia: postVideos.map((v) => ({
                 '@type': 'VideoObject',

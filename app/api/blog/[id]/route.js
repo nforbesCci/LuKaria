@@ -6,6 +6,11 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { parseVideosJsonFromForm, sanitizeStoredVideos } from '../../../../lib/blog-videos';
 
+function parsePostKind(formData) {
+  const raw = String(formData.get('postKind') || '').trim().toLowerCase();
+  return raw === 'video' ? 'video' : 'article';
+}
+
 function isDoctorOrAdmin(session) {
   const groups = session?.user?.groups || session?.user?.['https://lukariagroup.com/roles'] || [];
   return groups.includes('Admin') || groups.includes('Doctor');
@@ -38,10 +43,18 @@ export async function PUT(request, { params }) {
     const title = formData.get('title');
     const content = formData.get('content');
     const imageFile = formData.get('image');
-    const videos = sanitizeStoredVideos(parseVideosJsonFromForm(formData));
+    const postKind = parsePostKind(formData);
+    const parsedVideos = sanitizeStoredVideos(parseVideosJsonFromForm(formData));
+    const videos = postKind === 'article' ? [] : parsedVideos;
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
+    }
+    if (postKind === 'video' && videos.length === 0) {
+      return NextResponse.json(
+        { error: 'Video blogs require at least one valid YouTube URL.' },
+        { status: 400 }
+      );
     }
 
     const db = await getDatabase();
@@ -49,6 +62,7 @@ export async function PUT(request, { params }) {
       title,
       content,
       updatedAt: new Date(),
+      postKind,
       videos,
       videoUrl: videos[0]?.url ?? null,
     };

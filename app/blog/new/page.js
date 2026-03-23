@@ -1,32 +1,21 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import {
   Container,
   Typography,
   Box,
-  TextField,
   Button,
   CircularProgress,
   Alert,
-  IconButton,
   Paper,
 } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import { Article, OndemandVideo } from '@mui/icons-material';
 
-const emptyVideoRow = () => ({ title: '', url: '' });
-
-export default function BlogNewPage() {
+export default function BlogNewChooserPage() {
   const router = useRouter();
   const { user } = useUser();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [videoEntries, setVideoEntries] = useState([emptyVideoRow()]);
-  const [imageFile, setImageFile] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
 
   const isDoctorOrAdmin = user && (
     (user.groups && (user.groups.includes('Admin') || user.groups.includes('Doctor'))) ||
@@ -35,48 +24,6 @@ export default function BlogNewPage() {
       user['https://lukariagroup.com/roles'].includes('Doctor')
     ))
   );
-
-  const addVideoRow = () => setVideoEntries((rows) => [...rows, emptyVideoRow()]);
-  const removeVideoRow = (index) => {
-    setVideoEntries((rows) =>
-      rows.length <= 1 ? [emptyVideoRow()] : rows.filter((_, j) => j !== index)
-    );
-  };
-  const setVideoField = (index, field, value) => {
-    setVideoEntries((rows) => {
-      const next = [...rows];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
-    setSaving(true);
-    setError('');
-    try {
-      const payload = videoEntries
-        .filter((v) => v.url.trim())
-        .map((v) => ({ title: v.title.trim(), url: v.url.trim() }));
-      const formData = new FormData();
-      formData.append('title', title.trim());
-      formData.append('content', content.trim());
-      formData.append('videosJson', JSON.stringify(payload));
-      if (imageFile) formData.append('image', imageFile);
-      const res = await fetch('/api/blog', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create post');
-      router.push(`/blog/${data.id}`);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
 
   if (!user) {
     return (
@@ -98,87 +45,89 @@ export default function BlogNewPage() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 14, mb: 6 }}>
-      <Typography variant="h4" sx={{ color: '#877449', mb: 3 }}>New Blog Post</Typography>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Post title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          multiline
-          rows={10}
-          label="Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          sx={{ mb: 2 }}
-        />
+      <Typography variant="h4" sx={{ color: '#877449', mb: 1 }}>
+        New blog post
+      </Typography>
+      <Typography variant="body1" sx={{ color: '#877449', opacity: 0.95, mb: 4 }}>
+        Choose how you want to publish: a written article, or a video blog with embedded YouTube video(s). These are two different formats—not an optional add-on.
+      </Typography>
 
-        <Typography variant="subtitle1" sx={{ color: '#877449', fontWeight: 600, mb: 1 }}>
-          Video blogs (optional)
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
-          Add one or more YouTube URLs with a title for each video. Posts with at least one valid video appear under &quot;Video blogs&quot; on the blog index.
-        </Typography>
-        {videoEntries.map((row, index) => (
-          <Paper key={index} variant="outlined" sx={{ p: 2, mb: 2, borderColor: '#877449' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-              <Typography variant="body2" sx={{ color: '#877449', fontWeight: 600 }}>
-                Video {index + 1}
-              </Typography>
-              <IconButton size="small" onClick={() => removeVideoRow(index)} aria-label="Remove video" sx={{ color: '#877449' }}>
-                <Delete />
-              </IconButton>
-            </Box>
-            <TextField
-              fullWidth
-              label="Video title"
-              placeholder="e.g. Introduction to our weight loss program"
-              value={row.title}
-              onChange={(e) => setVideoField(index, 'title', e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="YouTube URL or video ID"
-              placeholder="https://www.youtube.com/watch?v=... or 11-character ID"
-              value={row.url}
-              onChange={(e) => setVideoField(index, 'url', e.target.value)}
-            />
-          </Paper>
-        ))}
-        <Button
-          type="button"
-          startIcon={<Add />}
-          onClick={addVideoRow}
-          sx={{ mb: 3, color: '#877449', borderColor: '#877449' }}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+          gap: 3,
+        }}
+      >
+        <Paper
+          elevation={0}
           variant="outlined"
+          sx={{
+            p: 3,
+            borderColor: '#877449',
+            borderWidth: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            backgroundColor: '#1a1a1a',
+          }}
         >
-          Add another video
-        </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Article sx={{ fontSize: 40, color: '#877449' }} />
+            <Typography variant="h6" sx={{ color: '#877449', fontWeight: 700 }}>
+              Article
+            </Typography>
+          </Box>
+          <Typography variant="body2" sx={{ color: '#ccc', flexGrow: 1 }}>
+            Text-focused post with optional header image. Shown under &quot;Articles&quot; on the blog.
+          </Typography>
+          <Button
+            variant="contained"
+            fullWidth
+            href="/blog/new/article"
+            sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
+          >
+            Create article
+          </Button>
+        </Paper>
 
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" sx={{ mb: 1 }}>Image (optional)</Typography>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-          />
-        </Box>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button type="submit" variant="contained" disabled={saving} sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}>
-            {saving ? 'Creating...' : 'Create Post'}
+        <Paper
+          elevation={0}
+          variant="outlined"
+          sx={{
+            p: 3,
+            borderColor: '#B8941F',
+            borderWidth: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            backgroundColor: '#1a1a1a',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <OndemandVideo sx={{ fontSize: 40, color: '#B8941F' }} />
+            <Typography variant="h6" sx={{ color: '#B8941F', fontWeight: 700 }}>
+              Video blog
+            </Typography>
+          </Box>
+          <Typography variant="body2" sx={{ color: '#ccc', flexGrow: 1 }}>
+            Post built around one or more YouTube embeds plus supporting text. Shown under &quot;Video blogs&quot; on the blog.
+          </Typography>
+          <Button
+            variant="contained"
+            fullWidth
+            href="/blog/new/video"
+            sx={{ backgroundColor: '#B8941F', color: '#000', '&:hover': { backgroundColor: '#877449' } }}
+          >
+            Create video blog
           </Button>
-          <Button variant="outlined" onClick={() => router.push('/blog')} sx={{ borderColor: '#877449', color: '#877449' }}>
-            Cancel
-          </Button>
-        </Box>
+        </Paper>
+      </Box>
+
+      <Box sx={{ mt: 3 }}>
+        <Button variant="text" onClick={() => router.push('/blog')} sx={{ color: '#877449' }}>
+          ← Back to blog
+        </Button>
       </Box>
     </Container>
   );

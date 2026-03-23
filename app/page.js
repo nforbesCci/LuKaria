@@ -450,6 +450,7 @@ export default function Home() {
                 alt="Dr. Kadria Fairclough, licensed physician"
                 fill
                 sizes="(max-width: 600px) 220px, 240px"
+                fetchPriority="low"
                 style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
                 onError={() => setDoctorPortraitSrc('/images/kadria.png')}
               />

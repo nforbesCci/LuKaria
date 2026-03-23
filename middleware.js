@@ -2,13 +2,29 @@ import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 import { NextResponse } from 'next/server';
 
 // Public paths that don't require authentication
-const publicPaths = ['/', '/ads', '/info', '/faq', '/contact', '/about', '/blog', '/information', '/unauthorized', '/consultation-required', '/privacy-policy', '/terms'];
+const publicPaths = [
+  '/',
+  '/ads',
+  '/info',
+  '/faq',
+  '/contact',
+  '/about',
+  '/blog',
+  '/information',
+  '/unauthorized',
+  '/consultation-required',
+  '/privacy-policy',
+  '/terms',
+  '/robots.txt',
+  '/llms.txt',
+  '/sitemap.xml',
+];
 
 export default function middleware(req) {
   const { pathname } = req.nextUrl;
   
   // Allow public paths without authentication
-  if (publicPaths.includes(pathname) || pathname.startsWith('/blog') || pathname === '/sitemap.xml') {
+  if (publicPaths.includes(pathname) || pathname.startsWith('/blog')) {
     return NextResponse.next();
   }
   

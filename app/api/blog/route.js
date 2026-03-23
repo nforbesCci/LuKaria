@@ -6,6 +6,11 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { parseVideosJsonFromForm, sanitizeStoredVideos } from '../../../lib/blog-videos';
 
+function parsePostKind(formData) {
+  const raw = String(formData.get('postKind') || '').trim().toLowerCase();
+  return raw === 'video' ? 'video' : 'article';
+}
+
 function isDoctorOrAdmin(session) {
   const groups = session?.user?.groups || session?.user?.['https://lukariagroup.com/roles'] || [];
   return groups.includes('Admin') || groups.includes('Doctor');
@@ -74,6 +79,7 @@ export async function POST(request) {
       title,
       content,
       imageUrl,
+      postKind,
       videos,
       videoUrl: videos[0]?.url ?? null,
       authorId: session.user.sub,

@@ -1,3 +1,9 @@
+/** Node runtime: MongoDB driver is not supported on Edge; Edge sitemap was causing 500s in prod. */
+export const runtime = 'nodejs';
+
+/** Refresh blog URLs periodically without rebuilding the whole site */
+export const revalidate = 3600;
+
 const BASE_URL = 'https://www.lukariagroup.com';
 
 const staticRoutes = [

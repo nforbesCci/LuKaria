@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { Article, Add, Login, OndemandVideo } from '@mui/icons-material';
 import { getYouTubeVideoId } from '../../lib/business';
-import { normalizePostVideos } from '../../lib/blog-videos';
+import { normalizePostVideos, isVideoBlogPost } from '../../lib/blog-videos';
 
 export default function BlogPage() {
   const { user } = useUser();
@@ -158,14 +158,34 @@ export default function BlogPage() {
               Blog
             </Typography>
             {isDoctorOrAdmin && (
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                href="/blog/new"
-                sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
-              >
-                New Post
-              </Button>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}>
+                <Button
+                  variant="contained"
+                  startIcon={<Article />}
+                  href="/blog/new/article"
+                  sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
+                >
+                  New article
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<OndemandVideo />}
+                  href="/blog/new/video"
+                  sx={{ backgroundColor: '#B8941F', color: '#000', '&:hover': { backgroundColor: '#877449' } }}
+                >
+                  New video blog
+                </Button>
+                <Button
+                  variant="text"
+                  size="small"
+                  component="a"
+                  href="/blog/new"
+                  startIcon={<Add />}
+                  sx={{ color: '#877449', textTransform: 'none' }}
+                >
+                  Compare formats
+                </Button>
+              </Box>
             )}
           </Box>
 
@@ -268,7 +288,7 @@ export default function BlogPage() {
                           Video blogs
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#877449', opacity: 0.9, mb: 3 }}>
-                          Posts with an embedded YouTube video from our team.
+                          Video-first posts with embedded YouTube from our team (a separate format from articles).
                         </Typography>
                         <Grid container spacing={3}>
                           {videoPosts.map((post) => (
