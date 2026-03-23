@@ -112,6 +112,22 @@ export default function RootLayout({ children }) {
               '@context': 'https://schema.org',
               '@graph': [
                 {
+                  '@type': 'WebSite',
+                  '@id': 'https://www.lukariagroup.com/#website',
+                  url: 'https://www.lukariagroup.com',
+                  name: 'Svelte by LuKaria',
+                  description: 'Medical weight loss Jamaica with doctor-guided care.',
+                  publisher: { '@id': 'https://www.lukariagroup.com/#organization' },
+                  inLanguage: 'en-JM',
+                },
+                {
+                  '@type': 'ImageObject',
+                  '@id': 'https://www.lukariagroup.com/#logo',
+                  url: 'https://www.lukariagroup.com/images/Lukaria_logo.png',
+                  width: 1200,
+                  height: 630,
+                },
+                {
                   '@type': 'Organization',
                   '@id': 'https://www.lukariagroup.com/#organization',
                   name: 'Svelte by LuKaria',
@@ -123,6 +139,7 @@ export default function RootLayout({ children }) {
                     contactType: 'customer service',
                     areaServed: 'JM',
                     availableLanguage: 'English',
+                    email: 'svelte@lukariagroup.com',
                   },
                 },
                 {
@@ -138,10 +155,13 @@ export default function RootLayout({ children }) {
                 },
                 {
                   '@type': 'Physician',
+                  '@id': 'https://www.lukariagroup.com/#physician',
                   name: 'Dr. Kadria Fairclough',
                   jobTitle: 'Physician',
+                  credential: ['BSc', 'BMedSci', 'MBBS', 'LMCC'],
                   worksFor: { '@id': 'https://www.lukariagroup.com/#organization' },
-                  description: 'Licensed physician specializing in medically supervised weight loss.',
+                  description: 'Licensed physician with over 15 years of experience, specializing in medically supervised weight loss and lifestyle medicine.',
+                  knowsAbout: ['Weight Management', 'Obesity Medicine', 'Lifestyle Medicine'],
                 },
               ],
             }),

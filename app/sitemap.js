@@ -1,5 +1,3 @@
-import { getDatabase } from '../lib/mongodb';
-
 const BASE_URL = 'https://www.lukariagroup.com';
 
 const staticRoutes = [
@@ -17,6 +15,7 @@ const staticRoutes = [
 export default async function sitemap() {
   let blogPosts = [];
   try {
+    const { getDatabase } = await import('../lib/mongodb');
     const db = await getDatabase();
     const posts = await db.collection('blogPosts').find({}).project({ _id: 1, updatedAt: 1, createdAt: 1 }).toArray();
     blogPosts = posts.map((p) => ({
@@ -26,7 +25,7 @@ export default async function sitemap() {
       priority: 0.6,
     }));
   } catch (err) {
-    console.error('Sitemap: Failed to fetch blog posts', err);
+    console.error('Sitemap: Failed to fetch blog posts, using static routes only', err?.message || err);
   }
 
   return [...staticRoutes, ...blogPosts];

@@ -290,6 +290,8 @@ export default function Home() {
             component="img"
             src="/images/Lukaria_logo_small.png"
             alt="Lukaria Logo"
+            width={48}
+            height={48}
             sx={{
               width: 48,
               height: 48,
@@ -419,7 +421,7 @@ export default function Home() {
         }}
       >
         <Box sx={{ flex: 1, maxWidth: { md: 520 }, order: { xs: 1, md: 1 } }}>
-          <Typography variant="h3" sx={{ color: '#000', fontWeight: 700, fontFamily: 'serif', mb: 2, fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' } }}>
+          <Typography component="h1" variant="h3" sx={{ color: '#000', fontWeight: 700, fontFamily: 'serif', mb: 2, fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' } }}>
             Medically Supervised Weight Loss
           </Typography>
           <Typography variant="body1" sx={{ color: '#333', mb: 3, fontSize: '1rem', lineHeight: 1.6 }}>
@@ -456,6 +458,8 @@ export default function Home() {
             component="img"
             src="/images/kadria_no_background.png"
             alt="Dr. Kadria Fairclough"
+            width={400}
+            height={400}
             sx={{
               width: '100%',
               maxWidth: 400,
@@ -470,10 +474,10 @@ export default function Home() {
       {/* 2. Meet Your Doctor */}
       <Box sx={{ width: '100%', backgroundColor: '#f5f3ef', py: 6, px: 2 }}>
         <Container maxWidth="md">
-          <Typography variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, mb: 0.5 }}>
+          <Typography component="h2" variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, mb: 0.5 }}>
             Meet Your Doctor
           </Typography>
-          <Typography variant="h5" sx={{ color: '#000', fontWeight: 700, mb: 3 }}>
+          <Typography component="h3" variant="h5" sx={{ color: '#000', fontWeight: 700, mb: 3 }}>
             Dr. Kadria Fairclough, Bsc, BMedSci, MBBS, LMCC.
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { sm: 'center' }, gap: 3 }}>
@@ -481,6 +485,8 @@ export default function Home() {
               component="img"
               src="/images/kadria_no_background.png"
               alt="Dr. Kadria Fairclough"
+              width={240}
+              height={240}
               sx={{
                 width: { xs: 220, sm: 240 },
                 height: { xs: 220, sm: 240 },
@@ -501,14 +507,14 @@ export default function Home() {
       {/* 3. How the Program Works */}
       <Box sx={{ width: '100%', backgroundColor: '#faf8f5', py: 6, px: 2 }}>
         <Container maxWidth="lg">
-          <Typography variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, textAlign: 'center', mb: 4 }}>
+          <Typography component="h2" variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, textAlign: 'center', mb: 4 }}>
             How the Program Works
           </Typography>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6} md={3}>
               <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
                 <ChatBubbleOutline sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>1-on-1 Consultation</Typography>
+                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>1-on-1 Consultation</Typography>
                 <Typography variant="body2" sx={{ color: '#333' }}>
                   Discuss your health history, weight loss goals, and develop a personalized plan that fits your needs.
                 </Typography>
@@ -517,7 +523,7 @@ export default function Home() {
             <Grid item xs={12} sm={6} md={3}>
               <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
                 <Medication sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>GLP-1 Medication</Typography>
+                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>GLP-1 Medication</Typography>
                 <Typography variant="body2" sx={{ color: '#333' }}>
                   Access to FDA-approved GLP-1 medications like Ozempic, Wegovy, and tirzepatide (if appropriate) to support your weight loss.
                 </Typography>
@@ -526,7 +532,7 @@ export default function Home() {
             <Grid item xs={12} sm={6} md={3}>
               <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
                 <HealthAndSafety sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Ongoing Support</Typography>
+                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Ongoing Support</Typography>
                 <Typography variant="body2" sx={{ color: '#333' }}>
                   Receive continuous monitoring, guidance, and encouragement to ensure safe and effective results.
                 </Typography>
@@ -535,7 +541,7 @@ export default function Home() {
             <Grid item xs={12} sm={6} md={3}>
               <Paper elevation={0} sx={{ p: 2.5, height: '100%', border: '1px solid #877449', borderRadius: 1, backgroundColor: '#fff' }}>
                 <VideoCall sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
-                <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Virtual Appointments</Typography>
+                <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>Virtual Appointments</Typography>
                 <Typography variant="body2" sx={{ color: '#333' }}>
                   Convenient secure virtual check-ins with Dr. Fairclough from the comfort of your home.
                 </Typography>
@@ -548,7 +554,7 @@ export default function Home() {
       {/* 4. Final CTA */}
       <Box sx={{ width: '100%', backgroundColor: '#f5f3ef', py: 6, px: 2, position: 'relative' }}>
         <Container maxWidth="md">
-          <Typography variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 1 }}>
+          <Typography component="h2" variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 1 }}>
             Ready To Transform Your Health? Start Your Svelte Journey Today!
           </Typography>
           <Typography variant="body1" sx={{ color: '#333', textAlign: 'center', mb: 4 }}>
@@ -560,7 +566,7 @@ export default function Home() {
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                   <Security sx={{ fontSize: 32, color: '#877449', mt: 0.25 }} />
                   <Box>
-                    <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Clinically Proven</Typography>
+                    <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Clinically Proven</Typography>
                     <Typography variant="body2" sx={{ color: '#333' }}>
                       Safe and effective GLP-1 medications, backed by research.
                     </Typography>
@@ -573,7 +579,7 @@ export default function Home() {
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                   <Assignment sx={{ fontSize: 32, color: '#877449', mt: 0.25 }} />
                   <Box>
-                    <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Ongoing Monitoring</Typography>
+                    <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 0.5 }}>Ongoing Monitoring</Typography>
                     <Typography variant="body2" sx={{ color: '#333' }}>
                       Regular follow-up and adjustments for optimal weight loss results.
                     </Typography>
