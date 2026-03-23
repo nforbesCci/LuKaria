@@ -15,7 +15,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { Login } from '@mui/icons-material';
+import { Login, Instagram, LinkedIn } from '@mui/icons-material';
 
 export default function AboutUs() {
   const { user } = useUser();
@@ -212,20 +212,44 @@ export default function AboutUs() {
                   </Typography>
                   <Divider sx={{ mb: 3, borderColor: '#877449' }} />
                   <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                    <Box
-                      component="img"
-                      src="/images/kadria.png"
-                      alt="Dr. Kadria Fairclough"
-                      width={250}
-                      height={250}
-                      sx={{
-                        width: { xs: '100%', md: 250 },
-                        maxWidth: 250,
-                        height: 'auto',
-                        borderRadius: 2,
-                        objectFit: 'cover',
-                      }}
-                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+                      <Box
+                        component="img"
+                        src="/images/kadria.png"
+                        alt="Dr. Kadria Fairclough"
+                        width={250}
+                        height={250}
+                        sx={{
+                          width: { xs: '100%', md: 250 },
+                          maxWidth: 250,
+                          height: 'auto',
+                          borderRadius: 2,
+                          objectFit: 'cover',
+                        }}
+                      />
+                      <Box sx={{ display: 'flex', gap: 1.5 }}>
+                        <Box
+                          component="a"
+                          href="https://www.instagram.com/thekadriafairclough"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Dr. Kadria Fairclough Instagram profile"
+                          sx={{ color: '#877449', display: 'inline-flex', '&:hover': { color: '#B8941F' } }}
+                        >
+                          <Instagram />
+                        </Box>
+                        <Box
+                          component="a"
+                          href="https://jm.linkedin.com/in/kadria-fairclough-stone"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Dr. Kadria Fairclough LinkedIn profile"
+                          sx={{ color: '#877449', display: 'inline-flex', '&:hover': { color: '#B8941F' } }}
+                        >
+                          <LinkedIn />
+                        </Box>
+                      </Box>
+                    </Box>
                     <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, flex: 1 }}>
                       Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss. Dr. Fairclough has always believed in patient-centred care which focuses on patient education and informed decision making. She possesses years of Canadian experience with Telehealth delivery.
                     </Typography>

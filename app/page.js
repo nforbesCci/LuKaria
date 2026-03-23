@@ -17,7 +17,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Login, WhatsApp } from '@mui/icons-material';
+import { Login, WhatsApp, Instagram, LinkedIn } from '@mui/icons-material';
 
 const HomeBelowFold = dynamic(() => import('../components/home/HomeBelowFold'), {
   loading: () => (
@@ -369,6 +369,28 @@ export default function Home() {
             <Typography variant="body1" sx={{ color: '#333', lineHeight: 1.7 }}>
               Dr. Kadria Fairclough is a licensed physician with over 15 years of experience helping patients achieve their health and wellness goals. At Svelte by LuKaria, she specializes in medically supervised weight loss and GLP-1 treatments ensuring safe, effective, and personalized care.
             </Typography>
+          </Box>
+          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+            <Box
+              component="a"
+              href="https://www.instagram.com/thekadriafairclough"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Dr. Kadria Fairclough Instagram profile"
+              sx={{ color: '#333', display: 'inline-flex', '&:hover': { color: '#877449' } }}
+            >
+              <Instagram />
+            </Box>
+            <Box
+              component="a"
+              href="https://jm.linkedin.com/in/kadria-fairclough-stone"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Dr. Kadria Fairclough LinkedIn profile"
+              sx={{ color: '#333', display: 'inline-flex', '&:hover': { color: '#877449' } }}
+            >
+              <LinkedIn />
+            </Box>
           </Box>
         </Container>
       </Box>
