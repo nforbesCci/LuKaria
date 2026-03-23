@@ -55,10 +55,17 @@ export async function POST(request) {
     const title = formData.get('title');
     const content = formData.get('content');
     const imageFile = formData.get('image');
+    const postKind = parsePostKind(formData);
     const videos = sanitizeStoredVideos(parseVideosJsonFromForm(formData));
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
+    }
+    if (postKind === 'video' && videos.length === 0) {
+      return NextResponse.json(
+        { error: 'Video blogs require at least one valid YouTube URL.' },
+        { status: 400 }
+      );
     }
 
     let imageUrl = null;

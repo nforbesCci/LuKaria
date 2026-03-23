@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Script from 'next/script';
 import SEO from '../../../components/SEO';
@@ -24,6 +24,7 @@ import { Article, Delete, Login } from '@mui/icons-material';
 
 export default function BlogPostPage() {
   const params = useParams();
+  const router = useRouter();
   const { user } = useUser();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -91,6 +92,18 @@ export default function BlogPostPage() {
       }));
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!confirm('Delete this blog post? This action cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/blog/${params.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete post');
+      router.push('/blog');
+    } catch (err) {
+      setError(err.message || 'Failed to delete post');
     }
   };
 
@@ -300,13 +313,20 @@ export default function BlogPostPage() {
             </Typography>
 
             {isDoctorOrAdmin && (
-              <Box sx={{ mt: 3 }}>
+              <Box sx={{ mt: 3, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                 <Button
                   variant="outlined"
                   href={`/blog/${post._id}/edit`}
                   sx={{ borderColor: '#877449', color: '#877449', '&:hover': { borderColor: '#B8941F', backgroundColor: 'rgba(212,175,55,0.1)' } }}
                 >
                   Edit Post
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={handleDeletePost}
+                >
+                  Delete Post
                 </Button>
               </Box>
             )}
