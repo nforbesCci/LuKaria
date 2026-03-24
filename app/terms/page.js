@@ -1,8 +1,6 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useState, useEffect } from 'react';
-import Header from '../../components/Header';
 import SEO from '../../components/SEO';
 import PublicTopMenu from '../../components/PublicTopMenu';
 import {
@@ -16,15 +14,6 @@ import { Login } from '@mui/icons-material';
 
 export default function Terms() {
   const { user } = useUser();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <>
