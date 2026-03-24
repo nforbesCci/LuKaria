@@ -3,16 +3,16 @@ import ThemeProvider from '../components/ThemeProvider';
 import NavigationDrawer from '../components/NavigationDrawer';
 import ClientLayout from '../components/ClientLayout';
 import ReduxProvider from '../components/ReduxProvider';
-import { REGISTERED_OFFICE, OFFICE_OPENING_HOURS_SCHEMA } from '../lib/business';
+import { REGISTERED_OFFICE, OFFICE_OPENING_HOURS_SCHEMA, GOOGLE_BUSINESS_PROFILE_URL } from '../lib/business';
 import { getOrganizationSameAs, getPhysicianSameAs } from '../lib/seo-constants';
 import './globals.css';
 
 export const metadata = {
   title: {
-    default: 'Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria',
+    default: 'Virtual GLP-1 Weight Loss Jamaica | Svelte by LuKaria',
     template: '%s | Svelte by LuKaria'
   },
-  description: 'Medical weight loss Jamaica with doctor-guided care. Svelte by LuKaria offers virtual GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide. Safe, physician-supervised weight management from home.',
+  description: 'Virtual GLP-1 medical weight loss in Jamaica. Physician-supervised care with Ozempic, Mounjaro & Tirzepatide. Free consultation — flat monthly fee, no waiting rooms.',
   keywords: [
     'medical weight loss Jamaica',
     'doctor-guided care',
@@ -51,8 +51,8 @@ export const metadata = {
     type: 'website',
     locale: 'en_JM',
     url: 'https://www.lukariagroup.com',
-    title: 'Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria',
-    description: 'Medical weight loss Jamaica with doctor-guided care. GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide. Physician-supervised virtual consultations.',
+    title: 'Virtual GLP-1 Weight Loss Jamaica | Svelte by LuKaria',
+    description: 'Virtual GLP-1 medical weight loss in Jamaica. Physician-supervised care with Ozempic, Mounjaro & Tirzepatide. Free consultation — flat monthly fee, no waiting rooms.',
     siteName: 'Svelte by LuKaria',
     images: [
       {
@@ -65,8 +65,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria',
-    description: 'Medical weight loss Jamaica with doctor-guided care. GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide.',
+    title: 'Virtual GLP-1 Weight Loss Jamaica | Svelte by LuKaria',
+    description: 'Virtual GLP-1 medical weight loss in Jamaica. Physician-supervised care with Ozempic, Mounjaro & Tirzepatide. Free consultation — flat monthly fee.',
     images: ['https://www.lukariagroup.com/images/Lukaria_logo.png'],
   },
   verification: {
@@ -170,14 +170,15 @@ export default function RootLayout({ children }) {
                   ...(orgSameAs.length ? { sameAs: orgSameAs } : {}),
                 },
                 {
-                  '@type': 'MedicalOrganization',
+                  '@type': ['MedicalOrganization', 'MedicalBusiness'],
                   '@id': 'https://www.lukariagroup.com/#localbusiness',
                   name: 'Svelte by LuKaria',
                   description:
-                    'Medical weight loss clinic in Jamaica with doctor-guided care. Physician-supervised weight loss programs. Registered office in Kingston; care delivered virtually with in-person visits by arrangement.',
+                    'Virtual medical weight loss clinic in Jamaica with doctor-guided care. Physician-supervised GLP-1 weight loss programs including Ozempic, Mounjaro and Tirzepatide. Registered office in Kingston; care delivered virtually island-wide.',
                   url: 'https://www.lukariagroup.com',
                   telephone: '+1-876-290-3659',
                   email: 'svelte@lukariagroup.com',
+                  hasMap: GOOGLE_BUSINESS_PROFILE_URL,
                   address: {
                     '@type': 'PostalAddress',
                     streetAddress: REGISTERED_OFFICE.streetAddress,
@@ -187,18 +188,21 @@ export default function RootLayout({ children }) {
                   },
                   areaServed: { '@type': 'Country', name: 'Jamaica' },
                   openingHoursSpecification: OFFICE_OPENING_HOURS_SCHEMA,
-                  ...(orgSameAs.length ? { sameAs: orgSameAs } : {}),
+                  medicalSpecialty: 'Bariatric Medicine',
+                  sameAs: [GOOGLE_BUSINESS_PROFILE_URL, ...orgSameAs],
                 },
                 {
                   '@type': 'Physician',
                   '@id': 'https://www.lukariagroup.com/#physician',
                   name: 'Dr. Kadria Fairclough',
+                  givenName: 'Kadria',
+                  familyName: 'Fairclough',
                   jobTitle: 'Physician',
                   credential: ['BSc', 'BMedSci', 'MBBS', 'LMCC'],
                   worksFor: { '@id': 'https://www.lukariagroup.com/#organization' },
                   description:
                     'Licensed physician with over 15 years of experience, specializing in medically supervised weight loss and lifestyle medicine. Extensive telehealth experience serving patients in Jamaica and Canada.',
-                  knowsAbout: ['Weight Management', 'Obesity Medicine', 'Lifestyle Medicine'],
+                  knowsAbout: ['Weight Management', 'Obesity Medicine', 'Lifestyle Medicine', 'GLP-1 Therapy', 'Telehealth'],
                   url: 'https://www.lukariagroup.com/about',
                   ...(physicianSameAs.length ? { sameAs: physicianSameAs } : {}),
                 },

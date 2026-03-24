@@ -25,6 +25,7 @@
     "jspdf": "^3.0.3",
     "mongodb": "^6.10.0",
     "next": "15.5.9",
+    "next-sitemap": "^4.2.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-redux": "^9.2.0",

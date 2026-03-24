@@ -35,13 +35,27 @@ export default function BlogPage() {
   );
 
   useEffect(() => {
-    fetch('/api/blog')
-      .then((res) => res.json())
-      .then((data) => {
-        setPosts(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    const loadPosts = () => {
+      setLoading(true);
+      setPosts([]);
+      fetch('/api/blog', { cache: 'no-store' })
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((data) => setPosts(Array.isArray(data) ? data : []))
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    };
+
+    loadPosts();
+
+    // Re-fetch when page is restored from bfcache (browser back/forward navigation)
+    const handlePageShow = (e) => {
+      if (e.persisted) loadPosts();
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
   }, []);
 
   return (

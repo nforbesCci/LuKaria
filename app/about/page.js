@@ -56,6 +56,51 @@ export default function AboutUs() {
         keywords="Dr. Kadria Fairclough, medical weight loss Jamaica, doctor-guided care, GLP-1 weight loss, weight loss doctor Jamaica, virtual clinic Jamaica, obesity management, Ozempic, Mounjaro, Tirzepatide"
         canonical="https://www.lukariagroup.com/about"
       />
+      <script
+        id="schema-about-physician"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Physician',
+            '@id': 'https://www.lukariagroup.com/#physician',
+            name: 'Dr. Kadria Fairclough',
+            givenName: 'Kadria',
+            familyName: 'Fairclough',
+            honorificPrefix: 'Dr.',
+            jobTitle: 'Physician & Founder',
+            description:
+              'Dr. Kadria Fairclough is a licensed physician with over 15 years of experience helping patients achieve their health and wellness goals. She founded Svelte by LuKaria to deliver compassionate, physician-supervised GLP-1 weight loss care virtually across Jamaica.',
+            credential: ['BSc', 'BMedSci', 'MBBS', 'LMCC'],
+            medicalSpecialty: 'Bariatric Medicine',
+            knowsAbout: [
+              'Weight Management',
+              'Obesity Medicine',
+              'Lifestyle Medicine',
+              'GLP-1 Therapy',
+              'Telehealth',
+              'Semaglutide',
+              'Tirzepatide',
+            ],
+            worksFor: {
+              '@type': 'MedicalOrganization',
+              '@id': 'https://www.lukariagroup.com/#localbusiness',
+              name: 'Svelte by LuKaria',
+              url: 'https://www.lukariagroup.com',
+            },
+            affiliation: {
+              '@type': 'MedicalOrganization',
+              name: 'Svelte by LuKaria',
+              url: 'https://www.lukariagroup.com',
+            },
+            url: 'https://www.lukariagroup.com/about',
+            sameAs: [
+              'https://www.instagram.com/thekadriafairclough',
+              'https://jm.linkedin.com/in/kadria-fairclough-stone',
+            ],
+          }),
+        }}
+      />
       <PublicTopMenu currentPath="/about" />
 
       {/* Top Navigation Bar */}

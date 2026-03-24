@@ -157,12 +157,13 @@ export default function FAQ() {
         </>
       )}
       <SEO
-        title="FAQ - GLP-1 Weight Loss Questions"
-        description="FAQ about medical weight loss Jamaica, GLP-1 weight loss, Ozempic, Mounjaro, Tirzepatide. Doctor-guided care answers for virtual consultations and weight loss program details."
-        keywords="GLP-1 weight loss FAQ, Ozempic Mounjaro questions, medical weight loss Jamaica FAQ, Tirzepatide answers, doctor-guided care FAQ, weight loss clinic Jamaica, Dr. Kadria Fairclough"
+        title="GLP-1 Weight Loss FAQ Jamaica — Tirzepatide & Semaglutide Questions"
+        description="Answers to common questions about GLP-1 weight loss in Jamaica — Tirzepatide, Semaglutide, Ozempic, Mounjaro. Learn how doctor-guided virtual care works at Svelte by LuKaria."
+        keywords="GLP-1 weight loss FAQ Jamaica, Tirzepatide questions, Semaglutide FAQ, Ozempic Mounjaro Jamaica, medical weight loss FAQ, doctor-guided care, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/faq"
       />
       <script
+        id="schema-faq-page"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />

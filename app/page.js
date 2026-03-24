@@ -100,6 +100,64 @@ export default function Home() {
       <Head>
         <link rel="canonical" href="https://www.lukariagroup.com/" />
       </Head>
+      <script
+        id="schema-homepage-medicalbusiness"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': ['MedicalBusiness', 'MedicalOrganization'],
+            '@id': 'https://www.lukariagroup.com/#medicalbusiness',
+            name: 'Svelte by LuKaria',
+            alternateName: 'LuKaria Medical Weight Loss',
+            description:
+              'Virtual GLP-1 medical weight loss clinic in Jamaica. Physician-supervised programs with Ozempic, Mounjaro and Tirzepatide. Doctor-guided care island-wide via telehealth.',
+            url: 'https://www.lukariagroup.com',
+            telephone: '+1-876-290-3659',
+            email: 'svelte@lukariagroup.com',
+            priceRange: '$$',
+            medicalSpecialty: 'Bariatric Medicine',
+            hasMap: 'https://www.google.com/maps?cid=9880637014440882752',
+            sameAs: ['https://www.google.com/maps?cid=9880637014440882752'],
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: '19 Fairdene Avenue',
+              addressLocality: 'Kingston',
+              addressRegion: 'Jamaica',
+              addressCountry: 'JM',
+            },
+            areaServed: { '@type': 'Country', name: 'Jamaica' },
+            openingHoursSpecification: [
+              {
+                '@type': 'OpeningHoursSpecification',
+                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                opens: '09:00',
+                closes: '17:00',
+              },
+            ],
+            availableService: [
+              {
+                '@type': 'MedicalTherapy',
+                name: 'GLP-1 Weight Loss (Semaglutide / Tirzepatide)',
+                description:
+                  'Physician-supervised GLP-1 medication programs for chronic weight management, including semaglutide (Ozempic, Wegovy) and tirzepatide (Mounjaro).',
+              },
+              {
+                '@type': 'MedicalTherapy',
+                name: 'Virtual Weight Loss Consultations',
+                description:
+                  'Telehealth consultations with a licensed physician for personalised weight loss treatment plans across Jamaica.',
+              },
+            ],
+            founder: {
+              '@type': 'Physician',
+              '@id': 'https://www.lukariagroup.com/#physician',
+              name: 'Dr. Kadria Fairclough',
+              url: 'https://www.lukariagroup.com/about',
+            },
+          }),
+        }}
+      />
       {/* Google Analytics */}
       {process.env.NEXT_PUBLIC_GA_ID && (
         <>
@@ -124,9 +182,9 @@ export default function Home() {
         </>
       )}
       <SEO
-        title="Medical Weight Loss Jamaica | Doctor-Guided Care | Svelte by LuKaria"
-        description="Medical weight loss Jamaica with doctor-guided care. GLP-1 weight loss including Ozempic, Mounjaro and Tirzepatide. Physician-supervised virtual consultations. Flat monthly fee, no waiting rooms."
-        keywords="medical weight loss Jamaica, doctor-guided care, GLP-1 weight loss, Ozempic Jamaica, Mounjaro Jamaica, Tirzepatide, Semaglutide, virtual weight loss clinic, telemedicine Jamaica, weight loss centre Jamaica, obesity treatment, Dr. Kadria Fairclough"
+        title="Virtual GLP-1 Weight Loss Jamaica | Svelte by LuKaria"
+        description="Virtual GLP-1 medical weight loss in Jamaica. Physician-supervised care with Ozempic, Mounjaro & Tirzepatide. Free consultation — flat monthly fee, no waiting rooms."
+        keywords="medical weight loss Jamaica, GLP-1 weight loss Jamaica, virtual weight loss clinic, doctor-guided care, Ozempic Jamaica, Mounjaro Jamaica, Tirzepatide, Semaglutide, telemedicine Jamaica, obesity treatment, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com"
       />
       <PublicTopMenu currentPath="/" />
