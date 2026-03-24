@@ -528,7 +528,6 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
-                  defaultExpanded={false}
                   expanded={expandedPanel === 'semaglutide-how-works'}
                   onChange={handleAccordionChange('semaglutide-how-works')}
                   sx={{ 
@@ -560,7 +559,6 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
-                  defaultExpanded={false}
                   expanded={expandedPanel === 'semaglutide-how-take'}
                   onChange={handleAccordionChange('semaglutide-how-take')}
                   sx={{ 
@@ -592,6 +590,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'semaglutide-weight-loss'}
                   onChange={handleAccordionChange('semaglutide-weight-loss')}
                   sx={{ 
@@ -623,6 +622,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'semaglutide-side-effects'}
                   onChange={handleAccordionChange('semaglutide-side-effects')}
                   sx={{ 
