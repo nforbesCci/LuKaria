@@ -72,7 +72,7 @@ export default function UserDebug() {
           </Typography>
         </Box>
 
-        <Accordion>
+        <Accordion defaultExpanded={false}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="subtitle1">User Properties</Typography>
           </AccordionSummary>
@@ -85,7 +85,7 @@ export default function UserDebug() {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion>
+        <Accordion defaultExpanded={false}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="subtitle1">Group Information</Typography>
           </AccordionSummary>
@@ -98,7 +98,7 @@ export default function UserDebug() {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion>
+        <Accordion defaultExpanded={false}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="subtitle1">Metadata</Typography>
           </AccordionSummary>
@@ -110,7 +110,7 @@ export default function UserDebug() {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion>
+        <Accordion defaultExpanded={false}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="subtitle1">Full User Object</Typography>
           </AccordionSummary>

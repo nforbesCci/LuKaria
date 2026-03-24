@@ -24,7 +24,7 @@ import {
 
 export default function FaqPageClient() {
   const { user } = useUser();
-  const [expandedPanel, setExpandedPanel] = useState('mounjaro-what');
+  const [expandedPanel, setExpandedPanel] = useState(false);
   const [activeTab, setActiveTab] = useState(0); // Default to Mounjaro (index 0)
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -128,7 +128,7 @@ export default function FaqPageClient() {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
-    setExpandedPanel(newValue === 0 ? 'mounjaro-what' : 'semaglutide-what');
+    setExpandedPanel(false);
   };
 
   return (
@@ -318,7 +318,8 @@ export default function FaqPageClient() {
             {/* Tirzepatide Tab Content */}
             {activeTab === 0 && (
               <Box>
-                <Accordion 
+<Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'mounjaro-what'}
                   onChange={handleAccordionChange('mounjaro-what')}
                   sx={{ 
@@ -350,6 +351,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'mounjaro-how-works'}
                   onChange={handleAccordionChange('mounjaro-how-works')}
                   sx={{ 
@@ -381,6 +383,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'mounjaro-how-take'}
                   onChange={handleAccordionChange('mounjaro-how-take')}
                   sx={{ 
@@ -412,6 +415,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'mounjaro-weight-loss'}
                   onChange={handleAccordionChange('mounjaro-weight-loss')}
                   sx={{ 
@@ -443,6 +447,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'mounjaro-side-effects'}
                   onChange={handleAccordionChange('mounjaro-side-effects')}
                   sx={{ 
@@ -490,7 +495,8 @@ export default function FaqPageClient() {
             {/* Semaglutide Tab Content */}
             {activeTab === 1 && (
               <Box>
-                <Accordion 
+<Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'semaglutide-what'}
                   onChange={handleAccordionChange('semaglutide-what')}
                   sx={{ 
@@ -522,6 +528,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'semaglutide-how-works'}
                   onChange={handleAccordionChange('semaglutide-how-works')}
                   sx={{ 
@@ -553,6 +560,7 @@ export default function FaqPageClient() {
                 </Accordion>
 
                 <Accordion
+                  defaultExpanded={false}
                   expanded={expandedPanel === 'semaglutide-how-take'}
                   onChange={handleAccordionChange('semaglutide-how-take')}
                   sx={{ 
