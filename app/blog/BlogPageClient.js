@@ -215,6 +215,12 @@ export default function BlogPageClient({ initialPosts = [] }) {
               {(() => {
                 const videoPosts = posts.filter((p) => normalizePostVideos(p).length > 0);
                 const articlePosts = posts.filter((p) => normalizePostVideos(p).length === 0);
+                const videoStart = (videoPage - 1) * POSTS_PER_PAGE;
+                const videoPaginated = videoPosts.slice(videoStart, videoStart + POSTS_PER_PAGE);
+                const articleStart = (articlePage - 1) * POSTS_PER_PAGE;
+                const articlePaginated = articlePosts.slice(articleStart, articleStart + POSTS_PER_PAGE);
+                const videoPages = Math.ceil(videoPosts.length / POSTS_PER_PAGE) || 1;
+                const articlePages = Math.ceil(articlePosts.length / POSTS_PER_PAGE) || 1;
                 const PostCard = ({ post, isVideo }) => {
                   const firstVideo = normalizePostVideos(post)[0];
                   const thumbId = firstVideo?.url ? getYouTubeVideoId(firstVideo.url) : null;
