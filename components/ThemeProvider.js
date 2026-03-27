@@ -2,9 +2,9 @@
 
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { usePathname } from 'next/navigation';
 import { createTheme } from '@mui/material/styles';
+import { isPublicPath } from '../lib/public-paths';
 
 // Light theme for public pages
 const lightTheme = createTheme({
@@ -47,11 +47,11 @@ const darkTheme = createTheme({
 });
 
 export default function ThemeProvider({ children }) {
-  const { user } = useUser();
-  const pathname = usePathname();
-  
-  // Use dark theme for authenticated pages, light theme for public pages
-  const currentTheme = user ? darkTheme : lightTheme;
+  const pathname = usePathname() || '';
+
+  // Pathname-first avoids a light→dark flash while Auth0 hydrates on app/doctor pages (CLS).
+  // Marketing URLs always use light theme, including when a session exists before redirect.
+  const currentTheme = isPublicPath(pathname) ? lightTheme : darkTheme;
   
   return (
     <MuiThemeProvider theme={currentTheme}>

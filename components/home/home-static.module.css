@@ -1,0 +1,210 @@
+/* Server-rendered homepage sections — avoids MUI in RSC and improves LCP */
+
+.hero {
+  width: 100%;
+  background-color: #faf8f5;
+  padding: 0 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 3rem;
+    min-height: 480px;
+  }
+}
+
+.heroCopy {
+  flex: 1;
+  max-width: 520px;
+  width: 100%;
+  order: 2;
+}
+
+@media (min-width: 900px) {
+  .heroCopy {
+    order: 1;
+  }
+}
+
+.heroH1 {
+  color: #000;
+  font-weight: 700;
+  font-family: Georgia, 'Times New Roman', serif;
+  margin: 0 0 1rem;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 600px) {
+  .heroH1 {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .heroH1 {
+    font-size: 2.5rem;
+  }
+}
+
+.heroLead {
+  color: #333;
+  margin: 0 0 1.25rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.heroCta {
+  display: inline-block;
+  text-transform: none;
+  background-color: #877449;
+  color: #000;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.75rem 2rem;
+  margin: 0;
+  text-decoration: none;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.heroCta:hover {
+  background-color: #b8941f;
+}
+
+.heroCaption {
+  display: block;
+  color: #555;
+  margin: 0.5rem 0 1rem;
+  font-size: 0.75rem;
+}
+
+.heroTag {
+  color: #555;
+  font-style: italic;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.heroImageWrap {
+  flex: 1;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  order: 1;
+}
+
+@media (min-width: 900px) {
+  .heroImageWrap {
+    order: 2;
+  }
+}
+
+.heroImage {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain;
+}
+
+.meet {
+  width: 100%;
+  background-color: #f5f3ef;
+  padding: 3rem 1rem;
+  box-sizing: border-box;
+}
+
+.meetInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.meetH2 {
+  color: #000;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+@media (min-width: 600px) {
+  .meetH2 {
+    font-size: 2rem;
+  }
+}
+
+.meetH3 {
+  color: #000;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  font-size: 1.15rem;
+}
+
+@media (min-width: 600px) {
+  .meetH3 {
+    font-size: 1.5rem;
+  }
+}
+
+.meetRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+@media (min-width: 600px) {
+  .meetRow {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.meetAvatar {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+@media (min-width: 600px) {
+  .meetAvatar {
+    width: 240px;
+    height: 240px;
+  }
+}
+
+.meetBody {
+  color: #333;
+  line-height: 1.7;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.socialRow {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.socialLink {
+  color: #333;
+  display: inline-flex;
+}
+
+.socialLink:hover {
+  color: #877449;
+}

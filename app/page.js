@@ -1,8 +1,15 @@
-import HomePageClient from './HomePageClient';
+import HomePageChrome from './HomePageChrome';
+import HomeHeroStatic from '../components/home/HomeHeroStatic';
+import HomeMeetDoctorStatic from '../components/home/HomeMeetDoctorStatic';
 
-/** Force SSR on every request — no static pre-render */
-export const dynamic = 'force-dynamic';
+/** Static marketing shell improves TTFB/LCP; hero/meet-doctor are server components for LCP. */
+export const revalidate = 3600;
 
 export default function HomePage() {
-  return <HomePageClient />;
+  return (
+    <HomePageChrome>
+      <HomeHeroStatic />
+      <HomeMeetDoctorStatic />
+    </HomePageChrome>
+  );
 }

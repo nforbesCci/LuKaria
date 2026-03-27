@@ -2,7 +2,7 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 import ThemeProvider from '../components/ThemeProvider';
 import NavigationDrawer from '../components/NavigationDrawer';
 import ClientLayout from '../components/ClientLayout';
-import ReduxProvider from '../components/ReduxProvider';
+import ConditionalReduxProvider from '../components/ConditionalReduxProvider';
 import { REGISTERED_OFFICE, OFFICE_OPENING_HOURS_SCHEMA, GOOGLE_BUSINESS_PROFILE_URL } from '../lib/business';
 import { getOrganizationSameAs, getPhysicianSameAs } from '../lib/seo-constants';
 import './globals.css';
@@ -214,14 +214,14 @@ export default function RootLayout({ children }) {
       </head>
             <body suppressHydrationWarning={true}>
               <UserProvider>
-                <ReduxProvider>
+                <ConditionalReduxProvider>
                   <ThemeProvider>
                     <ClientLayout>
                       <NavigationDrawer />
                       {children}
                     </ClientLayout>
                   </ThemeProvider>
-                </ReduxProvider>
+                </ConditionalReduxProvider>
               </UserProvider>
             </body>
     </html>
