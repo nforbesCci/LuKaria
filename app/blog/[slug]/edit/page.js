@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { normalizePostVideos, isVideoBlogPost } from '../../../../lib/blog-videos';
+import { getPublicBlogPath } from '../../../../lib/blog-url';
 
 const emptyVideoRow = () => ({ title: '', url: '' });
 
@@ -32,6 +33,8 @@ export default function BlogEditPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  const segment = params?.slug;
+
   const isDoctorOrAdmin = user && (
     (user.groups && (user.groups.includes('Admin') || user.groups.includes('Doctor'))) ||
     (user['https://lukariagroup.com/roles'] && (
@@ -42,30 +45,39 @@ export default function BlogEditPage() {
 
   const isVideoMode = post ? isVideoBlogPost(post) : false;
 
+  const goToPost = (nextSlug, currentPost) => {
+    const pathSeg = nextSlug || currentPost?.slug || currentPost?._id || segment;
+    router.push(`/blog/${pathSeg}`);
+  };
+
   useEffect(() => {
-    if (!params?.id || !user) return;
+    if (!segment || !user) return;
     if (!isDoctorOrAdmin) {
       setError('Access denied. Doctor or Admin required.');
       setLoading(false);
       return;
     }
-    fetch(`/api/blog/${params.id}`)
+    fetch(`/api/blog/${encodeURIComponent(segment)}`)
       .then((res) => res.json())
       .then((data) => {
-        setPost(data);
-        setTitle(data.title || '');
-        setContent(data.content || '');
-        const vlist = normalizePostVideos(data);
-        setVideoEntries(
-          vlist.length ? vlist.map((v) => ({ title: v.title || '', url: v.url || '' })) : [emptyVideoRow()]
-        );
+        if (data.error) {
+          setPost(null);
+        } else {
+          setPost(data);
+          setTitle(data.title || '');
+          setContent(data.content || '');
+          const vlist = normalizePostVideos(data);
+          setVideoEntries(
+            vlist.length ? vlist.map((v) => ({ title: v.title || '', url: v.url || '' })) : [emptyVideoRow()]
+          );
+        }
         setLoading(false);
       })
       .catch(() => {
         setError('Failed to load post');
         setLoading(false);
       });
-  }, [params?.id, user, isDoctorOrAdmin]);
+  }, [segment, user, isDoctorOrAdmin]);
 
   const addVideoRow = () => setVideoEntries((rows) => [...rows, emptyVideoRow()]);
   const removeVideoRow = (index) => {
@@ -83,7 +95,7 @@ export default function BlogEditPage() {
 
   const handleSubmitArticle = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
+    if (!title.trim() || !content.trim() || !segment) return;
     setSaving(true);
     setError('');
     try {
@@ -93,15 +105,13 @@ export default function BlogEditPage() {
       formData.append('postKind', 'article');
       formData.append('videosJson', JSON.stringify([]));
       if (imageFile) formData.append('image', imageFile);
-      const res = await fetch(`/api/blog/${params.id}`, {
+      const res = await fetch(`/api/blog/${encodeURIComponent(segment)}`, {
         method: 'PUT',
         body: formData,
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to update');
-      }
-      router.push(`/blog/${params.id}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update');
+      goToPost(data.slug, { ...post, slug: data.slug || post?.slug });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -120,15 +130,13 @@ export default function BlogEditPage() {
       formData.append('postKind', 'article');
       formData.append('videosJson', JSON.stringify([]));
       if (imageFile) formData.append('image', imageFile);
-      const res = await fetch(`/api/blog/${params.id}`, {
+      const res = await fetch(`/api/blog/${encodeURIComponent(segment)}`, {
         method: 'PUT',
         body: formData,
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to update');
-      }
-      router.push(`/blog/${params.id}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update');
+      goToPost(data.slug, { ...post, slug: data.slug || post?.slug });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -155,15 +163,13 @@ export default function BlogEditPage() {
       formData.append('postKind', 'video');
       formData.append('videosJson', JSON.stringify(payload));
       if (imageFile) formData.append('image', imageFile);
-      const res = await fetch(`/api/blog/${params.id}`, {
+      const res = await fetch(`/api/blog/${encodeURIComponent(segment)}`, {
         method: 'PUT',
         body: formData,
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to update');
-      }
-      router.push(`/blog/${params.id}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update');
+      goToPost(data.slug, { ...post, slug: data.slug || post?.slug });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -204,6 +210,8 @@ export default function BlogEditPage() {
       </Container>
     );
   }
+
+  const cancelHref = post ? getPublicBlogPath(post) : '/blog';
 
   if (isVideoMode) {
     return (
@@ -292,7 +300,7 @@ export default function BlogEditPage() {
             <Button type="submit" variant="contained" disabled={saving} sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}>
               {saving ? 'Saving...' : 'Save'}
             </Button>
-            <Button variant="outlined" onClick={() => router.push(`/blog/${params.id}`)} sx={{ borderColor: '#877449', color: '#877449' }}>
+            <Button variant="outlined" onClick={() => router.push(cancelHref)} sx={{ borderColor: '#877449', color: '#877449' }}>
               Cancel
             </Button>
             <Button type="button" variant="text" disabled={saving} onClick={handleConvertToArticle} sx={{ color: '#999' }}>
@@ -353,7 +361,7 @@ export default function BlogEditPage() {
           <Button type="submit" variant="contained" disabled={saving} sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}>
             {saving ? 'Saving...' : 'Save'}
           </Button>
-          <Button variant="outlined" onClick={() => router.push(`/blog/${params.id}`)} sx={{ borderColor: '#877449', color: '#877449' }}>
+          <Button variant="outlined" onClick={() => router.push(cancelHref)} sx={{ borderColor: '#877449', color: '#877449' }}>
             Cancel
           </Button>
         </Box>

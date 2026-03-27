@@ -1,15 +1,13 @@
-import { ObjectId } from 'mongodb';
-import { SITE_URL } from '../../../lib/public-seo';
+import { getBlogPostBySegment } from '../../../lib/get-public-blog-posts';
+import { getPublicBlogCanonicalUrl } from '../../../lib/blog-url';
 
 export async function generateMetadata({ params }) {
-  const { id } = await params;
-  if (!id || !ObjectId.isValid(id)) {
+  const { slug: segment } = await params;
+  if (!segment) {
     return { title: 'Blog | Svelte by LuKaria' };
   }
   try {
-    const { getDatabase } = await import('../../../lib/mongodb');
-    const db = await getDatabase();
-    const post = await db.collection('blogPosts').findOne({ _id: new ObjectId(id) });
+    const post = await getBlogPostBySegment(segment);
     if (!post) {
       return { title: 'Blog Post | Svelte by LuKaria' };
     }
@@ -17,7 +15,7 @@ export async function generateMetadata({ params }) {
     const desc =
       (post.content || '').replace(/\s+/g, ' ').trim().slice(0, 160) ||
       'Blog post from Svelte by LuKaria';
-    const url = `${SITE_URL}/blog/${id}`;
+    const url = getPublicBlogCanonicalUrl(post);
     return {
       title,
       description: desc,

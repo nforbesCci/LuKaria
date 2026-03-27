@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { parseVideosJsonFromForm, sanitizeStoredVideos } from '../../../lib/blog-videos';
+import { allocateUniqueSlug } from '../../../lib/blog-slug';
 
 function parsePostKind(formData) {
   const raw = String(formData.get('postKind') || '').trim().toLowerCase();
@@ -82,6 +83,8 @@ export async function POST(request) {
     }
 
     const db = await getDatabase();
+    const coll = db.collection('blogPosts');
+    const slug = await allocateUniqueSlug(coll, title);
     const doc = {
       title,
       content,
@@ -89,6 +92,7 @@ export async function POST(request) {
       postKind,
       videos,
       videoUrl: videos[0]?.url ?? null,
+      slug,
       authorId: session.user.sub,
       authorName: session.user.name || 'Doctor',
       createdAt: new Date(),
@@ -96,8 +100,12 @@ export async function POST(request) {
       comments: [],
     };
 
-    const result = await db.collection('blogPosts').insertOne(doc);
-    return NextResponse.json({ success: true, id: result.insertedId.toString() });
+    const result = await coll.insertOne(doc);
+    return NextResponse.json({
+      success: true,
+      id: result.insertedId.toString(),
+      slug,
+    });
   } catch (error) {
     console.error('Blog POST error:', error);
     return NextResponse.json({ error: 'Failed to create blog post' }, { status: 500 });

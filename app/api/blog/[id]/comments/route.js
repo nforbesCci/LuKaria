@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getDatabase } from '../../../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { resolveBlogPostObjectId } from '../../../../../lib/blog-resolve';
 
 function isDoctorOrAdmin(session) {
   const groups = session?.user?.groups || session?.user?.['https://lukariagroup.com/roles'] || [];
@@ -10,7 +11,7 @@ function isDoctorOrAdmin(session) {
 
 export async function POST(request, { params }) {
   try {
-    const { id } = await params;
+    const { id: segment } = await params;
     const body = await request.json();
     const { authorName, content } = body;
 
@@ -26,8 +27,12 @@ export async function POST(request, { params }) {
     };
 
     const db = await getDatabase();
+    const postId = await resolveBlogPostObjectId(db, segment);
+    if (!postId) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
     const result = await db.collection('blogPosts').updateOne(
-      { _id: new ObjectId(id) },
+      { _id: postId },
       { $push: { comments: comment } }
     );
 
@@ -48,7 +53,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized. Doctor or Admin required.' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id: segment } = await params;
     const { searchParams } = new URL(request.url);
     const commentId = searchParams.get('commentId');
 
@@ -57,8 +62,12 @@ export async function DELETE(request, { params }) {
     }
 
     const db = await getDatabase();
+    const postId = await resolveBlogPostObjectId(db, segment);
+    if (!postId) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
     const result = await db.collection('blogPosts').updateOne(
-      { _id: new ObjectId(id) },
+      { _id: postId },
       { $pull: { comments: { id: commentId } } }
     );
 

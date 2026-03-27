@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getDatabase } from '../../../../lib/mongodb';
-import { ObjectId } from 'mongodb';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { parseVideosJsonFromForm, sanitizeStoredVideos } from '../../../../lib/blog-videos';
+import { resolveBlogPostObjectId } from '../../../../lib/blog-resolve';
+import { allocateUniqueSlug } from '../../../../lib/blog-slug';
 
 function parsePostKind(formData) {
   const raw = String(formData.get('postKind') || '').trim().toLowerCase();
@@ -18,9 +19,13 @@ function isDoctorOrAdmin(session) {
 
 export async function GET(request, { params }) {
   try {
-    const { id } = await params;
+    const { id: segment } = await params;
     const db = await getDatabase();
-    const post = await db.collection('blogPosts').findOne({ _id: new ObjectId(id) });
+    const postId = await resolveBlogPostObjectId(db, segment);
+    if (!postId) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+    const post = await db.collection('blogPosts').findOne({ _id: postId });
     if (!post) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
@@ -38,7 +43,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized. Doctor or Admin required.' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id: segment } = await params;
     const formData = await request.formData();
     const title = formData.get('title');
     const content = formData.get('content');
@@ -58,6 +63,12 @@ export async function PUT(request, { params }) {
     }
 
     const db = await getDatabase();
+    const postId = await resolveBlogPostObjectId(db, segment);
+    if (!postId) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+
+    const existing = await db.collection('blogPosts').findOne({ _id: postId });
     const update = {
       title,
       content,
@@ -66,6 +77,12 @@ export async function PUT(request, { params }) {
       videos,
       videoUrl: videos[0]?.url ?? null,
     };
+
+    let assignedSlug = null;
+    if (existing && !existing.slug) {
+      assignedSlug = await allocateUniqueSlug(db.collection('blogPosts'), title, postId);
+      update.slug = assignedSlug;
+    }
 
     if (imageFile && imageFile.size > 0) {
       const bytes = await imageFile.arrayBuffer();
@@ -79,15 +96,13 @@ export async function PUT(request, { params }) {
       update.imageUrl = `/images/blog/${filename}`;
     }
 
-    const result = await db.collection('blogPosts').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: update }
-    );
+    const result = await db.collection('blogPosts').updateOne({ _id: postId }, { $set: update });
 
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
-    return NextResponse.json({ success: true });
+    const publicSlug = assignedSlug || existing?.slug || null;
+    return NextResponse.json({ success: true, slug: publicSlug });
   } catch (error) {
     console.error('Blog PUT error:', error);
     return NextResponse.json({ error: 'Failed to update post' }, { status: 500 });
@@ -101,9 +116,13 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized. Doctor or Admin required.' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id: segment } = await params;
     const db = await getDatabase();
-    const result = await db.collection('blogPosts').deleteOne({ _id: new ObjectId(id) });
+    const postId = await resolveBlogPostObjectId(db, segment);
+    if (!postId) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+    const result = await db.collection('blogPosts').deleteOne({ _id: postId });
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }

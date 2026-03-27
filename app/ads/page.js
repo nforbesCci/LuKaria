@@ -68,6 +68,7 @@ export default function AdsLandingPage() {
         description="Medical weight loss Jamaica with doctor-guided care. Physician-supervised weight loss programs. Flat monthly fee. Schedule your free consultation today."
         keywords="medical weight loss Jamaica, doctor-guided care, physician-supervised weight loss, weight loss centre Jamaica, obesity treatment, weight management, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/ads"
+        robots="noindex, follow"
       />
 
       <PublicTopMenu currentPath="/ads" />

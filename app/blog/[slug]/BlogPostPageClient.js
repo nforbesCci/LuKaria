@@ -9,6 +9,7 @@ import PublicTopMenu from '../../../components/PublicTopMenu';
 import { getYouTubeEmbedUrl, getYouTubeVideoId } from '../../../lib/business';
 import { normalizePostVideos, isVideoBlogPost } from '../../../lib/blog-videos';
 import { toIsoDateString } from '../../../lib/seo-helpers';
+import { getPublicBlogPath, getPublicBlogCanonicalUrl } from '../../../lib/blog-url';
 import {
   Container,
   Typography,
@@ -22,7 +23,8 @@ import {
 } from '@mui/material';
 import { Delete, Login } from '@mui/icons-material';
 
-export default function BlogPostPageClient({ initialPost }) {
+/** @param {{ initialPost?: object, relatedPosts?: Array<{ _id: string, title: string, slug?: string | null }> }} props */
+export default function BlogPostPageClient({ initialPost, relatedPosts = [] }) {
   const params = useParams();
   const router = useRouter();
   const { user } = useUser();
@@ -34,6 +36,8 @@ export default function BlogPostPageClient({ initialPost }) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  const segment = params?.slug;
+
   const isDoctorOrAdmin = user && (
     (user.groups && (user.groups.includes('Admin') || user.groups.includes('Doctor'))) ||
     (user['https://lukariagroup.com/roles'] && (
@@ -44,23 +48,23 @@ export default function BlogPostPageClient({ initialPost }) {
 
   useEffect(() => {
     if (initialPost) return;
-    if (!params?.id) return;
-    fetch(`/api/blog/${params.id}`)
+    if (!segment) return;
+    fetch(`/api/blog/${encodeURIComponent(segment)}`)
       .then((res) => res.json())
       .then((data) => {
-        setPost(data);
+        setPost(data.error ? null : data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [params?.id, initialPost]);
+  }, [segment, initialPost]);
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
-    if (!commentName.trim() || !commentContent.trim()) return;
+    if (!commentName.trim() || !commentContent.trim() || !post?._id) return;
     setSubmitting(true);
     setError('');
     try {
-      const res = await fetch(`/api/blog/${params.id}/comments`, {
+      const res = await fetch(`/api/blog/${post._id}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ authorName: commentName.trim(), content: commentContent.trim() }),
@@ -83,9 +87,10 @@ export default function BlogPostPageClient({ initialPost }) {
   };
 
   const handleDeleteComment = async (commentId) => {
+    if (!post?._id) return;
     if (!confirm('Remove this comment?')) return;
     try {
-      const res = await fetch(`/api/blog/${params.id}/comments?commentId=${commentId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/blog/${post._id}/comments?commentId=${commentId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to remove comment');
       setPost((prev) => ({
         ...prev,
@@ -97,9 +102,10 @@ export default function BlogPostPageClient({ initialPost }) {
   };
 
   const handleDeletePost = async () => {
+    if (!post?._id) return;
     if (!confirm('Delete this blog post? This action cannot be undone.')) return;
     try {
-      const res = await fetch(`/api/blog/${params.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/blog/${post._id}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete post');
       router.push('/blog');
@@ -118,6 +124,90 @@ export default function BlogPostPageClient({ initialPost }) {
 
   const postVideos = normalizePostVideos(post);
   const isVideoBlog = isVideoBlogPost(post);
+  const canonicalUrl = getPublicBlogCanonicalUrl(post);
+  const blogPath = getPublicBlogPath(post);
+
+  const blogPostingJson = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${canonicalUrl}#blogPosting`,
+    headline: post.title,
+    description: post.content?.slice(0, 160),
+    url: canonicalUrl,
+    inLanguage: 'en-JM',
+    articleSection: isVideoBlog ? 'Video blog' : 'Articles',
+    datePublished: toIsoDateString(post.createdAt),
+    dateModified: toIsoDateString(post.updatedAt || post.createdAt),
+    author: {
+      '@type': 'Person',
+      name: post.authorName || 'Doctor',
+      ...(post.authorName && /kadria fairclough/i.test(post.authorName)
+        ? { url: 'https://www.lukariagroup.com/about' }
+        : {}),
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Svelte by LuKaria',
+      url: 'https://www.lukariagroup.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.lukariagroup.com/images/Lukaria_logo.png',
+      },
+    },
+    isPartOf: {
+      '@type': 'WebSite',
+      '@id': 'https://www.lukariagroup.com/#website',
+      name: 'Svelte by LuKaria',
+      url: 'https://www.lukariagroup.com',
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalUrl,
+    },
+    ...((post.imageUrl || (isVideoBlog && postVideos[0]?.url)) && {
+      image: {
+        '@type': 'ImageObject',
+        url: post.imageUrl
+          ? `https://www.lukariagroup.com${post.imageUrl}`
+          : `https://img.youtube.com/vi/${getYouTubeVideoId(postVideos[0].url)}/mqdefault.jpg`,
+      },
+    }),
+    ...(postVideos.length > 0 && {
+      associatedMedia: postVideos.map((v) => ({
+        '@type': 'VideoObject',
+        name: v.title || post.title,
+        embedUrl: getYouTubeEmbedUrl(v.url),
+        ...(getYouTubeVideoId(v.url) && {
+          thumbnailUrl: `https://img.youtube.com/vi/${getYouTubeVideoId(v.url)}/mqdefault.jpg`,
+        }),
+      })),
+    }),
+  };
+
+  const breadcrumbJson = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://www.lukariagroup.com',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: 'https://www.lukariagroup.com/blog',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: canonicalUrl,
+      },
+    ],
+  };
 
   return (
     <>
@@ -127,72 +217,18 @@ export default function BlogPostPageClient({ initialPost }) {
       <SEO
         title={`${post.title} | Blog | Svelte by LuKaria`}
         description={post.content?.slice(0, 160) || 'Blog post from Svelte by LuKaria'}
-        canonical={`https://www.lukariagroup.com/blog/${post._id}`}
+        canonical={canonicalUrl}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            '@id': `https://www.lukariagroup.com/blog/${post._id}#article`,
-            headline: post.title,
-            description: post.content?.slice(0, 160),
-            url: `https://www.lukariagroup.com/blog/${post._id}`,
-            inLanguage: 'en-JM',
-            articleSection: isVideoBlog ? 'Video blog' : 'Articles',
-            datePublished: toIsoDateString(post.createdAt),
-            dateModified: toIsoDateString(post.updatedAt || post.createdAt),
-            author: {
-              '@type': 'Person',
-              name: post.authorName || 'Doctor',
-              ...(post.authorName && /kadria fairclough/i.test(post.authorName)
-                ? { url: 'https://www.lukariagroup.com/about' }
-                : {}),
-            },
-            publisher: {
-              '@type': 'Organization',
-              name: 'Svelte by LuKaria',
-              url: 'https://www.lukariagroup.com',
-              logo: {
-                '@type': 'ImageObject',
-                url: 'https://www.lukariagroup.com/images/Lukaria_logo.png',
-              },
-            },
-            isPartOf: {
-              '@type': 'WebSite',
-              '@id': 'https://www.lukariagroup.com/#website',
-              name: 'Svelte by LuKaria',
-              url: 'https://www.lukariagroup.com',
-            },
-            mainEntityOfPage: {
-              '@type': 'WebPage',
-              '@id': `https://www.lukariagroup.com/blog/${post._id}`,
-            },
-            ...((post.imageUrl || (isVideoBlog && postVideos[0]?.url)) && {
-              image: {
-                '@type': 'ImageObject',
-                url: post.imageUrl
-                  ? `https://www.lukariagroup.com${post.imageUrl}`
-                  : `https://img.youtube.com/vi/${getYouTubeVideoId(postVideos[0].url)}/mqdefault.jpg`,
-              },
-            }),
-            ...(postVideos.length > 0 && {
-              associatedMedia: postVideos.map((v) => ({
-                '@type': 'VideoObject',
-                name: v.title || post.title,
-                embedUrl: getYouTubeEmbedUrl(v.url),
-                ...(getYouTubeVideoId(v.url) && {
-                  thumbnailUrl: `https://img.youtube.com/vi/${getYouTubeVideoId(v.url)}/mqdefault.jpg`,
-                }),
-              })),
-            }),
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJson) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJson) }}
       />
       <PublicTopMenu currentPath="/blog" />
 
-      {/* Top Navigation Bar - Logo and Login */}
       <Box
         sx={{
           position: 'fixed',
@@ -317,23 +353,37 @@ export default function BlogPostPageClient({ initialPost }) {
               <Box sx={{ mt: 3, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                 <Button
                   variant="outlined"
-                  href={`/blog/${post._id}/edit`}
+                  href={`${blogPath}/edit`}
                   sx={{ borderColor: '#877449', color: '#877449', '&:hover': { borderColor: '#B8941F', backgroundColor: 'rgba(212,175,55,0.1)' } }}
                 >
                   Edit Post
                 </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={handleDeletePost}
-                >
+                <Button variant="outlined" color="error" onClick={handleDeletePost}>
                   Delete Post
                 </Button>
               </Box>
             )}
           </Paper>
 
-          {/* Comments */}
+          {relatedPosts.length > 0 && (
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h5" sx={{ color: '#877449', fontWeight: 600, mb: 2 }}>
+                Related posts
+              </Typography>
+              <Paper elevation={1} sx={{ p: 2, backgroundColor: '#1a1a1a', border: '1px solid #877449' }}>
+                <Box component="ul" sx={{ m: 0, pl: 2.5, '& li': { mb: 1 } }}>
+                  {relatedPosts.map((rp) => (
+                    <Typography component="li" key={rp._id} variant="body1" sx={{ color: '#877449' }}>
+                      <Box component="a" href={getPublicBlogPath(rp)} sx={{ color: '#B8941F', textDecoration: 'underline' }}>
+                        {rp.title}
+                      </Box>
+                    </Typography>
+                  ))}
+                </Box>
+              </Paper>
+            </Box>
+          )}
+
           <Box sx={{ mt: 4 }}>
             <Typography variant="h5" sx={{ color: '#877449', fontWeight: 600, mb: 2 }}>
               Comments

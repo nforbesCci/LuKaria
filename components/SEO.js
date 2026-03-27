@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-export default function SEO({ title, description, keywords, canonical }) {
+export default function SEO({ title, description, keywords, canonical, robots }) {
   useEffect(() => {
     // Update document title
     if (title) {
@@ -41,7 +41,17 @@ export default function SEO({ title, description, keywords, canonical }) {
       }
       linkCanonical.href = canonical;
     }
-  }, [title, description, keywords, canonical]);
+
+    if (robots) {
+      let metaRobots = document.querySelector('meta[name="robots"]');
+      if (!metaRobots) {
+        metaRobots = document.createElement('meta');
+        metaRobots.name = 'robots';
+        document.head.appendChild(metaRobots);
+      }
+      metaRobots.content = robots;
+    }
+  }, [title, description, keywords, canonical, robots]);
 
   return null;
 }

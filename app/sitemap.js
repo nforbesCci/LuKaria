@@ -1,4 +1,6 @@
 /** Node runtime: MongoDB driver is not supported on Edge; Edge sitemap was causing 500s in prod. */
+import { STATIC_SITEMAP_LASTMOD } from '../lib/sitemap-static-dates';
+
 export const runtime = 'nodejs';
 
 /** Refresh blog URLs periodically without rebuilding the whole site */
@@ -6,17 +8,22 @@ export const revalidate = 3600;
 
 const BASE_URL = 'https://www.lukariagroup.com';
 
+function lastModForPath(pathname) {
+  const iso = STATIC_SITEMAP_LASTMOD[pathname];
+  return iso ? new Date(iso) : new Date(STATIC_SITEMAP_LASTMOD['/'] || Date.now());
+}
+
 const staticRoutes = [
-  { url: BASE_URL,                                  lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0  },
-  { url: `${BASE_URL}/glp-1-weight-loss`,           lastModified: new Date(), changeFrequency: 'monthly', priority: 0.95 },
-  { url: `${BASE_URL}/info`,                        lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9  },
-  { url: `${BASE_URL}/faq`,                         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
-  { url: `${BASE_URL}/about`,                       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
-  { url: `${BASE_URL}/testimonials`,                lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8  },
-  { url: `${BASE_URL}/contact`,                     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8  },
-  { url: `${BASE_URL}/blog`,                        lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.75 },
-  { url: `${BASE_URL}/privacy-policy`,              lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
-  { url: `${BASE_URL}/terms`,                       lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
+  { url: BASE_URL,                                  lastModified: lastModForPath('/'),               changeFrequency: 'weekly',  priority: 1.0  },
+  { url: `${BASE_URL}/glp-1-weight-loss`,           lastModified: lastModForPath('/glp-1-weight-loss'), changeFrequency: 'monthly', priority: 0.95 },
+  { url: `${BASE_URL}/info`,                        lastModified: lastModForPath('/info'),             changeFrequency: 'monthly', priority: 0.9  },
+  { url: `${BASE_URL}/faq`,                         lastModified: lastModForPath('/faq'),             changeFrequency: 'monthly', priority: 0.85 },
+  { url: `${BASE_URL}/about`,                       lastModified: lastModForPath('/about'),            changeFrequency: 'monthly', priority: 0.85 },
+  { url: `${BASE_URL}/testimonials`,                lastModified: lastModForPath('/testimonials'),      changeFrequency: 'monthly', priority: 0.8  },
+  { url: `${BASE_URL}/contact`,                     lastModified: lastModForPath('/contact'),          changeFrequency: 'monthly', priority: 0.8  },
+  { url: `${BASE_URL}/blog`,                        lastModified: lastModForPath('/blog'),             changeFrequency: 'weekly',  priority: 0.75 },
+  { url: `${BASE_URL}/privacy-policy`,              lastModified: lastModForPath('/privacy-policy'),   changeFrequency: 'yearly',  priority: 0.3  },
+  { url: `${BASE_URL}/terms`,                       lastModified: lastModForPath('/terms'),            changeFrequency: 'yearly',  priority: 0.3  },
   // /ads is excluded — paid landing page, not for organic indexing
 ];
 
@@ -38,16 +45,19 @@ async function fetchBlogRoutesForSitemap() {
   // 5s timeout: beat common serverless limits (~10s) so we return static before platform kills us
   const db = await withTimeout(getDatabase(), 5000, 'MongoDB getDatabase');
   const posts = await withTimeout(
-    db.collection('blogPosts').find({}).project({ _id: 1, updatedAt: 1, createdAt: 1 }).toArray(),
+    db.collection('blogPosts').find({}).project({ _id: 1, slug: 1, updatedAt: 1, createdAt: 1 }).toArray(),
     5000,
     'MongoDB blogPosts query'
   );
-  return posts.map((p) => ({
-    url: `${BASE_URL}/blog/${String(p._id)}`,
-    lastModified: p.updatedAt || p.createdAt || new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.6,
-  }));
+  return posts.map((p) => {
+    const seg = p.slug && String(p.slug).trim() ? String(p.slug).trim() : String(p._id);
+    return {
+      url: `${BASE_URL}/blog/${seg}`,
+      lastModified: p.updatedAt || p.createdAt || new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    };
+  });
 }
 
 /**

@@ -48,7 +48,7 @@ export default function BlogNewArticlePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create post');
-      router.push(`/blog/${data.id}`);
+      router.push(`/blog/${data.slug || data.id}`);
     } catch (err) {
       setError(err.message);
     } finally {

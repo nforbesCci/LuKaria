@@ -22,6 +22,7 @@ import {
 import { Article, Add, Login, OndemandVideo } from '@mui/icons-material';
 import { getYouTubeVideoId } from '../../lib/business';
 import { normalizePostVideos } from '../../lib/blog-videos';
+import { getPublicBlogPath } from '../../lib/blog-url';
 
 const POSTS_PER_PAGE = 5;
 
@@ -237,7 +238,7 @@ export default function BlogPageClient({ initialPosts = [] }) {
                       >
                         <CardActionArea
                           component="a"
-                          href={`/blog/${post._id}`}
+                          href={getPublicBlogPath(post)}
                           sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
                         >
                           {isVideo && thumbId ? (
