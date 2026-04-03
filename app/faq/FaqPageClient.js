@@ -26,102 +26,6 @@ export default function FaqPageClient() {
   const { user } = useUser();
   const [expandedPanel, setExpandedPanel] = useState(false);
   const [activeTab, setActiveTab] = useState(0); // Default to Mounjaro (index 0)
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'What is Tirzepatide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Tirzepatide is a GLP-1 and GIP receptor agonist prescribed alongside reduced calorie intake and increased physical activity for chronic weight management in adults with BMI outside a healthy range.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How does Tirzepatide work?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Tirzepatide helps regulate blood sugar and reduce how much food you eat, supporting medically supervised weight management.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How do I take Tirzepatide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Tirzepatide is injected under the skin once weekly at any time of day in the abdomen, thigh, or back of the arm, rotating injection sites each week.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How much weight can I lose while taking Tirzepatide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Individual results vary. Clinical studies report that adults may lose up to 22.5% of body weight.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What are the possible side effects of taking Tirzepatide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Common side effects include nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, and reflux. Serious side effects are possible, so speak with your doctor about risks and suitability.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What is Semaglutide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Semaglutide is a GLP-1 receptor agonist prescribed with reduced-calorie nutrition and increased physical activity for chronic weight management in adults with BMI outside a healthy range.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How does Semaglutide work?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Semaglutide slows gastric emptying and stimulates satiety pathways in the brain, which can reduce appetite and hunger.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How do I take Semaglutide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Semaglutide is injected under the skin once weekly at any time of day in the abdomen, thigh, or back of the arm, rotating injection sites each week.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How much weight can I lose while taking Semaglutide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Individual results vary. Clinical studies report up to 20% body weight reduction in adults.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What are the possible side effects of taking Semaglutide?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text:
-            'Common side effects include nausea, diarrhea, vomiting, constipation, abdominal pain, headache, fatigue, and reflux. Serious side effects are possible, so discuss risks with your doctor.',
-        },
-      },
-    ],
-  };
-
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedPanel(isExpanded ? panel : false);
   };
@@ -161,11 +65,6 @@ export default function FaqPageClient() {
         description="Answers to common questions about GLP-1 weight loss in Jamaica — Tirzepatide, Semaglutide, Ozempic, Mounjaro. Learn how doctor-guided virtual care works at Svelte by LuKaria."
         keywords="GLP-1 weight loss FAQ Jamaica, Tirzepatide questions, Semaglutide FAQ, Ozempic Mounjaro Jamaica, medical weight loss FAQ, doctor-guided care, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com/faq"
-      />
-      <script
-        id="schema-faq-page"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <PublicTopMenu currentPath="/faq" />
 

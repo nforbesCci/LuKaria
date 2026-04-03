@@ -34,7 +34,9 @@
   },
   "scripts": {
     "dev": "npx next dev",
+    "clean:next": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});\"",
     "dev:https": "node server.js",
+    "dev:https:fresh": "npm run clean:next && node server.js",
     "build": "npx next build",
     "start": "npx next start",
     "start:https": "NODE_ENV=production node server.js",

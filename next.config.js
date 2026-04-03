@@ -1,7 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // Smaller server/client graphs; avoids flaky missing vendor-chunks like `@mui.js` after interrupted dev compiles
+    optimizePackageImports: ['@mui/material', '@mui/icons-material', '@mui/x-date-pickers'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    qualities: [70, 72, 75, 80],
+    /** Public `/images/*` URLs are content-addressed by query; safe to cache optimized variants longer */
+    minimumCacheTTL: 60 * 60 * 24 * 7,
   },
   env: {
     AUTH0_SECRET: process.env.AUTH0_SECRET,

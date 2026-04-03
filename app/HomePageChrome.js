@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 import Script from 'next/script';
 import SEO from '../components/SEO';
+import { SITE_DEFAULT_TITLE, SITE_DEFAULT_DESCRIPTION } from '../lib/public-seo';
 import PublicTopMenu from '../components/PublicTopMenu';
 import {
   Container,
@@ -16,21 +17,18 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Login, WhatsApp } from '@mui/icons-material';
-
-const HomeBelowFold = dynamic(() => import('../components/home/HomeBelowFold'), {
-  loading: () => (
-    <Box sx={{ minHeight: 320, display: 'flex', justifyContent: 'center', alignItems: 'center', py: 6 }}>
-      <CircularProgress size={32} sx={{ color: '#877449' }} aria-label="Loading section" />
-    </Box>
-  ),
-  ssr: true,
-});
+import { Login } from '@mui/icons-material';
 
 /** Client shell: nav, auth redirect, analytics — LCP lives in server `children` */
 export default function HomePageChrome({ children }) {
   const { user, isLoading, error } = useUser();
   const router = useRouter();
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add('home-scroll-snap');
+    return () => root.classList.remove('home-scroll-snap');
+  }, []);
 
   useEffect(() => {
     if (isLoading || !user) return;
@@ -91,64 +89,6 @@ export default function HomePageChrome({ children }) {
       <Head>
         <link rel="canonical" href="https://www.lukariagroup.com/" />
       </Head>
-      <script
-        id="schema-homepage-medicalbusiness"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': ['MedicalBusiness', 'MedicalOrganization'],
-            '@id': 'https://www.lukariagroup.com/#medicalbusiness',
-            name: 'Svelte by LuKaria',
-            alternateName: 'LuKaria Medical Weight Loss',
-            description:
-              'Virtual GLP-1 medical weight loss clinic in Jamaica. Physician-supervised programs with Ozempic, Mounjaro and Tirzepatide. Doctor-guided care island-wide via telehealth.',
-            url: 'https://www.lukariagroup.com',
-            telephone: '+1-876-290-3659',
-            email: 'svelte@lukariagroup.com',
-            priceRange: '$$',
-            medicalSpecialty: 'Bariatric Medicine',
-            hasMap: 'https://www.google.com/maps?cid=9880637014440882752',
-            sameAs: ['https://www.google.com/maps?cid=9880637014440882752'],
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: '19 Fairdene Avenue',
-              addressLocality: 'Kingston',
-              addressRegion: 'Jamaica',
-              addressCountry: 'JM',
-            },
-            areaServed: { '@type': 'Country', name: 'Jamaica' },
-            openingHoursSpecification: [
-              {
-                '@type': 'OpeningHoursSpecification',
-                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                opens: '09:00',
-                closes: '17:00',
-              },
-            ],
-            availableService: [
-              {
-                '@type': 'MedicalTherapy',
-                name: 'GLP-1 Weight Loss (Semaglutide / Tirzepatide)',
-                description:
-                  'Physician-supervised GLP-1 medication programs for chronic weight management, including semaglutide (Ozempic, Wegovy) and tirzepatide (Mounjaro).',
-              },
-              {
-                '@type': 'MedicalTherapy',
-                name: 'Virtual Weight Loss Consultations',
-                description:
-                  'Telehealth consultations with a licensed physician for personalised weight loss treatment plans across Jamaica.',
-              },
-            ],
-            founder: {
-              '@type': 'Physician',
-              '@id': 'https://www.lukariagroup.com/#physician',
-              name: 'Dr. Kadria Fairclough',
-              url: 'https://www.lukariagroup.com/about',
-            },
-          }),
-        }}
-      />
       {process.env.NEXT_PUBLIC_GA_ID && (
         <>
           <Script
@@ -172,9 +112,9 @@ export default function HomePageChrome({ children }) {
         </>
       )}
       <SEO
-        title="Virtual GLP-1 Weight Loss Jamaica | Svelte by LuKaria"
-        description="Virtual GLP-1 medical weight loss in Jamaica. Physician-supervised care with Ozempic, Mounjaro & Tirzepatide. Free consultation — flat monthly fee, no waiting rooms."
-        keywords="medical weight loss Jamaica, GLP-1 weight loss Jamaica, virtual weight loss clinic, doctor-guided care, Ozempic Jamaica, Mounjaro Jamaica, Tirzepatide, Semaglutide, telemedicine Jamaica, obesity treatment, Dr. Kadria Fairclough"
+        title={SITE_DEFAULT_TITLE}
+        description={SITE_DEFAULT_DESCRIPTION}
+        keywords="weight loss Jamaica, physician-supervised weight loss, GLP-1 Jamaica, Ozempic Jamaica, Mounjaro Jamaica, Tirzepatide, medical weight loss Jamaica, virtual weight loss clinic, telemedicine Jamaica, free consultation, Dr. Kadria Fairclough"
         canonical="https://www.lukariagroup.com"
       />
       <PublicTopMenu currentPath="/" />
@@ -271,37 +211,10 @@ export default function HomePageChrome({ children }) {
           px: 2,
         }}
       >
-        <Box
-          component="a"
-          href="https://wa.me/18762903659"
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            px: 1,
-            py: 0,
-            textDecoration: 'none',
-            borderRadius: 1,
-            backgroundColor: '#ffffff',
-            zIndex: 100,
-            '&:hover': { backgroundColor: '#f5f5f5' },
-          }}
-        >
-          <WhatsApp sx={{ fontSize: 28, color: '#25D366' }} />
-          <Typography
-            variant="body2"
-            sx={{ color: '#25D366', fontWeight: 600, fontSize: '0.9rem' }}
-          >
-            876-290-3659
-          </Typography>
-        </Box>
+      
       </Box>
 
       {children}
-
-      <HomeBelowFold />
     </>
   );
 }

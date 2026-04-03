@@ -5,6 +5,26 @@ body {
   overflow-x: hidden;
 }
 
+/* Homepage only: `home-scroll-snap` class is toggled on <html> from HomePageChrome */
+@media (min-width: 900px) {
+  html.home-scroll-snap {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scroll-padding-top: 112px;
+  }
+
+  html.home-scroll-snap .home-snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+}
+
+@media (min-width: 900px) and (prefers-reduced-motion: reduce) {
+  html.home-scroll-snap {
+    scroll-behavior: auto;
+  }
+}
+
 /* Ensure proper font loading */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 

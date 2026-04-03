@@ -6,12 +6,14 @@ const PORTRAIT = '/images/kadria_no_background.png';
 /** Server component — ships in RSC payload for faster LCP */
 export default function HomeHeroStatic() {
   return (
-    <section className={styles.hero}>
+    <section className={`${styles.hero} home-snap-section`}>
       <div className={styles.heroCopy}>
-        <h1 className={styles.heroH1}>Medically Supervised Weight Loss</h1>
+        <h1 className={styles.heroH1}>
+          Medically Supervised Weight Loss delivered to you virtually.
+        </h1>
         <p className={styles.heroLead}>
-            Effective, physician-guided weight loss, including the use of GLP-1 medications (Ozempic,
-            Wegovy, Tirzepatide).
+          Effective, physician-guided weight loss, including the use of GLP-1 medications (Ozempic,
+          Wegovy, Tirzepatide). No waiting rooms, no pharmacies—structured virtual care on your terms.
         </p>
         <a
           className={styles.heroCta}
@@ -30,8 +32,10 @@ export default function HomeHeroStatic() {
           alt="Dr. Kadria Fairclough, physician for medical weight loss in Jamaica"
           width={400}
           height={400}
-          priority
-          sizes="(max-width: 900px) 100vw, 400px"
+          loading="lazy"
+          decoding="async"
+          sizes="(max-width: 900px) min(100vw, 400px), 400px"
+          quality={80}
           className={styles.heroImage}
         />
       </div>

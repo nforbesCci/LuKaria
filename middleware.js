@@ -23,7 +23,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - images (public images folder)
+     * - media (public audio/video, etc.)
      */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|images).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|images|media).*)',
   ],
 };

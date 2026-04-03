@@ -23,7 +23,7 @@ import {
  */
 export default function HomeBelowFold() {
   return (
-    <>
+    <Box component="section" className="home-snap-section" sx={{ width: '100%' }}>
       {/* Patient experiences */}
       <Box sx={{ width: '100%', backgroundColor: '#faf8f5', py: 6, px: 2 }}>
         <Container maxWidth="lg">
@@ -177,6 +177,6 @@ export default function HomeBelowFold() {
           </Box>
         </Container>
       </Box>
-    </>
+    </Box>
   );
 }
