@@ -34,7 +34,9 @@ Svelte by LuKaria is a medical weight loss clinic based in Jamaica, offering doc
 - https://www.lukariagroup.com/blog
 - https://www.lukariagroup.com/contact
 - https://www.lukariagroup.com/glp-1-weight-loss
+- https://www.lukariagroup.com/ozempic-semaglutide
+- https://www.lukariagroup.com/mounjaro-tirzepatide
 - https://www.lukariagroup.com/testimonials
 
 ## Last Updated
-- 2026-03-23
+- 2026-04-05

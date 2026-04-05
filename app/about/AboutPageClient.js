@@ -15,7 +15,11 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { Login, Instagram, LinkedIn } from '@mui/icons-material';
+import { Login, Instagram, LinkedIn, Facebook } from '@mui/icons-material';
+
+const RICHIE_B_AUDIO_BASE = 'Audio from kadria';
+const RICHIE_B_AUDIO_MP3 = `/media/${encodeURIComponent(`${RICHIE_B_AUDIO_BASE}.mp3`)}`;
+const RICHIE_B_AUDIO_OGA = `/media/${encodeURIComponent(`${RICHIE_B_AUDIO_BASE}.oga`)}`;
 
 export default function AboutPageClient() {
   const { user } = useUser();
@@ -212,7 +216,17 @@ export default function AboutPageClient() {
                   </Typography>
                   <Divider sx={{ mb: 3, borderColor: '#877449' }} />
                   <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        width: { xs: '100%', md: 280 },
+                        maxWidth: 280,
+                        flexShrink: 0,
+                      }}
+                    >
                       <Box
                         component="img"
                         src="/images/kadria.png"
@@ -227,7 +241,10 @@ export default function AboutPageClient() {
                           objectFit: 'cover',
                         }}
                       />
-                      <Box sx={{ display: 'flex', gap: 1.5 }}>
+                      <Typography variant="caption" sx={{ color: '#877449', opacity: 0.95, textAlign: 'center', lineHeight: 1.5, px: 0.5 }}>
+                        Follow Dr. Fairclough on social media, and listen or watch selected interviews and appearances below.
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center' }}>
                         <Box
                           component="a"
                           href="https://www.instagram.com/thekadriafairclough"
@@ -249,13 +266,51 @@ export default function AboutPageClient() {
                           <LinkedIn />
                         </Box>
                       </Box>
+                      <Box sx={{ width: '100%', mt: 0.5 }}>
+                        <Typography variant="caption" component="p" sx={{ color: '#877449', mb: 1, lineHeight: 1.5, textAlign: 'center' }}>
+                          Hear Dr. Fairclough on the Richie B Morning Show (December 20, 2024).
+                        </Typography>
+                        <Box
+                          component="audio"
+                          controls
+                          preload="none"
+                          controlsList="nodownload"
+                          sx={{ width: '100%', maxWidth: '100%' }}
+                        >
+                          <source src={RICHIE_B_AUDIO_OGA} type="audio/ogg" />
+                          <source src={RICHIE_B_AUDIO_MP3} type="audio/mpeg" />
+                        </Box>
+                      </Box>
+                      <Box
+                        component="a"
+                        href="https://www.facebook.com/reel/572700465770089"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          color: '#877449',
+                          textDecoration: 'none',
+                          typography: 'caption',
+                          textAlign: 'left',
+                          lineHeight: 1.5,
+                          '&:hover': { color: '#B8941F', textDecoration: 'underline' },
+                        }}
+                        aria-label="Watch Dr. Fairclough speaking for Massy Pharmacy Jamaica on Facebook"
+                      >
+                        <Facebook sx={{ fontSize: 22, flexShrink: 0 }} />
+                        <span>Video: Dr. Fairclough speaking for Massy Pharmacy Jamaica (Facebook).</span>
+                      </Box>
                     </Box>
-                    <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, flex: 1 }}>
-                      Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss. Dr. Fairclough has always believed in patient-centred care which focuses on patient education and informed decision making. She possesses years of Canadian experience with Telehealth delivery.
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#877449', lineHeight: 1.8, flex: 1 }}>
-                      Dr. Fairclough is MBBS and LMCC credentialed, and provides Jamaica-focused virtual care with medically supervised treatment plans and follow-up in line with local patient safety expectations.
-                    </Typography>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                        Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss. Dr. Fairclough has always believed in patient-centred care which focuses on patient education and informed decision making. She possesses years of Canadian experience with Telehealth delivery.
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#877449', lineHeight: 1.8 }}>
+                        Dr. Fairclough is MBBS and LMCC credentialed, and provides Jamaica-focused virtual care with medically supervised treatment plans and follow-up in line with local patient safety expectations.
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               )}

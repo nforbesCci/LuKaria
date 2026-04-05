@@ -43,7 +43,8 @@ pids
 !.yarn/versions
 .pnp.*
 
-# IDE
+# IDE — local MCP config may contain API keys
+.cursor/mcp.json
 .vscode/
 .idea/
 *.swp

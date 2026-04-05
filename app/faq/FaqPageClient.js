@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Script from 'next/script';
 import SEO from '../../components/SEO';
@@ -24,6 +25,7 @@ import {
 
 export default function FaqPageClient() {
   const { user } = useUser();
+  const searchParams = useSearchParams();
   const [expandedPanel, setExpandedPanel] = useState(false);
   const [activeTab, setActiveTab] = useState(0); // Default to Mounjaro (index 0)
   const handleAccordionChange = (panel) => (event, isExpanded) => {
@@ -34,6 +36,15 @@ export default function FaqPageClient() {
     setActiveTab(newValue);
     setExpandedPanel(false);
   };
+
+  useEffect(() => {
+    const glp = (searchParams.get('glp') || '').toLowerCase();
+    if (glp === 'semaglutide' || glp === 'ozempic') {
+      setActiveTab(1);
+    } else if (glp === 'tirzepatide' || glp === 'mounjaro') {
+      setActiveTab(0);
+    }
+  }, [searchParams]);
 
   return (
     <>

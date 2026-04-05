@@ -16,6 +16,8 @@ function lastModForPath(pathname) {
 const staticRoutes = [
   { url: BASE_URL,                                  lastModified: lastModForPath('/'),               changeFrequency: 'weekly',  priority: 1.0  },
   { url: `${BASE_URL}/glp-1-weight-loss`,           lastModified: lastModForPath('/glp-1-weight-loss'), changeFrequency: 'monthly', priority: 0.95 },
+  { url: `${BASE_URL}/ozempic-semaglutide`,        lastModified: lastModForPath('/ozempic-semaglutide'), changeFrequency: 'monthly', priority: 0.9 },
+  { url: `${BASE_URL}/mounjaro-tirzepatide`,       lastModified: lastModForPath('/mounjaro-tirzepatide'), changeFrequency: 'monthly', priority: 0.9 },
   { url: `${BASE_URL}/info`,                        lastModified: lastModForPath('/info'),             changeFrequency: 'monthly', priority: 0.9  },
   { url: `${BASE_URL}/faq`,                         lastModified: lastModForPath('/faq'),             changeFrequency: 'monthly', priority: 0.85 },
   { url: `${BASE_URL}/about`,                       lastModified: lastModForPath('/about'),            changeFrequency: 'monthly', priority: 0.85 },

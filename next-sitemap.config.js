@@ -54,6 +54,8 @@ module.exports = {
     const overrides = {
       '/': { priority: 1.0, changefreq: 'weekly' },
       '/glp-1-weight-loss': { priority: 0.95, changefreq: 'monthly' },
+      '/ozempic-semaglutide': { priority: 0.9, changefreq: 'monthly' },
+      '/mounjaro-tirzepatide': { priority: 0.9, changefreq: 'monthly' },
       '/info': { priority: 0.9, changefreq: 'monthly' },
       '/faq': { priority: 0.85, changefreq: 'monthly' },
       '/about': { priority: 0.85, changefreq: 'monthly' },
