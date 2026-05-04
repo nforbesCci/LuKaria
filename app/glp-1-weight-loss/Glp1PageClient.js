@@ -40,10 +40,26 @@ export default function Glp1PageClient() {
         <Typography component="h1" variant="h3" sx={{ color: '#877449', fontWeight: 700, mb: 1 }}>
           GLP-1 Weight Loss Jamaica
         </Typography>
-        <Typography variant="body1" sx={{ color: '#333', maxWidth: 900 }}>
+        <Typography variant="body1" sx={{ color: '#333', maxWidth: 900, mb: 3 }}>
           Svelte by LuKaria provides doctor-guided GLP-1 treatment plans for adults in Jamaica. Every plan is
           personalized and medically supervised by Dr. Kadria Fairclough with virtual follow-up.
         </Typography>
+        <Button
+          component="a"
+          href="https://calendly.com/kadriaf-lukariagroup/30min"
+          variant="contained"
+          sx={{
+            backgroundColor: '#877449',
+            color: '#000',
+            fontWeight: 700,
+            px: 4,
+            py: 1.5,
+            fontSize: '1.1rem',
+            '&:hover': { backgroundColor: '#B8941F' },
+          }}
+        >
+          Book a Free Consultation
+        </Button>
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -159,7 +175,7 @@ export default function Glp1PageClient() {
             variant="contained"
             sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
           >
-            Book a consultation
+            Book a Free Consultation
           </Button>
           <Button component="a" href="/faq" variant="outlined" sx={{ borderColor: '#877449', color: '#877449' }}>
             Read FAQ

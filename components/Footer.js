@@ -1,90 +1,74 @@
-'use client';
-
-import { Box, Container, Typography, Stack, Divider } from '@mui/material';
 import Link from 'next/link';
+import styles from './footer.module.css';
 
 export default function Footer() {
   return (
-    <Box
-      component="footer"
-      sx={{
-        backgroundColor: '#000000',
-        color: '#877449',
-        mt: 'auto',
-        borderTop: '1px solid rgba(135, 116, 73, 0.2)',
-      }}
-    >
-      <Container maxWidth="lg">
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: { xs: 'column', md: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'center', md: 'flex-start' },
-          gap: 3
-        }}>
-          {/* Logo Section */}
-          <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-            <Box
-              component="img"
-              src="/images/Lukaria_logo_small.png"
-              alt="Lukaria Logo"
-              sx={{
-                width: 60,
-                height: 60,
-                objectFit: 'contain'
-              }}
-            />
-          </Box>
+    <footer className={styles.footer}>
+      <div className={styles.footerInner}>
+        {/* Brand Column */}
+        <div className={styles.brandCol}>
+          <div className={styles.brandWordmark}>
+            <span className={styles.svelte}>Svelte</span>
+            <span className={styles.byLukaria}>by LuKaria</span>
+          </div>
+          <p className={styles.brandDesc}>
+            Jamaica's premier virtual medically supervised weight loss authority. 
+            Providing physician-guided care and GLP-1 treatments island-wide.
+          </p>
+          <div className={styles.contactInfo}>
+            <a href="tel:+18762903659" className={styles.contactItem}>
+              <span>+1 (876) 290-3659</span>
+            </a>
+            <a href="mailto:info@lukariagroup.com" className={styles.contactItem}>
+              <span>info@lukariagroup.com</span>
+            </a>
+            <div className={styles.contactItem}>
+              <span>Kingston, Jamaica</span>
+            </div>
+          </div>
+        </div>
 
-          {/* Links Section */}
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 3,
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: 'center',
-            mt: '20px'
-          }}>
-            <Link href="/privacy-policy" passHref style={{ textDecoration: 'none' }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: '#877449',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    textDecoration: 'underline',
-                    color: '#B8941F'
-                  }
-                }}
-              >
-                Privacy Policy
-              </Typography>
+        {/* Svelte Program Column */}
+        <div className={styles.linkCol}>
+          <h4 className={styles.colTitle}>The Program</h4>
+          <nav className={styles.linkList}>
+            <Link href="/glp-1" className={styles.footerLink}>GLP-1 Weight Loss</Link>
+            <Link href="/faq" className={styles.footerLink}>Common Questions</Link>
+            <Link href="/testimonials" className={styles.footerLink}>Patient Stories</Link>
+            <Link href="/blog" className={styles.footerLink}>Insights & Tips</Link>
+          </nav>
+        </div>
+
+        {/* Company Column */}
+        <div className={styles.linkCol}>
+          <h4 className={styles.colTitle}>Company</h4>
+          <nav className={styles.linkList}>
+            <Link href="/about" className={styles.footerLink}>About Dr. Fairclough</Link>
+            <Link href="/contact" className={styles.footerLink}>Contact Us</Link>
+            <Link href="/privacy-policy" className={styles.footerLink}>Privacy Policy</Link>
+            <Link href="/terms" className={styles.footerLink}>Terms of Service</Link>
+          </nav>
+        </div>
+
+        {/* Journey Column */}
+        <div className={styles.linkCol}>
+          <h4 className={styles.colTitle}>Your Journey</h4>
+          <nav className={styles.linkList}>
+            <Link href="/api/auth/login" className={styles.footerLink}>Sign In / Register</Link>
+            <Link href="/dashboard" className={styles.footerLink}>My Portal</Link>
+            <Link href="https://calendly.com/kadriaf-lukariagroup/30min" target="_blank" className={styles.footerLink}>
+              Free Consultation
             </Link>
-            <Link href="/terms" passHref style={{ textDecoration: 'none' }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: '#877449',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    textDecoration: 'underline',
-                    color: '#B8941F'
-                  }
-                }}
-              >
-                Terms of Service
-              </Typography>
-            </Link>
-          </Box>
-        </Box>
+          </nav>
+        </div>
+      </div>
 
-        <Divider sx={{ borderColor: 'rgba(135, 116, 73, 0.3)' }} />
-
-        {/* Copyright */}
-        <Typography variant="body2" sx={{ textAlign: 'center', color: '#877449', opacity: 0.8 }}>
-          © {new Date().getFullYear()} LuKaria. All rights reserved.
-        </Typography>
-      </Container>
-    </Box>
+      <div className={styles.bottomBar}>
+        <div className={styles.maxWrap}>
+          <span>© {new Date().getFullYear()} Svelte by LuKaria. All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
   );
 }
 

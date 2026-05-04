@@ -40,11 +40,27 @@ export default function OzempicSemaglutidePageClient() {
           <Typography component="h1" variant="h3" sx={{ color: '#877449', fontWeight: 700, mb: 1 }}>
             Ozempic &amp; semaglutide weight loss Jamaica
           </Typography>
-          <Typography variant="body1" sx={{ color: '#333', maxWidth: 900 }}>
+          <Typography variant="body1" sx={{ color: '#333', maxWidth: 900, mb: 3 }}>
             Semaglutide is a GLP-1 receptor agonist prescribed as an adjunct to nutrition and activity changes for chronic
             weight management in selected adults. Svelte by LuKaria offers doctor-guided care with brands you may know
             (including Ozempic, where appropriate) and ongoing virtual monitoring.
           </Typography>
+          <Button
+            component="a"
+            href="https://calendly.com/kadriaf-lukariagroup/30min"
+            variant="contained"
+            sx={{
+              backgroundColor: '#877449',
+              color: '#000',
+              fontWeight: 700,
+              px: 4,
+              py: 1.5,
+              fontSize: '1.1rem',
+              '&:hover': { backgroundColor: '#B8941F' },
+            }}
+          >
+            Book a Free Consultation
+          </Button>
         </Box>
 
         <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -158,7 +174,7 @@ export default function OzempicSemaglutidePageClient() {
             variant="contained"
             sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
           >
-            Book a consultation
+            Book a Free Consultation
           </Button>
           <Button component="a" href="/faq?glp=semaglutide" variant="outlined" sx={{ borderColor: '#877449', color: '#877449' }}>
             Semaglutide FAQ

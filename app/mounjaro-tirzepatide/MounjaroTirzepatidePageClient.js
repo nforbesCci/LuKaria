@@ -40,11 +40,27 @@ export default function MounjaroTirzepatidePageClient() {
           <Typography component="h1" variant="h3" sx={{ color: '#877449', fontWeight: 700, mb: 1 }}>
             Mounjaro &amp; tirzepatide weight loss Jamaica
           </Typography>
-          <Typography variant="body1" sx={{ color: '#333', maxWidth: 900 }}>
+          <Typography variant="body1" sx={{ color: '#333', maxWidth: 900, mb: 3 }}>
             Tirzepatide works on GLP-1 and GIP pathways and is prescribed alongside nutrition and activity changes for chronic
             weight management in selected adults. Svelte by LuKaria provides medically supervised plans—including Mounjaro
             when appropriate—with telehealth follow-up.
           </Typography>
+          <Button
+            component="a"
+            href="https://calendly.com/kadriaf-lukariagroup/30min"
+            variant="contained"
+            sx={{
+              backgroundColor: '#877449',
+              color: '#000',
+              fontWeight: 700,
+              px: 4,
+              py: 1.5,
+              fontSize: '1.1rem',
+              '&:hover': { backgroundColor: '#B8941F' },
+            }}
+          >
+            Book a Free Consultation
+          </Button>
         </Box>
 
         <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -157,7 +173,7 @@ export default function MounjaroTirzepatidePageClient() {
             variant="contained"
             sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
           >
-            Book a consultation
+            Book a Free Consultation
           </Button>
           <Button component="a" href="/faq?glp=tirzepatide" variant="outlined" sx={{ borderColor: '#877449', color: '#877449' }}>
             Tirzepatide FAQ

@@ -311,7 +311,7 @@ export default function BlogPageClient({ initialPosts = [] }) {
                               {post.content}
                             </Typography>
                             <Typography variant="caption" sx={{ color: '#877449', opacity: 0.8, display: 'block', mt: 1 }}>
-                              {new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} • {post.authorName}
+                              Posted on: {new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} • {post.authorName}
                             </Typography>
                           </CardContent>
                         </CardActionArea>

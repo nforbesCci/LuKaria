@@ -305,7 +305,7 @@ export default function BlogPostPageClient({ initialPost, relatedPosts = [] }) {
               {post.title}
             </Typography>
             <Typography variant="body2" sx={{ color: '#877449', opacity: 0.8, mb: 3 }}>
-              {new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} • {post.authorName}
+              Posted on: {new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} • {post.authorName}
             </Typography>
             {postVideos.map((v, idx) =>
               getYouTubeEmbedUrl(v.url) ? (
