@@ -74,9 +74,6 @@ export const metadata = {
   verification: {
     google: 'TAAk9hGtQmi6UwNq4n4g8UrBCM2w91kIZU0ndvLHlKw',
   },
-  alternates: {
-    canonical: 'https://www.lukariagroup.com',
-  },
 };
 
 export default function RootLayout({ children }) {

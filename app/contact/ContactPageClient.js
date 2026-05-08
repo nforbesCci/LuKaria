@@ -18,6 +18,7 @@ import {
   WhatsApp,
   Place,
   Schedule,
+  Star,
 } from '@mui/icons-material';
 import { REGISTERED_OFFICE_DISPLAY, OFFICE_HOURS_DISPLAY } from '../../lib/business';
 
@@ -173,10 +174,37 @@ export default function ContactPageClient() {
                   </Typography>
                 </Box>
               </Box>
-              <Typography variant="caption" sx={{ color: '#aaa', display: 'block', lineHeight: 1.5 }}>
+              <Typography variant="caption" sx={{ color: '#aaa', display: 'block', lineHeight: 1.5, mb: 2 }}>
                 Medical care is delivered virtually. This address is for correspondence and verification; it is not a walk-in clinic.
                 In-person visits only by prior arrangement.
               </Typography>
+
+              <Box 
+                component="a" 
+                href="https://www.google.com/maps/place/Svelte+by+LuKaria/@18.118212,-77.9355935,9z/data=!4m10!1m2!2m1!1ssvelte+by+lukaria+jamaica!3m6!1s0x47fd40404dfbb82d:0x8936e50b7d80ea40!8m2!3d18.1193338!4d-77.2761154!15sChlzdmVsdGUgYnkgbHVrYXJpYSBqYW1haWNhkgEObWVkaWNhbF9jbGluaWPgAQA!16s%2Fg%2F11mkzwccq_?entry=ttu&amp;g_ep=EgoyMDI2MDUwMi4wIKXMDSoASAFQAw%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  display: 'block', 
+                  width: '100%', 
+                  height: '300px', 
+                  borderRadius: '8px', 
+                  overflow: 'hidden', 
+                  mt: 2,
+                  position: 'relative'
+                }}
+              >
+                <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, cursor: 'pointer' }} />
+                <iframe 
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0 }} 
+                  loading="lazy" 
+                  allowFullScreen 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src="https://maps.google.com/maps?cid=9887309995166394944&amp;z=9&amp;output=embed"
+                />
+              </Box>
             </Box>
 
             <Box sx={{ 
@@ -298,6 +326,68 @@ export default function ContactPageClient() {
                 fontStyle: 'italic'
               }}>
                 Click to send a WhatsApp message
+              </Typography>
+            </Box>
+
+            <Box sx={{ 
+              backgroundColor: '#36454F', 
+              p: 0.625, 
+              borderRadius: 2,
+              mt: 3
+            }}>
+              <Star sx={{ 
+                fontSize: 48, 
+                color: '#FFD700', 
+                mb: 2 
+              }} />
+              <Typography variant="h5" sx={{ 
+                color: '#FFD700', 
+                fontWeight: 600, 
+                mb: 2 
+              }}>
+                Review us on Google
+              </Typography>
+              <Box 
+                component="img"
+                src="/images/svelte review qr code.png"
+                alt="Scan to review us on Google"
+                sx={{
+                  width: '120px',
+                  height: '120px',
+                  display: 'block',
+                  mx: 'auto',
+                  mb: 2,
+                  borderRadius: 1,
+                  backgroundColor: 'white',
+                  p: 0.5
+                }}
+              />
+              <Typography 
+                variant="h6" 
+                component="a"
+                href="https://g.page/r/CUDqgH0L5TaJEBM/review"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  color: 'white',
+                  fontFamily: 'monospace',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  display: 'block',
+                  '&:hover': {
+                    color: '#FFD700',
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                Leave a Review
+              </Typography>
+              <Typography variant="body2" sx={{ 
+                color: '#877449', 
+                mt: 2,
+                fontStyle: 'italic'
+              }}>
+                Scan the QR code or click the link to share your experience with us
               </Typography>
             </Box>
             </Box>

@@ -54,7 +54,7 @@ export default function AboutPageClient() {
           />
         </>
       )}
-      <SEO 
+      <SEO
         title="About Us - Doctor-Guided Care"
         description="Meet Dr. Kadria Fairclough. Medical weight loss Jamaica with doctor-guided care. Svelte by LuKaria offers GLP-1 weight loss, Ozempic, Mounjaro and Tirzepatide through virtual consultations."
         keywords="Dr. Kadria Fairclough, medical weight loss Jamaica, doctor-guided care, GLP-1 weight loss, weight loss doctor Jamaica, virtual clinic Jamaica, obesity management, Ozempic, Mounjaro, Tirzepatide"
@@ -64,7 +64,7 @@ export default function AboutPageClient() {
 
       {/* Top Navigation Bar */}
       <Box
-        sx={{ 
+        sx={{
           position: 'fixed',
           top: 48,
           left: 0,
@@ -297,10 +297,10 @@ export default function AboutPageClient() {
                           lineHeight: 1.5,
                           '&:hover': { color: '#B8941F', textDecoration: 'underline' },
                         }}
-                        aria-label="Watch Dr. Fairclough speaking for Massy Pharmacy Jamaica on Facebook"
+                        aria-label="Watch Dr. Fairclough speaking for Massy Pharmaceuticals Jamaica on Facebook"
                       >
                         <Facebook sx={{ fontSize: 22, flexShrink: 0 }} />
-                        <span>Video: Dr. Fairclough speaking for Massy Pharmacy Jamaica (Facebook).</span>
+                        <span>Video: Dr. Fairclough speaking for Massy Pharmaceuticals Jamaica (Facebook).</span>
                       </Box>
                     </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
