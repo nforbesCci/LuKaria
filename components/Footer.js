@@ -32,7 +32,7 @@ export default function Footer() {
         <div className={styles.linkCol}>
           <h4 className={styles.colTitle}>The Program</h4>
           <nav className={styles.linkList}>
-            <Link href="/glp-1" className={styles.footerLink}>GLP-1 Weight Loss</Link>
+            <Link href="/glp-1-weight-loss" className={styles.footerLink}>GLP-1 Weight Loss</Link>
             <Link href="/faq" className={styles.footerLink}>Common Questions</Link>
             <Link href="/testimonials" className={styles.footerLink}>Patient Stories</Link>
             <Link href="/blog" className={styles.footerLink}>Insights & Tips</Link>
