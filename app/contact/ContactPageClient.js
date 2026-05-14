@@ -20,7 +20,7 @@ import {
   Schedule,
   Star,
 } from '@mui/icons-material';
-import { REGISTERED_OFFICE_DISPLAY, OFFICE_HOURS_DISPLAY } from '../../lib/business';
+import { LOCATIONS, OFFICE_HOURS_DISPLAY } from '../../lib/business';
 
 export default function ContactPageClient() {
   const { user } = useUser();
@@ -149,63 +149,65 @@ export default function ContactPageClient() {
             </Typography>
 
             <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center' }}>
-            <Box sx={{
-              backgroundColor: '#36454F',
-              p: 2,
-              borderRadius: 2,
-              mb: 3,
-              textAlign: 'left',
-            }}>
-              <Place sx={{ fontSize: 40, color: '#877449', mb: 1, display: 'block', mx: 'auto' }} />
-              <Typography variant="h5" sx={{ color: '#877449', fontWeight: 600, mb: 1, textAlign: 'center' }}>
-                Registered office
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'white', mb: 2, textAlign: 'center', lineHeight: 1.6 }}>
-                {REGISTERED_OFFICE_DISPLAY}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
-                <Schedule sx={{ fontSize: 22, color: '#877449', mt: 0.25 }} />
-                <Box>
-                  <Typography variant="subtitle2" sx={{ color: '#877449', fontWeight: 600 }}>
-                    Office hours
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'white' }}>
-                    {OFFICE_HOURS_DISPLAY}
-                  </Typography>
+            {LOCATIONS.map((loc, idx) => (
+              <Box key={idx} sx={{
+                backgroundColor: '#36454F',
+                p: 2,
+                borderRadius: 2,
+                mb: 3,
+                textAlign: 'left',
+              }}>
+                <Place sx={{ fontSize: 40, color: '#877449', mb: 1, display: 'block', mx: 'auto' }} />
+                <Typography variant="h5" sx={{ color: '#877449', fontWeight: 600, mb: 1, textAlign: 'center' }}>
+                  {loc.name}
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'white', mb: 2, textAlign: 'center', lineHeight: 1.6 }}>
+                  {loc.displayAddress}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
+                  <Schedule sx={{ fontSize: 22, color: '#877449', mt: 0.25 }} />
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ color: '#877449', fontWeight: 600 }}>
+                      Office hours
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'white' }}>
+                      {loc.hours}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Typography variant="caption" sx={{ color: '#aaa', display: 'block', lineHeight: 1.5, mb: 2 }}>
+                  Medical care is delivered virtually. This address is for correspondence and verification; it is not a walk-in clinic.
+                  In-person visits only by prior arrangement.
+                </Typography>
+
+                <Box 
+                  component="a" 
+                  href={loc.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ 
+                    display: 'block', 
+                    width: '100%', 
+                    height: '300px', 
+                    borderRadius: '8px', 
+                    overflow: 'hidden', 
+                    mt: 2,
+                    position: 'relative'
+                  }}
+                >
+                  <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, cursor: 'pointer' }} />
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    style={{ border: 0 }} 
+                    loading="lazy" 
+                    allowFullScreen 
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={`https://maps.google.com/maps?cid=${loc.cid}&z=10&output=embed`}
+                  />
                 </Box>
               </Box>
-              <Typography variant="caption" sx={{ color: '#aaa', display: 'block', lineHeight: 1.5, mb: 2 }}>
-                Medical care is delivered virtually. This address is for correspondence and verification; it is not a walk-in clinic.
-                In-person visits only by prior arrangement.
-              </Typography>
-
-              <Box 
-                component="a" 
-                href="https://www.google.com/maps/place/Svelte+by+LuKaria/@18.118212,-77.9355935,9z/data=!4m10!1m2!2m1!1ssvelte+by+lukaria+jamaica!3m6!1s0x47fd40404dfbb82d:0x8936e50b7d80ea40!8m2!3d18.1193338!4d-77.2761154!15sChlzdmVsdGUgYnkgbHVrYXJpYSBqYW1haWNhkgEObWVkaWNhbF9jbGluaWPgAQA!16s%2Fg%2F11mkzwccq_?entry=ttu&amp;g_ep=EgoyMDI2MDUwMi4wIKXMDSoASAFQAw%3D%3D"
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{ 
-                  display: 'block', 
-                  width: '100%', 
-                  height: '300px', 
-                  borderRadius: '8px', 
-                  overflow: 'hidden', 
-                  mt: 2,
-                  position: 'relative'
-                }}
-              >
-                <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, cursor: 'pointer' }} />
-                <iframe 
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  loading="lazy" 
-                  allowFullScreen 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src="https://maps.google.com/maps?cid=9887309995166394944&amp;z=9&amp;output=embed"
-                />
-              </Box>
-            </Box>
+            ))}
 
             <Box sx={{ 
               backgroundColor: '#36454F', 
