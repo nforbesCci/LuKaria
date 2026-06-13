@@ -59,7 +59,7 @@ For a better development experience, you can install the CA certificate to avoid
 
 If you encounter issues:
 
-1. **Certificate errors**: Regenerate certificates with `npx mkcert create-cert --key certificates/localhost-key.pem --cert certificates/localhost.pem --domains localhost,127.0.0.1,::1`
+1. **Certificate errors**: Regenerate certificates with `npx mkcert create-cert --ca-key certificates/ca.key --ca-cert certificates/ca.crt --key certificates/localhost-key.pem --cert certificates/localhost.pem --domains localhost 127.0.0.1 ::1`
 2. **Port conflicts**: The HTTPS server runs on port 3000 by default
 3. **Browser cache**: Clear browser cache if you see mixed content warnings
 

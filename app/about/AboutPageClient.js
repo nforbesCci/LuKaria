@@ -14,6 +14,7 @@ import {
   Divider,
   Tabs,
   Tab,
+  Button,
 } from '@mui/material';
 import { Login, Instagram, LinkedIn, Facebook } from '@mui/icons-material';
 
@@ -229,7 +230,7 @@ export default function AboutPageClient() {
                     >
                       <Box
                         component="img"
-                        src="/images/kadria.png"
+                        src="/images/kadia circular.jpeg"
                         alt="Dr. Kadria Fairclough"
                         width={250}
                         height={250}
@@ -311,6 +312,58 @@ export default function AboutPageClient() {
                         Dr. Fairclough is MBBS and LMCC credentialed, and provides Jamaica-focused virtual care with medically supervised treatment plans and follow-up in line with local patient safety expectations.
                       </Typography>
                     </Box>
+                  </Box>
+                  <Box sx={{ mt: 4 }}>
+                    <Typography variant="h5" gutterBottom sx={{ color: '#877449', fontWeight: '600' }}>
+                      Qualifications
+                    </Typography>
+                    <Divider sx={{ mb: 3, borderColor: '#877449' }} />
+                    <Grid container spacing={2}>
+                      <Grid item xs={6} sm={3}>
+                        <Box
+                          component="img"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (1).jpeg"
+                          alt="Qualification"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box
+                          component="img"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (2).jpeg"
+                          alt="Qualification"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box
+                          component="img"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (3).jpeg"
+                          alt="Qualification"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box
+                          component="img"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM.jpeg"
+                          alt="Qualification"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                          <Button
+                            variant="contained"
+                            href="/images/Metabolic Health Certificate-Vively.pdf"
+                            target="_blank"
+                            sx={{ backgroundColor: '#877449', color: '#000', textTransform: 'none', '&:hover': { backgroundColor: '#B8941F' } }}
+                          >
+                            View Metabolic Health Certificate (PDF)
+                          </Button>
+                        </Box>
+                      </Grid>
+                    </Grid>
                   </Box>
                 </Box>
               )}

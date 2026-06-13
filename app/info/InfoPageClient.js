@@ -63,7 +63,7 @@ export default function InfoPageClient() {
       <SEO 
         title="Pricing | Medical Weight Loss Jamaica"
         description="Transparent pricing for medical weight loss Jamaica. Svelte by LuKaria GLP-1 weight loss program includes physician appointments, GLP-1 medications. Doctor-guided care with flat monthly fee."
-        keywords="medical weight loss pricing Jamaica, GLP-1 weight loss cost, Ozempic Mounjaro price Jamaica, weight loss program cost, doctor-guided care pricing, affordable weight loss Jamaica, Dr. Kadria Fairclough"
+        keywords="medical weight loss pricing Jamaica, GLP-1 weight loss cost, Ozempic Mounjaro price Jamaica, weight loss program cost, doctor-guided care pricing, affordable weight loss Jamaica, Dr. Kadria Fairclough, mounjaro pricing in Jamaica"
         canonical="https://www.lukariagroup.com/info"
       />
       <PublicTopMenu currentPath="/info" />
