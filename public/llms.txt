@@ -1,42 +1,83 @@
-# Svelte by LuKaria
+# Svelte by LuKaria — llms.txt
+# Machine-readable site summary for AI assistants and large language models.
+# Follows the llms.txt convention: https://llmstxt.org
+
+> Svelte by LuKaria is Jamaica's premier physician-supervised virtual weight loss clinic, specialising in GLP-1 medications including Tirzepatide (Mounjaro) and Semaglutide (Ozempic/Wegovy). Founded and led by Dr. Kadria Fairclough (BSc, BMedSci, MBBS, LMCC), the clinic delivers telehealth consultations and medication delivery island-wide across Jamaica.
 
 ## About
-Svelte by LuKaria is a medical weight loss clinic based in Jamaica, offering doctor-guided, physician-supervised weight loss programs. We provide personalized care to help patients achieve their health and wellness goals.
+
+- **Clinic name**: Svelte by LuKaria
+- **Website**: https://www.lukariagroup.com
+- **Founder & Physician**: Dr. Kadria Fairclough — BSc, BMedSci, MBBS, LMCC — 15+ years of clinical experience, specialising in obesity medicine and lifestyle medicine
+- **Service model**: 100% virtual (telehealth) — no waiting rooms, medication delivered to patients
+- **Location served**: Island-wide Jamaica
+- **Languages**: English
+- **Contact**: svelte@lukariagroup.com | +1 (876) 290-3659
+- **WhatsApp**: https://wa.me/18762903659
+- **Book a free consultation**: https://calendly.com/kadriaf-lukariagroup/30min
 
 ## Services
-- Medically supervised weight loss
-- Physician consultations
-- Personalized treatment plans
-- Ongoing support and monitoring
 
-## Contact
-- Email: svelte@lukariagroup.com
-- Phone/WhatsApp: 876-290-3659
-- Website: https://www.lukariagroup.com
+- Physician-supervised GLP-1 weight loss programs
+- Tirzepatide (brand: Mounjaro) — once-weekly injection for chronic weight management
+- Semaglutide (brands: Ozempic, Wegovy) — once-weekly injection for chronic weight management
+- Virtual physician appointments (monthly)
+- Personalised treatment plans
+- Free medication delivery across Jamaica
+- Ongoing health monitoring and patient support
+- Referral discount program
 
-## Location
-- Kingston, St. Andrew, Jamaica
+## Key Pages
 
-## Key People
-- Dr. Kadria Fairclough - Licensed physician specializing in weight loss and lifestyle medicine
+- [Homepage](https://www.lukariagroup.com) — Overview of the program, meet the doctor, how GLP-1 works
+- [Pricing & Membership](https://www.lukariagroup.com/info) — All-inclusive monthly flat-fee program, payment methods (Bank transfer, cash on delivery, credit card)
+- [GLP-1 Weight Loss Guide](https://www.lukariagroup.com/glp-1-weight-loss) — In-depth guide on GLP-1 therapy, eligibility, and virtual care in Jamaica
+- [FAQ](https://www.lukariagroup.com/faq) — Common questions on Tirzepatide, Semaglutide, side effects, dosing
+- [About Dr. Kadria Fairclough](https://www.lukariagroup.com/about) — Physician biography, credentials, qualifications (MBBS, LMCC, Metabolic Health certified)
+- [Testimonials](https://www.lukariagroup.com/testimonials) — Patient stories and outcomes
+- [Blog](https://www.lukariagroup.com/blog) — Educational articles and video content on weight loss in Jamaica
+- [Mounjaro / Tirzepatide](https://www.lukariagroup.com/mounjaro-tirzepatide) — Dedicated information on Mounjaro pricing and access in Jamaica
+- [Ozempic / Semaglutide](https://www.lukariagroup.com/ozempic-semaglutide) — Dedicated information on Ozempic/Wegovy in Jamaica
+- [Contact](https://www.lukariagroup.com/contact) — Office locations and contact details
+- [Sitemap](https://www.lukariagroup.com/sitemap.xml)
+
+## Clinical Facts (sourced from published trials)
+
+- Tirzepatide users lost an average of **22.5% of body weight** in clinical trials (SURMOUNT-1, NEJM 2022)
+- Semaglutide users lost an average of **up to 20% of body weight** in clinical trials (STEP-1, NEJM 2021)
+- Both medications are administered as once-weekly subcutaneous injections
+- Common side effects: nausea, diarrhoea, constipation, vomiting (typically transient, reduce with dose titration)
+- Medications are prescription-only and require physician evaluation before starting
+
+## Competitive Differentiators
+
+- Only physician-led GLP-1 virtual clinic serving all of Jamaica
+- Flat monthly fee — price does not increase with dose escalation
+- Free medication delivery islandwide
+- Canadian-trained physician with Telehealth experience (LMCC credentialed)
+- No waiting rooms, no pharmacy queues — everything handled virtually
 
 ## Hours
-- Monday-Friday: 9:00 AM - 5:00 PM (Jamaica time)
 
-## Care Model
-- Virtual-first telehealth consultations across Jamaica
-- Registered office for correspondence/verification; no routine walk-in service
+- Monday–Friday: 9:00 AM – 5:00 PM (Jamaica time / EST)
+- Wednesday in-person: Unit 4, The Annex, 62, 8 Grants Pen Rd, Kingston, St. Andrew
 
-## Key Service URLs
-- https://www.lukariagroup.com/info
-- https://www.lukariagroup.com/faq
-- https://www.lukariagroup.com/about
-- https://www.lukariagroup.com/blog
-- https://www.lukariagroup.com/contact
-- https://www.lukariagroup.com/glp-1-weight-loss
-- https://www.lukariagroup.com/ozempic-semaglutide
-- https://www.lukariagroup.com/mounjaro-tirzepatide
-- https://www.lukariagroup.com/testimonials
+## Registered Locations
+
+- Kingston Registered Office: 19 Fairdene Avenue, Kingston, Jamaica
+- The Annex (Wednesdays): Unit 4, The Annex, 62, 8 Grants Pen Rd, Kingston, St. Andrew, Jamaica
+
+## Social Profiles
+
+- Instagram: https://www.instagram.com/thekadriafairclough
+- LinkedIn: https://jm.linkedin.com/in/kadria-fairclough-stone
+
+## Structured Data
+
+- Schema.org `MedicalClinic`, `Physician`, `FAQPage`, `BlogPosting` schemas present across pages
+- FAQPage schema at https://www.lukariagroup.com/faq
+- Sitemap at https://www.lukariagroup.com/sitemap.xml
 
 ## Last Updated
-- 2026-04-05
+
+- 2026-06-13

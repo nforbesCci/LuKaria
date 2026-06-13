@@ -333,9 +333,22 @@ export default function InfoPageClient() {
                   </List>
                   
                   <Box sx={{ textAlign: 'center', mt: 3, pt: 2, borderTop: '1px solid #877449' }}>
-                    <Typography variant="h5" sx={{ color: '#877449', fontWeight: 'bold' }}>
-                      
+                    <Typography variant="h5" sx={{ color: '#877449', fontWeight: 'bold', mb: 1 }}>
+                      Contact for Price
                     </Typography>
+                    <Button
+                      component="a"
+                      href="/contact"
+                      variant="outlined"
+                      sx={{
+                        borderColor: '#877449',
+                        color: '#877449',
+                        textTransform: 'none',
+                        '&:hover': { borderColor: '#B8941F', backgroundColor: 'rgba(183,148,31,0.08)' }
+                      }}
+                    >
+                      Get in Touch
+                    </Button>
                   </Box>
                 </Paper>
 
