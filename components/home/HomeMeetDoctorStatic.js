@@ -71,10 +71,12 @@ export default function HomeMeetDoctorStatic() {
           </div>
           <div className={styles.meetCopy}>
             <p className={styles.meetBody}>
-              Dr. Kadria Fairclough is a licensed physician with over 15 years of experience helping
-              patients achieve their health and wellness goals. At Svelte by LuKaria, she specializes in
-              medically supervised weight loss and GLP-1 treatments ensuring safe, effective, and
-              personalized care.
+              Born and raised in Jamaica, Dr. Kadria Fairclough understands that weight and metabolic
+              health challenges affect entire families—not just individuals. As a physician and mother,
+              she is passionate about helping patients achieve lasting weight loss, improve their health,
+              and feel their best through compassionate, evidence-based care. With over a decade of
+              medical experience, her mission is simple, to help more Jamaicans live longer, healthier
+              lives with the people who matter most.
             </p>
             <div className={styles.meetMedia}>
               <p className={styles.meetMediaCaption}>

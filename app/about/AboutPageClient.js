@@ -230,7 +230,7 @@ export default function AboutPageClient() {
                     >
                       <Box
                         component="img"
-                        src="/images/kadia circular.jpeg"
+                        src="/images/Kadria turtle neck.jpeg"
                         alt="Dr. Kadria Fairclough"
                         width={250}
                         height={250}
@@ -305,12 +305,24 @@ export default function AboutPageClient() {
                       </Box>
                     </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
-                        Svelte by LuKaria was founded by Dr. Kadria Fairclough, a dedicated physician with a special interest in lifestyle medicine and obesity management. With a passion for transforming lives through science-backed, compassionate care, Dr. Fairclough created Svelte to empower individuals who are ready to make lasting changes to their health—without the stigma or complexity that often comes with weight loss. Dr. Fairclough has always believed in patient-centred care which focuses on patient education and informed decision making. She possesses years of Canadian experience with Telehealth delivery.
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#877449', lineHeight: 1.8 }}>
-                        Dr. Fairclough is MBBS and LMCC credentialed, and provides Jamaica-focused virtual care with medically supervised treatment plans and follow-up in line with local patient safety expectations.
-                      </Typography>
+                       <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                         Dr. Kadria Fairclough is a Jamaican physician, mother, and advocate for healthier living who understands firsthand the challenges many individuals face with weight management and metabolic health. Born and raised right here in Jamaica, she has witnessed the impact of obesity, diabetes, hypertension, and other metabolic conditions not only among her patients, but within her own family as well.
+                       </Typography>
+                       <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                         Family has always been at the centre of Dr. Fairclough's life. As a mother to a son, she understands the importance of being healthy enough to fully participate in life's most meaningful moments. She does not take that role for granted and is passionate about helping others improve their health so they can enjoy more quality time with the people they love.
+                       </Typography>
+                       <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                         This personal connection to metabolic health inspired Dr. Fairclough to establish Svelte by LuKaria, a medical weight management practice dedicated to helping patients achieve sustainable weight loss, improve metabolic health, and transform their body composition through evidence-based care. Her goal extends beyond helping patients lose weight; she is committed to helping them build healthier bodies, reduce their risk of chronic disease, increase longevity, and regain confidence in themselves.
+                       </Typography>
+                       <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                         Dr. Fairclough believes that every patient deserves compassionate, individualized care free from judgment or stigma. She is deeply committed to patient education and informed decision-making, empowering patients with the knowledge and tools they need to make lasting changes to their health.
+                       </Typography>
+                       <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8, mb: 2 }}>
+                         With years of Canadian telehealth experience and credentials including MBBS and LMCC, Dr. Fairclough provides Jamaica-focused virtual care through medically supervised treatment plans and ongoing support tailored to each patient's unique needs and goals.
+                       </Typography>
+                       <Typography variant="body1" sx={{ color: '#877449', lineHeight: 1.8 }}>
+                         Through Svelte by LuKaria, Dr. Fairclough is helping Jamaicans take control of their health, improve their metabolic wellness, and create a future where they can live longer, healthier, and more fulfilling lives with their families.
+                       </Typography>
                     </Box>
                   </Box>
                   <Box sx={{ mt: 4 }}>
@@ -318,52 +330,104 @@ export default function AboutPageClient() {
                       Qualifications
                     </Typography>
                     <Divider sx={{ mb: 3, borderColor: '#877449' }} />
-                    <Grid container spacing={2}>
-                      <Grid item xs={6} sm={3}>
-                        <Box
-                          component="img"
-                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (1).jpeg"
-                          alt="Qualification"
-                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6} sm={3}>
-                        <Box
-                          component="img"
-                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (2).jpeg"
-                          alt="Qualification"
-                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6} sm={3}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
+
+                      {/* 1 — MBBS, UWI (tallest — portrait) */}
+                      <Box sx={{ flex: '1 1 180px', maxWidth: 240, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                           component="img"
                           src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (3).jpeg"
-                          alt="Qualification"
-                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
+                          alt="MBBS, Bachelor of Medicine and Bachelor of Surgery — University of the West Indies"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
                         />
-                      </Grid>
-                      <Grid item xs={6} sm={3}>
+                        <Typography variant="caption" sx={{ color: '#877449', mt: 1, textAlign: 'center', fontWeight: 600 }}>
+                          MBBS — Bachelor of Medicine &amp; Surgery
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.7, textAlign: 'center' }}>
+                          University of the West Indies
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.55, textAlign: 'center' }}>
+                          Issued: July 2007
+                        </Typography>
+                      </Box>
+
+                      {/* 2 — Medical Council of Jamaica Annual Practising Certificate */}
+                      <Box sx={{ flex: '1 1 180px', maxWidth: 240, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <Box
+                          component="img"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (2).jpeg"
+                          alt="Medical Council of Jamaica — Annual Practising Certificate 2026"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
+                        />
+                        <Typography variant="caption" sx={{ color: '#877449', mt: 1, textAlign: 'center', fontWeight: 600 }}>
+                          Annual Practising Certificate
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.7, textAlign: 'center' }}>
+                          Medical Council of Jamaica
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.55, textAlign: 'center' }}>
+                          Valid: Jan 2026 – Dec 2026
+                        </Typography>
+                      </Box>
+
+                      {/* 3 — Metabolic Health Essentials Certificate (Vively) */}
+                      <Box sx={{ flex: '1 1 180px', maxWidth: 240, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <Box
+                          component="img"
+                          src="/images/Metabolic Health certificate.jpeg"
+                          alt="Metabolic Health Essentials Course — Vively Health, 2024"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
+                        />
+                        <Typography variant="caption" sx={{ color: '#877449', mt: 1, textAlign: 'center', fontWeight: 600 }}>
+                          Metabolic Health Essentials
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.7, textAlign: 'center' }}>
+                          Vively Health (12-hour course)
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.55, textAlign: 'center' }}>
+                          Issued: 2024
+                        </Typography>
+                      </Box>
+
+                      {/* 4 — LMCC, Medical Council of Canada (landscape) */}
+                      <Box sx={{ flex: '1 1 260px', maxWidth: 340, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <Box
+                          component="img"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (1).jpeg"
+                          alt="LMCC — Licentiate of the Medical Council of Canada, 2022"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
+                        />
+                        <Typography variant="caption" sx={{ color: '#877449', mt: 1, textAlign: 'center', fontWeight: 600 }}>
+                          LMCC — Licentiate of the Medical Council of Canada
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.7, textAlign: 'center' }}>
+                          Medical Council of Canada
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.55, textAlign: 'center' }}>
+                          Issued: February 2022
+                        </Typography>
+                      </Box>
+
+                      {/* 5 — Derma Institute Botox & Filler (landscape) */}
+                      <Box sx={{ flex: '1 1 260px', maxWidth: 340, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                           component="img"
                           src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM.jpeg"
-                          alt="Qualification"
-                          sx={{ width: '100%', height: 'auto', borderRadius: 2 }}
+                          alt="Combined Foundation & Advanced Botox and Dermal Filler Course — Derma Institute, 2025"
+                          sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
                         />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Box sx={{ mt: 2, textAlign: 'center' }}>
-                          <Button
-                            variant="contained"
-                            href="/images/Metabolic Health Certificate-Vively.pdf"
-                            target="_blank"
-                            sx={{ backgroundColor: '#877449', color: '#000', textTransform: 'none', '&:hover': { backgroundColor: '#B8941F' } }}
-                          >
-                            View Metabolic Health Certificate (PDF)
-                          </Button>
-                        </Box>
-                      </Grid>
-                    </Grid>
+                        <Typography variant="caption" sx={{ color: '#877449', mt: 1, textAlign: 'center', fontWeight: 600 }}>
+                          Foundation &amp; Advanced Botox &amp; Dermal Filler
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.7, textAlign: 'center' }}>
+                          Derma Institute — 24 CPD Points
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#877449', opacity: 0.55, textAlign: 'center' }}>
+                          Issued: 20 July 2025
+                        </Typography>
+                      </Box>
+
+                    </Box>
                   </Box>
                 </Box>
               )}

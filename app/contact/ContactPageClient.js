@@ -176,8 +176,7 @@ export default function ContactPageClient() {
                   </Box>
                 </Box>
                 <Typography variant="caption" sx={{ color: '#aaa', display: 'block', lineHeight: 1.5, mb: 2 }}>
-                  Medical care is delivered virtually. This address is for correspondence and verification; it is not a walk-in clinic.
-                  In-person visits only by prior arrangement.
+                  {loc.description}
                 </Typography>
 
                 <Box 

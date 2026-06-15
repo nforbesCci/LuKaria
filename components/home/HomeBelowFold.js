@@ -92,7 +92,7 @@ export default function HomeBelowFold() {
                 <Medication sx={{ fontSize: 36, color: '#877449', mb: 1 }} />
                 <Typography component="h3" variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 1 }}>GLP-1 Medication</Typography>
                 <Typography variant="body2" sx={{ color: '#333' }}>
-                  Access to FDA-approved GLP-1 medications like Ozempic, Wegovy, and tirzepatide (if appropriate) to support your weight loss.
+                  Access to FDA-approved GLP-1 medications like Semaglutide/Ozempic and Tirzepatide/Mounjaro (if appropriate) to support your weight loss.
                 </Typography>
               </Paper>
             </Grid>

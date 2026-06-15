@@ -12,8 +12,7 @@ export default function HomeHeroStatic() {
           Medically Supervised Weight Loss delivered to you virtually.
         </h1>
         <p className={styles.heroLead}>
-          Effective, physician-guided weight loss, including the use of GLP-1 medications (Ozempic,
-          Wegovy, Tirzepatide). No waiting rooms, no pharmacies—structured virtual care on your terms.
+          Effective, physician-guided weight loss, including the use of GLP-1 medications (Semaglutide/Ozempic and Tirzepatide/Mounjaro). No waiting rooms, no pharmacies—structured virtual care on your terms.
         </p>
         <a
           className={styles.heroCta}
