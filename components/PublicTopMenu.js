@@ -19,6 +19,8 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 const GLP1_SUBMENU = [
   { label: 'Ozempic / semaglutide', href: '/ozempic-semaglutide' },
   { label: 'Mounjaro / tirzepatide', href: '/mounjaro-tirzepatide' },
+  { label: 'Svelte Sustain', href: '/svelte-sustain' },
+  { label: 'Weight loss injections', href: '/weight-loss-injections' },
 ];
 
 const MENU_ITEMS = [
