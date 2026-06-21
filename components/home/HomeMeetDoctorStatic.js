@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import styles from './home-static.module.css';
 
-const PORTRAIT = '/images/kadia circular.jpeg';
+const PORTRAIT = '/images/kadia circular.webp';
 /** Add MP3 (or M4A) for Safari — Ogg/Opus alone often won’t play in Safari/iOS. */
 const RICHIE_B_AUDIO_BASE = 'Audio from kadria';
 const RICHIE_B_AUDIO_MP3 = `/media/${encodeURIComponent(`${RICHIE_B_AUDIO_BASE}.mp3`)}`;

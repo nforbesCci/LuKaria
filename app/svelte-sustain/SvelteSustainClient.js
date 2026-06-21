@@ -16,7 +16,7 @@ export default function SvelteSustainClient() {
           <Grid item xs={12} md={6}>
             <Box sx={{ position: 'relative', width: '100%', height: { xs: 300, md: 400 }, borderRadius: 2, overflow: 'hidden' }}>
               <Image 
-                src="/images/weightManagemnt.jpeg" 
+                src="/images/weightManagemnt.webp" 
                 alt="Weight Maintenance" 
                 fill 
                 style={{ objectFit: 'cover' }} 

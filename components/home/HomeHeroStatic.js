@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import styles from './home-static.module.css';
 
-const PORTRAIT = '/images/Kadria business.jpeg';
+const PORTRAIT = '/images/Kadria business.webp';
 
 /** Server component — ships in RSC payload for faster LCP */
 export default function HomeHeroStatic() {

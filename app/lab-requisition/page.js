@@ -836,7 +836,7 @@ export default function LabRequisition() {
           }
         }}>
           <Box component="img" 
-            src="/images/Lukaria_logo_background_removed_small.png" 
+            src="/images/Lukaria_logo_background_removed_small.webp" 
             alt="LuKaria Logo"
             sx={{ 
               height: 60, 
@@ -1038,7 +1038,7 @@ export default function LabRequisition() {
                       }}
                     >
                       <Image
-                        src="/images/signature.png"
+                        src="/images/signature.webp"
                         alt="Doctor's Signature"
                         width={120}
                         height={40}

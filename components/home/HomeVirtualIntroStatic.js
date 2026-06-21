@@ -2,7 +2,7 @@ import Image from 'next/image';
 import styles from './home-static.module.css';
 import ymyl from './home-ymyl.module.css';
 
-const PHOTO = '/images/WhatsApp Image 2026-06-14 at 11.58.55 AM.jpeg';
+const PHOTO = '/images/WhatsApp Image 2026-06-14 at 11.58.55 AM.webp';
 
 /**
  * Standalone viewport-height intro: “what is virtual supervised care in Jamaica” + lifestyle photo (server component).

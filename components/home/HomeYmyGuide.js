@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import styles from './home-ymyl.module.css';
 
-const GLP1_CONSULT_IMAGE = '/images/WhatsApp Image 2026-06-14 at 11.58.55 AM (1).jpeg';
+const GLP1_CONSULT_IMAGE = '/images/WhatsApp Image 2026-06-14 at 11.58.55 AM (1).webp';
 
 /**
  * Physician-led YMYL homepage copy (crawlable in initial HTML).

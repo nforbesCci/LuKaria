@@ -5,9 +5,9 @@ import Image from 'next/image';
 import styles from './home-static.module.css';
 
 const IMAGES = [
-  '/images/weightloss3_16x9.png',
-  '/images/weightloss1_16x9.png',
-  '/images/weightloss2_16x9.png',
+  '/images/weightloss3_16x9.webp',
+  '/images/weightloss1_16x9.webp',
+  '/images/weightloss2_16x9.webp',
 ];
 
 const CALENDLY_URL = 'https://calendly.com/kadriaf-lukariagroup/30min';

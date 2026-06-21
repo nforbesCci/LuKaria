@@ -83,7 +83,7 @@ export default function AboutPageClient() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box
             component="img"
-            src="/images/Lukaria_logo_small.png"
+            src="/images/Lukaria_logo_small.webp"
             alt="Lukaria Logo"
             width={48}
             height={48}
@@ -230,7 +230,7 @@ export default function AboutPageClient() {
                     >
                       <Box
                         component="img"
-                        src="/images/Kadria turtle neck.jpeg"
+                        src="/images/Kadria turtle neck.webp"
                         alt="Dr. Kadria Fairclough"
                         width={250}
                         height={250}
@@ -336,7 +336,7 @@ export default function AboutPageClient() {
                       <Box sx={{ flex: '1 1 180px', maxWidth: 240, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                           component="img"
-                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (3).jpeg"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (3).webp"
                           alt="MBBS, Bachelor of Medicine and Bachelor of Surgery — University of the West Indies"
                           sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
                         />
@@ -355,7 +355,7 @@ export default function AboutPageClient() {
                       <Box sx={{ flex: '1 1 180px', maxWidth: 240, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                           component="img"
-                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (2).jpeg"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (2).webp"
                           alt="Medical Council of Jamaica — Annual Practising Certificate 2026"
                           sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
                         />
@@ -374,7 +374,7 @@ export default function AboutPageClient() {
                       <Box sx={{ flex: '1 1 180px', maxWidth: 240, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                           component="img"
-                          src="/images/Metabolic Health certificate.jpeg"
+                          src="/images/Metabolic Health certificate.webp"
                           alt="Metabolic Health Essentials Course — Vively Health, 2024"
                           sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
                         />
@@ -393,7 +393,7 @@ export default function AboutPageClient() {
                       <Box sx={{ flex: '1 1 260px', maxWidth: 340, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                           component="img"
-                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (1).jpeg"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM (1).webp"
                           alt="LMCC — Licentiate of the Medical Council of Canada, 2022"
                           sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
                         />
@@ -412,7 +412,7 @@ export default function AboutPageClient() {
                       <Box sx={{ flex: '1 1 260px', maxWidth: 340, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                           component="img"
-                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM.jpeg"
+                          src="/images/WhatsApp Image 2026-06-08 at 11.30.35 AM.webp"
                           alt="Combined Foundation & Advanced Botox and Dermal Filler Course — Derma Institute, 2025"
                           sx={{ width: '100%', height: 'auto', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
                         />

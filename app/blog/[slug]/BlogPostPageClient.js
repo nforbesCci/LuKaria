@@ -151,7 +151,7 @@ export default function BlogPostPageClient({ initialPost, relatedPosts = [] }) {
       url: 'https://www.lukariagroup.com',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.lukariagroup.com/images/Lukaria_logo.png',
+        url: 'https://www.lukariagroup.com/images/Lukaria_logo.webp',
       },
     },
     isPartOf: {
@@ -246,7 +246,7 @@ export default function BlogPostPageClient({ initialPost, relatedPosts = [] }) {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box component="img" src="/images/Lukaria_logo_small.png" alt="Lukaria Logo" sx={{ width: 48, height: 48, objectFit: 'contain', display: { xs: 'none', sm: 'block' } }} />
+          <Box component="img" src="/images/Lukaria_logo_small.webp" alt="Lukaria Logo" sx={{ width: 48, height: 48, objectFit: 'contain', display: { xs: 'none', sm: 'block' } }} />
           <Typography variant="h5" component="span" className="Svelte_logo">Svelte</Typography>
           <Typography variant="body1" component="span" className="svelte_post_script">by LuKaria</Typography>
         </Box>

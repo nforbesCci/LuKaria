@@ -58,7 +58,7 @@ export const metadata = {
     siteName: 'Svelte by LuKaria',
     images: [
       {
-        url: 'https://www.lukariagroup.com/images/Lukaria_logo.png',
+        url: 'https://www.lukariagroup.com/images/Lukaria_logo.webp',
         width: 1200,
         height: 630,
         alt: 'Svelte by LuKaria Logo',
@@ -69,7 +69,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: SITE_DEFAULT_TITLE,
     description: SITE_DEFAULT_DESCRIPTION,
-    images: ['https://www.lukariagroup.com/images/Lukaria_logo.png'],
+    images: ['https://www.lukariagroup.com/images/Lukaria_logo.webp'],
   },
   verification: {
     google: 'TAAk9hGtQmi6UwNq4n4g8UrBCM2w91kIZU0ndvLHlKw',

@@ -76,7 +76,7 @@ export default function AdsLandingPage() {
       {/* Top Navigation Bar */}
       <Box sx={{ position: 'fixed', top: 48, left: 0, right: 0, height: 64, backgroundColor: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, zIndex: 1000, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box component="img" src="/images/Lukaria_logo_small.png" alt="Lukaria Logo" width={48} height={48} sx={{ width: 48, height: 48, objectFit: 'contain', display: { xs: 'none', sm: 'block' } }} />
+          <Box component="img" src="/images/Lukaria_logo_small.webp" alt="Lukaria Logo" width={48} height={48} sx={{ width: 48, height: 48, objectFit: 'contain', display: { xs: 'none', sm: 'block' } }} />
           <Typography variant="h5" component="span" className="Svelte_logo">Svelte</Typography>
           <Typography variant="body1" component="span" className="svelte_post_script">by LuKaria</Typography>
         </Box>
@@ -123,7 +123,7 @@ export default function AdsLandingPage() {
           <Typography variant="body2" sx={{ color: '#555', fontStyle: 'italic' }}>Lose Weight & Feel Your Best with Svelte by LuKaria</Typography>
         </Box>
         <Box sx={{ flex: 1, maxWidth: { md: 480 }, display: 'flex', justifyContent: 'center', order: { xs: 0, md: 2 } }}>
-          <Box component="img" src="/images/kadria_no_background.png" alt="Dr. Kadria Fairclough" sx={{ width: '100%', maxWidth: 400, height: 'auto', objectFit: 'contain' }} onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.png'; }} />
+          <Box component="img" src="/images/kadria_no_background.webp" alt="Dr. Kadria Fairclough" sx={{ width: '100%', maxWidth: 400, height: 'auto', objectFit: 'contain' }} onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.webp'; }} />
         </Box>
       </Box>
 
@@ -133,7 +133,7 @@ export default function AdsLandingPage() {
           <Typography variant="h4" sx={{ color: '#000', fontFamily: 'serif', fontWeight: 600, mb: 0.5 }}>Meet Your Doctor</Typography>
           <Typography variant="h5" sx={{ color: '#000', fontWeight: 700, mb: 3 }}>Dr. Kadria Fairclough, Bsc, BMedSci, MBBS, LMCC.</Typography>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { sm: 'center' }, gap: 3 }}>
-            <Box component="img" src="/images/kadria_no_background.png" alt="Dr. Kadria Fairclough" width={240} height={240} sx={{ width: { xs: 220, sm: 240 }, height: { xs: 220, sm: 240 }, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center 15%', flexShrink: 0 }} onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.png'; }} />
+            <Box component="img" src="/images/kadria_no_background.webp" alt="Dr. Kadria Fairclough" width={240} height={240} sx={{ width: { xs: 220, sm: 240 }, height: { xs: 220, sm: 240 }, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center 15%', flexShrink: 0 }} onError={(e) => { e.target.onerror = null; e.target.src = '/images/kadria.webp'; }} />
             <Typography variant="body1" sx={{ color: '#333', lineHeight: 1.7 }}>
               Dr. Kadria Fairclough is a licensed physician with over 15 years of experience helping patients achieve their health and wellness goals. At Svelte by LuKaria, she specializes in medically supervised weight loss, ensuring safe, effective, and personalized care.
             </Typography>

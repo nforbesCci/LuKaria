@@ -100,7 +100,7 @@ export default function FaqPageClient() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box
             component="img"
-            src="/images/Lukaria_logo_small.png"
+            src="/images/Lukaria_logo_small.webp"
             alt="Lukaria Logo"
             width={48}
             height={48}

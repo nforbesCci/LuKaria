@@ -80,7 +80,7 @@ export default function ContactPageClient() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box
             component="img"
-            src="/images/Lukaria_logo_small.png"
+            src="/images/Lukaria_logo_small.webp"
             alt="Lukaria Logo"
             sx={{
               width: 48,
@@ -350,7 +350,7 @@ export default function ContactPageClient() {
               </Typography>
               <Box 
                 component="img"
-                src="/images/svelte review qr code.png"
+                src="/images/svelte review qr code.webp"
                 alt="Scan to review us on Google"
                 sx={{
                   width: '120px',
