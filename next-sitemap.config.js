@@ -9,7 +9,7 @@
  * @type {import('next-sitemap').IConfig}
  */
 module.exports = {
-  siteUrl: 'https://www.lukariagroup.com',
+  siteUrl: 'https://svelte.lukariagroup.com',
   generateRobotsTxt: false, // robots.txt is managed manually in public/
 
   // Exclude authenticated, admin, and non-public routes
