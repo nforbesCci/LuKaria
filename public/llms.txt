@@ -7,7 +7,7 @@
 ## About
 
 - **Clinic name**: Svelte by LuKaria
-- **Website**: https://www.lukariagroup.com
+- **Website**: https://svelte.lukariagroup.com
 - **Founder & Physician**: Dr. Kadria Fairclough — BSc, BMedSci, MBBS, LMCC — 15+ years of clinical experience, specialising in obesity medicine and lifestyle medicine
 - **Service model**: 100% virtual (telehealth) — no waiting rooms, medication delivered to patients
 - **Location served**: Island-wide Jamaica
@@ -29,19 +29,19 @@
 
 ## Key Pages
 
-- [Homepage](https://www.lukariagroup.com) — Overview of the program, meet the doctor, how GLP-1 works
-- [Pricing & Membership](https://www.lukariagroup.com/info) — All-inclusive monthly flat-fee program, payment methods (Bank transfer, cash on delivery, credit card)
-- [GLP-1 Weight Loss Guide](https://www.lukariagroup.com/glp-1-weight-loss) — In-depth guide on GLP-1 therapy, eligibility, and virtual care in Jamaica
-- [FAQ](https://www.lukariagroup.com/faq) — Common questions on Tirzepatide, Semaglutide, side effects, dosing
-- [About Dr. Kadria Fairclough](https://www.lukariagroup.com/about) — Physician biography, credentials, qualifications (MBBS, LMCC, Metabolic Health certified)
-- [Testimonials](https://www.lukariagroup.com/testimonials) — Patient stories and outcomes
-- [Blog](https://www.lukariagroup.com/blog) — Educational articles and video content on weight loss in Jamaica
-- [Mounjaro / Tirzepatide](https://www.lukariagroup.com/mounjaro-tirzepatide) — Dedicated information on Mounjaro pricing and access in Jamaica
-- [Ozempic / Semaglutide](https://www.lukariagroup.com/ozempic-semaglutide) — Dedicated information on Ozempic/Wegovy in Jamaica
-- [Svelte Sustain](https://www.lukariagroup.com/svelte-sustain) — Weight maintenance program offering ongoing support and medication management after achieving weight goals
-- [Weight Loss Injections](https://www.lukariagroup.com/weight-loss-injections) — Overview of physician-supervised GLP-1 injectable medications in Jamaica
-- [Contact](https://www.lukariagroup.com/contact) — Office locations and contact details
-- [Sitemap](https://www.lukariagroup.com/sitemap.xml)
+- [Homepage](https://svelte.lukariagroup.com) — Overview of the program, meet the doctor, how GLP-1 works
+- [Pricing & Membership](https://svelte.lukariagroup.com/info) — All-inclusive monthly flat-fee program, payment methods (Bank transfer, cash on delivery, credit card)
+- [GLP-1 Weight Loss Guide](https://svelte.lukariagroup.com/glp-1-weight-loss) — In-depth guide on GLP-1 therapy, eligibility, and virtual care in Jamaica
+- [FAQ](https://svelte.lukariagroup.com/faq) — Common questions on Tirzepatide, Semaglutide, side effects, dosing
+- [About Dr. Kadria Fairclough](https://svelte.lukariagroup.com/about) — Physician biography, credentials, qualifications (MBBS, LMCC, Metabolic Health certified)
+- [Testimonials](https://svelte.lukariagroup.com/testimonials) — Patient stories and outcomes
+- [Blog](https://svelte.lukariagroup.com/blog) — Educational articles and video content on weight loss in Jamaica
+- [Mounjaro / Tirzepatide](https://svelte.lukariagroup.com/mounjaro-tirzepatide) — Dedicated information on Mounjaro pricing and access in Jamaica
+- [Ozempic / Semaglutide](https://svelte.lukariagroup.com/ozempic-semaglutide) — Dedicated information on Ozempic/Wegovy in Jamaica
+- [Svelte Sustain](https://svelte.lukariagroup.com/svelte-sustain) — Weight maintenance program offering ongoing support and medication management after achieving weight goals
+- [Weight Loss Injections](https://svelte.lukariagroup.com/weight-loss-injections) — Overview of physician-supervised GLP-1 injectable medications in Jamaica
+- [Contact](https://svelte.lukariagroup.com/contact) — Office locations and contact details
+- [Sitemap](https://svelte.lukariagroup.com/sitemap.xml)
 
 ## Clinical Facts (sourced from published trials)
 
@@ -77,8 +77,8 @@
 ## Structured Data
 
 - Schema.org `MedicalClinic`, `Physician`, `FAQPage`, `BlogPosting` schemas present across pages
-- FAQPage schema at https://www.lukariagroup.com/faq
-- Sitemap at https://www.lukariagroup.com/sitemap.xml
+- FAQPage schema at https://svelte.lukariagroup.com/faq
+- Sitemap at https://svelte.lukariagroup.com/sitemap.xml
 
 ## Last Updated
 
