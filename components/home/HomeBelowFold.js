@@ -158,7 +158,7 @@ export default function HomeBelowFold() {
           <Box sx={{ textAlign: 'center' }}>
             <Button
               component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/30min"
+              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
               variant="contained"
               size="large"
               sx={{
