@@ -38,7 +38,7 @@ export default function SvelteSustainClient() {
             </Typography>
             <Button
               component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/30min"
+              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
               variant="contained"
               sx={{
                 backgroundColor: '#877449',
@@ -293,7 +293,7 @@ export default function SvelteSustainClient() {
           </Typography>
           <Button
             component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/30min"
+            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
             variant="contained"
             size="large"
             sx={{

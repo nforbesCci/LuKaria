@@ -56,7 +56,7 @@ export default function Footer() {
           <nav className={styles.linkList}>
             <Link href="/api/auth/login" className={styles.footerLink}>Sign In / Register</Link>
             <Link href="/dashboard" className={styles.footerLink}>My Portal</Link>
-            <Link href="https://calendly.com/kadriaf-lukariagroup/30min" target="_blank" className={styles.footerLink}>
+            <Link href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation" target="_blank" className={styles.footerLink}>
               Free Consultation
             </Link>
           </nav>

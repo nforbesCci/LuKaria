@@ -10,7 +10,7 @@ const IMAGES = [
   '/images/weightloss2_16x9.webp',
 ];
 
-const CALENDLY_URL = 'https://calendly.com/kadriaf-lukariagroup/30min';
+const CALENDLY_URL = 'https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation';
 
 /** Full-viewport opener — background photo carousel, Svelte wordmark + tagline. */
 export default function HomeHeroBackdropStatic() {

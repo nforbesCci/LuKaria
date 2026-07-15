@@ -112,7 +112,7 @@ export default function AdsLandingPage() {
           </Typography>
           <Button
             component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/30min"
+            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
             variant="contained"
             size="large"
             sx={{ textTransform: 'none', backgroundColor: '#877449', color: '#000', fontWeight: 600, fontSize: '1.1rem', px: 4, py: 1.5, '&:hover': { backgroundColor: '#B8941F' } }}
@@ -208,7 +208,7 @@ export default function AdsLandingPage() {
             </Grid>
           </Grid>
           <Box sx={{ textAlign: 'center' }}>
-            <Button component="a" href="https://calendly.com/kadriaf-lukariagroup/30min" variant="contained" size="large" sx={{ textTransform: 'none', backgroundColor: '#877449', color: '#000', fontWeight: 600, fontSize: '1.1rem', px: 4, py: 1.5, '&:hover': { backgroundColor: '#B8941F' } }}>
+            <Button component="a" href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation" variant="contained" size="large" sx={{ textTransform: 'none', backgroundColor: '#877449', color: '#000', fontWeight: 600, fontSize: '1.1rem', px: 4, py: 1.5, '&:hover': { backgroundColor: '#B8941F' } }}>
               Get Started
             </Button>
           </Box>

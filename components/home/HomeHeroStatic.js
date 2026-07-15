@@ -16,7 +16,7 @@ export default function HomeHeroStatic() {
         </p>
         <a
           className={styles.heroCta}
-          href="https://calendly.com/kadriaf-lukariagroup/30min"
+          href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
           target="_blank"
           rel="noopener noreferrer"
         >

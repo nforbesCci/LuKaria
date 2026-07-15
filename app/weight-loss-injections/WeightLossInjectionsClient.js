@@ -44,7 +44,7 @@ export default function WeightLossInjectionsClient() {
           </Typography>
           <Button
             component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/30min"
+            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
             variant="contained"
             sx={{
               backgroundColor: '#877449',
@@ -133,7 +133,7 @@ export default function WeightLossInjectionsClient() {
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Button
               component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/30min"
+              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
               variant="contained"
               sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
             >
