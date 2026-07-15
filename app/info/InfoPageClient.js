@@ -141,7 +141,7 @@ export default function InfoPageClient() {
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Button
               component="a"
-              href="https://calendly.com/kadriaf-lukariagroup"
+              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
               target="_blank"
               rel="noopener noreferrer"
               variant="contained"
@@ -458,9 +458,12 @@ export default function InfoPageClient() {
                 Ready to Start Your Weight Loss Journey?
               </Typography>
               <Button
+                component="a"
+                href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+                target="_blank"
+                rel="noopener noreferrer"
                 variant="contained"
                 size="large"
-                onClick={() => window.location.href = '/api/auth/login'}
                 sx={{
                   backgroundColor: '#000',
                   color: '#877449',
