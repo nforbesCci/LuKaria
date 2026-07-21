@@ -73,6 +73,15 @@ export default function LabRequisition() {
     }
   }, [pdfSuccess, pdfError, dispatch]);
 
+  // Editable patient info — prefilled from profile, doctor can change
+  const [patientInfo, setPatientInfo] = useState({
+    name: '',
+    dateOfBirth: '',
+    sex: '',
+    phone: '',
+    address: '',
+  });
+
   // Fetch profile data when component loads or selected user changes
   useEffect(() => {
     if (mounted && selectedUser) {
@@ -83,6 +92,23 @@ export default function LabRequisition() {
       }
     }
   }, [mounted, selectedUser, profile, dispatch]);
+
+  // Prefill patient fields whenever the loaded profile matches the selected user
+  useEffect(() => {
+    if (!profile?.profile || !selectedUser) return;
+    if (profile.userId !== selectedUser.user_id) return;
+    setPatientInfo({
+      name: profile.profile.name || '',
+      dateOfBirth: profile.profile.dateOfBirth || '',
+      sex: profile.profile.sex || '',
+      phone: profile.profile.preferredPhone || '',
+      address: profile.profile.homeAddress || '',
+    });
+  }, [profile, selectedUser]);
+
+  const updatePatientInfo = (field) => (event) => {
+    setPatientInfo((prev) => ({ ...prev, [field]: event.target.value }));
+  };
 
   // Add print-specific styles
   useEffect(() => {
@@ -640,13 +666,13 @@ export default function LabRequisition() {
   };
 
   const sendPDF = () => {
-    const patientName = profile?.profile?.name || 'Patient';
+    const patientName = patientInfo.name || profile?.profile?.name || 'Patient';
     const fileName = `Lab-Requisition-${patientName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
     
-    // Create user info object from admin profile
+    // Create user info object from admin profile (use edited name when present)
     const userInfo = {
       sub:  profile?.userId ,
-      name: profile?.profile?.name ,
+      name: patientInfo.name || profile?.profile?.name ,
       email: profile?.profile?.userEmail,
     };
     
@@ -914,47 +940,47 @@ export default function LabRequisition() {
                   <TextField
                     fullWidth
                     label="Patient Name"
-                    value={profile?.profile?.name || ''}
+                    value={patientInfo.name}
+                    onChange={updatePatientInfo('name')}
                     variant="standard"
-                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
                   <TextField
                     fullWidth
                     label="Date of Birth"
-                    value={profile?.profile?.dateOfBirth || ''}
+                    value={patientInfo.dateOfBirth}
+                    onChange={updatePatientInfo('dateOfBirth')}
                     variant="standard"
-                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
                   <TextField
                     fullWidth
                     label="Sex"
-                    value={profile?.profile?.sex || ''}
+                    value={patientInfo.sex}
+                    onChange={updatePatientInfo('sex')}
                     variant="standard"
-                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={2.4}>
                   <TextField
                     fullWidth
                     label="Phone Number"
-                    value={profile?.profile?.preferredPhone || ''}
+                    value={patientInfo.phone}
+                    onChange={updatePatientInfo('phone')}
                     variant="standard"
-                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={2.4}>
                   <TextField
                     fullWidth
                     label="Address"
-                    value={profile?.profile?.homeAddress || ''}
+                    value={patientInfo.address}
+                    onChange={updatePatientInfo('address')}
                     multiline
                     rows={2}
                     variant="standard"
-                    InputProps={{ readOnly: true }}
                   />
                 </Grid>
               </Grid>
