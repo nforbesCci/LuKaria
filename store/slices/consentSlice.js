@@ -4,6 +4,7 @@ const initialState = {
   photographConsent: null,
   mounjaroConsent: null,
   semaglutideConsent: null,
+  retatrutideConsent: null,
   telehealthConsent: null,
   isLoading: false,
   isFetching: false,
@@ -15,6 +16,8 @@ const initialState = {
   mounjaroIsSaved: false,
   semaglutideHasChanges: false,
   semaglutideIsSaved: false,
+  retatrutideHasChanges: false,
+  retatrutideIsSaved: false,
   telehealthHasChanges: false,
   telehealthIsSaved: false,
 };
@@ -140,6 +143,44 @@ const consentSlice = createSlice({
       state.isFetching = false;
       state.error = action.payload;
     },
+    // Retatrutide consent actions
+    saveRetatrutideConsent: (state, action) => {
+      state.isLoading = true;
+      state.error = null;
+      state.retatrutideIsSaved = false;
+    },
+    saveRetatrutideConsentSuccess: (state, action) => {
+      state.isLoading = false;
+      state.retatrutideConsent = action.payload;
+      state.retatrutideIsSaved = true;
+      state.retatrutideHasChanges = false;
+      state.error = null;
+    },
+    saveRetatrutideConsentFailure: (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+      state.retatrutideIsSaved = false;
+    },
+    setRetatrutideConsentChanges: (state, action) => {
+      state.retatrutideHasChanges = action.payload;
+    },
+    resetRetatrutideConsentSaveFlag: (state) => {
+      state.retatrutideIsSaved = false;
+    },
+    fetchRetatrutideConsent: (state) => {
+      state.isFetching = true;
+      state.error = null;
+    },
+    fetchRetatrutideConsentSuccess: (state, action) => {
+      state.isFetching = false;
+      state.retatrutideConsent = action.payload;
+      state.isLoaded = true;
+      state.error = null;
+    },
+    fetchRetatrutideConsentFailure: (state, action) => {
+      state.isFetching = false;
+      state.error = action.payload;
+    },
     // Telehealth consent actions
     saveTelehealthConsent: (state, action) => {
       state.isLoading = true;
@@ -207,6 +248,14 @@ export const {
   fetchSemaglutideConsent,
   fetchSemaglutideConsentSuccess,
   fetchSemaglutideConsentFailure,
+  saveRetatrutideConsent,
+  saveRetatrutideConsentSuccess,
+  saveRetatrutideConsentFailure,
+  setRetatrutideConsentChanges,
+  resetRetatrutideConsentSaveFlag,
+  fetchRetatrutideConsent,
+  fetchRetatrutideConsentSuccess,
+  fetchRetatrutideConsentFailure,
   saveTelehealthConsent,
   saveTelehealthConsentSuccess,
   saveTelehealthConsentFailure,

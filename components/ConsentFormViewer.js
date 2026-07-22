@@ -119,6 +119,35 @@ const ConsentFormViewer = ({
           </Box>
         );
 
+      case 'retatrutide':
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Retatrutide Consent Form
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              <strong>Purpose of Treatment:</strong><br />
+              Retatrutide is a human-based Glucagon-like peptide-1 (GLP-1) receptor agonist, Glucose Dependent Insulinotropic Polypeptide (GIP) receptor agonist, and Glucagon receptor (GCGR) agonist. It is an experimental drug developed as an adjunct to a reduced calorie diet and increased physical activity for chronic weight management in adults with an initial body mass index (BMI) that is considered outside a healthy range.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Retatrutide is still in clinical trials and has not yet been FDA approved. Medicines like Retatrutide work by slowing gastric emptying time and stimulating the satiety center in the brain to reduce hunger and appetite. They also improve fat storage and fat burning.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              <strong>Do not take Retatrutide if:</strong><br />
+              • You have a personal or family history of medullary thyroid carcinoma (Thyroid Cancer)<br />
+              • Multiple Endocrine Neoplasia syndrome type 2<br />
+              • You are pregnant or plan to become pregnant while taking this medicine<br />
+              • You are diabetic and/or taking any medications related to lowering your blood sugar levels without speaking with your endocrinologist<br />
+              • You have a history of Pancreatitis<br />
+              • You are allergic to BPC-157, Retatrutide or any other GLP-1 agonist such as: Adlyxin®, Byeta®, Bydureon®, Ozempic®, Rybelsus®, Trulicity®, Victoza®, Wegovy®<br />
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              <strong>Consent:</strong><br />
+              By signing below, I certify that I have read and understand the contents of this form. I acknowledge that I am aware that Retatrutide is still in clinical trials and that all potential benefits and risks may not be known at this time; and that Dr. Kadria Fairclough and Svelte by LuKaria may not be held liable for any adverse side effects and outcomes that I develop that are not yet known.
+            </Typography>
+          </Box>
+        );
+
       default:
         return (
           <Typography variant="body2" color="text.secondary">

@@ -122,16 +122,34 @@ export async function GET(request, { params }) {
         await semaglutideConsentCollection.insertOne(semaglutideConsentDocs);
       }
 
+      const retatrutideConsentCollection = db.collection('RetatrutideConsentCollection');
+
+      let retatrutideConsentDocs = await retatrutideConsentCollection
+        .findOne({ userId: targetUserId });
+
+      if (retatrutideConsentDocs == null) {
+        retatrutideConsentDocs = {
+          userId: targetUserId,
+          complete: false,
+          available: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        await retatrutideConsentCollection.insertOne(retatrutideConsentDocs);
+      }
+
     const consentDocs = {telehealth : telehealthDocs,
       photograph:photographConsentDocs, 
       mounjaro: mounjaroConsentDocs,
-      semaglutide: semaglutideConsentDocs};
+      semaglutide: semaglutideConsentDocs,
+      retatrutide: retatrutideConsentDocs};
 
     console.log('✅ Admin consent forms fetched successfully:', {
       telehealth: telehealthDocs ? 'found' : 'not found',
       photograph: photographConsentDocs ? 'found' : 'not found', 
       mounjaro: mounjaroConsentDocs ? 'found' : 'not found',
-      semaglutide: semaglutideConsentDocs ? 'found' : 'not found'
+      semaglutide: semaglutideConsentDocs ? 'found' : 'not found',
+      retatrutide: retatrutideConsentDocs ? 'found' : 'not found'
     });
 
     // Debug: Log the actual properties of each form
@@ -161,6 +179,13 @@ export async function GET(request, { params }) {
         available: semaglutideConsentDocs.available,
         locked: semaglutideConsentDocs.locked,
         complete: semaglutideConsentDocs.complete
+      });
+    }
+    if (retatrutideConsentDocs) {
+      console.log('📊 Retatrutide form properties:', {
+        available: retatrutideConsentDocs.available,
+        locked: retatrutideConsentDocs.locked,
+        complete: retatrutideConsentDocs.complete
       });
     }
 
@@ -273,6 +298,14 @@ export async function PUT(request, { params }) {
     if (formType === 'semaglutide') {
       const semaglutideCollection = db.collection('SemaglutideConsentCollection');
       result = await semaglutideCollection.updateOne(
+        { userId: targetUserId },
+        { $set: updateFields }
+      );
+    }
+
+    if (formType === 'retatrutide') {
+      const retatrutideCollection = db.collection('RetatrutideConsentCollection');
+      result = await retatrutideCollection.updateOne(
         { userId: targetUserId },
         { $set: updateFields }
       );

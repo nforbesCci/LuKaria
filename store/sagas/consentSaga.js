@@ -12,6 +12,10 @@ import {
   saveSemaglutideConsentFailure,
   fetchSemaglutideConsentSuccess,
   fetchSemaglutideConsentFailure,
+  saveRetatrutideConsentSuccess,
+  saveRetatrutideConsentFailure,
+  fetchRetatrutideConsentSuccess,
+  fetchRetatrutideConsentFailure,
   saveTelehealthConsentSuccess,
   saveTelehealthConsentFailure,
   fetchTelehealthConsentSuccess,
@@ -306,6 +310,102 @@ export function* watchFetchSemaglutideConsent() {
   yield takeEvery('consent/fetchSemaglutideConsent', fetchSemaglutideConsentSaga);
 }
 
+// API call to save retatrutide consent to MongoDB
+function* saveRetatrutideConsentToDatabase(consentData) {
+  try {
+    const response = yield call(fetch, '/api/consent/retatrutide/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(consentData),
+    });
+
+    if (!response.ok) {
+      const errorData = yield response.json();
+      console.error('❌ Consent Saga: API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorData.details || errorData.error || 'Unknown error'}`);
+    }
+
+    const result = yield response.json();
+    return result;
+  } catch (error) {
+    console.error('Error saving retatrutide consent to database:', error);
+    throw error;
+  }
+}
+
+// Saga to handle retatrutide consent saving
+function* saveRetatrutideConsentSaga(action) {
+  try {
+    console.log('🔄 Consent Saga: Starting retatrutide consent save...', action.payload);
+    
+    const result = yield call(saveRetatrutideConsentToDatabase, action.payload);
+    
+    console.log('✅ Consent Saga: Retatrutide consent saved successfully', result);
+    
+    yield put(saveRetatrutideConsentSuccess(result.data));
+  } catch (error) {
+    console.error('❌ Consent Saga: Error saving retatrutide consent', error);
+    yield put(saveRetatrutideConsentFailure(error.message));
+  }
+}
+
+// Watch for retatrutide consent save actions
+export function* watchSaveRetatrutideConsent() {
+  yield takeEvery('consent/saveRetatrutideConsent', saveRetatrutideConsentSaga);
+}
+
+// API call to fetch retatrutide consent from MongoDB
+function* fetchRetatrutideConsentFromDatabase() {
+  try {
+    const response = yield call(fetch, '/api/consent/retatrutide/fetch', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = yield response.json();
+      console.error('❌ Consent Saga: API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorData.details || errorData.error || 'Unknown error'}`);
+    }
+
+    const result = yield response.json();
+    return result;
+  } catch (error) {
+    console.error('Error fetching retatrutide consent from database:', error);
+    throw error;
+  }
+}
+
+// Saga to handle retatrutide consent fetching
+function* fetchRetatrutideConsentSaga(action) {
+  try {
+    console.log('🔄 Consent Saga: Starting retatrutide consent fetch...');
+    
+    const result = yield call(fetchRetatrutideConsentFromDatabase);
+    
+    console.log('✅ Consent Saga: Retatrutide consent fetched successfully');
+    console.log('Result structure:', {
+      success: result.success,
+      hasData: !!result.data,
+      dataKeys: result.data ? Object.keys(result.data) : []
+    });
+    
+    yield put(fetchRetatrutideConsentSuccess(result.data));
+  } catch (error) {
+    console.error('❌ Consent Saga: Error fetching retatrutide consent', error);
+    yield put(fetchRetatrutideConsentFailure(error.message));
+  }
+}
+
+// Watch for retatrutide consent fetch actions
+export function* watchFetchRetatrutideConsent() {
+  yield takeEvery('consent/fetchRetatrutideConsent', fetchRetatrutideConsentSaga);
+}
+
 // API call to save telehealth consent to MongoDB
 function* saveTelehealthConsentToDatabase(consentData) {
   try {
@@ -410,6 +510,8 @@ export default function* consentSaga() {
     watchFetchMounjaroConsent(),
     watchSaveSemaglutideConsent(),
     watchFetchSemaglutideConsent(),
+    watchSaveRetatrutideConsent(),
+    watchFetchRetatrutideConsent(),
     watchSaveTelehealthConsent(),
     watchFetchTelehealthConsent(),
   ]);

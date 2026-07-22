@@ -1,0 +1,19 @@
+> Ready on https://localhost:3000
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1289ms (280 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 9.7s (2322 modules)
+🔧 Admin Saga: Setting up admin saga watchers
+🔧 Admin Saga: Admin saga watchers set up successfully
+🔧 Admin Consent Saga: Starting saga setup
+🔧 Admin Consent Saga: Setting up fetch watcher
+🔧 Admin Consent Saga: Setting up update watcher
+🔧 Admin Consent Saga: Setting up pre-appointment task watcher
+🔧 Admin Pre-Appointment Tasks Saga: Starting saga setup
+🔧 Admin Pre-Appointment Tasks Saga: Setting up fetch watcher
+🔧 Setting up deleteAdminQuestion watcher
+🔧 Pre-Appointment Tasks Saga: Starting saga setup
+🔧 Pre-Appointment Tasks Saga: Setting up fetchPreAppointmentTasks watcher
+ GET / 200 in 8519ms
+ GET / 200 in 11009ms
+ GET / 200 in 242ms

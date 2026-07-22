@@ -1,0 +1,67 @@
+import { NextResponse } from 'next/server';
+import clientPromise from '../../../../../lib/mongodb';
+import { getSession } from '@auth0/nextjs-auth0';
+
+export async function GET(request) {
+  try {
+    // Get user session
+    const session = await getSession();
+    
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const userId = session.user.sub;
+
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db('lukaria');
+    const collection = db.collection('RetatrutideConsentCollection');
+
+    // Fetch the document for this user
+    let document = await collection.findOne({ userId });
+
+    if (!document) {
+      console.log('📭 No retatrutide consent found for user:', userId);
+      
+      // Create a new document for this user
+      const newDocument = {
+        userId: userId,
+        complete: false,
+        available: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      // Insert the new document
+      await collection.insertOne(newDocument);
+      
+      return NextResponse.json({
+        success: true,
+        message: 'No retatrutide consent found',
+        data: newDocument,
+      });
+    }
+
+    console.log('✅ Retatrutide consent fetched successfully:', document);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Retatrutide consent fetched successfully',
+      data: document,
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching retatrutide consent:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to fetch retatrutide consent',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}
