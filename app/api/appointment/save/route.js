@@ -1,4 +1,4 @@
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
 
@@ -7,7 +7,7 @@ export async function POST(request) {
   console.log('🔍 API Route Called: POST /api/appointment/save');
   
   try {
-    const session = await getSession(request);
+    const session = await getApiSession(request);
     
     console.log('👤 Session:', session ? 'Found' : 'Not found');
     console.log('👤 User:', session?.user?.sub || 'No user');

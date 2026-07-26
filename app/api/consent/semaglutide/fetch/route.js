@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '../../../../../lib/mongodb';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../../lib/api-auth';
 
 export async function GET(request) {
   try {
     // Get user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(

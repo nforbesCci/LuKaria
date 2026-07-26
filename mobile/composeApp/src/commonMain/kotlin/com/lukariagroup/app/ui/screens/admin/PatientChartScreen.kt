@@ -1,0 +1,251 @@
+package com.lukariagroup.app.ui.screens.admin
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.filled.Biotech
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Dining
+import androidx.compose.material.icons.filled.Healing
+import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.lukariagroup.app.AppContainer
+import com.lukariagroup.app.data.models.PatientProfile
+import com.lukariagroup.app.data.models.PreAppointmentTask
+import com.lukariagroup.app.ui.components.BodyCopy
+import com.lukariagroup.app.ui.components.DashboardAppIcon
+import com.lukariagroup.app.ui.components.ErrorText
+import com.lukariagroup.app.ui.components.LoadingBlock
+import com.lukariagroup.app.ui.components.LukariaScaffold
+import com.lukariagroup.app.ui.components.SectionTitle
+import com.lukariagroup.app.ui.navigation.AppRoute
+import com.lukariagroup.app.ui.theme.LukariaError
+import com.lukariagroup.app.ui.theme.LukariaGold
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonPrimitive
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun PatientChartScreen(
+    userId: String,
+    onBack: () -> Unit,
+    onNavigate: (String) -> Unit,
+) {
+    var profile by remember { mutableStateOf<PatientProfile?>(null) }
+    var consultationOccurred by remember { mutableStateOf(false) }
+    var tasks by remember { mutableStateOf<List<PreAppointmentTask>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    fun refresh() {
+        scope.launch {
+            loading = true
+            error = null
+            val errors = mutableListOf<String>()
+
+            runCatching { AppContainer.adminRepository.fetchProfile(userId) }
+                .onSuccess {
+                    profile = it.profile ?: profile
+                    val meta = it.profile?.userMetadata
+                    if (meta != null) {
+                        consultationOccurred =
+                            meta["consultationOccurred"]?.jsonPrimitive?.booleanOrNull == true
+                    }
+                }
+                .onFailure { errors += "Profile: ${it.message}" }
+
+            runCatching { AppContainer.adminRepository.fetchDbProfile(userId) }
+                .onSuccess {
+                    if (profile == null) profile = it.profile
+                    val meta = it.profile?.userMetadata
+                    if (meta != null) {
+                        consultationOccurred =
+                            meta["consultationOccurred"]?.jsonPrimitive?.booleanOrNull == true
+                    }
+                }
+                .onFailure { errors += "DB profile: ${it.message}" }
+
+            runCatching { AppContainer.adminRepository.fetchPreAppointmentTasks(userId) }
+                .onSuccess { tasks = it.tasks }
+                .onFailure { errors += "Tasks: ${it.message}" }
+
+            error = errors.takeIf { it.isNotEmpty() }?.joinToString("\n")
+            loading = false
+        }
+    }
+
+    LaunchedEffect(userId) { refresh() }
+
+    LukariaScaffold(title = "Patient chart", onBack = onBack) {
+        if (loading) LoadingBlock()
+        ErrorText(error)
+        message?.let { Text(it, color = MaterialTheme.colorScheme.primary) }
+
+        SectionTitle(profile?.name ?: userId)
+        BodyCopy(profile?.userEmail ?: profile?.email ?: "")
+
+        SectionTitle("Actions")
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            DashboardAppIcon(
+                label = if (consultationOccurred) "Disable Account" else "Enable Account",
+                icon = if (consultationOccurred) Icons.Filled.Lock else Icons.Filled.LockOpen,
+                containerColor = if (consultationOccurred) LukariaError else LukariaGold,
+                onClick = {
+                    scope.launch {
+                        val next = !consultationOccurred
+                        runCatching {
+                            AppContainer.adminRepository.enableUser(userId, consultationOccurred = next)
+                        }.onSuccess {
+                            message = if (next) "Account enabled" else "Account disabled"
+                            refresh()
+                        }.onFailure { error = it.message }
+                    }
+                },
+            )
+            DashboardAppIcon(
+                label = "Reschedule",
+                icon = Icons.Filled.CalendarMonth,
+                containerColor = Color(0xFF3D7A5A),
+                onClick = { onNavigate(AppRoute.AdminChartReschedule.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Lab Requisition",
+                icon = Icons.Filled.Biotech,
+                containerColor = Color(0xFF5B7C99),
+                onClick = { onNavigate(AppRoute.LabRequisitionForUser.create(userId)) },
+            )
+        }
+
+        SectionTitle("Profile Completion Status")
+        CompletionRow(
+            label = "Account",
+            done = consultationOccurred,
+            doneText = "Active",
+            incompleteText = "Disabled",
+        )
+        val orderedKeys = listOf(
+            "completeMedicalProfile" to "Medical Profile",
+            "enterWeightHeight" to "Weight and Height",
+            "completeConsentForms" to "Consent Forms Complete",
+            "prepareQuestions" to "Prepared Questions",
+        )
+        orderedKeys.forEach { (key, label) ->
+            val task = tasks.find { it.taskKey == key }
+            CompletionRow(
+                label = label,
+                done = task?.completed == true,
+                doneText = "Completed",
+                incompleteText = "Incomplete",
+            )
+        }
+
+        SectionTitle("Chart sections")
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            DashboardAppIcon(
+                label = "Profile Summary",
+                icon = Icons.Filled.Person,
+                containerColor = LukariaGold,
+                onClick = { onNavigate(AppRoute.AdminChartProfile.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Consent Forms",
+                icon = Icons.AutoMirrored.Filled.Assignment,
+                containerColor = Color(0xFF5B7C99),
+                onClick = { onNavigate(AppRoute.AdminChartConsents.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Side Effects",
+                icon = Icons.Filled.Healing,
+                containerColor = Color(0xFF9A4F5C),
+                onClick = { onNavigate(AppRoute.AdminChartSideEffects.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Weight Logging",
+                icon = Icons.Filled.MonitorWeight,
+                containerColor = Color(0xFF8B6B4A),
+                onClick = { onNavigate(AppRoute.AdminChartWeight.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Medication Tracker",
+                icon = Icons.Filled.Medication,
+                containerColor = Color(0xFF6B5B95),
+                onClick = { onNavigate(AppRoute.AdminChartMedications.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Meal Tracker",
+                icon = Icons.Filled.Dining,
+                containerColor = Color(0xFFC4784A),
+                onClick = { onNavigate(AppRoute.AdminChartMeals.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Questions",
+                icon = Icons.Filled.HelpOutline,
+                containerColor = Color(0xFF4A6FA5),
+                onClick = { onNavigate(AppRoute.AdminChartQuestions.create(userId)) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompletionRow(
+    label: String,
+    done: Boolean,
+    doneText: String,
+    incompleteText: String,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = if (done) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
+            contentDescription = null,
+            tint = if (done) Color(0xFF3D7A5A) else LukariaError,
+        )
+        Text(
+            text = "$label — ${if (done) doneText else incompleteText}",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}

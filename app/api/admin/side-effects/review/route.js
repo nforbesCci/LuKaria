@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../../lib/api-auth';
 import { getDatabase } from '../../../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
 
@@ -8,7 +8,7 @@ export async function POST(request) {
     console.log('🔄 Side Effects Review API: Starting request processing');
     
     // Get the session to verify user authentication
-    const session = await getSession(request);
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       console.log('❌ Side Effects Review API: No session found');

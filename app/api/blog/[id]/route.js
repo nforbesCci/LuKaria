@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import { getDatabase } from '../../../../lib/mongodb';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
@@ -38,7 +38,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const session = await getSession();
+    const session = await getApiSession(request);
     if (!session?.user || !isDoctorOrAdmin(session)) {
       return NextResponse.json({ error: 'Unauthorized. Doctor or Admin required.' }, { status: 403 });
     }
@@ -111,7 +111,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const session = await getSession();
+    const session = await getApiSession(request);
     if (!session?.user || !isDoctorOrAdmin(session)) {
       return NextResponse.json({ error: 'Unauthorized. Doctor or Admin required.' }, { status: 403 });
     }

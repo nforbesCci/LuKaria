@@ -1,15 +1,15 @@
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/appointment/check - Check if appointment is configured and get details
-export async function GET() {
+export async function GET(request) {
   console.log('🔍 API Route Called: GET /api/appointment/check');
   
   try {
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     console.log('👤 Session:', session ? 'Found' : 'Not found');
     console.log('👤 User:', session?.user?.sub || 'No user');
@@ -103,7 +103,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

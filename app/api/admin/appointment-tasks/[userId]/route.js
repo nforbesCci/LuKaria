@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../../lib/api-auth';
 import { getDatabase } from '../../../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request, { params }) {
   try {
     // Get admin user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(
@@ -65,7 +65,7 @@ export async function GET(request, { params }) {
 export async function POST(request, { params }) {
   try {
     // Get admin user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(
@@ -140,7 +140,7 @@ export async function POST(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     // Get admin user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import { getDatabase } from '../../../../lib/mongodb';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +12,7 @@ export async function POST(request) {
     const measurementsData = await request.json();
     
     // Get the user session (no parameters for Next.js 15)
-    const session = await getSession();
+    const session = await getApiSession(request);
     if (!session || !session.user) {
       console.log('❌ Measurements Save API: No user session found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

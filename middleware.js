@@ -9,6 +9,14 @@ export default function middleware(req) {
   if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
+
+  // Native mobile / API clients send Authorization: Bearer <JWT>.
+  // Cookie session is still enforced for browser traffic below.
+  // Route handlers validate the JWT via getApiSession().
+  const authHeader = req.headers.get('authorization') || '';
+  if (authHeader.toLowerCase().startsWith('bearer ')) {
+    return NextResponse.next();
+  }
   
   // Apply authentication to all other routes
   return withMiddlewareAuthRequired()(req);

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import { getDatabase } from '../../../../lib/mongodb';
 
 export async function POST(request) {
@@ -7,7 +7,7 @@ export async function POST(request) {
     console.log('🔄 Profile API: Starting profile save...');
     
     // Get the user session
-    const session = await getSession(request);
+    const session = await getApiSession(request);
     if (!session || !session.user) {
       console.log('❌ Profile API: No user session found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

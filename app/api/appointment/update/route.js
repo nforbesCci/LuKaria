@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import { getCollection } from '../../../../lib/mongodb';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { ConfidentialClientApplication } from '@azure/msal-node';
@@ -8,7 +8,7 @@ export async function PUT(request) {
   console.log('🔄 API Route Called: PUT /api/appointment/update');
 
   try {
-    const session = await getSession(request);
+    const session = await getApiSession(request);
 
     if (!session || !session.user) {
       console.warn('❌ Unauthorized request to update appointment');

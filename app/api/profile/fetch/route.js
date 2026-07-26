@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import { getDatabase } from '../../../../lib/mongodb';
 
 export async function GET(request) {
@@ -9,7 +9,7 @@ export async function GET(request) {
     console.log(`📍 [${requestId}] Profile Fetch API: Request timestamp:`, new Date().toISOString());
     
     // Get the user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     if (!session || !session.user) {
       console.log(`❌ [${requestId}] Profile Fetch API: No user session found`);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../lib/api-auth';
 import { getDatabase } from '../../../lib/mongodb';
 
 export const dynamic = 'force-dynamic';
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
   try {
     // Get user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(
@@ -53,7 +53,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     // Get user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(
@@ -118,7 +118,7 @@ export async function PUT(request) {
     console.log('🔧 PUT /api/pre-appointment-tasks - Starting request');
     
     // Get user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       console.log('❌ PUT /api/pre-appointment-tasks - No session found');
@@ -199,7 +199,7 @@ export async function PUT(request) {
 export async function DELETE(request) {
   try {
     // Get user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(

@@ -1,2 +1,15 @@
-(node:25580) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(node:17708) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
 (Use `node --trace-deprecation ...` to show where the warning was created)
+Error [CallbackHandlerError]: Callback handler failed. CAUSE: invalid_grant (Invalid authorization code)
+    at async Server.<anonymous> (C:\Git\Lukaria\server.js:28:7) {
+  code: 'ERR_CALLBACK_HANDLER_FAILURE',
+  status: 400,
+  [cause]: Error: invalid_grant (Invalid authorization code)
+      at async Server.<anonymous> (C:\Git\Lukaria\server.js:28:7) {
+    error: 'invalid_grant',
+    errorDescription: 'Invalid authorization code',
+    status: 400,
+    statusCode: 400,
+    openIdState: { returnTo: 'https://localhost:3000' }
+  }
+}

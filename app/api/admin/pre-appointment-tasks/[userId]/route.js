@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../../lib/api-auth';
 import { getDatabase } from '../../../../../lib/mongodb';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
     console.log('🔧 Admin Pre-Appointment Tasks API: GET request started');
     
     // Get the session
-    const session = await getSession();
+    const session = await getApiSession(request);
     if (!session || !session.user) {
       console.log('❌ Admin Pre-Appointment Tasks API: No session found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -68,7 +68,7 @@ export async function PUT(request, { params }) {
     console.log('🔧 PUT /api/pre-appointment-tasks - Starting request');
     
     // Get user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       console.log('❌ PUT /api/pre-appointment-tasks - No session found');

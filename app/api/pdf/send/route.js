@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { ConfidentialClientApplication } from '@azure/msal-node';
+import { getApiSession, hasAdminOrDoctorRole } from '../../../../lib/api-auth';
 
 // Initialize MSAL
 const msalConfig = {
@@ -191,6 +192,10 @@ async function sendEmailWithAttachment(pdfBuffer, fileName, userEmail, userName)
 export async function POST(request) {
   try {
     console.log('PDF send API called');
+    const session = await getApiSession(request);
+    if (!session?.user || !hasAdminOrDoctorRole(session.user)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const { pdfData, fileName, userInfo } = await request.json();
 
     if (!pdfData || !fileName) {

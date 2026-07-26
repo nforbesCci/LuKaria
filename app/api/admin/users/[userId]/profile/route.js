@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../../../lib/api-auth';
 import { getDatabase } from '../../../../../../lib/mongodb';
 
 export async function GET(request, { params }) {
@@ -7,7 +7,7 @@ export async function GET(request, { params }) {
     console.log('🔍 API: Fetching DB profile for user:', params.userId);
     
     // Get admin session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       console.error('❌ API: Admin not authenticated');
@@ -79,7 +79,7 @@ export async function POST(request, { params }) {
     console.log('💾 API: Admin updating profile for user:', params.userId);
     
     // Get admin session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       console.error('❌ API: Admin not authenticated');

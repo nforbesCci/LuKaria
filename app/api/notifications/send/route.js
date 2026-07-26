@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession } from '../../../../lib/api-auth';
 import clientPromise from '../../../../lib/mongodb';
 
 export async function POST(request) {
@@ -7,7 +7,7 @@ export async function POST(request) {
     console.log('📤 API: Received notification send request');
     
     // Get user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       console.error('❌ API: User not authenticated');

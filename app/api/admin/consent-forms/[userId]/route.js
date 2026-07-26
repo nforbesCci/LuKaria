@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { getApiSession, hasAdminOrDoctorRole } from '../../../../../lib/api-auth';
 import { getDatabase } from '../../../../../lib/mongodb';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +19,7 @@ export async function OPTIONS(request) {
 export async function GET(request, { params }) {
   try {
     // Get admin user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(
@@ -35,12 +35,7 @@ export async function GET(request, { params }) {
       );
     }
 
-    // Check if user has admin role (case insensitive)
-    const userRoles = session.user['https://lukariagroup.com/roles'] || [];
-    const hasAdminRole = userRoles.some(role => 
-      role.toLowerCase() === 'admin' || role.toLowerCase() === 'doctor'
-    );
-    if (!hasAdminRole) {
+    if (!hasAdminOrDoctorRole(session.user)) {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }
@@ -223,7 +218,7 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     // Get admin user session
-    const session = await getSession();
+    const session = await getApiSession(request);
     
     if (!session || !session.user) {
       return NextResponse.json(
@@ -239,12 +234,7 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Check if user has admin role (case insensitive)
-    const userRoles = session.user['https://lukariagroup.com/roles'] || [];
-    const hasAdminRole = userRoles.some(role => 
-      role.toLowerCase() === 'admin' || role.toLowerCase() === 'doctor'
-    );
-    if (!hasAdminRole) {
+    if (!hasAdminOrDoctorRole(session.user)) {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }

@@ -1,8 +1,8 @@
 > Ready on https://localhost:3000
  ○ Compiling /middleware ...
- ✓ Compiled /middleware in 1289ms (280 modules)
+ ✓ Compiled /middleware in 1132ms (280 modules)
  ○ Compiling / ...
- ✓ Compiled / in 9.7s (2322 modules)
+ ✓ Compiled / in 9.1s (2322 modules)
 🔧 Admin Saga: Setting up admin saga watchers
 🔧 Admin Saga: Admin saga watchers set up successfully
 🔧 Admin Consent Saga: Starting saga setup
@@ -14,6 +14,8 @@
 🔧 Setting up deleteAdminQuestion watcher
 🔧 Pre-Appointment Tasks Saga: Starting saga setup
 🔧 Pre-Appointment Tasks Saga: Setting up fetchPreAppointmentTasks watcher
- GET / 200 in 8519ms
- GET / 200 in 11009ms
- GET / 200 in 242ms
+ GET / 200 in 9850ms
+ ○ Compiling /api/auth/[...auth0] ...
+ ✓ Compiled /api/auth/[...auth0] in 2.6s (1518 modules)
+ GET /api/auth/callback?code=joLxf0Xl1NWzsE8F0CnRtJacElrsxlO7dW_m8SGvVamiy&state=eyJyZXR1cm5UbyI6Imh0dHBzOi8vbG9jYWxob3N0OjMwMDAifQ 400 in 4516ms
+ ✓ Compiled in 584ms (280 modules)
