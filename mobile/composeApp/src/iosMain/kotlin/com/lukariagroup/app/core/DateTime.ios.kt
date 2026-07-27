@@ -7,14 +7,15 @@ import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
 import platform.Foundation.NSTimeZone
 import platform.Foundation.dateWithTimeIntervalSince1970
+import platform.Foundation.localeWithLocaleIdentifier
 import platform.Foundation.timeIntervalSince1970
 import platform.Foundation.timeZoneWithName
 
 actual fun todayIsoDate(): String {
     val formatter = NSDateFormatter().apply {
         dateFormat = "yyyy-MM-dd"
-        locale = NSLocale.currentLocale
-        timeZone = NSTimeZone.localTimeZone
+        locale = NSLocale.localeWithLocaleIdentifier("en_US_POSIX")
+        timeZone = NSTimeZone.systemTimeZone
     }
     return formatter.stringFromDate(NSDate())
 }
@@ -22,7 +23,7 @@ actual fun todayIsoDate(): String {
 actual fun epochMillisToIsoDate(millis: Long): String {
     val formatter = NSDateFormatter().apply {
         dateFormat = "yyyy-MM-dd"
-        locale = NSLocale.currentLocale
+        locale = NSLocale.localeWithLocaleIdentifier("en_US_POSIX")
         timeZone = NSTimeZone.timeZoneWithName("UTC")!!
     }
     val date = NSDate.dateWithTimeIntervalSince1970(millis / 1000.0)
