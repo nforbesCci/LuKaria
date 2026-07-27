@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.savedstate.read
 import com.lukariagroup.app.ui.navigation.AppRoute
 import com.lukariagroup.app.ui.screens.admin.AdminConsentFormsScreen
 import com.lukariagroup.app.ui.screens.admin.AdminHomeScreen
@@ -49,6 +50,9 @@ import com.lukariagroup.app.ui.screens.patient.ScheduleScreen
 import com.lukariagroup.app.ui.screens.patient.SideEffectsScreen
 import com.lukariagroup.app.ui.screens.patient.WeightLoggingScreen
 import com.lukariagroup.app.ui.theme.LukariaTheme
+
+private fun androidx.navigation.NavBackStackEntry.argString(key: String): String =
+    arguments?.read { getStringOrNull(key) }.orEmpty()
 
 @Composable
 fun App() {
@@ -95,7 +99,7 @@ fun App() {
                 arguments = listOf(navArgument("slug") { type = NavType.StringType }),
             ) { entry ->
                 BlogDetailScreen(
-                    slug = entry.arguments?.getString("slug").orEmpty(),
+                    slug = entry.argString("slug"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -155,7 +159,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 PatientChartScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                     onNavigate = { navController.navigate(it) },
                 )
@@ -165,7 +169,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminProfileSummaryScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -174,7 +178,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminConsentFormsScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -183,7 +187,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminPatientSideEffectsScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -192,7 +196,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminWeightLoggingScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -201,7 +205,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminMedicationScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -210,7 +214,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminMealTrackerScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -219,7 +223,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminQuestionsScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -228,7 +232,7 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminPatientRescheduleScreen(
-                    userId = entry.arguments?.getString("userId").orEmpty(),
+                    userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )
             }
@@ -246,7 +250,7 @@ fun App() {
             ) { entry ->
                 LabRequisitionScreen(
                     onBack = { navController.popBackStack() },
-                    userId = entry.arguments?.getString("userId"),
+                    userId = entry.argString("userId"),
                 )
             }
             composable(AppRoute.BlogCms.route) { BlogCmsScreen { navController.popBackStack() } }
