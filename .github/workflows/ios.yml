@@ -82,6 +82,13 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: mobile
+
       - name: Write App Store Connect API key
         env:
           APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
@@ -91,7 +98,6 @@ jobs:
           KEY_PATH="$HOME/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8"
           printf '%s\n' "$APP_STORE_CONNECT_API_KEY_P8" > "$KEY_PATH"
           echo "ASC_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
-          echo "ASC_API_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
 
       - name: Inject Team ID into xcconfig
         env:
@@ -100,7 +106,6 @@ jobs:
           sed -i '' "s/^TEAM_ID=.*/TEAM_ID=${APPLE_TEAM_ID}/" iosApp/Configuration/Config.xcconfig
           sed -i '' "s/TEAM_ID_PLACEHOLDER/${APPLE_TEAM_ID}/" iosApp/ExportOptions.plist
           cat iosApp/Configuration/Config.xcconfig
-          cat iosApp/ExportOptions.plist
 
       - name: Bump CFBundleVersion from run number
         run: |
@@ -108,69 +113,30 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" iosApp/iosApp/Info.plist
           /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" iosApp/iosApp/Info.plist
 
-      - name: Resolve packages / prepare Xcode
-        run: xcodebuild -version
+      - name: Cache distribution signing keychain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Keychains/lukaria-ci.keychain-db
+            ~/Library/MobileDevice/Provisioning Profiles
+          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v1
 
-      - name: Archive iOS app
+      - name: Build IPA + upload TestFlight (Fastlane)
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-        run: |
-          set -euo pipefail
-          xcodebuild \
-            -project iosApp/iosApp.xcodeproj \
-            -scheme iosApp \
-            -configuration Release \
-            -destination "generic/platform=iOS" \
-            -archivePath "$RUNNER_TEMP/Svelte.xcarchive" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$ASC_KEY_PATH" \
-            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
-            -authenticationKeyIssuerID "$APP_STORE_CONNECT_API_ISSUER_ID" \
-            CODE_SIGN_STYLE=Automatic \
-            CODE_SIGNING_ALLOWED=YES \
-            CODE_SIGNING_REQUIRED=YES \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
-            archive
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI_KEYCHAIN_PASSWORD: lukaria-ci-temp
+          FASTLANE_SKIP_UPDATE_CHECK: "1"
+        run: bundle exec fastlane ios beta
 
-      - name: Export IPA
-        env:
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-        run: |
-          set -euo pipefail
-          xcodebuild \
-            -exportArchive \
-            -archivePath "$RUNNER_TEMP/Svelte.xcarchive" \
-            -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist iosApp/ExportOptions.plist \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$ASC_KEY_PATH" \
-            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
-            -authenticationKeyIssuerID "$APP_STORE_CONNECT_API_ISSUER_ID"
-
-      - name: Upload IPA to TestFlight
-        env:
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-        run: |
-          set -euo pipefail
-          IPA=$(ls "$RUNNER_TEMP/export"/*.ipa | head -n 1)
-          echo "Uploading $IPA"
-          xcrun altool --upload-app \
-            --type ios \
-            --file "$IPA" \
-            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
-            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER_ID" \
-            --verbose
-
-      - name: Upload archive artifact
+      - name: Upload IPA artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: svelte-ios-archive
+          name: svelte-ios-ipa
           path: |
+            ${{ runner.temp }}/Svelte.ipa
             ${{ runner.temp }}/Svelte.xcarchive
-            ${{ runner.temp }}/export
           if-no-files-found: ignore
           retention-days: 14

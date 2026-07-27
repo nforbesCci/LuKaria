@@ -23,6 +23,8 @@ Find it in [Apple Developer → Membership](https://developer.apple.com/account)
 
 1. App exists in App Store Connect: **Svelte by Lukaria** / `com.lukaria.svelte`
 2. Bundle ID matches `mobile/iosApp/Configuration/Config.xcconfig`
-3. ASC API key has **Admin** or **App Manager** + access to this app
+3. ASC API key has **Admin** (needed so Fastlane can create the Distribution cert + App Store profile)
 4. Commit + push `mobile/` and `.github/workflows/ios.yml` to `master`
 5. Watch **Actions → iOS Build & TestFlight**
+
+Deploy uses Fastlane (`mobile/fastlane`) to create an **Apple Distribution** certificate and App Store provisioning profile (no physical device required), then uploads to TestFlight. The CI keychain is cached so later runs can reuse the cert private key.
