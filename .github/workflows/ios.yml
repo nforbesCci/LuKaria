@@ -118,15 +118,16 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" iosApp/iosApp/Info.plist
           /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" iosApp/iosApp/Info.plist
 
-      - name: Cache distribution signing keychain
-        uses: actions/cache@v4
+      - name: Restore distribution signing keychain
+        id: keychain-cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/Library/Keychains/lukaria-ci.keychain-db
             ~/Library/Keychains/lukaria-ci.keychain-db-shm
             ~/Library/Keychains/lukaria-ci.keychain-db-wal
             ~/Library/MobileDevice/Provisioning Profiles
-          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v2
+          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v3
           restore-keys: |
             ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-
 
@@ -140,6 +141,17 @@ jobs:
           CI_KEYCHAIN_PASSWORD: lukaria-ci-temp
           FASTLANE_SKIP_UPDATE_CHECK: "1"
         run: bundle exec fastlane ios beta
+
+      - name: Save distribution signing keychain
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/Library/Keychains/lukaria-ci.keychain-db
+            ~/Library/Keychains/lukaria-ci.keychain-db-shm
+            ~/Library/Keychains/lukaria-ci.keychain-db-wal
+            ~/Library/MobileDevice/Provisioning Profiles
+          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v3-${{ github.run_id }}
 
       - name: Upload IPA artifact
         if: always()
