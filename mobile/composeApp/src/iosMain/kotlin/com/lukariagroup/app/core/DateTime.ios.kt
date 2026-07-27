@@ -15,7 +15,7 @@ actual fun todayIsoDate(): String {
     val formatter = NSDateFormatter().apply {
         dateFormat = "yyyy-MM-dd"
         locale = NSLocale.localeWithLocaleIdentifier("en_US_POSIX")
-        timeZone = NSTimeZone.systemTimeZone
+        // Default timeZone is the device local zone.
     }
     return formatter.stringFromDate(NSDate())
 }
