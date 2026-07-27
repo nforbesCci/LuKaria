@@ -122,6 +122,8 @@ jobs:
             ~/Library/Keychains/lukaria-ci.keychain-db-wal
             ~/Library/MobileDevice/Provisioning Profiles
           key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v2
+          restore-keys: |
+            ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-
 
       - name: Build IPA + upload TestFlight (Fastlane)
         env:
