@@ -40,6 +40,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Link release framework (iosArm64)
         run: ./gradlew :composeApp:linkReleaseFrameworkIosArm64 --stacktrace
 
@@ -73,6 +76,9 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Write App Store Connect API key
         env:
