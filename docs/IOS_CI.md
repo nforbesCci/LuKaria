@@ -19,6 +19,22 @@ APPLE_TEAM_ID=<your 10-character Apple Developer Team ID>
 
 Find it in [Apple Developer → Membership](https://developer.apple.com/account) or Xcode → Settings → Accounts.
 
+## If TestFlight deploy fails on signing
+
+The **Compile ComposeApp (iOS)** job validates Kotlin/Native builds. The deploy job needs an **Apple Distribution** certificate.
+
+If CI logs show `reached the maximum number of available Distribution certificates`:
+
+1. Open [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/certificates/list) → **Distribution** → revoke unused/expired certs (Apple allows 3 active).
+2. Re-run **Actions → iOS Build & TestFlight**.
+
+Alternatively, export a Distribution `.p12` from Keychain Access and add repo secrets:
+
+```text
+IOS_DISTRIBUTION_CERT_P12_BASE64=<base64 of .p12 file>
+IOS_DISTRIBUTION_CERT_PASSWORD=<p12 export password>
+```
+
 ## First deploy checklist
 
 1. App exists in App Store Connect: **Svelte by Lukaria** / `com.lukaria.svelte`

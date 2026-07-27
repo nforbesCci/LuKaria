@@ -8,6 +8,22 @@ def distribution_identity_in_keychain?(keychain_path)
   !output.strip.empty?
 end
 
+def import_distribution_p12!(keychain_name:, keychain_password:)
+  p12_b64 = ENV["IOS_DISTRIBUTION_CERT_P12_BASE64"]
+  return if p12_b64.nil? || p12_b64.strip.empty?
+
+  require "base64"
+  p12_path = File.join(Dir.tmpdir, "lukaria-distribution.p12")
+  File.binwrite(p12_path, Base64.decode64(p12_b64))
+  import_certificate(
+    certificate_path: p12_path,
+    certificate_password: ENV.fetch("IOS_DISTRIBUTION_CERT_PASSWORD"),
+    keychain_name: keychain_name,
+    keychain_password: keychain_password
+  )
+  UI.success("Imported Apple Distribution certificate from IOS_DISTRIBUTION_CERT_P12_BASE64")
+end
+
 platform :ios do
   desc "Archive, export, and upload Svelte to TestFlight"
   lane :beta do
@@ -41,10 +57,15 @@ platform :ios do
       )
     end
 
+    import_distribution_p12!(
+      keychain_name: keychain_name,
+      keychain_password: keychain_password
+    )
+
     if distribution_identity_in_keychain?(keychain_path)
-      UI.success("Reusing Apple Distribution identity from CI keychain cache")
+      UI.success("Using Apple Distribution identity from CI keychain")
     else
-      UI.important("No Distribution identity in CI keychain; fetching or creating one")
+      UI.important("No Distribution identity in keychain; creating one via App Store Connect API")
       begin
         cert(
           api_key: api_key,
@@ -56,8 +77,9 @@ platform :ios do
       rescue => e
         UI.user_error!(
           "Distribution signing failed (#{e.message}). " \
-          "Revoke an unused Apple Distribution certificate in developer.apple.com " \
-          "or import MATCH_* / signing secrets, then re-run CI."
+          "Revoke an unused Apple Distribution certificate at developer.apple.com, " \
+          "or add repo secrets IOS_DISTRIBUTION_CERT_P12_BASE64 + IOS_DISTRIBUTION_CERT_PASSWORD " \
+          "(export a .p12 from Keychain Access), then re-run CI."
         )
       end
     end
