@@ -18,6 +18,8 @@ concurrency:
 
 env:
   JAVA_VERSION: "17"
+  # Kotlin/Native link of Compose + material-icons-extended OOMs at the default 2g.
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx6g -Dkotlin.daemon.jvmargs=-Xmx6g"
 
 jobs:
   # Always validate the KMP iOS framework compiles on check-in.
