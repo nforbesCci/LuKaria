@@ -33,20 +33,21 @@ platform :ios do
       )
     end
 
+    # Prefer downloading an existing Distribution cert (avoids hitting Apple's 3-cert limit).
     begin
       cert(
         api_key: api_key,
         development: false,
-        force: false,
+        readonly: true,
         keychain_path: keychain_path,
         keychain_password: keychain_password
       )
     rescue => e
-      UI.important("Distribution cert reuse failed (#{e.message}); recreating.")
+      UI.important("No reusable Distribution cert in keychain (#{e.message}); creating one.")
       cert(
         api_key: api_key,
         development: false,
-        force: true,
+        force: false,
         keychain_path: keychain_path,
         keychain_password: keychain_password
       )
