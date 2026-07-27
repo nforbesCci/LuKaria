@@ -63,6 +63,7 @@ sealed class AppRoute(val route: String) {
     data object LabRequisitionForUser : AppRoute("admin/labs/{userId}") {
         fun create(userId: String) = "admin/labs/$userId"
     }
+    data object AdminSettings : AppRoute("admin/settings")
     data object BlogCms : AppRoute("admin/blog-cms")
 
     companion object {
@@ -76,7 +77,7 @@ sealed class AppRoute(val route: String) {
             SideEffects, Membership, BarcodeScanner,
         )
         val admin = listOf(
-            AdminHome, RescheduleRequests, AdminSideEffects, LabRequisition, BlogCms,
+            AdminHome, RescheduleRequests, AdminSideEffects, LabRequisition, AdminSettings, BlogCms,
         )
     }
 }

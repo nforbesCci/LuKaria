@@ -101,6 +101,9 @@ fun AdminHomeScreen(
         Button(onClick = { onNavigate(AppRoute.LabRequisition.route) }, modifier = Modifier.fillMaxWidth()) {
             Text("Lab requisition")
         }
+        Button(onClick = { onNavigate(AppRoute.AdminSettings.route) }, modifier = Modifier.fillMaxWidth()) {
+            Text("System Settings")
+        }
         Button(onClick = { onNavigate(AppRoute.BlogCms.route) }, modifier = Modifier.fillMaxWidth()) {
             Text("Blog CMS")
         }

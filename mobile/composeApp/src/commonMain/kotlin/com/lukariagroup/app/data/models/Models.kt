@@ -418,6 +418,25 @@ data class DbProfileResponse(
     val error: String? = null,
 )
 
+@Serializable
+data class Auth0RoleSummary(
+    val id: String? = null,
+    val name: String? = null,
+    val description: String? = null,
+)
+
+@Serializable
+data class UserRolesResponse(
+    val success: Boolean = true,
+    val userId: String? = null,
+    val roles: List<Auth0RoleSummary> = emptyList(),
+    val primaryRole: String? = null,
+    val availableRoles: List<Auth0RoleSummary> = emptyList(),
+    val message: String? = null,
+    val error: String? = null,
+    val details: String? = null,
+)
+
 enum class ConsentType(val pathSegment: String, val displayName: String) {
     TELEHEALTH("telehealth", "Telehealth Consent"),
     PHOTOGRAPH("photograph", "Photograph Consent"),

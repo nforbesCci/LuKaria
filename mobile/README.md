@@ -99,7 +99,35 @@ Windows:
 
 ### iOS Xcode project
 
-This repo ships the KMP shared module. Create an Xcode app that embeds the `ComposeApp` framework and calls `MainViewController()` (standard CMP iOS host). URL scheme `lukaria` must be registered for Auth0 callbacks.
+Host app lives in [`iosApp/`](iosApp/) (`com.lukaria.svelte` / **Svelte**).
+
+```bash
+# From mobile/ on macOS with Xcode
+open iosApp/iosApp.xcodeproj
+# Set TEAM_ID in iosApp/Configuration/Config.xcconfig, then Run
+```
+
+Auth0 URL scheme `lukaria` is registered in `Info.plist`. Production API base URL comes from `API_BASE_URL` in Config / Info.plist.
+
+### CI (GitHub Actions)
+
+Workflow: [`.github/workflows/ios.yml`](../.github/workflows/ios.yml)
+
+| Trigger | What runs |
+|---------|-----------|
+| Push / PR touching `mobile/**` | Compile `ComposeApp` iOS framework |
+| Push to `master` / `workflow_dispatch` | Archive + upload IPA to TestFlight |
+
+**Secrets** (repo → Settings → Secrets and variables → Actions):
+
+| Secret | Purpose |
+|--------|---------|
+| `APP_STORE_CONNECT_API_ISSUER_ID` | ASC API key issuer (already set) |
+| `APP_STORE_CONNECT_API_KEY_ID` | ASC API key id (already set) |
+| `APP_STORE_CONNECT_API_KEY_P8` | ASC `.p8` private key contents (already set) |
+| `APPLE_TEAM_ID` | Apple Developer Team ID (**required for deploy**) |
+
+The ASC API key user must have access to create/manage profiles and upload builds for **Svelte by Lukaria** (`com.lukaria.svelte`).
 
 ## Feature coverage (M0–M5)
 

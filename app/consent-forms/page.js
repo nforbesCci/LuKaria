@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useBasicAccess } from '../../hooks/useAccessControl';
+import { usePatientAccess } from '../../hooks/useAccessControl';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -66,7 +66,7 @@ export default function ConsentForms() {
   const router = useRouter();
   
   // Access control - only Admin and Patient can access
-  useBasicAccess();
+  usePatientAccess();
   const [activeTab, setActiveTab] = useState(0);
   
   // Redux hooks

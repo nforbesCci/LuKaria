@@ -33,11 +33,14 @@ export default function HomePageChrome({ children }) {
   useEffect(() => {
     if (isLoading || !user) return;
     const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-    const isOnlyDoctor =
-      userGroups.includes('Doctor') &&
-      !userGroups.includes('Admin') &&
-      !userGroups.includes('Patient');
-    if (isOnlyDoctor) {
+    const isStaff =
+      userGroups.includes('Admin') ||
+      userGroups.includes('Doctor') ||
+      userGroups.some((r) => {
+        const lower = String(r).toLowerCase();
+        return lower === 'admin' || lower === 'doctor' || lower.includes('admin') || lower.includes('doctor');
+      });
+    if (isStaff) {
       router.push('/admin');
     } else {
       router.push('/dashboard');
@@ -70,15 +73,18 @@ export default function HomePageChrome({ children }) {
 
   if (!isLoading && user) {
     const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-    const isOnlyDoctor =
-      userGroups.includes('Doctor') &&
-      !userGroups.includes('Admin') &&
-      !userGroups.includes('Patient');
+    const isStaff =
+      userGroups.includes('Admin') ||
+      userGroups.includes('Doctor') ||
+      userGroups.some((r) => {
+        const lower = String(r).toLowerCase();
+        return lower === 'admin' || lower === 'doctor' || lower.includes('admin') || lower.includes('doctor');
+      });
     return (
       <Container maxWidth="xl" sx={{ mt: 8, textAlign: 'center' }}>
         <CircularProgress />
         <Typography variant="h6" sx={{ mt: 2 }}>
-          {isOnlyDoctor ? 'Redirecting to Administration...' : 'Redirecting to Dashboard...'}
+          {isStaff ? 'Redirecting to Administration...' : 'Redirecting to Dashboard...'}
         </Typography>
       </Container>
     );

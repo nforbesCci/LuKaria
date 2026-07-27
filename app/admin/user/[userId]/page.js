@@ -174,6 +174,13 @@ export default function UserDetailPage() {
   const [fetchError, setFetchError] = useState(null);
   const [enablingAccount, setEnablingAccount] = useState(false);
   const [dbConsultationOccurred, setDbConsultationOccurred] = useState(false);
+  const [primaryRole, setPrimaryRole] = useState('');
+  const [availableRoles, setAvailableRoles] = useState(['Patient', 'Doctor', 'Admin']);
+  const [selectedRole, setSelectedRole] = useState('');
+  const [rolesLoading, setRolesLoading] = useState(false);
+  const [savingRole, setSavingRole] = useState(false);
+  const [roleFeedback, setRoleFeedback] = useState(null);
+  const [showEditUser, setShowEditUser] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
   const [appointmentData, setAppointmentData] = useState({
     type: 'review',
@@ -209,6 +216,21 @@ export default function UserDetailPage() {
   const [currentWeek, setCurrentWeek] = useState(1);
   const [viewingConsentForm, setViewingConsentForm] = useState(null);
 
+  const canManageRoles = (() => {
+    const roles =
+      currentUser?.['https://lukariagroup.com/roles'] ||
+      currentUser?.groups ||
+      [];
+    if (!Array.isArray(roles)) return false;
+    return roles.some((r) => {
+      const lower = String(r).toLowerCase();
+      return lower === 'admin' || (lower.includes('admin') && !lower.includes('doctor'));
+    });
+  })();
+  const isEditingSelf =
+    Boolean(currentUser?.sub) &&
+    (currentUser.sub === userId || currentUser.sub === decodeURIComponent(userId || ''));
+
   // Access control - only Admin and Doctor can access
   useAdminAccess();
 
@@ -224,6 +246,12 @@ export default function UserDetailPage() {
       dispatch(fetchAdminProfileAction({ userId }));
     }
   }, [userId, dispatch]);
+
+  useEffect(() => {
+    if (userId && canManageRoles) {
+      fetchUserRoles();
+    }
+  }, [userId, canManageRoles]);
 
   // Fetch pre-appointment tasks when consultation is completed
   useEffect(() => {
@@ -333,8 +361,8 @@ export default function UserDetailPage() {
 
       console.log('🔍 Fetching user data for ID:', userId);
       
-      // Fetch real user data from API
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      // Fetch real user data from API (encode | and other special chars once)
+      const response = await fetch(`/api/admin/users/${encodeURIComponent(userId)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -432,6 +460,59 @@ export default function UserDetailPage() {
     } catch (err) {
       console.error('❌ Error toggling account:', err);
       setEnablingAccount(false);
+    }
+  };
+
+  const fetchUserRoles = async () => {
+    if (!userId || !canManageRoles) return;
+    setRolesLoading(true);
+    setRoleFeedback(null);
+    try {
+      const response = await fetch(`/api/admin/users/${encodeURIComponent(userId)}/roles`);
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || data.details || 'Failed to load roles');
+      }
+      const names =
+        (data.availableRoles || [])
+          .map((r) => r.name)
+          .filter(Boolean) || ['Patient', 'Doctor', 'Admin'];
+      setAvailableRoles(names.length ? names : ['Patient', 'Doctor', 'Admin']);
+      setPrimaryRole(data.primaryRole || '');
+      setSelectedRole(data.primaryRole || '');
+    } catch (err) {
+      console.error('❌ Error fetching roles:', err);
+      setRoleFeedback({ type: 'error', message: err.message });
+    } finally {
+      setRolesLoading(false);
+    }
+  };
+
+  const handleSaveRole = async () => {
+    if (!selectedRole || !userId) return;
+    setSavingRole(true);
+    setRoleFeedback(null);
+    try {
+      const response = await fetch(`/api/admin/users/${encodeURIComponent(userId)}/roles`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: selectedRole }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || data.details || 'Failed to update role');
+      }
+      setPrimaryRole(data.primaryRole || selectedRole);
+      setSelectedRole(data.primaryRole || selectedRole);
+      setRoleFeedback({
+        type: 'success',
+        message: data.message || `Role updated to ${data.primaryRole || selectedRole}`,
+      });
+    } catch (err) {
+      console.error('❌ Error saving role:', err);
+      setRoleFeedback({ type: 'error', message: err.message });
+    } finally {
+      setSavingRole(false);
     }
   };
 
@@ -1390,6 +1471,15 @@ export default function UserDetailPage() {
             Appointment has been successfully scheduled for {userData?.name}!
           </Alert>
         )}
+        {roleFeedback && (
+          <Alert
+            severity={roleFeedback.type}
+            sx={{ mb: 3 }}
+            onClose={() => setRoleFeedback(null)}
+          >
+            {roleFeedback.message}
+          </Alert>
+        )}
 
         {/* Action Buttons Card */}
         <Card sx={{ mb: 4 }}>
@@ -1488,7 +1578,79 @@ export default function UserDetailPage() {
               >
                 Lab Requisition
               </Button>
+              {canManageRoles && (
+                <Button
+                  variant={showEditUser ? 'outlined' : 'contained'}
+                  startIcon={<Edit />}
+                  onClick={() => setShowEditUser((open) => !open)}
+                  sx={{
+                    textTransform: 'none',
+                    ...(showEditUser
+                      ? { borderColor: '#877449', color: '#877449' }
+                      : {
+                          backgroundColor: '#877449',
+                          '&:hover': { backgroundColor: '#B8941F' },
+                        }),
+                  }}
+                >
+                  Edit User
+                </Button>
+              )}
             </Stack>
+
+            {canManageRoles && showEditUser && (
+              <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 600 }}>
+                  Edit User
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                  <FormControl size="small" sx={{ minWidth: 160 }}>
+                    <InputLabel id="user-role-label">User role</InputLabel>
+                    <Select
+                      labelId="user-role-label"
+                      label="User role"
+                      value={selectedRole || ''}
+                      disabled={isEditingSelf || rolesLoading || savingRole}
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                    >
+                      {availableRoles.map((role) => (
+                        <MenuItem key={role} value={role}>
+                          {role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Button
+                    variant="outlined"
+                    startIcon={<AdminPanelSettings />}
+                    onClick={handleSaveRole}
+                    disabled={
+                      isEditingSelf ||
+                      savingRole ||
+                      rolesLoading ||
+                      !selectedRole ||
+                      selectedRole === primaryRole
+                    }
+                    sx={{ textTransform: 'none', borderColor: '#877449', color: '#877449' }}
+                  >
+                    {savingRole ? 'Saving…' : 'Assign role'}
+                  </Button>
+                  {primaryRole && (
+                    <Chip
+                      size="small"
+                      icon={<AdminPanelSettings />}
+                      label={`Current: ${primaryRole}`}
+                      variant="outlined"
+                    />
+                  )}
+                  {isEditingSelf && (
+                    <Typography variant="caption" color="text.secondary">
+                      You cannot change your own role
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            )}
           </CardContent>
         </Card>
 

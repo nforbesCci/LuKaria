@@ -1,6 +1,7 @@
 package com.lukariagroup.app.ui.screens.admin
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Biotech
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Cancel
@@ -20,11 +22,19 @@ import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +60,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PatientChartScreen(
     userId: String,
@@ -63,7 +73,16 @@ fun PatientChartScreen(
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
+    var primaryRole by remember { mutableStateOf("") }
+    var selectedRole by remember { mutableStateOf("") }
+    var availableRoles by remember { mutableStateOf(listOf("Patient", "Doctor", "Admin")) }
+    var rolesLoading by remember { mutableStateOf(false) }
+    var savingRole by remember { mutableStateOf(false) }
+    var roleMenuExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val sessionUser by AppContainer.authRepository.user.collectAsState()
+    val canManageRoles = sessionUser?.isAdmin == true
+    val isSelf = sessionUser?.sub == userId
 
     fun refresh() {
         scope.launch {
@@ -102,7 +121,28 @@ fun PatientChartScreen(
         }
     }
 
+    fun loadRoles() {
+        if (!canManageRoles) return
+        scope.launch {
+            rolesLoading = true
+            runCatching { AppContainer.adminRepository.fetchUserRoles(userId) }
+                .onSuccess { res ->
+                    if (!res.success) {
+                        error = res.error ?: res.details ?: "Failed to load roles"
+                        return@onSuccess
+                    }
+                    val names = res.availableRoles.mapNotNull { it.name }.filter { it.isNotBlank() }
+                    availableRoles = names.ifEmpty { listOf("Patient", "Doctor", "Admin") }
+                    primaryRole = res.primaryRole.orEmpty()
+                    selectedRole = res.primaryRole.orEmpty()
+                }
+                .onFailure { error = "Roles: ${it.message}" }
+            rolesLoading = false
+        }
+    }
+
     LaunchedEffect(userId) { refresh() }
+    LaunchedEffect(userId, canManageRoles) { loadRoles() }
 
     LukariaScaffold(title = "Patient chart", onBack = onBack) {
         if (loading) LoadingBlock()
@@ -146,6 +186,89 @@ fun PatientChartScreen(
                 containerColor = Color(0xFF5B7C99),
                 onClick = { onNavigate(AppRoute.LabRequisitionForUser.create(userId)) },
             )
+        }
+
+        if (canManageRoles) {
+            SectionTitle("User role")
+            BodyCopy(
+                if (isSelf) {
+                    "You cannot change your own role."
+                } else if (primaryRole.isNotBlank()) {
+                    "Current role: $primaryRole"
+                } else {
+                    "Assign Patient, Doctor, or Admin."
+                },
+            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ExposedDropdownMenuBox(
+                    expanded = roleMenuExpanded && !isSelf,
+                    onExpandedChange = { if (!isSelf) roleMenuExpanded = it },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    OutlinedTextField(
+                        value = selectedRole,
+                        onValueChange = {},
+                        readOnly = true,
+                        enabled = !isSelf && !rolesLoading && !savingRole,
+                        label = { Text("Role") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleMenuExpanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                            .fillMaxWidth(),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = roleMenuExpanded && !isSelf,
+                        onDismissRequest = { roleMenuExpanded = false },
+                    ) {
+                        availableRoles.forEach { role ->
+                            DropdownMenuItem(
+                                text = { Text(role) },
+                                onClick = {
+                                    selectedRole = role
+                                    roleMenuExpanded = false
+                                },
+                            )
+                        }
+                    }
+                }
+                Button(
+                    onClick = {
+                        scope.launch {
+                            savingRole = true
+                            error = null
+                            runCatching {
+                                AppContainer.adminRepository.setUserRole(userId, selectedRole)
+                            }.onSuccess { res ->
+                                if (!res.success) {
+                                    error = res.error ?: res.details ?: "Failed to update role"
+                                } else {
+                                    primaryRole = res.primaryRole ?: selectedRole
+                                    selectedRole = primaryRole
+                                    message = res.message ?: "Role updated to $primaryRole"
+                                }
+                            }.onFailure { error = it.message }
+                            savingRole = false
+                        }
+                    },
+                    enabled = !isSelf &&
+                        !savingRole &&
+                        !rolesLoading &&
+                        selectedRole.isNotBlank() &&
+                        selectedRole != primaryRole,
+                ) {
+                    Icon(
+                        Icons.Filled.AdminPanelSettings,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
+                    Text(if (savingRole) "Saving…" else "Assign role")
+                }
+            }
         }
 
         SectionTitle("Profile Completion Status")

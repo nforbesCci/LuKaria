@@ -9,9 +9,7 @@ object Roles {
     fun fromClaims(roles: List<String>?): Set<String> =
         roles?.map { it.trim() }?.filter { it.isNotEmpty() }?.toSet().orEmpty()
 
-    fun isPatient(roles: Collection<String>): Boolean =
-        roles.any { it.equals(PATIENT, ignoreCase = true) } ||
-            (!isAdmin(roles) && !isDoctor(roles))
+    fun isPatient(roles: Collection<String>): Boolean = !isStaff(roles)
 
     fun isAdmin(roles: Collection<String>): Boolean =
         roles.any { it.equals(ADMIN, ignoreCase = true) }

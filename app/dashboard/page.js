@@ -33,6 +33,7 @@ import {
   AdminPanelSettings,
   Schedule,
   Report,
+  Settings,
 } from '@mui/icons-material';
 
 export default function DashboardPage() {
@@ -40,7 +41,7 @@ export default function DashboardPage() {
   const dispatch = useAppDispatch();
   const profileState = useAppSelector((state) => state.profile);
 
-  // Access control - only Admin and Patient can access
+  // Access control - Admin, Doctor, or Patient
   useBasicAccess();
 
   useEffect(() => {
@@ -70,6 +71,7 @@ export default function DashboardPage() {
           { text: 'Administration', path: '/admin', icon: <AdminPanelSettings /> },
           { text: 'Reschedule Requests', path: '/admin/reschedule-requests', icon: <Schedule /> },
           { text: 'Side Effects Reports', path: '/admin/side-effects', icon: <Report /> },
+          { text: 'System Settings', path: '/admin/settings', icon: <Settings /> },
         ]
       : []),
   ].filter((item) => item.path !== '/dashboard');

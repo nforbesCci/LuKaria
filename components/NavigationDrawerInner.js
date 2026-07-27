@@ -33,6 +33,7 @@ import {
   Report,
   Groups,
   Article,
+  Settings,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -154,6 +155,11 @@ export default function NavigationDrawerInner() {
             text: 'Side Effects Reports',
             icon: <Report />,
             path: '/admin/side-effects',
+          },
+          {
+            text: 'System Settings',
+            icon: <Settings />,
+            path: '/admin/settings',
           },
         ]
       : []),

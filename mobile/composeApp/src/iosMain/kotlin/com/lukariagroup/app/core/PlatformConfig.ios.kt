@@ -1,8 +1,14 @@
 package com.lukariagroup.app.core
 
+import platform.Foundation.NSBundle
+
 actual object PlatformConfig {
-    /** Simulator: local HTTPS Next.js. Device builds should use a reachable host + trusted cert. */
-    actual val apiBaseUrl: String = "https://localhost:3000"
+    /** Production by default; override via Info.plist key API_BASE_URL for local/dev builds. */
+    actual val apiBaseUrl: String =
+        (NSBundle.mainBundle.objectForInfoDictionaryKey("API_BASE_URL") as? String)
+            ?.takeIf { it.isNotBlank() }
+            ?: "https://www.lukariagroup.com"
+
     /** Custom Auth0 domain (login + JWKS). */
     actual val auth0Domain: String = "auth.lukariagroup.com"
     /** Auth0 Native application "Lukaria Mobile". */

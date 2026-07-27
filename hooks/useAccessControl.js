@@ -5,51 +5,64 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAppSelector } from '../store/hooks';
 
+const ROLES_CLAIM = 'https://lukariagroup.com/roles';
+
 /**
  * Access control rules for different pages
  */
 const ACCESS_RULES = {
-  // Basic access - Admin and Patient only
-  BASIC_ACCESS: ['Admin', 'Patient'],
-  
-  // Requires consultation - Admin and Patient with consultationOccurred
-  CONSULTATION_REQUIRED: ['Admin', 'Patient'],
-  
+  // Patient self-service (profile, consents, trackers)
+  PATIENT_ONLY: ['Patient'],
+
   // Admin portal - Admin and Doctor only
   ADMIN_PORTAL: ['Admin', 'Doctor'],
+
+  // Shared hub (dashboard) — any known app role
+  ANY_APP_ROLE: ['Admin', 'Doctor', 'Patient'],
 };
+
+function getUserGroups(user) {
+  if (!user) return [];
+  const raw = user.groups || user[ROLES_CLAIM] || [];
+  if (Array.isArray(raw)) return raw.map((r) => String(r));
+  if (raw) return [String(raw)];
+  return [];
+}
 
 /**
  * Check if user has any of the required groups
  */
 function hasRequiredGroup(userGroups, requiredGroups) {
   if (!userGroups || !Array.isArray(userGroups)) return false;
-  
-  // Check for exact matches first
-  const exactMatch = requiredGroups.some(group => userGroups.includes(group));
+
+  const exactMatch = requiredGroups.some((group) => userGroups.includes(group));
   if (exactMatch) return true;
-  
-  // Check for case-insensitive matches
-  const caseInsensitiveMatch = requiredGroups.some(requiredGroup => 
-    userGroups.some(userGroup => 
-      userGroup.toLowerCase() === requiredGroup.toLowerCase()
-    )
+
+  const caseInsensitiveMatch = requiredGroups.some((requiredGroup) =>
+    userGroups.some((userGroup) => userGroup.toLowerCase() === requiredGroup.toLowerCase()),
   );
-  
-  // Check for partial matches (e.g., "doctor group" contains "doctor")
-  const partialMatch = requiredGroups.some(requiredGroup => 
-    userGroups.some(userGroup => 
-      userGroup.toLowerCase().includes(requiredGroup.toLowerCase())
-    )
+  if (caseInsensitiveMatch) return true;
+
+  const partialMatch = requiredGroups.some((requiredGroup) =>
+    userGroups.some((userGroup) =>
+      userGroup.toLowerCase().includes(requiredGroup.toLowerCase()),
+    ),
   );
-  
-  
-  return exactMatch || caseInsensitiveMatch || partialMatch;
+
+  return partialMatch;
+}
+
+function isStaff(userGroups) {
+  return hasRequiredGroup(userGroups, ACCESS_RULES.ADMIN_PORTAL);
+}
+
+/** Patient self-service only — staff never qualify, even if they also have Patient. */
+function isPatientOnly(userGroups) {
+  return !isStaff(userGroups) && hasRequiredGroup(userGroups, ACCESS_RULES.PATIENT_ONLY);
 }
 
 /**
- * Hook to protect pages with basic access (Admin and Patient)
- * Used for: Dashboard, Profile, Consent Forms
+ * Hook for pages any signed-in app role can open (e.g. dashboard).
  */
 export function useBasicAccess() {
   const { user, isLoading } = useUser();
@@ -57,9 +70,9 @@ export function useBasicAccess() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-      
-      if (!hasRequiredGroup(userGroups, ACCESS_RULES.BASIC_ACCESS)) {
+      const userGroups = getUserGroups(user);
+
+      if (!hasRequiredGroup(userGroups, ACCESS_RULES.ANY_APP_ROLE)) {
         router.push('/unauthorized');
       }
     }
@@ -69,9 +82,30 @@ export function useBasicAccess() {
 }
 
 /**
- * Hook to protect pages requiring consultation
- * Used for: Side Effects, Weight Logging, Medication Tracker, Meal Tracker
- * Requires: Admin OR (Patient with consultationOccurred)
+ * Patient-only pages (profile, consent forms).
+ */
+export function usePatientAccess() {
+  const { user, isLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      const userGroups = getUserGroups(user);
+      if (isStaff(userGroups)) {
+        router.push('/admin');
+        return;
+      }
+      if (!isPatientOnly(userGroups)) {
+        router.push('/unauthorized');
+      }
+    }
+  }, [user, isLoading, router]);
+
+  return { user, isLoading };
+}
+
+/**
+ * Patient pages that also require consultationOccurred.
  */
 export function useConsultationAccess() {
   const { user, isLoading } = useUser();
@@ -80,24 +114,26 @@ export function useConsultationAccess() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-      
-      // Check multiple sources for consultationOccurred (prefer MongoDB profile)
-      const consultationOccurred = profileState.profile?.user_metadata?.consultationOccurred ||
-                                   user.user_metadata?.consultationOccurred || 
-                                   user['https://lukariagroup.com/user_metadata']?.consultationOccurred ||
-                                   false;
-      
-      const isAdmin = userGroups.includes('Admin');
-      const isPatientWithConsultation = userGroups.includes('Patient') && consultationOccurred;
-      
-      // Admin has full access, Patient needs consultation
-      if (profileState?.profile && !isAdmin && !isPatientWithConsultation && !consultationOccurred) {
-        if (userGroups.includes('Patient') && !consultationOccurred) {
-          router.push('/consultation-required');
-        } else {
-          router.push('/unauthorized');
-        }
+      const userGroups = getUserGroups(user);
+
+      if (isStaff(userGroups)) {
+        router.push('/admin');
+        return;
+      }
+
+      const consultationOccurred =
+        profileState.profile?.user_metadata?.consultationOccurred ||
+        user.user_metadata?.consultationOccurred ||
+        user['https://lukariagroup.com/user_metadata']?.consultationOccurred ||
+        false;
+
+      if (!isPatientOnly(userGroups)) {
+        router.push('/unauthorized');
+        return;
+      }
+
+      if (profileState?.profile && !consultationOccurred) {
+        router.push('/consultation-required');
       }
     }
   }, [user, isLoading, profileState.profile, router]);
@@ -106,9 +142,7 @@ export function useConsultationAccess() {
 }
 
 /**
- * Hook to protect admin portal pages
- * Used for: Administration
- * Requires: Admin or Doctor
+ * Admin / Doctor portal pages.
  */
 export function useAdminAccess() {
   const { user, isLoading } = useUser();
@@ -116,8 +150,8 @@ export function useAdminAccess() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-      
+      const userGroups = getUserGroups(user);
+
       if (!hasRequiredGroup(userGroups, ACCESS_RULES.ADMIN_PORTAL)) {
         router.push('/unauthorized');
       }
@@ -128,34 +162,31 @@ export function useAdminAccess() {
 }
 
 /**
- * Utility function to check if user should see navigation items
+ * Utility function to check if user should see navigation items / dashboard cards.
  */
 export function canAccessPage(user, pageType, profileData = null) {
   if (!user) return false;
-  
-  const userGroups = user.groups || user['https://lukariagroup.com/roles'] || [];
-  
-  // Check multiple sources (prefer MongoDB profile if available)
-  const consultationOccurred = profileData?.user_metadata?.consultationOccurred ||
-                               user.user_metadata?.consultationOccurred || 
-                               user['https://lukariagroup.com/user_metadata']?.consultationOccurred ||
-                               false;
 
+  const userGroups = getUserGroups(user);
+
+  const consultationOccurred =
+    profileData?.user_metadata?.consultationOccurred ||
+    user.user_metadata?.consultationOccurred ||
+    user['https://lukariagroup.com/user_metadata']?.consultationOccurred ||
+    false;
 
   switch (pageType) {
     case 'basic':
-      return hasRequiredGroup(userGroups, ACCESS_RULES.BASIC_ACCESS);
-    
+      // Patient self-service nav only
+      return isPatientOnly(userGroups);
+
     case 'consultation':
-      const isAdmin = userGroups.includes('Admin');
-      const isPatientWithConsultation = userGroups.includes('Patient') && consultationOccurred;
-      return isAdmin || isPatientWithConsultation;
-    
+      return isPatientOnly(userGroups) && Boolean(consultationOccurred);
+
     case 'admin':
-      return hasRequiredGroup(userGroups, ACCESS_RULES.ADMIN_PORTAL);
-    
+      return isStaff(userGroups);
+
     default:
       return false;
   }
 }
-

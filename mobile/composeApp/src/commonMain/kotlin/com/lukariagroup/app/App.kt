@@ -19,6 +19,7 @@ import com.lukariagroup.app.ui.screens.admin.AdminPatientRescheduleScreen
 import com.lukariagroup.app.ui.screens.admin.AdminPatientSideEffectsScreen
 import com.lukariagroup.app.ui.screens.admin.AdminProfileSummaryScreen
 import com.lukariagroup.app.ui.screens.admin.AdminQuestionsScreen
+import com.lukariagroup.app.ui.screens.admin.AdminSettingsScreen
 import com.lukariagroup.app.ui.screens.admin.AdminSideEffectsScreen
 import com.lukariagroup.app.ui.screens.admin.AdminWeightLoggingScreen
 import com.lukariagroup.app.ui.screens.admin.BlogCmsScreen
@@ -104,7 +105,10 @@ fun App() {
                     authViewModel = authViewModel,
                     onBack = { navController.popBackStack() },
                     onLoggedIn = {
-                        navController.navigate(AppRoute.Dashboard.route) {
+                        val staff = authViewModel.uiState.value.user?.isStaff == true
+                        navController.navigate(
+                            if (staff) AppRoute.AdminHome.route else AppRoute.Dashboard.route,
+                        ) {
                             popUpTo(AppRoute.Home.route)
                         }
                     },
@@ -230,6 +234,9 @@ fun App() {
             }
             composable(AppRoute.RescheduleRequests.route) { RescheduleRequestsScreen { navController.popBackStack() } }
             composable(AppRoute.AdminSideEffects.route) { AdminSideEffectsScreen { navController.popBackStack() } }
+            composable(AppRoute.AdminSettings.route) {
+                AdminSettingsScreen(onBack = { navController.popBackStack() })
+            }
             composable(AppRoute.LabRequisition.route) {
                 LabRequisitionScreen(onBack = { navController.popBackStack() })
             }

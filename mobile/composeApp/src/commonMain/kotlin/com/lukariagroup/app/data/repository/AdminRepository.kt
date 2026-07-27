@@ -11,6 +11,7 @@ import com.lukariagroup.app.data.models.PreAppointmentTasksResponse
 import com.lukariagroup.app.data.models.ProfileResponse
 import com.lukariagroup.app.data.models.RescheduleRequestsResponse
 import com.lukariagroup.app.data.models.SideEffectsResponse
+import com.lukariagroup.app.data.models.UserRolesResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.request.parameter
 import kotlinx.serialization.json.JsonObject
@@ -106,8 +107,35 @@ class AdminRepository(private val client: HttpClient) {
             buildJsonObject { put("consultationOccurred", consultationOccurred) },
         )
 
+    suspend fun fetchUserRoles(userId: String): UserRolesResponse =
+        client.getApi("api/admin/users/$userId/roles")
+
+    suspend fun setUserRole(userId: String, role: String): UserRolesResponse =
+        client.putApi(
+            "api/admin/users/$userId/roles",
+            buildJsonObject { put("role", role) },
+        )
+
     suspend fun sendLabPdf(body: JsonObject): JsonObject =
         client.postApi("api/pdf/lab-requisition", body)
+
+    suspend fun fetchAdminSettings(): JsonObject =
+        client.getApi("api/admin/settings")
+
+    suspend fun saveAdminSettingsConfig(type: String, config: JsonObject): ApiMessage =
+        client.postApi(
+            "api/admin/settings/config",
+            buildJsonObject {
+                put("type", type)
+                put("config", config)
+            },
+        )
+
+    suspend fun sendMicrosoftTestEmail(to: String): ApiMessage =
+        client.postApi("api/admin/microsoft/test", buildJsonObject { put("to", to) })
+
+    suspend fun sendGoogleTestEmail(to: String): ApiMessage =
+        client.postApi("api/admin/google/test", buildJsonObject { put("to", to) })
 
     suspend fun updateConsentForm(
         userId: String,

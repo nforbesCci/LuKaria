@@ -127,9 +127,10 @@ export async function PATCH(request) {
     }
 
     const management = await getManagementClient();
-    const updatedUser = await management.users.update({ id: userId }, updates);
+    // Auth0 Management SDK v5: users.update(id: string, body)
+    const updatedUser = await management.users.update(userId, updates);
 
-    return NextResponse.json({ success: true, user: updatedUser });
+    return NextResponse.json({ success: true, user: updatedUser.data || updatedUser });
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json(
