@@ -118,8 +118,10 @@ jobs:
         with:
           path: |
             ~/Library/Keychains/lukaria-ci.keychain-db
+            ~/Library/Keychains/lukaria-ci.keychain-db-shm
+            ~/Library/Keychains/lukaria-ci.keychain-db-wal
             ~/Library/MobileDevice/Provisioning Profiles
-          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v1
+          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v2
 
       - name: Build IPA + upload TestFlight (Fastlane)
         env:

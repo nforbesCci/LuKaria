@@ -1,5 +1,13 @@
 default_platform(:ios)
 
+def distribution_identity_in_keychain?(keychain_path)
+  output = sh(
+    "security find-identity -v -p codesigning '#{keychain_path}' | grep 'Apple Distribution' || true",
+    log: false
+  )
+  !output.strip.empty?
+end
+
 platform :ios do
   desc "Archive, export, and upload Svelte to TestFlight"
   lane :beta do
@@ -33,24 +41,25 @@ platform :ios do
       )
     end
 
-    # Prefer downloading an existing Distribution cert (avoids hitting Apple's 3-cert limit).
-    begin
-      cert(
-        api_key: api_key,
-        development: false,
-        readonly: true,
-        keychain_path: keychain_path,
-        keychain_password: keychain_password
-      )
-    rescue => e
-      UI.important("No reusable Distribution cert in keychain (#{e.message}); creating one.")
-      cert(
-        api_key: api_key,
-        development: false,
-        force: false,
-        keychain_path: keychain_path,
-        keychain_password: keychain_password
-      )
+    if distribution_identity_in_keychain?(keychain_path)
+      UI.success("Reusing Apple Distribution identity from CI keychain cache")
+    else
+      UI.important("No Distribution identity in CI keychain; fetching or creating one")
+      begin
+        cert(
+          api_key: api_key,
+          development: false,
+          force: false,
+          keychain_path: keychain_path,
+          keychain_password: keychain_password
+        )
+      rescue => e
+        UI.user_error!(
+          "Distribution signing failed (#{e.message}). " \
+          "Revoke an unused Apple Distribution certificate in developer.apple.com " \
+          "or import MATCH_* / signing secrets, then re-run CI."
+        )
+      end
     end
 
     profile_uuid = sigh(
