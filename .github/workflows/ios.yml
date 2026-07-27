@@ -98,7 +98,9 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           sed -i '' "s/^TEAM_ID=.*/TEAM_ID=${APPLE_TEAM_ID}/" iosApp/Configuration/Config.xcconfig
+          sed -i '' "s/TEAM_ID_PLACEHOLDER/${APPLE_TEAM_ID}/" iosApp/ExportOptions.plist
           cat iosApp/Configuration/Config.xcconfig
+          cat iosApp/ExportOptions.plist
 
       - name: Bump CFBundleVersion from run number
         run: |
@@ -126,6 +128,8 @@ jobs:
             -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
             -authenticationKeyIssuerID "$APP_STORE_CONNECT_API_ISSUER_ID" \
             CODE_SIGN_STYLE=Automatic \
+            CODE_SIGNING_ALLOWED=YES \
+            CODE_SIGNING_REQUIRED=YES \
             DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
             archive
 
