@@ -24,6 +24,61 @@ def import_distribution_p12!(keychain_name:, keychain_password:)
   UI.success("Imported Apple Distribution certificate from IOS_DISTRIBUTION_CERT_P12_BASE64")
 end
 
+# Revoke one Distribution cert that CI cannot use (no matching private key on this runner).
+def revoke_one_orphaned_distribution_cert!(api_key:)
+  require "spaceship"
+
+  Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(
+    key_id: api_key[:key_id],
+    issuer_id: api_key[:issuer_id],
+    key: api_key[:key],
+    duration: api_key[:duration] || 1200,
+    in_house: api_key[:in_house] || false
+  )
+
+  certs = Spaceship::ConnectAPI::Certificate.all.select do |c|
+    type = c.certificate_type.to_s
+    type == "DISTRIBUTION" || type == "IOS_DISTRIBUTION"
+  end
+
+  if certs.empty?
+    UI.important("No Distribution certificates found to revoke")
+    return false
+  end
+
+  target = certs.max_by { |c| c.expiration_date.to_s }
+  UI.important("Revoking Distribution cert id=#{target.id} type=#{target.certificate_type} (no private key on this runner)")
+  target.delete!
+  true
+end
+
+def ensure_distribution_cert!(api_key:, keychain_path:, keychain_password:)
+  cert(
+    api_key: api_key,
+    development: false,
+    force: false,
+    keychain_path: keychain_path,
+    keychain_password: keychain_password
+  )
+rescue => e
+  message = e.message.to_s
+  unless message.include?("maximum number") || message.include?("another Distribution")
+    raise
+  end
+
+  UI.important("Distribution cert limit hit; revoking one portal cert without a local private key")
+  revoked = revoke_one_orphaned_distribution_cert!(api_key: api_key)
+  UI.user_error!("Could not free a Distribution cert slot: #{message}") unless revoked
+
+  cert(
+    api_key: api_key,
+    development: false,
+    force: false,
+    keychain_path: keychain_path,
+    keychain_password: keychain_password
+  )
+end
+
 platform :ios do
   desc "Archive, export, and upload Svelte to TestFlight"
   lane :beta do
@@ -66,22 +121,11 @@ platform :ios do
       UI.success("Using Apple Distribution identity from CI keychain")
     else
       UI.important("No Distribution identity in keychain; creating one via App Store Connect API")
-      begin
-        cert(
-          api_key: api_key,
-          development: false,
-          force: false,
-          keychain_path: keychain_path,
-          keychain_password: keychain_password
-        )
-      rescue => e
-        UI.user_error!(
-          "Distribution signing failed (#{e.message}). " \
-          "Revoke an unused Apple Distribution certificate at developer.apple.com, " \
-          "or add repo secrets IOS_DISTRIBUTION_CERT_P12_BASE64 + IOS_DISTRIBUTION_CERT_PASSWORD " \
-          "(export a .p12 from Keychain Access), then re-run CI."
-        )
-      end
+      ensure_distribution_cert!(
+        api_key: api_key,
+        keychain_path: keychain_path,
+        keychain_password: keychain_password
+      )
     end
 
     profile_uuid = sigh(
