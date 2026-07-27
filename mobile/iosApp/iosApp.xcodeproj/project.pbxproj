@@ -338,10 +338,11 @@
 		7555FFA7242A565B00829871 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
-				ENABLE_PREVIEWS = YES;
+				CODE_SIGN_IDENTITY = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				ENABLE_PREVIEWS = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
@@ -359,7 +360,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_ID}";
 				PRODUCT_NAME = "${APP_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
