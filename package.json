@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "yarn@1.22.0",
   "dependencies": {
+    "@3dlook/camera-widget-react": "^1.1.1",
     "@auth0/auth0-react": "^2.5.0",
     "@auth0/nextjs-auth0": "^3.8.0",
     "@azure/msal-browser": "^4.25.0",
@@ -28,6 +29,7 @@
     "mongodb": "^6.10.0",
     "next": "15.5.9",
     "next-sitemap": "^4.2.3",
+    "preact": "^10.29.7",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-redux": "^9.2.0",
@@ -40,7 +42,8 @@
     "dev:fresh": "npm run clean:next && node server.js",
     "build": "npx next build",
     "start": "node server.js",
-    "lint": "npx next lint"
+    "lint": "npx next lint",
+    "postinstall": "node scripts/patch-look-camera-widget.js && node scripts/copy-look-camera-assets.js"
   },
   "engines": {
     "yarn": ">=1.22.0",

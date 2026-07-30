@@ -1,7 +1,13 @@
 import SwiftUI
+import ComposeApp
 
 @main
 struct iOSApp: App {
+    init() {
+        // Wire 3DLOOK LookCamera SDK for Kotlin Body Scan screen.
+        LookCameraBridge.install()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

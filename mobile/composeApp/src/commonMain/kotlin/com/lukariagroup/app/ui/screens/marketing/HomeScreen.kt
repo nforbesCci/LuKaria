@@ -39,8 +39,10 @@ import org.jetbrains.compose.resources.painterResource
 fun HomeScreen(
     isLoggedIn: Boolean,
     isStaff: Boolean,
+    userDisplayName: String?,
     onNavigate: (String) -> Unit,
     onLogin: () -> Unit,
+    onLogout: () -> Unit,
     onDashboard: () -> Unit,
     onAdmin: () -> Unit,
 ) {
@@ -86,6 +88,16 @@ fun HomeScreen(
         BodyCopy("Personalized GLP-1 care, appointments, labs, and daily tracking — in one place.")
 
         if (isLoggedIn) {
+            val greetingName = userDisplayName?.takeIf { it.isNotBlank() } ?: "there"
+            Text(
+                "Hi $greetingName",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) {
+                Text("Log out")
+            }
             Button(onClick = onDashboard, modifier = Modifier.fillMaxWidth()) {
                 Text("Open patient dashboard")
             }
@@ -96,7 +108,7 @@ fun HomeScreen(
             }
         } else {
             Button(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
-                Text("Sign in")
+                Text("Log in")
             }
         }
 

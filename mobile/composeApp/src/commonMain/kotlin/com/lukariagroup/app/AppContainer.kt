@@ -7,6 +7,7 @@ import com.lukariagroup.app.core.ApiClient
 import com.lukariagroup.app.data.repository.AdminRepository
 import com.lukariagroup.app.data.repository.AppointmentRepository
 import com.lukariagroup.app.data.repository.BlogRepository
+import com.lukariagroup.app.data.repository.BodyScanRepository
 import com.lukariagroup.app.data.repository.ConsentRepository
 import com.lukariagroup.app.data.repository.FoodRepository
 import com.lukariagroup.app.data.repository.MealRepository
@@ -30,6 +31,7 @@ object AppContainer {
     val consentRepository by lazy { ConsentRepository(httpClient) }
     val appointmentRepository by lazy { AppointmentRepository(httpClient) }
     val measurementRepository by lazy { MeasurementRepository(httpClient) }
+    val bodyScanRepository by lazy { BodyScanRepository(httpClient) }
     val medicationRepository by lazy { MedicationRepository(httpClient) }
     val mealRepository by lazy { MealRepository(httpClient) }
     val sideEffectRepository by lazy { SideEffectRepository(httpClient) }

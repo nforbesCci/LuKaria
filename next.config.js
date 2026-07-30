@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['@3dlook/camera-widget-react', 'preact'],
   experimental: {
     // Smaller server/client graphs; avoids flaky missing vendor-chunks like `@mui.js` after interrupted dev compiles
     optimizePackageImports: ['@mui/material', '@mui/icons-material', '@mui/x-date-pickers'],
@@ -24,6 +25,16 @@ const nextConfig = {
     MS365_EMAIL_FROM: process.env.MS365_EMAIL_FROM,
     MS365_EMAIL_TO: process.env.MS365_EMAIL_TO,
     MS365_SHAREPOINT_SITE_ID: process.env.MS365_SHAREPOINT_SITE_ID,
+  },
+  webpack: (config) => {
+    // 3DLOOK camera widget is Preact; keep its require('preact') resolving correctly.
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      preact: require.resolve('preact'),
+      'preact/compat': require.resolve('preact/compat'),
+      'preact/hooks': require.resolve('preact/hooks'),
+    };
+    return config;
   },
 }
 

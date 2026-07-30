@@ -40,6 +40,7 @@ import com.lukariagroup.app.ui.screens.marketing.LegalScreens
 import com.lukariagroup.app.ui.screens.marketing.ServiceMarketingScreen
 import com.lukariagroup.app.ui.screens.marketing.TestimonialsScreen
 import com.lukariagroup.app.ui.screens.patient.BarcodeScannerScreen
+import com.lukariagroup.app.ui.screens.patient.BodyScanScreen
 import com.lukariagroup.app.ui.screens.patient.ConsentFormsScreen
 import com.lukariagroup.app.ui.screens.patient.DashboardScreen
 import com.lukariagroup.app.ui.screens.patient.MealTrackerScreen
@@ -73,8 +74,10 @@ fun App() {
                 HomeScreen(
                     isLoggedIn = authState.isLoggedIn,
                     isStaff = authState.user?.isStaff == true,
+                    userDisplayName = authState.user?.displayName,
                     onNavigate = { navController.navigate(it) },
                     onLogin = { authViewModel.openNativeLogin() },
+                    onLogout = { authViewModel.logout() },
                     onDashboard = { navController.navigate(AppRoute.Dashboard.route) },
                     onAdmin = { navController.navigate(AppRoute.AdminHome.route) },
                 )
@@ -136,6 +139,7 @@ fun App() {
             composable(AppRoute.ConsentForms.route) { ConsentFormsScreen { navController.popBackStack() } }
             composable(AppRoute.Schedule.route) { ScheduleScreen { navController.popBackStack() } }
             composable(AppRoute.WeightLogging.route) { WeightLoggingScreen { navController.popBackStack() } }
+            composable(AppRoute.BodyScan.route) { BodyScanScreen { navController.popBackStack() } }
             composable(AppRoute.MedicationTracker.route) { MedicationTrackerScreen { navController.popBackStack() } }
             composable(AppRoute.MealTracker.route) {
                 MealTrackerScreen(

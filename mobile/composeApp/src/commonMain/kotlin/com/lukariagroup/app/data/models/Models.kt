@@ -437,6 +437,75 @@ data class UserRolesResponse(
     val details: String? = null,
 )
 
+@Serializable
+data class BodyScanCreateRequest(
+    val height: Int,
+    val weight: Int? = null,
+    val gender: String,
+    val age: Int? = null,
+    val frontPhoto: String,
+    val sidePhoto: String,
+)
+
+@Serializable
+data class BodyScanErrorItem(
+    val error_source: String? = null,
+    val detail: String? = null,
+    val description: String? = null,
+)
+
+@Serializable
+data class BodyScanMeasurement(
+    val id: String? = null,
+    val status: String? = null,
+    val gender: String? = null,
+    val height: Int? = null,
+    val weight: Int? = null,
+    val estimated_weight: Double? = null,
+    val age: Int? = null,
+    val fat_percentage: Double? = null,
+    val bmi: Double? = null,
+    val estimated_bmi: Double? = null,
+    val bmr: Double? = null,
+    val estimated_bmr: Double? = null,
+    val fat_body_mass: Double? = null,
+    val lean_body_mass: Double? = null,
+    val model_3d_url: String? = null,
+    val circumference_params: JsonObject? = null,
+    val created_at: String? = null,
+    val completed_at: String? = null,
+    val errors: List<BodyScanErrorItem> = emptyList(),
+)
+
+@Serializable
+data class BodyScanMutationResponse(
+    val success: Boolean = true,
+    val measurementId: String? = null,
+    val status: String? = null,
+    val measurement: BodyScanMeasurement? = null,
+    val error: String? = null,
+)
+
+@Serializable
+data class BodyScanListItem(
+    val measurementId: String? = null,
+    val status: String? = null,
+    val gender: String? = null,
+    val heightCm: Int? = null,
+    val weightKg: Int? = null,
+    val age: Int? = null,
+    val createdAt: String? = null,
+    val measurement: BodyScanMeasurement? = null,
+)
+
+@Serializable
+data class BodyScanListResponse(
+    val success: Boolean = true,
+    val count: Int = 0,
+    val scans: List<BodyScanListItem> = emptyList(),
+    val error: String? = null,
+)
+
 enum class ConsentType(val pathSegment: String, val displayName: String) {
     TELEHEALTH("telehealth", "Telehealth Consent"),
     PHOTOGRAPH("photograph", "Photograph Consent"),

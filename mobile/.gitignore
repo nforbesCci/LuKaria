@@ -2,6 +2,7 @@
 build/
 **/build/
 local.properties
+github.properties
 *.iml
 .idea/
 .DS_Store

@@ -31,6 +31,18 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.cio)
+            // 3DLOOK FitXpress AI camera capture UI
+            // https://github.com/3dlook-me/android_sdk_public
+            // Patched AAR: privacy checkbox pre-accepted (see scripts/patch-look-camera-android.py)
+            implementation(files("libs/look-camera-sdk-0.0.3-lukaria.aar"))
+            // LookCamera transitive deps (file AAR does not pull POM deps)
+            implementation("androidx.camera:camera-core:1.4.2")
+            implementation("androidx.camera:camera-camera2:1.4.2")
+            implementation("androidx.camera:camera-lifecycle:1.4.2")
+            implementation("androidx.camera:camera-view:1.4.2")
+            implementation("androidx.camera:camera-extensions:1.4.2")
+            implementation("androidx.camera:camera-video:1.4.2")
+            implementation("androidx.graphics:graphics-path:1.1.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -82,6 +94,23 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
+    configurations.configureEach {
+        resolutionStrategy {
+            force(
+                "androidx.camera:camera-core:1.4.2",
+                "androidx.camera:camera-camera2:1.4.2",
+                "androidx.camera:camera-lifecycle:1.4.2",
+                "androidx.camera:camera-view:1.4.2",
+                "androidx.camera:camera-extensions:1.4.2",
+                "androidx.camera:camera-video:1.4.2",
+                "androidx.graphics:graphics-path:1.1.0",
+            )
         }
     }
     buildTypes {

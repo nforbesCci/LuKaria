@@ -33,6 +33,6 @@ export const config = {
      * - images (public images folder)
      * - media (public audio/video, etc.)
      */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|images|media).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|images|media|widget-assets).*)',
   ],
 };

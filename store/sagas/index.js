@@ -21,6 +21,7 @@ import adminQuestionsSaga from './adminQuestionsSaga';
 import sideEffectsSaga from './sideEffectsSaga';
 import { pdfSaga } from './pdfSaga';
 import preAppointmentTasksSaga from './preAppointmentTasksSaga';
+import bodyScanSaga from './bodyScanSaga';
 
 // Root saga that combines all sagas
 export default function* rootSaga() {
@@ -47,6 +48,7 @@ export default function* rootSaga() {
     fork(sideEffectsSaga),
     fork(pdfSaga),
     fork(preAppointmentTasksSaga),
+    fork(bodyScanSaga),
   ]);
 }
 

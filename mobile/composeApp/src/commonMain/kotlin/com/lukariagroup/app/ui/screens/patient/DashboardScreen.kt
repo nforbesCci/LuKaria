@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Dining
 import androidx.compose.material.icons.filled.Healing
@@ -82,6 +83,7 @@ fun DashboardScreen(
         DashboardLink("Consents", AppRoute.ConsentForms.route, Icons.AutoMirrored.Filled.Assignment, Color(0xFF5B7C99)),
         DashboardLink("Schedule", AppRoute.Schedule.route, Icons.Filled.CalendarMonth, Color(0xFF3D7A5A)),
         DashboardLink("Weight", AppRoute.WeightLogging.route, Icons.Filled.MonitorWeight, Color(0xFF8B6B4A)),
+        DashboardLink("Body scan", AppRoute.BodyScan.route, Icons.Filled.AccessibilityNew, Color(0xFF4A6B8B)),
         DashboardLink("Meds", AppRoute.MedicationTracker.route, Icons.Filled.Medication, Color(0xFF6B5B95)),
         DashboardLink("Meals", AppRoute.MealTracker.route, Icons.Filled.Dining, Color(0xFFC4784A)),
         DashboardLink("Side effects", AppRoute.SideEffects.route, Icons.Filled.Healing, Color(0xFF9A4F5C)),

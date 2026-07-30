@@ -34,6 +34,7 @@ import {
   Schedule,
   Report,
   Settings,
+  AccessibilityNew,
 } from '@mui/icons-material';
 
 export default function DashboardPage() {
@@ -62,6 +63,7 @@ export default function DashboardPage() {
           { text: 'Membership Area', path: '/membership', icon: <Groups /> },
           { text: 'Side Effects', path: '/side-effects', icon: <MedicalServices /> },
           { text: 'Weight Logging', path: '/weight-logging', icon: <Scale /> },
+          { text: 'Body Scan', path: '/body-scan', icon: <AccessibilityNew /> },
           { text: 'Medication Tracker', path: '/medication-tracker', icon: <Medication /> },
           { text: 'Meal Tracker', path: '/meal-tracker', icon: <Restaurant /> },
         ]
