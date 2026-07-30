@@ -11,12 +11,12 @@ enum LookCameraBridge {
     }
 
     private final class Presenter: LookCameraPresenter {
-        func present(onComplete: @escaping (String?, String?) -> KotlinUnit) {
+        func present(onComplete: LookCameraCompletion) {
             DispatchQueue.main.async {
                 LookCameraSDK.shared.presentSDKView(mode: .startFromTutorial) { result in
                     let front = Self.jpegDataUrl(from: result.frontPhoto)
                     let side = Self.jpegDataUrl(from: result.sidePhoto)
-                    _ = onComplete(front, side)
+                    onComplete.onComplete(frontDataUrl: front, sideDataUrl: side)
                 }
             }
         }

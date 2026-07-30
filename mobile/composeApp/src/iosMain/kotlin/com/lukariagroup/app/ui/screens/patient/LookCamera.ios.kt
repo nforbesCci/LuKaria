@@ -15,9 +15,18 @@ actual fun rememberLookCameraLauncher(
                 NSLog("LookCameraHost.presenter is not installed — open iosApp and ensure LookCameraBridge.install() runs.")
                 onResult(LookCameraCapture(frontDataUrl = null, sideDataUrl = null))
             } else {
-                presenter.present { front, side ->
-                    onResult(LookCameraCapture(frontDataUrl = front, sideDataUrl = side))
-                }
+                presenter.present(
+                    object : LookCameraCompletion {
+                        override fun onComplete(frontDataUrl: String?, sideDataUrl: String?) {
+                            onResult(
+                                LookCameraCapture(
+                                    frontDataUrl = frontDataUrl,
+                                    sideDataUrl = sideDataUrl,
+                                ),
+                            )
+                        }
+                    },
+                )
             }
         }
     }
