@@ -13,11 +13,8 @@ struct iOSApp: App {
             ContentView()
                 .onOpenURL { url in
                     // Auth0 returns tokens in the URL fragment for native login.
-                    NotificationCenter.default.post(
-                        name: Notification.Name("LukariaAuthCallback"),
-                        object: nil,
-                        userInfo: ["url": url.absoluteString]
-                    )
+                    // Must call Kotlin — posting a Notification alone was never observed.
+                    _ = AuthCallbackKt.handleAuth0CallbackUrl(url: url.absoluteString)
                 }
         }
     }
