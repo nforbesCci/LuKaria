@@ -25,7 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.lukariagroup.app.core.openExternalUrl
+import com.lukariagroup.app.core.openWhatsAppChat
 import com.lukariagroup.app.ui.components.BodyCopy
 import com.lukariagroup.app.ui.components.LukariaScaffold
 import com.lukariagroup.app.ui.theme.LukariaGold
@@ -113,7 +113,7 @@ fun HomeScreen(
         }
 
         OutlinedButton(
-            onClick = { openExternalUrl("https://wa.me/18762903659") },
+            onClick = { openWhatsAppChat("18762903659") },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Chat on WhatsApp")

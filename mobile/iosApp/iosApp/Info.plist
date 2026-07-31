@@ -64,6 +64,11 @@
 			</array>
 		</dict>
 	</array>
+	<!-- Required for canOpenURL(whatsapp://…) -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Svelte uses the camera for AI body scans and to scan food barcodes for meal logging.</string>
 	<key>NSMotionUsageDescription</key>
