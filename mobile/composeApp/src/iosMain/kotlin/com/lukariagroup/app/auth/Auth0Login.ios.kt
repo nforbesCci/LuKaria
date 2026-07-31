@@ -1,21 +1,15 @@
 package com.lukariagroup.app.auth
 
 import com.lukariagroup.app.core.PlatformConfig
-import platform.Foundation.NSCharacterSet
+import io.ktor.http.encodeURLParameter
 import platform.Foundation.NSUUID
 import platform.Foundation.NSURL
-import platform.Foundation.stringByAddingPercentEncodingWithAllowedCharacters
 import platform.UIKit.UIApplication
 
 actual fun openAuth0Login() {
     val domain = PlatformConfig.auth0Domain.trimEnd('/')
-    // Encode query values strictly — unencoded "://" in redirect_uri/audience
-    // can make NSURL.URLWithString return null (silent no-op) or Auth0 reject the request.
-    val allowed = NSCharacterSet.characterSetWithCharactersInString(
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~",
-    )
-    fun enc(value: String): String =
-        value.stringByAddingPercentEncodingWithAllowedCharacters(allowed) ?: value
+    // Encode query values — unencoded "://" in redirect_uri/audience breaks NSURL parsing.
+    fun enc(value: String): String = value.encodeURLParameter()
 
     val params = buildList {
         add("client_id=${enc(PlatformConfig.auth0ClientId)}")
