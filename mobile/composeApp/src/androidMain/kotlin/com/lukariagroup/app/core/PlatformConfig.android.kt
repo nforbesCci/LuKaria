@@ -4,10 +4,10 @@ import com.lukariagroup.app.BuildConfig
 
 actual object PlatformConfig {
     /**
-     * Debug → local Next.js (Bearer JWT). Release → production (requires deployed api-auth).
-     * See composeApp/build.gradle.kts buildConfigField API_BASE_URL.
+     * Defaults to production (`https://www.lukariagroup.com`).
+     * Override locally: `./gradlew :composeApp:installDebug -PAPI_BASE_URL=https://127.0.0.1:3000`
      */
-    actual val apiBaseUrl: String = BuildConfig.API_BASE_URL
+    actual val apiBaseUrl: String = resolveApiBaseUrl(BuildConfig.API_BASE_URL)
     /** Custom Auth0 domain (login + JWKS). */
     actual val auth0Domain: String = "auth.lukariagroup.com"
     /** Auth0 Native application "Lukaria Mobile". */

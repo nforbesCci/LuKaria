@@ -19,22 +19,20 @@ Package: `com.lukariagroup.app`
 
 ## Configure API base URL
 
-Default is production:
+Default (debug + release) is production:
 
-```kotlin
-// androidMain + iosMain PlatformConfig
-apiBaseUrl = "https://www.lukariagroup.com"
+```text
+https://www.lukariagroup.com
 ```
 
-For local Next.js (emulator):
+Local Next.js override:
 
-| Platform | Suggested `apiBaseUrl` |
-|----------|------------------------|
-| Android **debug** | `https://127.0.0.1:3000` + `adb reverse tcp:3000 tcp:3000` |
-| iOS simulator | `https://localhost:3000` (trust local CA in keychain if prompted) |
-| Release builds | `https://www.lukariagroup.com` |
+| Platform | How |
+|----------|-----|
+| Android | `./gradlew :composeApp:installDebug -PAPI_BASE_URL=https://127.0.0.1:3000` then `adb reverse tcp:3000 tcp:3000` |
+| iOS simulator | Set `API_BASE_URL=https://localhost:3000` in `iosApp/Configuration/Config.xcconfig` (include the port — bare `https://localhost` hits :443 and fails) |
 
-Debug Android trusts the local self-signed cert in `PlatformHttpClient.android.kt`. **Production only accepts Auth0 cookie sessions today** until `lib/api-auth.js` + middleware Bearer support are deployed — debug builds must hit local `npm run dev` (HTTPS).
+Debug Android trusts the local self-signed cert in `PlatformHttpClient.android.kt` when pointed at local Next.
 
 ## Auth0 native setup
 

@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.lukariagroup.app.AppContainer
+import com.lukariagroup.app.core.PlatformConfig
 import com.lukariagroup.app.data.models.BodyScanCreateRequest
 import com.lukariagroup.app.data.models.BodyScanListItem
 import com.lukariagroup.app.data.models.BodyScanMeasurement
@@ -26,6 +27,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+
+private fun apiErrorMessage(throwable: Throwable): String =
+    "${throwable.message ?: "Request failed"} (API: ${PlatformConfig.apiBaseUrl})"
 
 @Composable
 fun BodyScanScreen(onBack: () -> Unit) {
@@ -82,7 +86,7 @@ fun BodyScanScreen(onBack: () -> Unit) {
                     history = it.scans
                     error = null
                 }
-                .onFailure { error = it.message }
+                .onFailure { error = apiErrorMessage(it) }
             loading = false
         }
     }
@@ -251,7 +255,7 @@ fun BodyScanScreen(onBack: () -> Unit) {
                                 }
                             }
                             refreshHistory()
-                        }.onFailure { error = it.message }
+                        }.onFailure { error = apiErrorMessage(it) }
                         submitting = false
                     }
                 },

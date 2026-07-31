@@ -5,9 +5,9 @@ import platform.Foundation.NSBundle
 actual object PlatformConfig {
     /** Production by default; override via Info.plist key API_BASE_URL for local/dev builds. */
     actual val apiBaseUrl: String =
-        (NSBundle.mainBundle.objectForInfoDictionaryKey("API_BASE_URL") as? String)
-            ?.takeIf { it.isNotBlank() }
-            ?: "https://www.lukariagroup.com"
+        resolveApiBaseUrl(
+            NSBundle.mainBundle.objectForInfoDictionaryKey("API_BASE_URL") as? String,
+        )
 
     /** Custom Auth0 domain (login + JWKS). */
     actual val auth0Domain: String = "auth.lukariagroup.com"

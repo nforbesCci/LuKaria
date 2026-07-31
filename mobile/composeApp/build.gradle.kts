@@ -84,9 +84,14 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0.0"
-        // Local HTTPS Next.js — use with: adb reverse tcp:3000 tcp:3000
-        // (cert SAN is localhost / 127.0.0.1 only)
-        buildConfigField("String", "API_BASE_URL", "\"https://127.0.0.1:3000\"")
+        // Production by default. Local Next.js override:
+        //   ./gradlew :composeApp:installDebug -PAPI_BASE_URL=https://127.0.0.1:3000
+        // then: adb reverse tcp:3000 tcp:3000
+        val apiBaseUrl = (project.findProperty("API_BASE_URL") as? String)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: "https://www.lukariagroup.com"
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
     buildFeatures {
         buildConfig = true
@@ -114,12 +119,8 @@ android {
         }
     }
     buildTypes {
-        getByName("debug") {
-            buildConfigField("String", "API_BASE_URL", "\"https://127.0.0.1:3000\"")
-        }
         getByName("release") {
             isMinifyEnabled = false
-            buildConfigField("String", "API_BASE_URL", "\"https://www.lukariagroup.com\"")
         }
     }
     compileOptions {
