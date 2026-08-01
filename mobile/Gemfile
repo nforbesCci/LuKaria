@@ -1,4 +1,4 @@
 source "https://rubygems.org"
 
-# Fastlane for iOS TestFlight uploads (see docs/IOS_CI.md).
+# Fastlane for iOS TestFlight + Android Play Store uploads (see docs/IOS_CI.md, docs/ANDROID_CI.md).
 gem "fastlane", "~> 2.225"

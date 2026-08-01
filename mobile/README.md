@@ -109,14 +109,14 @@ Auth0 URL scheme `lukaria` is registered in `Info.plist`. Production API base UR
 
 ### CI (GitHub Actions)
 
-Workflow: [`.github/workflows/ios.yml`](../.github/workflows/ios.yml)
+| Workflow | Trigger | What runs |
+|----------|---------|-----------|
+| [`.github/workflows/ios.yml`](../.github/workflows/ios.yml) | Push / PR touching `mobile/**` | Compile `ComposeApp` iOS framework |
+| | Push to `master` / `workflow_dispatch` | Archive + upload IPA to TestFlight |
+| [`.github/workflows/android.yml`](../.github/workflows/android.yml) | Push / PR touching `mobile/**` | Assemble Android release |
+| | Push to `master` / `workflow_dispatch` | Sign AAB + upload to Play **internal** testing |
 
-| Trigger | What runs |
-|---------|-----------|
-| Push / PR touching `mobile/**` | Compile `ComposeApp` iOS framework |
-| Push to `master` / `workflow_dispatch` | Archive + upload IPA to TestFlight |
-
-**Secrets** (repo → Settings → Secrets and variables → Actions):
+**iOS secrets** (repo → Settings → Secrets and variables → Actions):
 
 | Secret | Purpose |
 |--------|---------|
@@ -126,6 +126,16 @@ Workflow: [`.github/workflows/ios.yml`](../.github/workflows/ios.yml)
 | `APPLE_TEAM_ID` | Apple Developer Team ID (**required for deploy**) |
 
 The ASC API key user must have access to create/manage profiles and upload builds for **Svelte by Lukaria** (`com.lukaria.svelte`).
+
+**Android / Play secrets** — see [`docs/ANDROID_CI.md`](../docs/ANDROID_CI.md):
+
+| Secret | Purpose |
+|--------|---------|
+| `ANDROID_KEYSTORE_BASE64` | Upload keystore as base64 |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
+| `ANDROID_KEY_ALIAS` | Key alias |
+| `ANDROID_KEY_PASSWORD` | Key password |
+| `PLAY_STORE_JSON_KEY` | Play Developer API service account JSON |
 
 ## Feature coverage (M0–M5)
 

@@ -82,8 +82,12 @@ android {
         applicationId = "com.lukariagroup.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        // CI: -PVERSION_CODE=${{ github.run_number }} -PVERSION_NAME=1.0.0
+        versionCode = (project.findProperty("VERSION_CODE") as? String)?.toIntOrNull() ?: 1
+        versionName = (project.findProperty("VERSION_NAME") as? String)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: "1.0.0"
         // Production by default. Local Next.js override:
         //   ./gradlew :composeApp:installDebug -PAPI_BASE_URL=https://127.0.0.1:3000
         // then: adb reverse tcp:3000 tcp:3000
@@ -118,10 +122,41 @@ android {
             )
         }
     }
+
+    val keystorePath = System.getenv("ANDROID_KEYSTORE_PATH")?.trim().orEmpty()
+    val keystorePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD").orEmpty()
+    val keyAliasEnv = System.getenv("ANDROID_KEY_ALIAS").orEmpty()
+    val keyPassword = System.getenv("ANDROID_KEY_PASSWORD").orEmpty()
+    val releaseKeystore = keystorePath.takeIf { it.isNotEmpty() }?.let { file(it) }
+    val hasReleaseSigning =
+        releaseKeystore != null &&
+            releaseKeystore.isFile &&
+            keystorePassword.isNotEmpty() &&
+            keyAliasEnv.isNotEmpty() &&
+            keyPassword.isNotEmpty()
+
+    signingConfigs {
+        create("release") {
+            if (hasReleaseSigning) {
+                storeFile = releaseKeystore
+                storePassword = keystorePassword
+                keyAlias = keyAliasEnv
+                this.keyPassword = keyPassword
+            }
+        }
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
+    }
+    // KMP + LookCamera AAR: lintVital can crash the AGP lint worker on release.
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

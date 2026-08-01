@@ -173,3 +173,39 @@ platform :ios do
     )
   end
 end
+
+platform :android do
+  desc "Build signed AAB and upload to Play Console internal testing"
+  lane :internal do
+    version_code = ENV.fetch("VERSION_CODE")
+    version_name = ENV.fetch("VERSION_NAME", "1.0.0")
+    json_key = ENV.fetch("PLAY_STORE_JSON_KEY_PATH")
+
+    gradle(
+      task: ":composeApp:bundleRelease",
+      project_dir: ".",
+      properties: {
+        "VERSION_CODE" => version_code,
+        "VERSION_NAME" => version_name
+      }
+    )
+
+    aab_path = File.expand_path(
+      "composeApp/build/outputs/bundle/release/composeApp-release.aab",
+      Dir.pwd
+    )
+    UI.user_error!("AAB not found at #{aab_path}") unless File.exist?(aab_path)
+
+    upload_to_play_store(
+      package_name: "com.lukariagroup.app",
+      track: "internal",
+      aab: aab_path,
+      json_key: json_key,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true,
+      release_status: "completed"
+    )
+  end
+end
