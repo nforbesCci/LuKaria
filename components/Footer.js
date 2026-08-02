@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import BookingLink from './BookingLink';
 import styles from './footer.module.css';
 
 export default function Footer() {
@@ -56,9 +57,9 @@ export default function Footer() {
           <nav className={styles.linkList}>
             <Link href="/api/auth/login" className={styles.footerLink}>Sign In / Register</Link>
             <Link href="/dashboard" className={styles.footerLink}>My Portal</Link>
-            <Link href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation" target="_blank" className={styles.footerLink}>
+            <BookingLink className={styles.footerLink}>
               Free Consultation
-            </Link>
+            </BookingLink>
           </nav>
         </div>
       </div>

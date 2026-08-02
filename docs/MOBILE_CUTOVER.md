@@ -42,6 +42,6 @@ Web keeps full product UI (marketing, patient, admin) **and** SEO. Mobile is a p
 - [ ] Health-adjacent data disclosures
 - [ ] Auth0 production native client + audience
 - [ ] `apiBaseUrl` = production
-- [ ] Carepatron / Calendly URLs verified
+- [ ] Carepatron / Calendly URLs verified (Calendly via Admin → Settings → Calendar; see [`CALENDAR_SETTINGS.md`](CALENDAR_SETTINGS.md))
 - [ ] Play Console app + CI secrets (see [`ANDROID_CI.md`](ANDROID_CI.md))
 - [ ] App Store / TestFlight CI secrets (see [`IOS_CI.md`](IOS_CI.md))

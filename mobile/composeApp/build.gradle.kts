@@ -43,6 +43,8 @@ kotlin {
             implementation("androidx.camera:camera-extensions:1.4.2")
             implementation("androidx.camera:camera-video:1.4.2")
             implementation("androidx.graphics:graphics-path:1.1.0")
+            // Google Code Scanner (Play Services) for food barcodes
+            implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

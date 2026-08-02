@@ -77,7 +77,7 @@ fun HomeScreen(
                     textAlign = TextAlign.Center,
                 )
                 Text(
-                    "clinical weight management and telehealth",
+                    "Clinical Weight and Metabolic Health Management",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.95f),
                     textAlign = TextAlign.Center,
@@ -85,7 +85,7 @@ fun HomeScreen(
             }
         }
 
-        BodyCopy("Personalized GLP-1 care, appointments, labs, and daily tracking — in one place.")
+        BodyCopy("Personalized metabolic health all in one place- appointments, GLP1 medications, body composition")
 
         if (isLoggedIn) {
             val greetingName = userDisplayName?.takeIf { it.isNotBlank() } ?: "there"
@@ -124,7 +124,6 @@ fun HomeScreen(
             "about" to "About",
             "services" to "Services",
             "faq" to "FAQ",
-            "testimonials" to "Testimonials",
             "blog" to "Blog",
             "contact" to "Contact",
             "privacy" to "Privacy",

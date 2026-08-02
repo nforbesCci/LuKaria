@@ -20,6 +20,7 @@ import {
   ListItemText,
   Paper,
 } from '@mui/material';
+import BookingButton from '../../components/BookingButton';
 import {
   AttachMoney,
   CreditCard,
@@ -139,9 +140,7 @@ export default function InfoPageClient() {
       {/* Main Content */}
         <Container maxWidth="lg" sx={{ mt: 18, mb: 6 }}>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Button
-              component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+            <BookingButton
               target="_blank"
               rel="noopener noreferrer"
               variant="contained"
@@ -160,7 +159,7 @@ export default function InfoPageClient() {
               }}
             >
               Book a No obligation appointment
-            </Button>
+            </BookingButton>
           </Box>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Typography component="h1" variant="h3" gutterBottom sx={{ color: '#877449', fontFamily: 'sans-serif' }}>
@@ -457,9 +456,7 @@ export default function InfoPageClient() {
               <Typography variant="h5" sx={{ color: '#000', fontWeight: '600', mb: 3 }}>
                 Ready to Start Your Weight Loss Journey?
               </Typography>
-              <Button
-                component="a"
-                href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+              <BookingButton
                 target="_blank"
                 rel="noopener noreferrer"
                 variant="contained"
@@ -478,7 +475,7 @@ export default function InfoPageClient() {
                 }}
               >
                 Get Started Today
-              </Button>
+              </BookingButton>
             </Paper>
           </Grid>
         </Grid>

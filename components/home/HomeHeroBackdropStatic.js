@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useBookingUrl, DEFAULT_BOOKING_URL } from '../../hooks/useBookingUrl';
 import styles from './home-static.module.css';
 
 const IMAGES = [
@@ -10,11 +11,10 @@ const IMAGES = [
   '/images/weightloss2_16x9.webp',
 ];
 
-const CALENDLY_URL = 'https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation';
-
 /** Full-viewport opener — background photo carousel, Svelte wordmark + tagline. */
 export default function HomeHeroBackdropStatic() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { bookingUrl } = useBookingUrl();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -62,7 +62,7 @@ export default function HomeHeroBackdropStatic() {
 
       <a
         className={styles.heroBackdropCta}
-        href={CALENDLY_URL}
+        href={bookingUrl || DEFAULT_BOOKING_URL}
         target="_blank"
         rel="noopener noreferrer"
       >

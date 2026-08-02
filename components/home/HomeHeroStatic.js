@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import BookingLink from '../BookingLink';
 import styles from './home-static.module.css';
 
 const PORTRAIT = '/images/Kadria business.webp';
@@ -14,14 +15,9 @@ export default function HomeHeroStatic() {
         <p className={styles.heroLead}>
           Effective, physician-guided weight loss, including the use of GLP-1 medications (Semaglutide/Ozempic and Tirzepatide/Mounjaro). No waiting rooms, no pharmacies—structured virtual care on your terms.
         </p>
-        <a
-          className={styles.heroCta}
-          href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <BookingLink className={styles.heroCta}>
           Start Your Svelte Journey
-        </a>
+        </BookingLink>
         <span className={styles.heroCaption}>Free no obligation consultation</span>
         <p className={styles.heroTag}>Lose Weight & Feel Your Best with Svelte by LuKaria</p>
       </div>

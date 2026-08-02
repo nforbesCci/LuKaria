@@ -14,6 +14,7 @@ import {
   Grid,
   Paper,
 } from '@mui/material';
+import BookingButton from '../../components/BookingButton';
 import {
   Login,
   WhatsApp,
@@ -110,15 +111,13 @@ export default function AdsLandingPage() {
           <Typography variant="body1" sx={{ color: '#333', mb: 3, fontSize: '1rem', lineHeight: 1.6 }}>
             Effective, physician-guided weight loss with science-backed programs tailored to your needs.
           </Typography>
-          <Button
-            component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+          <BookingButton
             variant="contained"
             size="large"
             sx={{ textTransform: 'none', backgroundColor: '#877449', color: '#000', fontWeight: 600, fontSize: '1.1rem', px: 4, py: 1.5, '&:hover': { backgroundColor: '#B8941F' } }}
           >
             Start Your Svelte Journey
-          </Button>
+          </BookingButton>
           <Typography variant="caption" sx={{ display: 'block', color: '#555', mt: 0.5, mb: 1 }}>Free no obligation consultation</Typography>
           <Typography variant="body2" sx={{ color: '#555', fontStyle: 'italic' }}>Lose Weight & Feel Your Best with Svelte by LuKaria</Typography>
         </Box>
@@ -208,9 +207,9 @@ export default function AdsLandingPage() {
             </Grid>
           </Grid>
           <Box sx={{ textAlign: 'center' }}>
-            <Button component="a" href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation" variant="contained" size="large" sx={{ textTransform: 'none', backgroundColor: '#877449', color: '#000', fontWeight: 600, fontSize: '1.1rem', px: 4, py: 1.5, '&:hover': { backgroundColor: '#B8941F' } }}>
+            <BookingButton variant="contained" size="large" sx={{ textTransform: 'none', backgroundColor: '#877449', color: '#000', fontWeight: 600, fontSize: '1.1rem', px: 4, py: 1.5, '&:hover': { backgroundColor: '#B8941F' } }}>
               Get Started
-            </Button>
+            </BookingButton>
           </Box>
         </Container>
       </Box>

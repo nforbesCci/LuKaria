@@ -8,6 +8,7 @@ import PageTitle from '../../components/PageTitle';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProfile } from '../../store/slices/profileSlice';
 import { canAccessPage, useBasicAccess } from '../../hooks/useAccessControl';
+import { useBookingUrl, DEFAULT_BOOKING_URL } from '../../hooks/useBookingUrl';
 import {
   Container,
   Typography,
@@ -41,6 +42,7 @@ export default function DashboardPage() {
   const { user, isLoading, error } = useUser();
   const dispatch = useAppDispatch();
   const profileState = useAppSelector((state) => state.profile);
+  const { bookingUrl, bookingLabel } = useBookingUrl();
 
   // Access control - Admin, Doctor, or Patient
   useBasicAccess();
@@ -54,7 +56,12 @@ export default function DashboardPage() {
       ? [
           { text: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
           { text: 'Profile', path: '/profile', icon: <Person /> },
-          { text: 'Book an appointment', path: 'https://calendly.com/kadriaf-lukariagroup', icon: <Schedule />, external: true },
+          {
+            text: bookingLabel || 'Book an appointment',
+            path: bookingUrl || DEFAULT_BOOKING_URL,
+            icon: <Schedule />,
+            external: true,
+          },
           { text: 'Consent Forms', path: '/consent-forms', icon: <Description /> },
         ]
       : []),

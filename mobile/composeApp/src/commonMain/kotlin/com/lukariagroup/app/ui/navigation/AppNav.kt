@@ -69,7 +69,7 @@ sealed class AppRoute(val route: String) {
 
     companion object {
         val marketing = listOf(
-            Home, Info, About, Faq, Contact, Testimonials,
+            Home, Info, About, Faq, Contact,
             Privacy, Terms, Hipaa, Services, BlogList,
         )
         val patient = listOf(

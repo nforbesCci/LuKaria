@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAdminAccess } from '../../../hooks/useAccessControl';
@@ -19,6 +20,8 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  CalendarMonth as CalendarMonthIcon,
+  ChevronRight as ChevronRightIcon,
   Done as DoneIcon,
   Email as EmailIcon,
   Google as GoogleIcon,
@@ -217,7 +220,8 @@ export default function AdminSettingsPage() {
           System Settings
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 4 }}>
-          Configure email integrations for clinic outbound mail (Microsoft 365 / Gmail).
+          Configure calendar booking and email integrations for clinic outbound mail
+          (Microsoft 365 / Gmail).
         </Typography>
 
         {feedback && (
@@ -229,6 +233,35 @@ export default function AdminSettingsPage() {
             {feedback.message}
           </Alert>
         )}
+
+        <Paper
+          component={Link}
+          href="/admin/settings/calendar"
+          elevation={1}
+          sx={{
+            p: 3,
+            mb: 3,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            textDecoration: 'none',
+            color: 'inherit',
+            border: '1px solid rgba(135, 116, 73, 0.35)',
+            '&:hover': { bgcolor: 'rgba(135, 116, 73, 0.06)' },
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <CalendarMonthIcon sx={{ color: gold }} />
+            <Box>
+              <Typography variant="h6">Calendar</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Calendly booking URL used for marketing CTAs and the mobile Calendly button.
+              </Typography>
+            </Box>
+          </Box>
+          <ChevronRightIcon sx={{ color: gold }} />
+        </Paper>
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>

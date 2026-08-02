@@ -5,6 +5,7 @@ import PublicTopBar from '../../components/PublicTopBar';
 import GlpPagesDisclaimer from '../../components/marketing/GlpPagesDisclaimer';
 import GlpVirtualProgramSection from '../../components/marketing/GlpVirtualProgramSection';
 import { Container, Typography, Box, Button, Paper, Grid } from '@mui/material';
+import BookingButton from '../../components/BookingButton';
 
 export default function Glp1PageClient() {
   const schema = {
@@ -44,9 +45,7 @@ export default function Glp1PageClient() {
           Svelte by LuKaria provides doctor-guided GLP-1 treatment plans for adults in Jamaica. Every plan is
           personalized and medically supervised by Dr. Kadria Fairclough with virtual follow-up.
         </Typography>
-        <Button
-          component="a"
-          href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+        <BookingButton
           variant="contained"
           sx={{
             backgroundColor: '#877449',
@@ -59,7 +58,7 @@ export default function Glp1PageClient() {
           }}
         >
           Book a Free Consultation
-        </Button>
+        </BookingButton>
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -169,14 +168,12 @@ export default function Glp1PageClient() {
       </Paper>
 
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Button
-            component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+          <BookingButton
             variant="contained"
             sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
           >
             Book a Free Consultation
-          </Button>
+          </BookingButton>
           <Button component="a" href="/faq" variant="outlined" sx={{ borderColor: '#877449', color: '#877449' }}>
             Read FAQ
           </Button>

@@ -35,6 +35,8 @@ fun ScheduleScreen(onBack: () -> Unit) {
     var preferred by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var calendlyUrl by remember { mutableStateOf(PlatformConfig.calendlyBookingUrl) }
+    var calendlyLabel by remember { mutableStateOf("Open Calendly") }
     val scope = rememberCoroutineScope()
 
     fun refresh() {
@@ -47,6 +49,11 @@ fun ScheduleScreen(onBack: () -> Unit) {
                     error = null
                 }
                 .onFailure { error = it.message }
+            runCatching { AppContainer.calendarRepository.fetchPublic() }
+                .onSuccess { res ->
+                    res.calendar?.bookingUrl?.takeIf { it.isNotBlank() }?.let { calendlyUrl = it }
+                    res.calendar?.bookingLabel?.takeIf { it.isNotBlank() }?.let { calendlyLabel = it }
+                }
             loading = false
         }
     }
@@ -65,9 +72,9 @@ fun ScheduleScreen(onBack: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
         ) { Text("Open Carepatron booking") }
         OutlinedButton(
-            onClick = { openExternalUrl(PlatformConfig.calendlyBookingUrl) },
+            onClick = { openExternalUrl(calendlyUrl) },
             modifier = Modifier.fillMaxWidth(),
-        ) { Text("Open Calendly") }
+        ) { Text(calendlyLabel) }
         OutlinedButton(
             onClick = {
                 scope.launch {

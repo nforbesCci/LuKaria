@@ -6,6 +6,8 @@ struct iOSApp: App {
     init() {
         // Wire 3DLOOK LookCamera SDK for Kotlin Body Scan screen.
         LookCameraBridge.install()
+        // AVFoundation barcode scanner for meal / food lookup.
+        BarcodeScannerBridge.install()
     }
 
     var body: some Scene {

@@ -5,6 +5,7 @@ import PublicTopBar from '../../components/PublicTopBar';
 import GlpPagesDisclaimer from '../../components/marketing/GlpPagesDisclaimer';
 import GlpVirtualProgramSection from '../../components/marketing/GlpVirtualProgramSection';
 import { Container, Typography, Box, Button, Paper, Grid } from '@mui/material';
+import BookingButton from '../../components/BookingButton';
 export default function WeightLossInjectionsClient() {
   const schema = {
     '@context': 'https://schema.org',
@@ -42,9 +43,7 @@ export default function WeightLossInjectionsClient() {
           <Typography variant="body1" sx={{ color: '#333', maxWidth: 900, mb: 3 }}>
             When people talk about &quot;weight loss injections,&quot; they are usually referring to a class of injectable medications known clinically as GLP-1 receptor agonists. These include well-known options like Ozempic and Mounjaro. Svelte by LuKaria offers physician-supervised access to these injectable treatments as part of a comprehensive weight management plan.
           </Typography>
-          <Button
-            component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+          <BookingButton
             variant="contained"
             sx={{
               backgroundColor: '#877449',
@@ -57,7 +56,7 @@ export default function WeightLossInjectionsClient() {
             }}
           >
             Book a Free Consultation
-          </Button>
+          </BookingButton>
         </Box>
 
         <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -131,14 +130,12 @@ export default function WeightLossInjectionsClient() {
             Whether care is delivered virtually or in person, our mission is to make high-quality metabolic health treatment accessible while providing the accountability, expertise, and support needed to help you achieve meaningful and sustainable results.
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Button
-              component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+            <BookingButton
               variant="contained"
               sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
             >
               Book a Free Consultation
-            </Button>
+            </BookingButton>
           </Box>
         </Paper>
 

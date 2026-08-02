@@ -28,9 +28,32 @@ fun BarcodeScannerScreen(onBack: () -> Unit) {
     var scanning by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
+    fun lookup(code: String) {
+        scope.launch {
+            runCatching { AppContainer.foodRepository.findByBarcode(code.trim()) }
+                .onSuccess {
+                    product = it
+                    if (it == null) error = "No product found for $code"
+                    else error = null
+                }
+                .onFailure { error = it.message }
+        }
+    }
+
+    val openScanner = rememberBarcodeScannerLauncher { scanned ->
+        scanning = false
+        if (scanned.isNullOrBlank()) {
+            error = "Scan cancelled or camera unavailable. Enter a barcode manually."
+            return@rememberBarcodeScannerLauncher
+        }
+        barcode = scanned
+        error = null
+        lookup(scanned)
+    }
+
     LukariaScaffold(title = "Barcode scanner", onBack = onBack) {
         SectionTitle("Lookup food")
-        BodyCopy("Camera scanning is a platform placeholder for M0. Enter a barcode manually or tap Scan (returns null until CameraX/AVFoundation is wired).")
+        BodyCopy("Scan a product barcode with the camera, or type the number and look it up.")
 
         OutlinedTextField(
             value = barcode,
@@ -47,32 +70,18 @@ fun BarcodeScannerScreen(onBack: () -> Unit) {
 
         OutlinedButton(
             onClick = {
-                scope.launch {
-                    scanning = true
-                    error = null
-                    val scanned = scanBarcode()
-                    if (scanned != null) barcode = scanned
-                    else error = "Scanner not available on this build — enter barcode manually."
-                    scanning = false
-                }
+                scanning = true
+                error = null
+                openScanner()
             },
+            enabled = !scanning,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(if (scanning) "Opening camera…" else "Open camera scanner")
         }
 
         Button(
-            onClick = {
-                scope.launch {
-                    runCatching { AppContainer.foodRepository.findByBarcode(barcode.trim()) }
-                        .onSuccess {
-                            product = it
-                            if (it == null) error = "No product found"
-                            else error = null
-                        }
-                        .onFailure { error = it.message }
-                }
-            },
+            onClick = { lookup(barcode) },
             enabled = barcode.isNotBlank(),
             modifier = Modifier.fillMaxWidth(),
         ) {

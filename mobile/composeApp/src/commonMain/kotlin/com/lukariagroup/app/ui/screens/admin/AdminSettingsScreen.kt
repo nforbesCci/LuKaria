@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.lukariagroup.app.AppContainer
+import com.lukariagroup.app.core.PlatformConfig
 import com.lukariagroup.app.core.openExternalUrl
 import com.lukariagroup.app.ui.components.BodyCopy
 import com.lukariagroup.app.ui.components.ErrorText
@@ -43,6 +45,14 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
     var gClientSecret by remember { mutableStateOf("") }
     var testEmail by remember { mutableStateOf("") }
 
+    var calendarEnabled by remember { mutableStateOf(true) }
+    var calendarProvider by remember { mutableStateOf("calendly") }
+    var calendarBookingUrl by remember { mutableStateOf(PlatformConfig.calendlyBookingUrl) }
+    var calendarEventTypeUrl by remember { mutableStateOf("") }
+    var calendarBookingLabel by remember { mutableStateOf("Book an appointment") }
+    var calendarApiToken by remember { mutableStateOf("") }
+    var calendarHasApiToken by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
 
     fun refresh() {
@@ -63,6 +73,18 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
                     error = null
                 }
                 .onFailure { error = it.message }
+            runCatching { AppContainer.adminRepository.fetchCalendarSettings() }
+                .onSuccess { res ->
+                    res.config?.let { cfg ->
+                        calendarEnabled = cfg.enabled
+                        calendarProvider = cfg.provider ?: "calendly"
+                        calendarBookingUrl = cfg.bookingUrl ?: PlatformConfig.calendlyBookingUrl
+                        calendarEventTypeUrl = cfg.eventTypeUrl.orEmpty()
+                        calendarBookingLabel = cfg.bookingLabel ?: "Book an appointment"
+                        calendarHasApiToken = cfg.hasApiToken
+                        calendarApiToken = ""
+                    }
+                }
             loading = false
         }
     }
@@ -83,7 +105,82 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
         if (loading) LoadingBlock()
         ErrorText(error)
         message?.let { Text(it) }
-        BodyCopy("Configure Microsoft 365 and Gmail for clinic outbound mail.")
+        BodyCopy("Configure calendar booking and clinic outbound mail (Microsoft 365 / Gmail).")
+
+        SectionTitle("Calendar")
+        BodyCopy("Public booking URL for marketing CTAs and the Schedule Calendly button.")
+        Switch(checked = calendarEnabled, onCheckedChange = { calendarEnabled = it })
+        BodyCopy(if (calendarEnabled) "Site-wide booking link enabled" else "Using default fallback URL when disabled")
+        OutlinedTextField(
+            calendarProvider,
+            { calendarProvider = it },
+            label = { Text("Provider") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            calendarBookingUrl,
+            { calendarBookingUrl = it },
+            label = { Text("Booking URL") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            calendarEventTypeUrl,
+            { calendarEventTypeUrl = it },
+            label = { Text("Event type URL") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            calendarBookingLabel,
+            { calendarBookingLabel = it },
+            label = { Text("Button label") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            calendarApiToken,
+            { calendarApiToken = it },
+            label = {
+                Text(
+                    if (calendarHasApiToken) {
+                        "API token (leave blank to keep)"
+                    } else {
+                        "API token (optional)"
+                    },
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Button(
+            onClick = {
+                scope.launch {
+                    runCatching {
+                        AppContainer.adminRepository.saveCalendarSettings(
+                            buildJsonObject {
+                                put("provider", calendarProvider.ifBlank { "calendly" })
+                                put("bookingUrl", calendarBookingUrl.trim())
+                                put(
+                                    "eventTypeUrl",
+                                    calendarEventTypeUrl.ifBlank { calendarBookingUrl }.trim(),
+                                )
+                                put("bookingLabel", calendarBookingLabel.trim())
+                                put("enabled", calendarEnabled)
+                                put("apiToken", calendarApiToken)
+                            },
+                        )
+                    }.onSuccess {
+                        message = "Calendar settings saved"
+                        refresh()
+                    }.onFailure { error = it.message }
+                }
+            },
+            enabled = calendarBookingUrl.isNotBlank(),
+            modifier = Modifier.fillMaxWidth(),
+        ) { Text("Save Calendar Settings") }
+        if (calendarBookingUrl.isNotBlank()) {
+            OutlinedButton(
+                onClick = { openExternalUrl(calendarBookingUrl) },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("Open booking link") }
+        }
 
         SectionTitle("Microsoft / M365")
         BodyCopy(if (msConnected) "Connected: ${msEmail ?: "—"}" else "Not linked")

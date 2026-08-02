@@ -3,6 +3,7 @@ package com.lukariagroup.app.data.repository
 import com.lukariagroup.app.data.models.AdminQuestionsResponse
 import com.lukariagroup.app.data.models.AdminUsersResponse
 import com.lukariagroup.app.data.models.ApiMessage
+import com.lukariagroup.app.data.models.CalendarAdminResponse
 import com.lukariagroup.app.data.models.DbProfileResponse
 import com.lukariagroup.app.data.models.MealsResponse
 import com.lukariagroup.app.data.models.MeasurementsResponse
@@ -130,6 +131,12 @@ class AdminRepository(private val client: HttpClient) {
                 put("config", config)
             },
         )
+
+    suspend fun fetchCalendarSettings(): CalendarAdminResponse =
+        client.getApi("api/admin/settings/calendar")
+
+    suspend fun saveCalendarSettings(body: JsonObject): CalendarAdminResponse =
+        client.putApi("api/admin/settings/calendar", body)
 
     suspend fun sendMicrosoftTestEmail(to: String): ApiMessage =
         client.postApi("api/admin/microsoft/test", buildJsonObject { put("to", to) })

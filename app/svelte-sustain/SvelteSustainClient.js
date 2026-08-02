@@ -4,6 +4,7 @@ import PublicTopMenu from '../../components/PublicTopMenu';
 import PublicTopBar from '../../components/PublicTopBar';
 import GlpPagesDisclaimer from '../../components/marketing/GlpPagesDisclaimer';
 import { Container, Typography, Box, Button, Paper, Grid, Card, CardContent } from '@mui/material';
+import BookingButton from '../../components/BookingButton';
 import Image from 'next/image';
 
 export default function SvelteSustainClient() {
@@ -36,9 +37,7 @@ export default function SvelteSustainClient() {
             <Typography variant="body1" sx={{ color: '#877449', fontWeight: 700, mb: 4, fontSize: '1.1rem' }}>
               Protect your progress. Sustain your success.
             </Typography>
-            <Button
-              component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+            <BookingButton
               variant="contained"
               sx={{
                 backgroundColor: '#877449',
@@ -51,7 +50,7 @@ export default function SvelteSustainClient() {
               }}
             >
               Book a Maintenance Consultation
-            </Button>
+            </BookingButton>
           </Grid>
         </Grid>
 
@@ -291,9 +290,7 @@ export default function SvelteSustainClient() {
             Book your maintenance consultation today and discover a personalized approach to long-term metabolic wellness.<br/><br/>
             <strong>Because lasting results deserve lasting support.</strong>
           </Typography>
-          <Button
-            component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+          <BookingButton
             variant="contained"
             size="large"
             sx={{
@@ -307,7 +304,7 @@ export default function SvelteSustainClient() {
             }}
           >
             Book a Maintenance Consultation
-          </Button>
+          </BookingButton>
         </Box>
 
         <GlpPagesDisclaimer />

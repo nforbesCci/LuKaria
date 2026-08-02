@@ -14,6 +14,45 @@ data class ApiMessage(
 )
 
 @Serializable
+data class PublicCalendarInfo(
+    val provider: String? = null,
+    val bookingUrl: String? = null,
+    val eventTypeUrl: String? = null,
+    val bookingLabel: String? = null,
+    val enabled: Boolean = true,
+)
+
+@Serializable
+data class PublicCalendarResponse(
+    val success: Boolean = true,
+    val calendar: PublicCalendarInfo? = null,
+    val error: String? = null,
+)
+
+@Serializable
+data class CalendarAdminConfig(
+    val provider: String? = null,
+    val bookingUrl: String? = null,
+    val eventTypeUrl: String? = null,
+    val eventTypeUri: String? = null,
+    val bookingLabel: String? = null,
+    val enabled: Boolean = true,
+    val apiToken: String? = null,
+    val hasApiToken: Boolean = false,
+    val webhookSigningKey: String? = null,
+    val hasWebhookSigningKey: Boolean = false,
+    val webhookUrl: String? = null,
+)
+
+@Serializable
+data class CalendarAdminResponse(
+    val success: Boolean = true,
+    val config: CalendarAdminConfig? = null,
+    val error: String? = null,
+    val details: String? = null,
+)
+
+@Serializable
 data class ProfileResponse(
     val success: Boolean = true,
     val message: String? = null,

@@ -24,22 +24,20 @@ fun InfoScreen(onBack: () -> Unit) {
 @Composable
 fun AboutScreen(onBack: () -> Unit) {
     LukariaScaffold(title = "About Svelte", onBack = onBack) {
-        SectionTitle("Clinical telehealth for metabolic health")
+        SectionTitle("Personalized Telemedicine delivery for your Metabolic Health")
         BodyCopy(
             "Svelte by LuKaria provides physician-led weight management with GLP-1 therapies, " +
                 "lifestyle coaching, and continuous remote monitoring.",
         )
-        BodyCopy("Our team includes board-certified clinicians focused on safe, evidence-based care.")
+        BodyCopy("Our team includes Licensed medical doctors focused on safe, evidence-based care.")
     }
 }
 
 @Composable
 fun FaqScreen(onBack: () -> Unit) {
     LukariaScaffold(title = "FAQ", onBack = onBack) {
-        SectionTitle("Is telehealth available in my state?")
-        BodyCopy("Coverage depends on clinician licensure. Contact us to confirm eligibility.")
         SectionTitle("Which medications are offered?")
-        BodyCopy("Semaglutide, tirzepatide (Mounjaro), and retatrutide pathways when clinically appropriate.")
+        BodyCopy("Semaglutide (Ozempic/Wegovy), Tirzepatide (Mounjaro)")
         SectionTitle("How do I join an appointment?")
         BodyCopy("After booking, your dashboard shows join details and pre-visit tasks.")
         SectionTitle("Is my data secure?")
@@ -76,7 +74,5 @@ fun ServiceMarketingScreen(onBack: () -> Unit) {
         BodyCopy("• Lab requisitions and results review")
         BodyCopy("• Nutrition & meal tracking support")
         BodyCopy("• Medication adherence monitoring")
-        SectionTitle("Membership")
-        BodyCopy("Membership unlocks ongoing clinician access, refill coordination, and the patient app suite.")
     }
 }

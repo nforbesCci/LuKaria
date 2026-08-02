@@ -8,6 +8,7 @@ import {
   Paper,
   Button,
 } from '@mui/material';
+import BookingButton from '../BookingButton';
 import {
   Star,
   ChatBubbleOutline,
@@ -156,9 +157,7 @@ export default function HomeBelowFold() {
             </Grid>
           </Grid>
           <Box sx={{ textAlign: 'center' }}>
-            <Button
-              component="a"
-              href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+            <BookingButton
               variant="contained"
               size="large"
               sx={{
@@ -173,7 +172,7 @@ export default function HomeBelowFold() {
               }}
             >
               Get Started
-            </Button>
+            </BookingButton>
           </Box>
         </Container>
       </Box>

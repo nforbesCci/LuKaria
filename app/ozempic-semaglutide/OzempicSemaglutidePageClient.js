@@ -5,6 +5,7 @@ import PublicTopBar from '../../components/PublicTopBar';
 import GlpPagesDisclaimer from '../../components/marketing/GlpPagesDisclaimer';
 import GlpVirtualProgramSection from '../../components/marketing/GlpVirtualProgramSection';
 import { Container, Typography, Box, Button, Paper, Grid } from '@mui/material';
+import BookingButton from '../../components/BookingButton';
 
 export default function OzempicSemaglutidePageClient() {
   const schema = {
@@ -45,9 +46,7 @@ export default function OzempicSemaglutidePageClient() {
             weight management in selected adults. Svelte by LuKaria offers doctor-guided care with brands you may know
             (including Ozempic, where appropriate) and ongoing virtual monitoring.
           </Typography>
-          <Button
-            component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+          <BookingButton
             variant="contained"
             sx={{
               backgroundColor: '#877449',
@@ -60,7 +59,7 @@ export default function OzempicSemaglutidePageClient() {
             }}
           >
             Book a Free Consultation
-          </Button>
+          </BookingButton>
         </Box>
 
         <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -168,14 +167,12 @@ export default function OzempicSemaglutidePageClient() {
         </Paper>
 
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Button
-            component="a"
-            href="https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+          <BookingButton
             variant="contained"
             sx={{ backgroundColor: '#877449', color: '#000', '&:hover': { backgroundColor: '#B8941F' } }}
           >
             Book a Free Consultation
-          </Button>
+          </BookingButton>
           <Button component="a" href="/faq?glp=semaglutide" variant="outlined" sx={{ borderColor: '#877449', color: '#877449' }}>
             Semaglutide FAQ
           </Button>
