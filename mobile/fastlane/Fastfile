@@ -180,19 +180,21 @@ platform :android do
     version_code = ENV.fetch("VERSION_CODE")
     version_name = ENV.fetch("VERSION_NAME", "1.0.0")
     json_key = ENV.fetch("PLAY_STORE_JSON_KEY_PATH")
+    # Fastlane's cwd is often mobile/fastlane; Gradle root is mobile/
+    project_root = File.expand_path("..", __dir__)
 
     gradle(
       task: ":composeApp:bundleRelease",
-      project_dir: ".",
+      project_dir: project_root,
       properties: {
         "VERSION_CODE" => version_code,
         "VERSION_NAME" => version_name
       }
     )
 
-    aab_path = File.expand_path(
-      "composeApp/build/outputs/bundle/release/composeApp-release.aab",
-      Dir.pwd
+    aab_path = File.join(
+      project_root,
+      "composeApp/build/outputs/bundle/release/composeApp-release.aab"
     )
     UI.user_error!("AAB not found at #{aab_path}") unless File.exist?(aab_path)
 
