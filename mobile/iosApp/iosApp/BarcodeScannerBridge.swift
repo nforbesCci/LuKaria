@@ -9,7 +9,8 @@ enum BarcodeScannerBridge {
     }
 
     private final class Presenter: BarcodeScannerPresenter {
-        func present(onComplete: BarcodeScannerCompletion) {
+        // K/N exports the parameter as onComplete_ for Swift protocol conformance.
+        func present(onComplete_ onComplete: BarcodeScannerCompletion) {
             DispatchQueue.main.async {
                 guard let root = Self.topViewController() else {
                     onComplete.onComplete(barcode: nil)

@@ -11,7 +11,8 @@ enum LookCameraBridge {
     }
 
     private final class Presenter: LookCameraPresenter {
-        func present(onComplete: LookCameraCompletion) {
+        // K/N exports the parameter as onComplete_ for Swift protocol conformance.
+        func present(onComplete_ onComplete: LookCameraCompletion) {
             DispatchQueue.main.async {
                 LookCameraSDK.shared.presentSDKView(mode: .startFromTutorial) { result in
                     let front = Self.jpegDataUrl(from: result.frontPhoto)
