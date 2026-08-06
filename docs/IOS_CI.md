@@ -39,8 +39,9 @@ IOS_DISTRIBUTION_CERT_PASSWORD=<p12 export password>
 
 1. App exists in App Store Connect: **Svelte by Lukaria** / `com.lukaria.svelte`
 2. Bundle ID matches `mobile/iosApp/Configuration/Config.xcconfig`
-3. ASC API key has **Admin** (needed so Fastlane can create the Distribution cert + App Store profile)
-4. Commit + push `mobile/` and `.github/workflows/ios.yml` to `master`
-5. Watch **Actions → iOS Build & TestFlight**
+3. `API_BASE_URL` in that xcconfig must use `https:/$()/www…` (plain `https://` is truncated by xcconfig `//` comments and ships as `https:`, which Ktor resolves to `localhost:443`)
+4. ASC API key has **Admin** (needed so Fastlane can create the Distribution cert + App Store profile)
+5. Commit + push `mobile/` and `.github/workflows/ios.yml` to `master`
+6. Watch **Actions → iOS Build & TestFlight**
 
 Deploy uses Fastlane (`mobile/fastlane`) to create an **Apple Distribution** certificate and App Store provisioning profile (no physical device required), then uploads to TestFlight. The CI keychain is cached so later runs can reuse the cert private key.

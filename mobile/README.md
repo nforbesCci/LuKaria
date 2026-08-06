@@ -30,7 +30,7 @@ Local Next.js override:
 | Platform | How |
 |----------|-----|
 | Android | `./gradlew :composeApp:installDebug -PAPI_BASE_URL=https://127.0.0.1:3000` then `adb reverse tcp:3000 tcp:3000` |
-| iOS simulator | Set `API_BASE_URL=https://localhost:3000` in `iosApp/Configuration/Config.xcconfig` (include the port — bare `https://localhost` hits :443 and fails) |
+| iOS simulator | In `iosApp/Configuration/Config.xcconfig` use `API_BASE_URL=https:/$()/localhost:3000` (xcconfig treats `//` as a comment — the `$()` break is required; include the port) |
 
 Debug Android trusts the local self-signed cert in `PlatformHttpClient.android.kt` when pointed at local Next.
 
