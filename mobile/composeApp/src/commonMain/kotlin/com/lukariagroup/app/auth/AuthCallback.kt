@@ -4,8 +4,12 @@ import com.lukariagroup.app.AppContainer
 import io.ktor.http.decodeURLPart
 
 /**
- * Parses Auth0 redirect URLs (`lukaria://callback#access_token=…` or query params)
+ * Parses Auth0 redirect URLs (`lukaria://callback#access_token=…&id_token=…`)
  * and stores the session. Used by Android MainActivity and iOS onOpenURL.
+ *
+ * Prefers [id_token] for Bearer + display name: it carries profile claims and is
+ * accepted by the API via AUTH0_NATIVE_CLIENT_ID. Access tokens for a custom API
+ * audience usually omit name/email and 401 if AUTH0_AUDIENCE is missing in prod.
  *
  * @return true if a token was found and stored
  */
@@ -35,12 +39,15 @@ fun handleAuth0CallbackUrl(url: String): Boolean {
     }
 
     // Fragment-first (implicit flow), then query (code / alternate).
-    val params = parseParams(fragment) + parseParams(query)
-    val token = params["access_token"]
-        ?: params["id_token"]
-        ?: return false
+    // Do not let query overwrite fragment keys that are already set.
+    val params = parseParams(query) + parseParams(fragment)
+    val idToken = params["id_token"]?.takeIf { it.isNotBlank() }
+    val accessToken = params["access_token"]?.takeIf { it.isNotBlank() }
+    if (idToken == null && accessToken == null) return false
 
-    if (token.isBlank()) return false
-    AppContainer.authRepository.loginWithAccessToken(token)
+    AppContainer.authRepository.loginWithAuth0Tokens(
+        accessToken = accessToken,
+        idToken = idToken,
+    )
     return true
 }

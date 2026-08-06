@@ -20,6 +20,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,11 +56,14 @@ fun DashboardScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit,
 ) {
-    val user = authViewModel.uiState.value.user
+    val authState by authViewModel.uiState.collectAsState()
+    val user = authState.user
     var notifications by remember { mutableStateOf<List<AppNotification>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(authState.isLoggedIn) {
+        if (!authState.isLoggedIn) return@LaunchedEffect
+        error = null
         runCatching { AppContainer.notificationRepository.fetch() }
             .onSuccess { result ->
                 if (!result.success) {

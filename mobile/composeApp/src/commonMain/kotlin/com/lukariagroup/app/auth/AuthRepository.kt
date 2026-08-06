@@ -29,13 +29,28 @@ class AuthRepository(
         _user.value = token?.let { JwtPayloadDecoder.decodeUser(it) }
     }
 
-    fun loginWithAccessToken(token: String): SessionUser {
-        val cleaned = token.trim()
-        require(cleaned.isNotBlank()) { "Access token is blank" }
-        tokenStore.setAccessToken(cleaned)
-        _accessToken.value = cleaned
-        val user = JwtPayloadDecoder.decodeUser(cleaned)
-            ?: SessionUser(sub = "dev-user", name = "Dev User", email = "dev@lukariagroup.com")
+    /**
+     * Dev paste / single-token login. Prefer a JWT that includes profile claims
+     * (typically the Auth0 id_token).
+     */
+    fun loginWithAccessToken(token: String): SessionUser =
+        loginWithAuth0Tokens(accessToken = token, idToken = null)
+
+    /**
+     * Store a Bearer JWT for API calls and hydrate [SessionUser] from the richest
+     * identity JWT available (id_token first).
+     */
+    fun loginWithAuth0Tokens(accessToken: String?, idToken: String?): SessionUser {
+        val bearer = pickBearerToken(idToken = idToken, accessToken = accessToken)
+        require(!bearer.isNullOrBlank()) { "Auth0 callback had no usable token" }
+
+        tokenStore.setAccessToken(bearer)
+        _accessToken.value = bearer
+
+        val user = JwtPayloadDecoder.decodeUser(idToken ?: "")
+            ?: JwtPayloadDecoder.decodeUser(accessToken ?: "")
+            ?: JwtPayloadDecoder.decodeUser(bearer)
+            ?: SessionUser(sub = "unknown", name = "Member")
         _user.value = user
         return user
     }
@@ -47,4 +62,19 @@ class AuthRepository(
     }
 
     fun currentUser(): SessionUser? = _user.value
+
+    companion object {
+        /**
+         * Prefer id_token: includes name/email and uses the native client as audience
+         * (accepted via AUTH0_NATIVE_CLIENT_ID). Fall back to access_token.
+         */
+        fun pickBearerToken(idToken: String?, accessToken: String?): String? {
+            val id = idToken?.trim()?.takeIf { it.isNotEmpty() && looksLikeJwt(it) }
+            if (id != null) return id
+            return accessToken?.trim()?.takeIf { it.isNotEmpty() }
+        }
+
+        private fun looksLikeJwt(token: String): Boolean =
+            token.count { it == '.' } >= 2
+    }
 }

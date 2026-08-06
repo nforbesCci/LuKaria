@@ -11,7 +11,8 @@ actual fun openAuth0Login() {
     val domain = PlatformConfig.auth0Domain.trimEnd('/')
     val builder = Uri.parse("https://$domain/authorize").buildUpon()
         .appendQueryParameter("client_id", PlatformConfig.auth0ClientId)
-        // Prefer ID token for API Bearer auth until an Auth0 API audience exists
+        // Implicit flow returns id_token (profile) + access_token (API audience).
+        // Callback prefers id_token for Bearer + display name.
         .appendQueryParameter("response_type", "id_token token")
         .appendQueryParameter("redirect_uri", PlatformConfig.auth0CallbackUrl)
         .appendQueryParameter("scope", "openid profile email")
