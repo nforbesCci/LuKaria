@@ -71,7 +71,8 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         iosMain.dependencies {
-            implementation(libs.ktor.client.cio)
+            // Darwin (NSURLSession) — CIO has no TLS on Kotlin/Native
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
