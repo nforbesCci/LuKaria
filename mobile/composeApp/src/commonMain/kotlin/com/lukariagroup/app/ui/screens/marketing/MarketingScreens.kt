@@ -49,9 +49,13 @@ fun FaqScreen(onBack: () -> Unit) {
 fun ContactScreen(onBack: () -> Unit) {
     LukariaScaffold(title = "Contact", onBack = onBack) {
         SectionTitle("Get in touch")
-        BodyCopy("Email: support@lukariagroup.com")
+        BodyCopy("Email: info@lukariagroup.com")
         BodyCopy("Web: https://www.lukariagroup.com/contact")
-        BodyCopy("For clinical emergencies, call 911 or your local emergency number — do not use in-app messaging.")
+        BodyCopy(
+            "For clinical emergencies, call your local emergency number — " +
+                "head to your nearest emergency room or urgent care center. " +
+                "Do not use in-app messaging.",
+        )
     }
 }
 

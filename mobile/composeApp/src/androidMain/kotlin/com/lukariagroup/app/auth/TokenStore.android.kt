@@ -26,6 +26,6 @@ actual class TokenStore actual constructor() {
 
     companion object {
         private const val PREFS = "lukaria_auth"
-        private const val KEY = "access_token"
+        private const val KEY = "bearer_token_v2"
     }
 }

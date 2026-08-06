@@ -25,6 +25,6 @@ actual class TokenStore actual constructor() {
     actual fun clear() = setAccessToken(null)
 
     companion object {
-        private const val KEY = "lukaria_access_token"
+        private const val KEY = "lukaria_bearer_token_v2"
     }
 }
