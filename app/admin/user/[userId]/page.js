@@ -4,13 +4,14 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccountAction, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction } from '../../../../store/slices/adminSlice';
+import { enableUserAccountAction, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminBodyScansAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction } from '../../../../store/slices/adminSlice';
 import AdminConsentForms from '../../../../components/AdminConsentForms';
 import ConsentFormViewer from '../../../../components/ConsentFormViewer';
 import AdminQuestions from '../../../../components/AdminQuestions';
 import AdminMealTracker from '../../../../components/AdminMealTracker';
 import AdminSideEffects from '../../../../components/AdminSideEffects';
 import AdminWeightLogging from '../../../../components/AdminWeightLogging';
+import AdminBodyScan from '../../../../components/AdminBodyScan';
 import AdminMedicationTracker from '../../../../components/AdminMedicationTracker';
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
 import { useAdminAccess } from '../../../../hooks/useAccessControl';
@@ -63,6 +64,7 @@ import {
   Assignment,
   Medication,
   Scale,
+  AccessibilityNew,
   Restaurant,
   TrendingUp,
   Email,
@@ -143,6 +145,11 @@ export default function UserDetailPage() {
   const adminMeasurements = useSelector((state) => state.admin.adminMeasurements);
   const adminMeasurementsLoading = useSelector((state) => state.admin.adminMeasurementsLoading);
   const adminMeasurementsError = useSelector((state) => state.admin.adminMeasurementsError);
+
+  // Get admin body scans state from Redux
+  const adminBodyScans = useSelector((state) => state.admin.adminBodyScans);
+  const adminBodyScansLoading = useSelector((state) => state.admin.adminBodyScansLoading);
+  const adminBodyScansError = useSelector((state) => state.admin.adminBodyScansError);
   
   // Get admin side effects state from Redux
   const adminSideEffects = useSelector((state) => state.admin.adminSideEffects);
@@ -263,7 +270,7 @@ export default function UserDetailPage() {
 
   // Fetch meals when Meal Tracker tab is selected
   useEffect(() => {
-    if (tabValue === 5 && userId) { // Meal Tracker tab index
+    if (tabValue === 6 && userId) { // Meal Tracker tab index
       // Calculate date range for the current week
       const dateRange = getWeekDateRange(currentWeek);
       const startDate = dateRange.startDate.toISOString().split('T')[0];
@@ -279,7 +286,7 @@ export default function UserDetailPage() {
 
   // Fetch medications when Medication Tracker tab is selected
   useEffect(() => {
-    if (tabValue === 4 && userId) { // Medication Tracker tab index
+    if (tabValue === 5 && userId) { // Medication Tracker tab index
       dispatch(fetchAdminMedicationsAction({ 
         userId, 
         daysBack: 28 // Last 4 weeks
@@ -297,6 +304,13 @@ export default function UserDetailPage() {
     }
   }, [tabValue, userId, dispatch]);
 
+  // Fetch body scans when Body Scan tab is selected
+  useEffect(() => {
+    if (tabValue === 4 && userId) {
+      dispatch(fetchAdminBodyScansAction({ userId }));
+    }
+  }, [tabValue, userId, dispatch]);
+
   // Fetch side effects when Side Effects tab is selected
   useEffect(() => {
     if (tabValue === 2 && userId) { // Side Effects tab index
@@ -309,14 +323,13 @@ export default function UserDetailPage() {
 
   // Fetch questions when Questions tab is selected
   useEffect(() => {
-    if (tabValue === 6 && userId) { // Questions tab index
+    if (tabValue === 7 && userId) { // Questions tab index
       dispatch(fetchAdminQuestionsAction({ 
         userId, 
         limit: 10 // Last 10 questions
       }));
     }
   }, [tabValue, userId, dispatch]);
-
   // Fetch consent forms when Consent Forms tab is selected
   useEffect(() => {
     if (tabValue === 1 && userId) { // Consent Forms tab index
@@ -1872,6 +1885,7 @@ export default function UserDetailPage() {
               <Tab icon={<Assignment />} label="Consent Forms" />
               <Tab icon={<HealthAndSafety />} label="Side Effects" />
               <Tab icon={<Scale />} label="Weight Logging" />
+              <Tab icon={<AccessibilityNew />} label="Body Scan" />
               <Tab icon={<Medication />} label="Medication Tracker" />
               <Tab icon={<Restaurant />} label="Meal Tracker" />
               <Tab icon={<Quiz />} label="Questions" />
@@ -2279,7 +2293,17 @@ export default function UserDetailPage() {
             />
           </TabPanel>
 
-          <TabPanel value={tabValue} index={4} id="medication-tracker-content">
+          <TabPanel value={tabValue} index={4} id="body-scan-content">
+            <AdminBodyScan
+              adminBodyScans={adminBodyScans.scans}
+              adminBodyScansLoading={adminBodyScansLoading}
+              adminBodyScansError={adminBodyScansError}
+              onGeneratePDF={generateTabPDF}
+              formatDate={formatDate}
+            />
+          </TabPanel>
+
+          <TabPanel value={tabValue} index={5} id="medication-tracker-content">
             <AdminMedicationTracker
               adminMedications={adminMedications.medications}
               adminMedicationsLoading={adminMedicationsLoading}
@@ -2289,7 +2313,7 @@ export default function UserDetailPage() {
             />
           </TabPanel>
 
-          <TabPanel value={tabValue} index={5} id="meal-tracker-content">
+          <TabPanel value={tabValue} index={6} id="meal-tracker-content">
             <AdminMealTracker
               meals={meals.meals}
               mealsLoading={mealsLoading}
@@ -2302,7 +2326,7 @@ export default function UserDetailPage() {
             />
           </TabPanel>
 
-          <TabPanel value={tabValue} index={6} id="questions-content">
+          <TabPanel value={tabValue} index={7} id="questions-content">
             <AdminQuestions
               adminQuestions={adminQuestions.questions}
               adminQuestionsLoading={adminQuestionsLoading}

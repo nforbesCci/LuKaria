@@ -45,6 +45,7 @@ kotlin {
             implementation("androidx.graphics:graphics-path:1.1.0")
             // Google Code Scanner (Play Services) for food barcodes
             implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+            implementation("androidx.exifinterface:exifinterface:1.3.7")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

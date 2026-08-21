@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Biotech
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -323,6 +324,12 @@ fun PatientChartScreen(
                 icon = Icons.Filled.MonitorWeight,
                 containerColor = Color(0xFF8B6B4A),
                 onClick = { onNavigate(AppRoute.AdminChartWeight.create(userId)) },
+            )
+            DashboardAppIcon(
+                label = "Body Scan",
+                icon = Icons.Filled.AccessibilityNew,
+                containerColor = Color(0xFF4A6B8B),
+                onClick = { onNavigate(AppRoute.AdminChartBodyScan.create(userId)) },
             )
             DashboardAppIcon(
                 label = "Medication Tracker",

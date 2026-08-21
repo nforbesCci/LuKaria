@@ -54,6 +54,11 @@ const initialState = {
   adminMeasurements: [],
   adminMeasurementsLoading: false,
   adminMeasurementsError: null,
+
+  // Admin body scans data
+  adminBodyScans: { scans: [] },
+  adminBodyScansLoading: false,
+  adminBodyScansError: null,
   
   // Admin side effects data
   adminSideEffects: [],
@@ -325,6 +330,23 @@ const adminSlice = createSlice({
     clearAdminMeasurementsError: (state) => {
       state.adminMeasurementsError = null;
     },
+
+    // Admin body scans reducers
+    fetchAdminBodyScans: (state) => {
+      state.adminBodyScansLoading = true;
+      state.adminBodyScansError = null;
+    },
+    fetchAdminBodyScansSuccess: (state, action) => {
+      state.adminBodyScansLoading = false;
+      state.adminBodyScans = action.payload;
+    },
+    fetchAdminBodyScansFailure: (state, action) => {
+      state.adminBodyScansLoading = false;
+      state.adminBodyScansError = action.payload;
+    },
+    clearAdminBodyScansError: (state) => {
+      state.adminBodyScansError = null;
+    },
     
     // Admin side effects reducers
     fetchAdminSideEffects: (state) => {
@@ -455,6 +477,10 @@ export const {
   fetchAdminMeasurementsFailure,
   updateAdminMeasurement,
   clearAdminMeasurementsError,
+  fetchAdminBodyScans,
+  fetchAdminBodyScansSuccess,
+  fetchAdminBodyScansFailure,
+  clearAdminBodyScansError,
   fetchAdminSideEffects,
   fetchAdminSideEffectsSuccess,
   fetchAdminSideEffectsFailure,
@@ -528,6 +554,11 @@ export const updateAdminMedicationAction = (payload) => ({
 
 export const fetchAdminMeasurementsAction = (payload) => ({
   type: 'admin/fetchAdminMeasurements',
+  payload,
+});
+
+export const fetchAdminBodyScansAction = (payload) => ({
+  type: 'admin/fetchAdminBodyScans',
   payload,
 });
 

@@ -27,7 +27,7 @@ enum LookCameraBridge {
             guard let data = try? Data(contentsOf: url) else { return nil }
             // Re-encode as JPEG so FitXpress always receives a compact data URL.
             if let image = UIImage(data: data),
-               let jpeg = image.jpegData(compressionQuality: 0.85) {
+               let jpeg = image.jpegData(compressionQuality: 0.92) {
                 return "data:image/jpeg;base64," + jpeg.base64EncodedString()
             }
             return "data:image/jpeg;base64," + data.base64EncodedString()

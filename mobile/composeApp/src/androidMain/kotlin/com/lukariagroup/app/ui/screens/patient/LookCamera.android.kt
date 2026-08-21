@@ -5,10 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -20,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.look.camera.sdk.SdkActivity
 import com.look.camera.sdk.data.LaunchOption
-import java.io.ByteArrayOutputStream
 
 private fun Context.findActivity(): Activity? {
     var current: Context = this
@@ -29,35 +24,6 @@ private fun Context.findActivity(): Activity? {
         current = current.baseContext
     }
     return null
-}
-
-private fun uriToJpegDataUrl(context: Context, uri: Uri?): String? {
-    if (uri == null) return null
-    return runCatching {
-        context.contentResolver.openInputStream(uri)?.use { input ->
-            val original = BitmapFactory.decodeStream(input) ?: return@use null
-            val maxSide = 1600
-            val scaled = if (original.width > maxSide || original.height > maxSide) {
-                val ratio = minOf(
-                    maxSide.toFloat() / original.width,
-                    maxSide.toFloat() / original.height,
-                )
-                Bitmap.createScaledBitmap(
-                    original,
-                    (original.width * ratio).toInt().coerceAtLeast(1),
-                    (original.height * ratio).toInt().coerceAtLeast(1),
-                    true,
-                ).also { if (it !== original) original.recycle() }
-            } else {
-                original
-            }
-            val out = ByteArrayOutputStream()
-            scaled.compress(Bitmap.CompressFormat.JPEG, 85, out)
-            if (scaled !== original) scaled.recycle()
-            val b64 = Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
-            "data:image/jpeg;base64,$b64"
-        }
-    }.getOrNull()
 }
 
 @Composable

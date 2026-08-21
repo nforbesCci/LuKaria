@@ -46,6 +46,9 @@ sealed class AppRoute(val route: String) {
     data object AdminChartWeight : AppRoute("admin/chart/{userId}/weight") {
         fun create(userId: String) = "admin/chart/$userId/weight"
     }
+    data object AdminChartBodyScan : AppRoute("admin/chart/{userId}/body-scan") {
+        fun create(userId: String) = "admin/chart/$userId/body-scan"
+    }
     data object AdminChartMedications : AppRoute("admin/chart/{userId}/medications") {
         fun create(userId: String) = "admin/chart/$userId/medications"
     }

@@ -16,6 +16,7 @@ import adminPreAppointmentTasksSaga from './adminPreAppointmentTasksSaga';
 import adminProfileSaga from './adminProfileSaga';
 import adminMedicationsSaga from './adminMedicationsSaga';
 import adminMeasurementsSaga from './adminMeasurementsSaga';
+import adminBodyScansSaga from './adminBodyScansSaga';
 import adminSideEffectsSaga from './adminSideEffectsSaga';
 import adminQuestionsSaga from './adminQuestionsSaga';
 import sideEffectsSaga from './sideEffectsSaga';
@@ -43,6 +44,7 @@ export default function* rootSaga() {
     fork(adminProfileSaga),
     fork(adminMedicationsSaga),
     fork(adminMeasurementsSaga),
+    fork(adminBodyScansSaga),
     fork(adminSideEffectsSaga),
     fork(adminQuestionsSaga),
     fork(sideEffectsSaga),

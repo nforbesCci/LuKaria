@@ -97,6 +97,9 @@ fun BodyScanScreen(onBack: () -> Unit) {
         BodyCopy(
             "Use the 3DLOOK AI camera for guided front and side photos, then submit for FitXpress measurements. Height is in cm.",
         )
+        BodyCopy(
+            "Tips: form-fitting clothes, plain background, full body head-to-toe, arms slightly away from sides, good lighting.",
+        )
         ErrorText(error)
         message?.let { Text(it) }
 
@@ -128,17 +131,30 @@ fun BodyScanScreen(onBack: () -> Unit) {
             ) { Text("New scan") }
         } else if (status == "failed") {
             SectionTitle("Scan failed")
-            Text(
-                current?.errors
-                    ?.mapNotNull { it.detail ?: it.description }
-                    ?.joinToString("; ")
-                    ?.ifBlank { null }
-                    ?: "Check pose and lighting, then try again.",
+            val failureDetail = current?.errors
+                ?.mapNotNull { err ->
+                    val source = err.error_source?.replace('_', ' ')
+                    val msg = err.detail ?: err.description
+                    when {
+                        msg.isNullOrBlank() -> null
+                        source.isNullOrBlank() -> msg
+                        else -> "$source: $msg"
+                    }
+                }
+                ?.joinToString("; ")
+                ?.ifBlank { null }
+                ?: "Check pose and lighting, then try again."
+            Text(failureDetail)
+            BodyCopy(
+                "Retake both photos with the AI camera. Wear fitted clothing, stand fully in frame " +
+                    "(head to feet), keep the camera upright, and use a plain background.",
             )
             Button(
                 onClick = {
                     status = null
                     current = null
+                    frontPhoto = null
+                    sidePhoto = null
                     message = null
                 },
                 modifier = Modifier.fillMaxWidth(),

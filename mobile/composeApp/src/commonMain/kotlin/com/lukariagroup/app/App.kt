@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.savedstate.read
 import com.lukariagroup.app.ui.navigation.AppRoute
+import com.lukariagroup.app.ui.screens.admin.AdminBodyScanScreen
 import com.lukariagroup.app.ui.screens.admin.AdminConsentFormsScreen
 import com.lukariagroup.app.ui.screens.admin.AdminHomeScreen
 import com.lukariagroup.app.ui.screens.admin.AdminMealTrackerScreen
@@ -200,6 +201,15 @@ fun App() {
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
             ) { entry ->
                 AdminWeightLoggingScreen(
+                    userId = entry.argString("userId"),
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable(
+                route = AppRoute.AdminChartBodyScan.route,
+                arguments = listOf(navArgument("userId") { type = NavType.StringType }),
+            ) { entry ->
+                AdminBodyScanScreen(
                     userId = entry.argString("userId"),
                     onBack = { navController.popBackStack() },
                 )

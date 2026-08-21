@@ -3,6 +3,7 @@ package com.lukariagroup.app.data.repository
 import com.lukariagroup.app.data.models.AdminQuestionsResponse
 import com.lukariagroup.app.data.models.AdminUsersResponse
 import com.lukariagroup.app.data.models.ApiMessage
+import com.lukariagroup.app.data.models.BodyScanListResponse
 import com.lukariagroup.app.data.models.CalendarAdminResponse
 import com.lukariagroup.app.data.models.DbProfileResponse
 import com.lukariagroup.app.data.models.MealsResponse
@@ -44,6 +45,9 @@ class AdminRepository(private val client: HttpClient) {
         client.getApi("api/admin/measurements/$userId") {
             parameter("daysBack", daysBack)
         }
+
+    suspend fun fetchBodyScans(userId: String): BodyScanListResponse =
+        client.getApi("api/admin/body-scans/$userId")
 
     suspend fun fetchMedications(userId: String, daysBack: Int = 28): MedicationsResponse =
         client.getApi("api/admin/medications/$userId") {
