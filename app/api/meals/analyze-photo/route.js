@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getApiSession } from '../../../../lib/api-auth';
 import { identifyFoodsFromPhoto } from '../../../../lib/gemini';
-import { resolveCaloriesForFoodName } from '../../../../lib/fatsecret';
+import { resolveFoodCalories } from '../../../../lib/nutrition';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,23 +39,17 @@ export async function POST(request) {
     const identified = await identifyFoodsFromPhoto(image);
     const items = [];
     for (const food of identified) {
-      let calories = null;
-      let fatSecret = null;
-      try {
-        const resolved = await resolveCaloriesForFoodName(food.name);
-        calories = resolved.calories;
-        fatSecret = resolved.fatSecret;
-      } catch (err) {
-        console.warn('FatSecret resolve failed for', food.name, err.message);
-      }
+      const resolved = await resolveFoodCalories(food);
       items.push({
-        name: food.name,
+        name: resolved.name || food.name,
         portion: food.portion,
         estimatedGrams: food.estimatedGrams,
-        calories,
+        calories: resolved.calories,
         mealType,
         servingSize: food.portion,
-        fatSecret,
+        calorieSource: resolved.source,
+        fatSecret: resolved.fatSecret,
+        usda: resolved.usda,
       });
     }
 
@@ -69,7 +63,7 @@ export async function POST(request) {
       date: date || null,
       mealType,
       items,
-      totalCalories,
+      totalCalories: Math.round(totalCalories * 10) / 10,
       photoAttached: true,
     });
   } catch (error) {
