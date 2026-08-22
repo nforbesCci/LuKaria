@@ -7,12 +7,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 /**
  * Invoked when any API call returns HTTP 401.
  * App collects [events] on the main coroutine and logs out + navigates Home.
+ *
+ * Note: avoid `@Volatile` — it is JVM-only and breaks iosArm64 compilation.
  */
 object SessionExpiredHandler {
     private val _events = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val events: SharedFlow<Unit> = _events.asSharedFlow()
 
-    @Volatile
     private var fired: Boolean = false
 
     fun notifyUnauthorized() {
