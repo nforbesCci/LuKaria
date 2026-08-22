@@ -57,3 +57,4 @@ Thumbs.db
 # 3DLOOK camera widget assets (copied by postinstall)
 public/widget-assets/
 
+.vercel

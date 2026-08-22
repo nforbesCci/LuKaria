@@ -64,12 +64,25 @@ export async function GET(request) {
         _id: userAppointment?._id.toHexString(),
         time: appointmentTime,
         length: appointmentLength,
-        date: appointmentDate,
+        date: appointmentDate || userAppointment?.date || null,
         provider: appointmentProvider || 'Default Provider',
         type: appointmentType || 'consultation',
         rescheduleRequested: userAppointment?.rescheduleRequested || false,
         rescheduleRequestedAt: userAppointment?.rescheduleRequestedAt || null
       } : null,
+      // Flat fields for mobile AppointmentResponse.appointment
+      appointment: isScheduled
+        ? {
+            startTime: userAppointment?.startTime || appointmentDate || null,
+            endTime: userAppointment?.endTime || appointmentEndDate || null,
+            status: userAppointment?.status || 'scheduled',
+            name: appointmentType || null,
+            email: userAppointment?.userEmail || null,
+            eventUri: userAppointment?.calendlyEventUri || null,
+            inviteeUri: userAppointment?.calendlyInviteeUri || null,
+          }
+        : null,
+      configured: Boolean(userAppointment),
       status: isScheduled ? 'scheduled' : 'not_scheduled',
       checkedAt: new Date().toISOString(),
       userId,
@@ -82,7 +95,9 @@ export async function GET(request) {
     
     return NextResponse.json({
       success: true,
-      data: appointmentData
+      data: appointmentData,
+      appointment: appointmentData.appointment,
+      configured: appointmentData.configured,
     });
 
   } catch (error) {

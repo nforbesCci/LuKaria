@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -39,7 +38,6 @@ import com.lukariagroup.app.ui.components.LukariaScaffold
 import com.lukariagroup.app.ui.components.SectionTitle
 import com.lukariagroup.app.ui.navigation.AppRoute
 import com.lukariagroup.app.ui.theme.LukariaGold
-import com.lukariagroup.app.ui.theme.LukariaGoldLight
 
 private data class DashboardLink(
     val label: String,
@@ -89,7 +87,6 @@ fun DashboardScreen(
         DashboardLink("Meds", AppRoute.MedicationTracker.route, Icons.Filled.Medication, Color(0xFF6B5B95)),
         DashboardLink("Meals", AppRoute.MealTracker.route, Icons.Filled.Dining, Color(0xFFC4784A)),
         DashboardLink("Side effects", AppRoute.SideEffects.route, Icons.Filled.Healing, Color(0xFF9A4F5C)),
-        DashboardLink("Scanner", AppRoute.BarcodeScanner.route, Icons.Filled.QrCodeScanner, LukariaGoldLight),
     )
 
     LukariaScaffold(title = "Dashboard", onBack = onBack) {

@@ -1,7 +1,11 @@
 package com.lukariagroup.app.data.repository
 
 import com.lukariagroup.app.data.models.AppointmentResponse
+import com.lukariagroup.app.data.models.AvailabilityResponse
+import com.lukariagroup.app.data.models.BookAppointmentResponse
+import com.lukariagroup.app.data.models.BookableTypesResponse
 import io.ktor.client.HttpClient
+import io.ktor.client.request.parameter
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -25,6 +29,34 @@ class AppointmentRepository(private val client: HttpClient) {
             buildJsonObject {
                 put("reason", reason)
                 put("preferredTimes", preferredTimes)
+            },
+        )
+
+    suspend fun bookable(): BookableTypesResponse =
+        client.getApi("api/appointment/bookable")
+
+    suspend fun availability(
+        eventTypeUri: String,
+        start: String,
+        end: String,
+    ): AvailabilityResponse =
+        client.getApi("api/appointment/availability") {
+            parameter("eventTypeUri", eventTypeUri)
+            parameter("start", start)
+            parameter("end", end)
+        }
+
+    suspend fun book(
+        eventTypeUri: String,
+        startTime: String,
+        typeName: String? = null,
+    ): BookAppointmentResponse =
+        client.postApi(
+            "api/appointment/book",
+            buildJsonObject {
+                put("eventTypeUri", eventTypeUri)
+                put("startTime", startTime)
+                if (typeName != null) put("typeName", typeName)
             },
         )
 }

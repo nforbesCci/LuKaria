@@ -4,13 +4,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.savedstate.read
+import com.lukariagroup.app.core.SessionExpiredHandler
 import com.lukariagroup.app.ui.navigation.AppRoute
 import com.lukariagroup.app.ui.screens.admin.AdminBodyScanScreen
 import com.lukariagroup.app.ui.screens.admin.AdminConsentFormsScreen
@@ -62,9 +68,39 @@ fun App() {
         val navController = rememberNavController()
         val authViewModel = remember { AppContainer.authViewModel() }
         val authState by authViewModel.uiState.collectAsState()
+        var sessionExpiredMessage by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) {
             AppContainer.authRepository.restoreSession()
+        }
+
+        LaunchedEffect(navController, authViewModel) {
+            SessionExpiredHandler.events.collect {
+                authViewModel.logout()
+                sessionExpiredMessage = "Session expired — please sign in again."
+                navController.navigate(AppRoute.Home.route) {
+                    popUpTo(AppRoute.Home.route) { inclusive = true }
+                }
+            }
+        }
+
+        LaunchedEffect(authState.isLoggedIn) {
+            if (authState.isLoggedIn) {
+                SessionExpiredHandler.reset()
+            }
+        }
+
+        if (sessionExpiredMessage != null) {
+            AlertDialog(
+                onDismissRequest = { sessionExpiredMessage = null },
+                confirmButton = {
+                    TextButton(onClick = { sessionExpiredMessage = null }) {
+                        Text("OK")
+                    }
+                },
+                title = { Text("User has been logged out") },
+                text = { Text(sessionExpiredMessage ?: "") },
+            )
         }
 
         NavHost(
@@ -143,10 +179,7 @@ fun App() {
             composable(AppRoute.BodyScan.route) { BodyScanScreen { navController.popBackStack() } }
             composable(AppRoute.MedicationTracker.route) { MedicationTrackerScreen { navController.popBackStack() } }
             composable(AppRoute.MealTracker.route) {
-                MealTrackerScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenBarcode = { navController.navigate(AppRoute.BarcodeScanner.route) },
-                )
+                MealTrackerScreen(onBack = { navController.popBackStack() })
             }
             composable(AppRoute.SideEffects.route) { SideEffectsScreen { navController.popBackStack() } }
             composable(AppRoute.Membership.route) { MembershipScreen { navController.popBackStack() } }

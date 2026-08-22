@@ -27,10 +27,29 @@ export async function POST(request) {
     const sideEffectsCollection = db.collection('SideEffects');
 
     // Create the side effects document
+    const severities = reportData.sideEffectSeverities && typeof reportData.sideEffectSeverities === 'object'
+      ? reportData.sideEffectSeverities
+      : {};
+    const otherSeverity = Number.isFinite(Number(reportData.otherSeverity))
+      ? Number(reportData.otherSeverity)
+      : (Number.isFinite(Number(severities.Other)) ? Number(severities.Other) : null);
+    const severityValues = [
+      ...Object.values(severities).map(Number).filter(Number.isFinite),
+      ...(otherSeverity != null ? [otherSeverity] : []),
+      ...(Number.isFinite(Number(reportData.severity)) ? [Number(reportData.severity)] : []),
+    ];
+    const overallSeverity = severityValues.length
+      ? Math.max(...severityValues)
+      : null;
+
     const sideEffectsDocument = {
       userId: userId,
       sideEffects: reportData.sideEffects || [],
+      sideEffectSeverities: severities,
       otherSideEffect: reportData.otherSideEffect || '',
+      otherSeverity,
+      severity: overallSeverity,
+      notes: reportData.notes || reportData.contactMessage || '',
       appetiteSuppressed: reportData.appetiteSuppressed || '',
       hasTreatmentConcerns: reportData.hasTreatmentConcerns || '',
       treatmentConcerns: reportData.treatmentConcerns || '',

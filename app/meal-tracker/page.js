@@ -436,16 +436,20 @@ export default function MealTracker() {
   // Group meals by meal type
   const mealsByType = {
     breakfast: meals.filter(meal => meal.mealType === 'breakfast'),
+    morning_snack: meals.filter(meal => meal.mealType === 'morning_snack' || meal.mealType === 'snack'),
     lunch: meals.filter(meal => meal.mealType === 'lunch'),
+    afternoon_snack: meals.filter(meal => meal.mealType === 'afternoon_snack'),
     dinner: meals.filter(meal => meal.mealType === 'dinner'),
-    snack: meals.filter(meal => meal.mealType === 'snack')
+    supper: meals.filter(meal => meal.mealType === 'supper'),
   };
 
   const mealTypes = [
-    { key: 'breakfast', label: 'Breakfast', icon: '🌅' },
-    { key: 'lunch', label: 'Lunch', icon: '☀️' },
-    { key: 'dinner', label: 'Dinner', icon: '🌙' },
-    { key: 'snack', label: 'Snack', icon: '🍿' }
+    { key: 'breakfast', label: 'Breakfast', icon: '' },
+    { key: 'morning_snack', label: 'Morning snack', icon: '' },
+    { key: 'lunch', label: 'Lunch', icon: '' },
+    { key: 'afternoon_snack', label: 'Afternoon snack', icon: '' },
+    { key: 'dinner', label: 'Dinner', icon: '' },
+    { key: 'supper', label: 'Supper', icon: '' },
   ];
 
   if (isLoading) {

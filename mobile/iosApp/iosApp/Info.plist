@@ -70,11 +70,11 @@
 		<string>whatsapp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Svelte uses the camera for AI body scans and to scan food barcodes for meal logging.</string>
+	<string>Svelte uses the camera for AI body scans and meal photos.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Svelte uses motion sensors to keep your phone upright during AI body scan photo capture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Svelte may access photos when saving or reviewing body scan images.</string>
+	<string>Svelte may access photos for body scans and meal logging.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

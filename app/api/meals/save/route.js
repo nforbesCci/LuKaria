@@ -17,7 +17,9 @@ export async function POST(request) {
     }
 
     const userId = session.user.sub;
-    const { date, meals } = await request.json();
+    const payload = await request.json();
+    const date = payload.date;
+    let meals = payload.meals;
 
     if (!date) {
       return NextResponse.json(
@@ -26,10 +28,33 @@ export async function POST(request) {
       );
     }
 
+    // Accept either a flat array or a map of slot → items[]
+    if (meals && !Array.isArray(meals) && typeof meals === 'object') {
+      meals = Object.entries(meals).flatMap(([mealType, items]) =>
+        (Array.isArray(items) ? items : []).map((item) => ({
+          ...item,
+          mealType: item.mealType || mealType,
+        })),
+      );
+    }
+
     if (!meals || !Array.isArray(meals)) {
       return NextResponse.json(
         { error: 'Meals array is required' },
         { status: 400 }
+      );
+    }
+
+    // Enforce at most one photo and reasonable slot set
+    const slots = new Set();
+    for (const item of meals) {
+      const slot = item.mealType || 'lunch';
+      slots.add(slot);
+    }
+    if (slots.size > 6) {
+      return NextResponse.json(
+        { error: 'At most 6 meal slots are allowed per day' },
+        { status: 400 },
       );
     }
 

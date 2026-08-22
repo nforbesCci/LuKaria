@@ -1,0 +1,14 @@
+mobile/
+.next/
+node_modules/
+.git/
+certificates/
+dist/
+build/
+coverage/
+*.log
+https-server.err.log
+https-server.log
+.kotlin/
+**/*.apk
+**/*.aab

@@ -62,7 +62,9 @@ export default function SideEffects() {
   const [formData, setFormData] = useState({
     // Side effects checklist
     sideEffects: [],
+    sideEffectSeverities: {},
     otherSideEffect: '',
+    otherSeverity: 3,
     
     // Appetite suppression
     appetiteSuppressed: '',
@@ -152,7 +154,9 @@ export default function SideEffects() {
       
       setFormData({
         sideEffects: mostRecentReport.sideEffects || [],
+        sideEffectSeverities: mostRecentReport.sideEffectSeverities || {},
         otherSideEffect: mostRecentReport.otherSideEffect || '',
+        otherSeverity: mostRecentReport.otherSeverity || 3,
         appetiteSuppressed: mostRecentReport.appetiteSuppressed || '',
         hasTreatmentConcerns: mostRecentReport.hasTreatmentConcerns || '',
         treatmentConcerns: mostRecentReport.treatmentConcerns || '',
@@ -173,11 +177,32 @@ export default function SideEffects() {
   };
 
   const handleSideEffectChange = (sideEffect, checked) => {
+    setFormData(prev => {
+      const nextEffects = checked
+        ? [...prev.sideEffects, sideEffect]
+        : prev.sideEffects.filter(e => e !== sideEffect);
+      const nextSeverities = { ...(prev.sideEffectSeverities || {}) };
+      if (checked) {
+        if (!nextSeverities[sideEffect]) nextSeverities[sideEffect] = 3;
+      } else {
+        delete nextSeverities[sideEffect];
+      }
+      return {
+        ...prev,
+        sideEffects: nextEffects,
+        sideEffectSeverities: nextSeverities,
+      };
+    });
+  };
+
+  const handleSeverityChange = (sideEffect, value) => {
+    const n = Math.min(10, Math.max(1, Number(value) || 1));
     setFormData(prev => ({
       ...prev,
-      sideEffects: checked 
-        ? [...prev.sideEffects, sideEffect]
-        : prev.sideEffects.filter(e => e !== sideEffect)
+      sideEffectSeverities: {
+        ...(prev.sideEffectSeverities || {}),
+        [sideEffect]: n,
+      },
     }));
   };
 
@@ -195,8 +220,16 @@ export default function SideEffects() {
       setSendSuccess(false);
       setLastDoctorName(assignedDoctorRef.current);
 
+      const severities = { ...(formData.sideEffectSeverities || {}) };
+      if (formData.otherSideEffect?.trim()) {
+        severities.Other = formData.otherSeverity ?? 3;
+      }
       const reportData = {
         ...formData,
+        sideEffectSeverities: severities,
+        otherSeverity: formData.otherSideEffect?.trim()
+          ? (formData.otherSeverity ?? 3)
+          : null,
         reportDate: new Date().toISOString(),
         reportId: formData.reportId || `SE-${Date.now()}`
       };
@@ -355,21 +388,43 @@ export default function SideEffects() {
                 Are you experiencing any of the following side effects?
               </Typography>
               <FormGroup>
-                <Grid container spacing={1}>
-                  {sideEffectsList.map((sideEffect) => (
-                    <Grid item xs={12} sm={6} md={4} key={sideEffect}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={formData.sideEffects.includes(sideEffect)}
-                            onChange={(e) => handleSideEffectChange(sideEffect, e.target.checked)}
+                <Grid container spacing={2}>
+                  {sideEffectsList.map((sideEffect) => {
+                    const checked = formData.sideEffects.includes(sideEffect);
+                    return (
+                      <Grid item xs={12} sm={6} key={sideEffect}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={checked}
+                              onChange={(e) => handleSideEffectChange(sideEffect, e.target.checked)}
+                              disabled={isFormComplete}
+                            />
+                          }
+                          label={sideEffect}
+                        />
+                        {checked && (
+                          <TextField
+                            select
+                            fullWidth
+                            size="small"
+                            label="Severity (1–10)"
+                            value={formData.sideEffectSeverities?.[sideEffect] ?? 3}
+                            onChange={(e) => handleSeverityChange(sideEffect, e.target.value)}
                             disabled={isFormComplete}
-                          />
-                        }
-                        label={sideEffect}
-                      />
-                    </Grid>
-                  ))}
+                            SelectProps={{ native: true }}
+                            sx={{ mt: 0.5, ml: 4, maxWidth: 200 }}
+                          >
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                              <option key={n} value={n}>
+                                {n}{n === 1 ? ' — mild' : n === 10 ? ' — severe' : ''}
+                              </option>
+                            ))}
+                          </TextField>
+                        )}
+                      </Grid>
+                    );
+                  })}
                 </Grid>
               </FormGroup>
 
@@ -384,6 +439,25 @@ export default function SideEffects() {
                   placeholder="Please describe any other side effects you're experiencing..."
                   disabled={isFormComplete}
                 />
+                {Boolean(formData.otherSideEffect?.trim()) && (
+                  <TextField
+                    select
+                    fullWidth
+                    size="small"
+                    label="Other severity (1–10)"
+                    value={formData.otherSeverity ?? 3}
+                    onChange={(e) => handleInputChange('otherSeverity', Number(e.target.value))}
+                    disabled={isFormComplete}
+                    SelectProps={{ native: true }}
+                    sx={{ mt: 2, maxWidth: 240 }}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                      <option key={n} value={n}>
+                        {n}{n === 1 ? ' — mild' : n === 10 ? ' — severe' : ''}
+                      </option>
+                    ))}
+                  </TextField>
+                )}
               </Box>
             </CardContent>
           </Card>
@@ -548,9 +622,17 @@ export default function SideEffects() {
                       Reported Side Effects:
                     </Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                      {formData.sideEffects.map((sideEffect) => (
-                        <Chip key={sideEffect} label={sideEffect} color="warning" variant="outlined" />
-                      ))}
+                      {formData.sideEffects.map((sideEffect) => {
+                        const sev = formData.sideEffectSeverities?.[sideEffect];
+                        return (
+                          <Chip
+                            key={sideEffect}
+                            label={sev != null ? `${sideEffect} · ${sev}/10` : sideEffect}
+                            color="warning"
+                            variant="outlined"
+                          />
+                        );
+                      })}
                     </Box>
                   </Box>
                 )}
@@ -562,6 +644,7 @@ export default function SideEffects() {
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 1 }}>
                       {formData.otherSideEffect}
+                      {formData.otherSeverity != null ? ` · severity ${formData.otherSeverity}/10` : ''}
                     </Typography>
                   </Box>
                 )}

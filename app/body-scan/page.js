@@ -52,6 +52,38 @@ function formatLabel(key) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function toFiniteNumber(value) {
+  if (value == null || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Primary → estimated → weight × fat %. */
+function resolveBodyMassValues(measurement) {
+  const m = measurement || {};
+  let lean = toFiniteNumber(m.lean_body_mass ?? m.estimated_lean_body_mass);
+  let fat = toFiniteNumber(m.fat_body_mass ?? m.estimated_fat_body_mass);
+  if (lean == null || fat == null) {
+    const weight = toFiniteNumber(m.weight ?? m.estimated_weight);
+    const fatPct = toFiniteNumber(m.fat_percentage);
+    if (weight != null && fatPct != null) {
+      const derivedFat = (weight * fatPct) / 100;
+      const derivedLean = weight - derivedFat;
+      if (fat == null) fat = derivedFat;
+      if (lean == null) lean = derivedLean;
+    }
+  }
+  return { lean, fat };
+}
+
+function resolveLeanMass(measurement) {
+  return resolveBodyMassValues(measurement).lean;
+}
+
+function resolveFatMass(measurement) {
+  return resolveBodyMassValues(measurement).fat;
+}
+
 function CircumferenceGrid({ params }) {
   if (!params || typeof params !== 'object') return null;
   const entries = Object.entries(params).filter(([, v]) => v != null && v !== '');
@@ -251,8 +283,8 @@ export default function BodyScanPage() {
                   ['Body fat %', measurement.fat_percentage],
                   ['BMR', measurement.bmr ?? measurement.estimated_bmr],
                   ['Weight (kg)', measurement.weight ?? measurement.estimated_weight],
-                  ['Lean mass (kg)', measurement.lean_body_mass],
-                  ['Fat mass (kg)', measurement.fat_body_mass],
+                  ['Lean mass (kg)', resolveLeanMass(measurement)],
+                  ['Fat mass (kg)', resolveFatMass(measurement)],
                 ].map(([label, value]) => (
                   <Grid item xs={6} sm={4} key={label}>
                     <Typography variant="caption" color="text.secondary">{label}</Typography>

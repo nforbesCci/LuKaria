@@ -34,14 +34,17 @@ export async function POST(request) {
     const dateKey = medicationData.date; // Format: YYYY-MM-DD
 
     // Prepare the document to save
+    const dosage = medicationData.dosage ?? medicationData.dose ?? '';
     const document = {
       userId: userId,
       userEmail: userEmail,
       medicationName: medicationData.medicationName,
-      dosage: medicationData.dosage,
+      dosage,
+      dose: dosage,
       date: dateKey,
-      time: medicationData.time,
+      time: medicationData.time || null,
       notes: medicationData.notes || '',
+      taken: medicationData.taken !== false,
       timestamp: timestamp,
       updatedAt: timestamp
     };

@@ -18,6 +18,7 @@ import com.lukariagroup.app.core.PlatformConfig
 import com.lukariagroup.app.data.models.BodyScanCreateRequest
 import com.lukariagroup.app.data.models.BodyScanListItem
 import com.lukariagroup.app.data.models.BodyScanMeasurement
+import com.lukariagroup.app.data.models.resolveBodyMass
 import com.lukariagroup.app.ui.components.BodyCopy
 import com.lukariagroup.app.ui.components.ErrorText
 import com.lukariagroup.app.ui.components.LoadingBlock
@@ -65,7 +66,7 @@ fun BodyScanScreen(onBack: () -> Unit) {
         }
     }
 
-    val pickImage = rememberImageDataUrlPicker { dataUrl ->
+    val imageSources = rememberImageDataUrlSources { dataUrl ->
         when (pickingSlot) {
             "front" -> frontPhoto = dataUrl
             "side" -> sidePhoto = dataUrl
@@ -109,12 +110,15 @@ fun BodyScanScreen(onBack: () -> Unit) {
         }
 
         if (status == "successful" && current != null) {
+            val mass = current.resolveBodyMass()
             SectionTitle("Results")
             Text("Status: successful")
             Text("BMI: ${current?.bmi ?: current?.estimated_bmi ?: "—"}")
             Text("Body fat %: ${current?.fat_percentage ?: "—"}")
             Text("BMR: ${current?.bmr ?: current?.estimated_bmr ?: "—"}")
             Text("Weight (kg): ${current?.weight ?: current?.estimated_weight ?: "—"}")
+            Text("Lean mass (kg): ${mass.leanKg ?: "—"}")
+            Text("Fat mass (kg): ${mass.fatKg ?: "—"}")
             current?.circumference_params?.entries?.take(12)?.forEach { (key, el) ->
                 val value = (el as? JsonPrimitive)?.contentOrNull ?: el.toString()
                 Text("${key.replace('_', ' ')}: $value")
@@ -208,7 +212,7 @@ fun BodyScanScreen(onBack: () -> Unit) {
             OutlinedButton(
                 onClick = {
                     pickingSlot = "front"
-                    pickImage()
+                    imageSources.pickGallery()
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(if (frontPhoto != null) "Change front photo" else "Pick front photo") }
@@ -216,7 +220,7 @@ fun BodyScanScreen(onBack: () -> Unit) {
             OutlinedButton(
                 onClick = {
                     pickingSlot = "side"
-                    pickImage()
+                    imageSources.pickGallery()
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(if (sidePhoto != null) "Change side photo" else "Pick side photo") }

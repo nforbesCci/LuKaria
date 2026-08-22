@@ -27,27 +27,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
 
+data class MetricChartPoint(
+    val label: String,
+    val value: Double,
+)
+
 data class WeightChartPoint(
     val label: String,
     val weight: Double,
 )
 
 /**
- * Weight trend line chart — chronological left → right.
+ * Generic metric trend line chart — chronological left → right.
  */
 @Composable
-fun WeightTrendChart(
-    points: List<WeightChartPoint>,
+fun MetricTrendChart(
+    points: List<MetricChartPoint>,
+    unitLabel: String,
     modifier: Modifier = Modifier,
     lineColor: Color = MaterialTheme.colorScheme.primary,
+    emptyMessage: String = "Need at least two points to show a chart.",
+    onePointMessage: String = "One measurement so far — add another to graph progress.",
+    footerNoun: String = "points",
 ) {
+    val unitSuffix = if (unitLabel.isBlank()) "" else " $unitLabel"
+
     if (points.size < 2) {
         Text(
-            text = if (points.isEmpty()) {
-                "Log at least two weigh-ins to see your trend."
-            } else {
-                "One measurement so far — add another date to graph change."
-            },
+            text = if (points.isEmpty()) emptyMessage else onePointMessage,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -55,21 +62,21 @@ fun WeightTrendChart(
         return
     }
 
-    val weights = points.map { it.weight }
-    val minW = weights.minOrNull() ?: 0.0
-    val maxW = weights.maxOrNull() ?: 1.0
+    val values = points.map { it.value }
+    val minW = values.minOrNull() ?: 0.0
+    val maxW = values.maxOrNull() ?: 1.0
     val span = max(maxW - minW, 1.0)
     val pad = span * 0.12
     val yMin = minW - pad
     val yMax = maxW + pad
     val yRange = max(yMax - yMin, 1.0)
 
-    val first = points.first().weight
-    val last = points.last().weight
+    val first = points.first().value
+    val last = points.last().value
     val delta = last - first
     val deltaLabel = when {
-        delta > 0.05 -> "+${formatOne(delta)} lbs"
-        delta < -0.05 -> "${formatOne(delta)} lbs"
+        delta > 0.05 -> "+${formatOne(delta)}$unitSuffix"
+        delta < -0.05 -> "${formatOne(delta)}$unitSuffix"
         else -> "No change"
     }
     val deltaColor = when {
@@ -94,7 +101,7 @@ fun WeightTrendChart(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "${formatOne(first)} → ${formatOne(last)} lbs",
+                "${formatOne(first)} → ${formatOne(last)}$unitSuffix",
                 style = MaterialTheme.typography.titleSmall,
             )
             Text(deltaLabel, style = MaterialTheme.typography.titleSmall, color = deltaColor)
@@ -149,7 +156,7 @@ fun WeightTrendChart(
                     val path = Path()
                     points.forEachIndexed { i, p ->
                         val x = xAt(i)
-                        val y = yAt(p.weight)
+                        val y = yAt(p.value)
                         if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
                     }
                     drawPath(
@@ -158,7 +165,7 @@ fun WeightTrendChart(
                         style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round),
                     )
                     points.forEachIndexed { i, p ->
-                        val center = Offset(xAt(i), yAt(p.weight))
+                        val center = Offset(xAt(i), yAt(p.value))
                         drawCircle(color = lineColor, radius = 5.dp.toPx(), center = center)
                         drawCircle(color = Color.White, radius = 2.5.dp.toPx(), center = center)
                     }
@@ -178,13 +185,33 @@ fun WeightTrendChart(
         }
 
         Text(
-            text = "${points.size} weigh-ins · ${points.first().label} to ${points.last().label}",
+            text = "${points.size} $footerNoun · ${points.first().label} to ${points.last().label}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
     }
+}
+
+/**
+ * Weight trend line chart — chronological left → right.
+ */
+@Composable
+fun WeightTrendChart(
+    points: List<WeightChartPoint>,
+    modifier: Modifier = Modifier,
+    lineColor: Color = MaterialTheme.colorScheme.primary,
+) {
+    MetricTrendChart(
+        points = points.map { MetricChartPoint(label = it.label, value = it.weight) },
+        unitLabel = "lbs",
+        modifier = modifier,
+        lineColor = lineColor,
+        emptyMessage = "Log at least two weigh-ins to see your trend.",
+        onePointMessage = "One measurement so far — add another date to graph change.",
+        footerNoun = "weigh-ins",
+    )
 }
 
 private fun formatOne(v: Double): String {

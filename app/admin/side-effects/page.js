@@ -538,17 +538,21 @@ export default function AdminSideEffectsPage() {
                   </Typography>
                   {selectedReport.sideEffects && selectedReport.sideEffects.length > 0 ? (
                     <List>
-                      {selectedReport.sideEffects.map((effect, index) => (
-                        <ListItem key={index} sx={{ pl: 0 }}>
-                          <ListItemIcon>
-                            <Warning color="warning" />
-                          </ListItemIcon>
-                          <ListItemText 
-                            primary={effect}
-                            primaryTypographyProps={{ variant: 'h6' }}
-                          />
-                        </ListItem>
-                      ))}
+                      {selectedReport.sideEffects.map((effect, index) => {
+                        const sev = selectedReport.sideEffectSeverities?.[effect]
+                          ?? selectedReport.severity;
+                        return (
+                          <ListItem key={index} sx={{ pl: 0 }}>
+                            <ListItemIcon>
+                              <Warning color="warning" />
+                            </ListItemIcon>
+                            <ListItemText 
+                              primary={sev != null ? `${effect} · severity ${sev}/10` : effect}
+                              primaryTypographyProps={{ variant: 'h6' }}
+                            />
+                          </ListItem>
+                        );
+                      })}
                     </List>
                   ) : (
                     <Typography variant="h6" color="text.secondary">
@@ -563,6 +567,9 @@ export default function AdminSideEffectsPage() {
                       </Typography>
                       <Typography variant="h6">
                         {selectedReport.otherSideEffect}
+                        {(selectedReport.otherSeverity ?? selectedReport.sideEffectSeverities?.Other) != null
+                          ? ` · severity ${selectedReport.otherSeverity ?? selectedReport.sideEffectSeverities?.Other}/10`
+                          : ''}
                       </Typography>
                     </Box>
                   )}

@@ -172,6 +172,47 @@ data class AppointmentResponse(
 )
 
 @Serializable
+data class BookableType(
+    val id: String? = null,
+    val name: String? = null,
+    val durationMinutes: Int? = null,
+    val eventTypeUri: String? = null,
+    val eventTypeUrl: String? = null,
+)
+
+@Serializable
+data class BookableTypesResponse(
+    val success: Boolean = true,
+    val enabled: Boolean = true,
+    val types: List<BookableType> = emptyList(),
+    val bookingLabel: String? = null,
+    val message: String? = null,
+    val error: String? = null,
+)
+
+@Serializable
+data class AvailabilitySlot(
+    val startTime: String? = null,
+    val status: String? = null,
+    val inviteesRemaining: Int? = null,
+)
+
+@Serializable
+data class AvailabilityResponse(
+    val success: Boolean = true,
+    val slots: List<AvailabilitySlot> = emptyList(),
+    val error: String? = null,
+)
+
+@Serializable
+data class BookAppointmentResponse(
+    val success: Boolean = true,
+    val message: String? = null,
+    val appointment: AppointmentInfo? = null,
+    val error: String? = null,
+)
+
+@Serializable
 data class MeasurementEntry(
     val date: String? = null,
     val dateKey: String? = null,
@@ -201,9 +242,23 @@ data class MedicationEntry(
     val date: String? = null,
     val medicationName: String? = null,
     val dose: String? = null,
+    val dosage: String? = null,
     val taken: Boolean = false,
     val notes: String? = null,
-    val injectionSite: String? = null,
+    val time: String? = null,
+)
+
+@Serializable
+data class FormularyMedication(
+    val name: String,
+    val doses: List<String> = emptyList(),
+)
+
+@Serializable
+data class FormularyResponse(
+    val success: Boolean = true,
+    val medications: List<FormularyMedication> = emptyList(),
+    val error: String? = null,
 )
 
 @Serializable
@@ -231,6 +286,8 @@ data class MealItem(
     @Serializable(with = FlexibleIntSerializer::class)
     val quantity: Int? = null,
     val mealType: String? = null,
+    val photoUrl: String? = null,
+    val portion: String? = null,
 )
 
 @Serializable
@@ -256,14 +313,53 @@ data class MealsResponse(
 )
 
 @Serializable
+data class MealAnalyzeItem(
+    val name: String? = null,
+    @Serializable(with = FlexibleDoubleSerializer::class)
+    val calories: Double? = null,
+    val mealType: String? = null,
+    val portion: String? = null,
+    val servingSize: String? = null,
+)
+
+@Serializable
+data class MealAnalyzeResponse(
+    val success: Boolean = true,
+    val mealType: String? = null,
+    val items: List<MealAnalyzeItem> = emptyList(),
+    @Serializable(with = FlexibleDoubleSerializer::class)
+    val totalCalories: Double? = null,
+    val error: String? = null,
+)
+
+@Serializable
+data class MealSaveResponse(
+    val success: Boolean = true,
+    val message: String? = null,
+    val date: String? = null,
+    @Serializable(with = FlexibleIntSerializer::class)
+    val mealsCount: Int? = null,
+    val error: String? = null,
+)
+
+@Serializable
 data class SideEffectEntry(
     val id: String? = null,
     @SerialName("_id")
     val mongoId: String? = null,
     val date: String? = null,
+    val reportDate: String? = null,
+    val reportId: String? = null,
     val symptoms: List<String> = emptyList(),
+    val sideEffects: List<String> = emptyList(),
+    val otherSideEffect: String? = null,
+    val sideEffectSeverities: Map<String, Int>? = null,
+    @Serializable(with = FlexibleIntSerializer::class)
+    val otherSeverity: Int? = null,
+    @Serializable(with = FlexibleIntSerializer::class)
     val severity: Int? = null,
     val notes: String? = null,
+    val contactMessage: String? = null,
     val nausea: Boolean = false,
     val vomiting: Boolean = false,
     val constipation: Boolean = false,
@@ -272,6 +368,7 @@ data class SideEffectEntry(
     val headache: Boolean = false,
     val reviewed: Boolean = false,
     val reviewNotes: String? = null,
+    val complete: Boolean = false,
 ) {
     val entryId: String? get() = id ?: mongoId
 }
@@ -499,7 +596,7 @@ data class BodyScanMeasurement(
     val status: String? = null,
     val gender: String? = null,
     val height: Int? = null,
-    val weight: Int? = null,
+    val weight: Double? = null,
     val estimated_weight: Double? = null,
     val age: Int? = null,
     val fat_percentage: Double? = null,
@@ -508,7 +605,9 @@ data class BodyScanMeasurement(
     val bmr: Double? = null,
     val estimated_bmr: Double? = null,
     val fat_body_mass: Double? = null,
+    val estimated_fat_body_mass: Double? = null,
     val lean_body_mass: Double? = null,
+    val estimated_lean_body_mass: Double? = null,
     val model_3d_url: String? = null,
     val circumference_params: JsonObject? = null,
     val created_at: String? = null,
