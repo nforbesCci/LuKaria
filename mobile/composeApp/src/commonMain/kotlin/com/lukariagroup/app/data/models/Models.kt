@@ -30,6 +30,16 @@ data class PublicCalendarResponse(
 )
 
 @Serializable
+data class CalendarAppointmentType(
+    val id: String? = null,
+    val name: String? = null,
+    val durationMinutes: Int? = null,
+    val eventTypeUrl: String? = null,
+    val eventTypeUri: String? = null,
+    val enabled: Boolean = true,
+)
+
+@Serializable
 data class CalendarAdminConfig(
     val provider: String? = null,
     val bookingUrl: String? = null,
@@ -39,9 +49,12 @@ data class CalendarAdminConfig(
     val enabled: Boolean = true,
     val apiToken: String? = null,
     val hasApiToken: Boolean = false,
+    val hasEnvToken: Boolean = false,
+    val canListEventTypes: Boolean = false,
     val webhookSigningKey: String? = null,
     val hasWebhookSigningKey: Boolean = false,
     val webhookUrl: String? = null,
+    val appointmentTypes: List<CalendarAppointmentType> = emptyList(),
 )
 
 @Serializable
@@ -50,6 +63,24 @@ data class CalendarAdminResponse(
     val config: CalendarAdminConfig? = null,
     val error: String? = null,
     val details: String? = null,
+)
+
+@Serializable
+data class CalendlyEventType(
+    val uri: String? = null,
+    val name: String? = null,
+    val duration: Int? = null,
+    val slug: String? = null,
+    val schedulingUrl: String? = null,
+    val active: Boolean = true,
+)
+
+@Serializable
+data class CalendlyEventTypesResponse(
+    val success: Boolean = true,
+    val eventTypes: List<CalendlyEventType> = emptyList(),
+    val activeCount: Int = 0,
+    val error: String? = null,
 )
 
 @Serializable
@@ -81,12 +112,15 @@ data class PatientProfile(
     val name: String? = null,
     val userEmail: String? = null,
     val email: String? = null,
+    val preferredEmail: String? = null,
     val phone: String? = null,
+    val preferredPhone: String? = null,
     val dateOfBirth: String? = null,
     val sex: String? = null,
     val gender: String? = null,
     val parish: String? = null,
     val address: String? = null,
+    val homeAddress: String? = null,
     val city: String? = null,
     val state: String? = null,
     val zip: String? = null,
@@ -101,16 +135,24 @@ data class PatientProfile(
     val emergencyContactName: String? = null,
     val emergencyContactPhone: String? = null,
     val emergencyContactRelationship: String? = null,
+    val nextOfKinName: String? = null,
+    val nextOfKinPhone: String? = null,
+    val nextOfKinRelationship: String? = null,
     val pharmacyName: String? = null,
     val pharmacyPhone: String? = null,
     @Serializable(with = FlexibleStringSerializer::class)
     val allergies: String? = null,
+    @Serializable(with = FlexibleStringSerializer::class)
+    val allergicMedications: String? = null,
+    val hasAllergies: Boolean? = null,
     @Serializable(with = FlexibleStringSerializer::class)
     val currentMedications: String? = null,
     @Serializable(with = FlexibleStringSerializer::class)
     val medicalHistory: String? = null,
     @Serializable(with = FlexibleStringSerializer::class)
     val medicalConditions: String? = null,
+    @Serializable(with = FlexibleStringSerializer::class)
+    val otherMedicalCondition: String? = null,
     val membershipTier: String? = null,
     val membershipStatus: String? = null,
     val isScheduled: Boolean? = null,
@@ -186,6 +228,7 @@ data class BookableTypesResponse(
     val enabled: Boolean = true,
     val types: List<BookableType> = emptyList(),
     val bookingLabel: String? = null,
+    val providerName: String? = null,
     val message: String? = null,
     val error: String? = null,
 )
@@ -392,12 +435,34 @@ data class AppNotification(
     val type: String? = null,
     val read: Boolean = false,
     val timestamp: String? = null,
+    val reminderDay: String? = null,
 )
 
 @Serializable
 data class NotificationsResponse(
     val success: Boolean = true,
     val notifications: List<AppNotification> = emptyList(),
+    val error: String? = null,
+)
+
+@Serializable
+data class BookingReminder(
+    val startDate: String? = null,
+    val endDate: String? = null,
+    val active: Boolean = false,
+    val setAt: String? = null,
+    val setByName: String? = null,
+    val lastNotifiedDate: String? = null,
+)
+
+@Serializable
+data class BookingReminderResponse(
+    val success: Boolean = true,
+    val reminder: BookingReminder? = null,
+    val active: Boolean = false,
+    val today: String? = null,
+    val message: String? = null,
+    val notifiedToday: Boolean = false,
     val error: String? = null,
 )
 
@@ -473,6 +538,14 @@ data class AdminUserSummary(
     @SerialName("last_login")
     val lastLogin: String? = null,
     val picture: String? = null,
+)
+
+@Serializable
+data class AdminUserDetailResponse(
+    val success: Boolean = true,
+    val user: AdminUserSummary? = null,
+    val error: String? = null,
+    val details: String? = null,
 )
 
 @Serializable

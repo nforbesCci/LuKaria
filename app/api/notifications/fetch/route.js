@@ -1,51 +1,35 @@
 import { NextResponse } from 'next/server';
 import { getApiSession } from '../../../../lib/api-auth';
-import clientPromise from '../../../../lib/mongodb';
+import { getDatabase } from '../../../../lib/mongodb';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
-    console.log('📥 API: Received notification fetch request');
-    
-    // Get user session
     const session = await getApiSession(request);
-    
-    if (!session || !session.user) {
-      console.error('❌ API: User not authenticated');
-      return NextResponse.json(
-        { success: false, error: 'Not authenticated' },
-        { status: 401 }
-      );
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
     }
 
     const userId = session.user.sub;
-    console.log('👤 API: User ID:', userId);
-
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db('LukariaDB');
+    const db = await getDatabase();
     const collection = db.collection('NotificationCollection');
 
-    console.log('🔍 API: Fetching notifications for user:', userId);
-
-    // Fetch notifications for the user, sorted by timestamp (newest first)
     const notifications = await collection
       .find({ userId })
       .sort({ timestamp: -1 })
+      .limit(50)
       .toArray();
-
-    console.log(`✅ API: Found ${notifications.length} notifications`);
 
     return NextResponse.json({
       success: true,
       notifications,
     });
-
   } catch (error) {
-    console.error('❌ API: Error fetching notifications:', error);
+    console.error('Notification fetch error:', error);
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to fetch notifications' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

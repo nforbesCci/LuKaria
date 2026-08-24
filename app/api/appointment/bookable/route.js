@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getApiSession } from '../../../../lib/api-auth';
-import { getCalendarConfig } from '../../../../lib/calendar-config';
+import {
+  getCalendarConfig,
+  getBookableAppointmentTypes,
+} from '../../../../lib/calendar-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,21 +25,20 @@ export async function GET(request) {
       });
     }
 
-    const types = (config.appointmentTypes || [])
-      .filter((t) => t.enabled !== false && (t.eventTypeUri || t.eventTypeUrl))
-      .map((t) => ({
-        id: t.id,
-        name: t.name,
-        durationMinutes: t.durationMinutes,
-        eventTypeUri: t.eventTypeUri || null,
-        eventTypeUrl: t.eventTypeUrl || null,
-      }));
+    const types = getBookableAppointmentTypes(config).map((t) => ({
+      id: t.id,
+      name: t.name,
+      durationMinutes: t.durationMinutes,
+      eventTypeUri: t.eventTypeUri || null,
+      eventTypeUrl: t.eventTypeUrl || null,
+    }));
 
     return NextResponse.json({
       success: true,
       enabled: true,
       types,
       bookingLabel: config.bookingLabel,
+      providerName: 'Dr Kadria Fairclough',
     });
   } catch (error) {
     console.error('Bookable types error:', error);

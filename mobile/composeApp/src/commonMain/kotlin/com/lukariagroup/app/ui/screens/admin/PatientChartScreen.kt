@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -31,6 +32,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,11 +48,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.lukariagroup.app.AppContainer
+import com.lukariagroup.app.data.models.BookingReminder
 import com.lukariagroup.app.data.models.PatientProfile
 import com.lukariagroup.app.data.models.PreAppointmentTask
 import com.lukariagroup.app.ui.components.BodyCopy
 import com.lukariagroup.app.ui.components.DashboardAppIcon
 import com.lukariagroup.app.ui.components.ErrorText
+import com.lukariagroup.app.ui.components.IsoDatePickerField
 import com.lukariagroup.app.ui.components.LoadingBlock
 import com.lukariagroup.app.ui.components.LukariaScaffold
 import com.lukariagroup.app.ui.components.SectionTitle
@@ -80,6 +84,10 @@ fun PatientChartScreen(
     var rolesLoading by remember { mutableStateOf(false) }
     var savingRole by remember { mutableStateOf(false) }
     var roleMenuExpanded by remember { mutableStateOf(false) }
+    var reminder by remember { mutableStateOf<BookingReminder?>(null) }
+    var reminderStartDate by remember { mutableStateOf("") }
+    var savingReminder by remember { mutableStateOf(false) }
+    var showReminderPanel by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val sessionUser by AppContainer.authRepository.user.collectAsState()
     val canManageRoles = sessionUser?.isAdmin == true
@@ -116,6 +124,15 @@ fun PatientChartScreen(
             runCatching { AppContainer.adminRepository.fetchPreAppointmentTasks(userId) }
                 .onSuccess { tasks = it.tasks }
                 .onFailure { errors += "Tasks: ${it.message}" }
+
+            runCatching { AppContainer.adminRepository.fetchBookingReminder(userId) }
+                .onSuccess {
+                    reminder = it.reminder
+                    if (reminderStartDate.isBlank()) {
+                        reminderStartDate = it.reminder?.startDate.orEmpty()
+                    }
+                }
+                .onFailure { errors += "Reminder: ${it.message}" }
 
             error = errors.takeIf { it.isNotEmpty() }?.joinToString("\n")
             loading = false
@@ -182,11 +199,82 @@ fun PatientChartScreen(
                 onClick = { onNavigate(AppRoute.AdminChartReschedule.create(userId)) },
             )
             DashboardAppIcon(
+                label = "Next appt reminder",
+                icon = Icons.Filled.NotificationsActive,
+                containerColor = Color(0xFF877449),
+                onClick = { showReminderPanel = !showReminderPanel },
+            )
+            DashboardAppIcon(
                 label = "Lab Requisition",
                 icon = Icons.Filled.Biotech,
                 containerColor = Color(0xFF5B7C99),
                 onClick = { onNavigate(AppRoute.LabRequisitionForUser.create(userId)) },
             )
+        }
+
+        if (showReminderPanel) {
+            SectionTitle("Next appointment reminder")
+            BodyCopy(
+                "Set the date the patient should start getting phone notifications to book their next visit. " +
+                    "They will be reminded daily for one week.",
+            )
+            if (reminder?.active == true && !reminder?.startDate.isNullOrBlank()) {
+                BodyCopy(
+                    "Active: ${reminder?.startDate} → ${reminder?.endDate}" +
+                        (reminder?.setByName?.let { " (set by $it)" } ?: ""),
+                )
+            }
+            IsoDatePickerField(
+                dateIso = reminderStartDate,
+                onDateChange = { reminderStartDate = it },
+                label = "Notify starting",
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Button(
+                    onClick = {
+                        if (reminderStartDate.isBlank()) {
+                            error = "Pick a start date for reminders"
+                            return@Button
+                        }
+                        scope.launch {
+                            savingReminder = true
+                            runCatching {
+                                AppContainer.adminRepository.setBookingReminder(userId, reminderStartDate)
+                            }.onSuccess { res ->
+                                if (!res.success) {
+                                    error = res.error ?: "Failed to set reminder"
+                                } else {
+                                    reminder = res.reminder
+                                    message = res.message ?: "Booking reminders scheduled for 7 days"
+                                    error = null
+                                }
+                            }.onFailure { error = it.message }
+                            savingReminder = false
+                        }
+                    },
+                    enabled = !savingReminder && reminderStartDate.isNotBlank(),
+                    modifier = Modifier.weight(1f),
+                ) { Text(if (savingReminder) "Saving…" else "Schedule 7-day reminders") }
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            savingReminder = true
+                            runCatching {
+                                AppContainer.adminRepository.clearBookingReminder(userId)
+                            }.onSuccess {
+                                reminder = null
+                                reminderStartDate = ""
+                                message = "Booking reminders cleared"
+                            }.onFailure { error = it.message }
+                            savingReminder = false
+                        }
+                    },
+                    enabled = !savingReminder && reminder?.active == true,
+                ) { Text("Clear") }
+            }
         }
 
         if (canManageRoles) {

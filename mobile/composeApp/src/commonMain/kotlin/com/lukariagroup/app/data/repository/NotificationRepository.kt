@@ -1,6 +1,6 @@
 package com.lukariagroup.app.data.repository
 
-import com.lukariagroup.app.data.models.AppNotification
+import com.lukariagroup.app.data.models.BookingReminderResponse
 import com.lukariagroup.app.data.models.NotificationsResponse
 import io.ktor.client.HttpClient
 import kotlinx.serialization.json.buildJsonObject
@@ -25,4 +25,7 @@ class NotificationRepository(private val client: HttpClient) {
                 if (userId != null) put("userId", userId)
             },
         )
+
+    suspend fun myBookingReminder(): BookingReminderResponse =
+        client.getApi("api/booking-reminder/mine")
 }

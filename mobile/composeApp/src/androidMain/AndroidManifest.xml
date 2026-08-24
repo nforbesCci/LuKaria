@@ -3,6 +3,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- LookCamera privacy/terms links open https://3dlook.ai/... -->
@@ -50,6 +55,9 @@
                     android:host="callback" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".core.BookingReminderReceiver"
+            android:exported="false" />
         <!-- Ensure LookCamera activity keeps a light no-action-bar theme under our app -->
         <activity
             android:name="com.look.camera.sdk.SdkActivity"

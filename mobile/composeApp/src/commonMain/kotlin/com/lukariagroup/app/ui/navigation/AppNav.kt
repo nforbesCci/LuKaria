@@ -27,6 +27,7 @@ sealed class AppRoute(val route: String) {
     data object MedicationTracker : AppRoute("patient/medications")
     data object MealTracker : AppRoute("patient/meals")
     data object SideEffects : AppRoute("patient/side-effects")
+    data object Notifications : AppRoute("patient/notifications")
     data object Membership : AppRoute("patient/membership")
     data object BarcodeScanner : AppRoute("patient/barcode")
 
@@ -76,7 +77,7 @@ sealed class AppRoute(val route: String) {
             Privacy, Terms, Hipaa, Services, BlogList,
         )
         val patient = listOf(
-            Dashboard, ProfileWizard, ConsentForms, Schedule,
+            Dashboard, ProfileWizard, ConsentForms, Schedule, Notifications,
             WeightLogging, BodyScan, MedicationTracker, MealTracker,
             SideEffects, Membership, BarcodeScanner,
         )

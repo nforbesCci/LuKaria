@@ -49,6 +49,7 @@ import com.lukariagroup.app.ui.screens.marketing.TestimonialsScreen
 import com.lukariagroup.app.ui.screens.patient.BarcodeScannerScreen
 import com.lukariagroup.app.ui.screens.patient.BodyScanScreen
 import com.lukariagroup.app.ui.screens.patient.ConsentFormsScreen
+import com.lukariagroup.app.ui.screens.patient.NotificationsScreen
 import com.lukariagroup.app.ui.screens.patient.DashboardScreen
 import com.lukariagroup.app.ui.screens.patient.MealTrackerScreen
 import com.lukariagroup.app.ui.screens.patient.MedicationTrackerScreen
@@ -182,6 +183,7 @@ fun App() {
                 MealTrackerScreen(onBack = { navController.popBackStack() })
             }
             composable(AppRoute.SideEffects.route) { SideEffectsScreen { navController.popBackStack() } }
+            composable(AppRoute.Notifications.route) { NotificationsScreen { navController.popBackStack() } }
             composable(AppRoute.Membership.route) { MembershipScreen { navController.popBackStack() } }
             composable(AppRoute.BarcodeScanner.route) { BarcodeScannerScreen { navController.popBackStack() } }
 

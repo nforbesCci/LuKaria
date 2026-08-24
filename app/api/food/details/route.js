@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cleanEnvValue } from '../../../../lib/usda';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,7 @@ export async function GET(request) {
     }
 
     // Get API key from environment variables
-    const apiKey = process.env.USDA_API_KEY;
+    const apiKey = cleanEnvValue(process.env.USDA_API_KEY);
     
     if (!apiKey) {
       console.error('❌ USDA API key not configured');

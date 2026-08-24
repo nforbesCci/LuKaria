@@ -4,7 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccountAction, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminBodyScansAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction } from '../../../../store/slices/adminSlice';
+import { enableUserAccountAction, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminBodyScansAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction, setSelectedUser } from '../../../../store/slices/adminSlice';
 import AdminConsentForms from '../../../../components/AdminConsentForms';
 import ConsentFormViewer from '../../../../components/ConsentFormViewer';
 import AdminQuestions from '../../../../components/AdminQuestions';
@@ -16,6 +16,7 @@ import AdminMedicationTracker from '../../../../components/AdminMedicationTracke
 import { adminRescheduleAppointment } from '../../../../store/slices/appointmentSlice';
 import { useAdminAccess } from '../../../../hooks/useAccessControl';
 import Header from '../../../../components/Header';
+import ScheduleBooking from '../../../../components/ScheduleBooking';
 import {
   Container,
   Typography,
@@ -84,6 +85,7 @@ import {
   LocalHospital,
   HealthAndSafety,
   Quiz,
+  NotificationsActive,
   Home as HomeIcon,
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
@@ -189,6 +191,11 @@ export default function UserDetailPage() {
   const [roleFeedback, setRoleFeedback] = useState(null);
   const [showEditUser, setShowEditUser] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
+  const [showBookingReminder, setShowBookingReminder] = useState(false);
+  const [bookingReminderDate, setBookingReminderDate] = useState('');
+  const [bookingReminder, setBookingReminder] = useState(null);
+  const [savingBookingReminder, setSavingBookingReminder] = useState(false);
+  const [bookingReminderFeedback, setBookingReminderFeedback] = useState(null);
   const [appointmentData, setAppointmentData] = useState({
     type: 'review',
     date: '',
@@ -435,6 +442,10 @@ export default function UserDetailPage() {
         setDbConsultationOccurred(data.profile.user_metadata.consultationOccurred);
         console.log('📋 consultationOccurred from DB:', data.profile.user_metadata.consultationOccurred);
       }
+      if (data.profile?.nextBookingReminder) {
+        setBookingReminder(data.profile.nextBookingReminder);
+        setBookingReminderDate(data.profile.nextBookingReminder.startDate || '');
+      }
     } catch (err) {
       console.warn('⚠️ Error fetching DB profile:', err);
     }
@@ -534,6 +545,55 @@ export default function UserDetailPage() {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleSaveBookingReminder = async () => {
+    if (!bookingReminderDate) {
+      setBookingReminderFeedback({ type: 'error', message: 'Pick a start date for reminders.' });
+      return;
+    }
+    setSavingBookingReminder(true);
+    setBookingReminderFeedback(null);
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(userId)}/booking-reminder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate: bookingReminderDate }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to schedule reminders');
+      setBookingReminder(data.reminder);
+      setBookingReminderFeedback({
+        type: 'success',
+        message: data.message || 'Patient will be reminded daily for one week.',
+      });
+    } catch (err) {
+      setBookingReminderFeedback({ type: 'error', message: err.message });
+    } finally {
+      setSavingBookingReminder(false);
+    }
+  };
+
+  const handleClearBookingReminder = async () => {
+    setSavingBookingReminder(true);
+    setBookingReminderFeedback(null);
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(userId)}/booking-reminder`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to clear reminders');
+      setBookingReminder(null);
+      setBookingReminderDate('');
+      setBookingReminderFeedback({
+        type: 'success',
+        message: data.message || 'Booking reminders cleared.',
+      });
+    } catch (err) {
+      setBookingReminderFeedback({ type: 'error', message: err.message });
+    } finally {
+      setSavingBookingReminder(false);
+    }
   };
 
   const handleSaveAppointment = () => {
@@ -1118,7 +1178,9 @@ export default function UserDetailPage() {
   };
 
   const generateLabRequisition = () => {
-    // Navigate to lab requisition page
+    if (userData) {
+      dispatch(setSelectedUser(userData));
+    }
     router.push('/lab-requisition');
   };
 
@@ -1524,64 +1586,29 @@ export default function UserDetailPage() {
                 }
               </Button>
               <Button
-                variant="contained"
+                variant={showReschedule ? 'outlined' : 'contained'}
                 color="primary"
                 startIcon={<Event sx={{ color: '#877449' }} />}
-                onClick={() => {
-                  console.log('📅 Loading appointment details for reschedule');
-                  console.log('DB Profile:', dbProfile);
-                  
-                  // Pre-populate form with existing appointment data from MongoDB profile
-                  const existingAppointment = dbProfile;
-                  console.log('Existing appointment from DB:', existingAppointment);
-                  
-                  if (existingAppointment && existingAppointment.isScheduled) {
-                    // Format date if needed (convert from various formats)
-                    let formattedDate = '';
-                    if (existingAppointment.date) {
-                      // Try to parse and format the date
-                      const dateObj = new Date(existingAppointment.date);
-                      if (!isNaN(dateObj.getTime())) {
-                        formattedDate = dateObj.toISOString().split('T')[0];
-                      } else {
-                        formattedDate = existingAppointment.date;
-                      }
-                    }
-                    
-                    const normalizedType = existingAppointment.type?.toLowerCase();
-                    const defaultType = normalizedType === 'review'
-                      ? 'review'
-                      : normalizedType === 'consultation'
-                        ? 'review'
-                        : normalizedType || 'review';
-
-                    setAppointmentData({
-                      type: defaultType,
-                      date: formattedDate,
-                      time: existingAppointment.time || '',
-                      length: existingAppointment.length || 30,
-                    });
-                    console.log('✅ Appointment form pre-populated from DB:', {
-                      type: existingAppointment.type || 'consultation',
-                      date: formattedDate,
-                      time: existingAppointment.time || '',
-                      length: existingAppointment.length || 30,
-                    });
-                  } else {
-                    console.log('ℹ️ No existing appointment found in DB, using defaults');
-                    // Reset to defaults if no appointment exists
-                    setAppointmentData({
-                      type: 'review',
-                      date: '',
-                      time: '',
-                      length: 30,
-                    });
-                  }
-                  setShowReschedule(true);
-                }}
+                onClick={() => setShowReschedule((open) => !open)}
                 sx={{ textTransform: 'none' }}
               >
                 Reschedule
+              </Button>
+              <Button
+                variant={showBookingReminder ? 'outlined' : 'contained'}
+                startIcon={<NotificationsActive />}
+                onClick={() => setShowBookingReminder((open) => !open)}
+                sx={{
+                  textTransform: 'none',
+                  ...(showBookingReminder
+                    ? { borderColor: '#877449', color: '#877449' }
+                    : {
+                        backgroundColor: '#877449',
+                        '&:hover': { backgroundColor: '#B8941F' },
+                      }),
+                }}
+              >
+                Next appointment reminder
               </Button>
               <Button
                 variant="contained"
@@ -1663,6 +1690,65 @@ export default function UserDetailPage() {
                   )}
                 </Box>
               </Box>
+            )}
+
+            {showBookingReminder && (
+            <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600, alignItems: 'center', gap: 1, display: 'flex' }}>
+                <NotificationsActive sx={{ color: '#877449' }} />
+                Next appointment reminder
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Choose the date this patient should start getting phone notifications to book their
+                next visit. They will be reminded daily for one week.
+              </Typography>
+              {bookingReminder?.active && bookingReminder?.startDate && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  Active window: {bookingReminder.startDate} → {bookingReminder.endDate}
+                  {bookingReminder.setByName ? ` (set by ${bookingReminder.setByName})` : ''}
+                </Alert>
+              )}
+              {bookingReminderFeedback && (
+                <Alert
+                  severity={bookingReminderFeedback.type}
+                  sx={{ mb: 2 }}
+                  onClose={() => setBookingReminderFeedback(null)}
+                >
+                  {bookingReminderFeedback.message}
+                </Alert>
+              )}
+              <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                <TextField
+                  label="Notify starting"
+                  type="date"
+                  size="small"
+                  value={bookingReminderDate}
+                  onChange={(e) => setBookingReminderDate(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ minWidth: 200 }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleSaveBookingReminder}
+                  disabled={savingBookingReminder || !bookingReminderDate}
+                  sx={{
+                    textTransform: 'none',
+                    backgroundColor: '#877449',
+                    '&:hover': { backgroundColor: '#B8941F' },
+                  }}
+                >
+                  {savingBookingReminder ? 'Saving…' : 'Schedule 7-day reminders'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={handleClearBookingReminder}
+                  disabled={savingBookingReminder || !bookingReminder?.active}
+                  sx={{ textTransform: 'none', borderColor: '#877449', color: '#877449' }}
+                >
+                  Clear
+                </Button>
+              </Box>
+            </Box>
             )}
           </CardContent>
         </Card>
@@ -1780,98 +1866,15 @@ export default function UserDetailPage() {
                 </Alert>
               )}
 
-              {/* Appointment Form */}
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="appointment-type-label">Appointment Type</InputLabel>
-                    <Select
-                      labelId="appointment-type-label"
-                      id="appointment-type"
-                      value={appointmentData.type}
-                      label="Appointment Type"
-                      onChange={(e) => handleAppointmentChange('type', e.target.value)}
-                    >
-                      <MenuItem value="review">Review</MenuItem>
-                      <MenuItem value="consultation">Consultation</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="appointment-length-label">Appointment Length</InputLabel>
-                    <Select
-                      labelId="appointment-length-label"
-                      id="appointment-length"
-                      value={appointmentData.length}
-                      label="Appointment Length"
-                      onChange={(e) => handleAppointmentChange('length', e.target.value)}
-                    >
-                      <MenuItem value={15}>15 minutes</MenuItem>
-                      <MenuItem value={30}>30 minutes</MenuItem>
-                      <MenuItem value={45}>45 minutes</MenuItem>
-                      <MenuItem value={60}>60 minutes</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Date"
-                    type="date"
-                    value={appointmentData.date}
-                    onChange={(e) => handleAppointmentChange('date', e.target.value)}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    inputProps={{
-                      min: new Date().toISOString().split('T')[0]
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Time"
-                    type="time"
-                    value={appointmentData.time}
-                    onChange={(e) => handleAppointmentChange('time', e.target.value)}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => setShowReschedule(false)}
-                      disabled={isBooking}
-                      sx={{ textTransform: 'none' }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={handleSaveAppointment}
-                      disabled={isBooking || !appointmentData.date || !appointmentData.time}
-                      sx={{ 
-                        textTransform: 'none',
-                        backgroundColor: '#877449',
-                        '&:hover': {
-                          backgroundColor: '#B8941F',
-                        }
-                      }}
-                    >
-                      {isBooking ? 'Saving...' : 'Save Appointment'}
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
+              <ScheduleBooking
+                forUserId={decodeURIComponent(userId)}
+                showChangeNote={false}
+                onSuccess={() => {
+                  setShowReschedule(false);
+                  fetchUserData();
+                  dispatch(fetchAdminProfileAction({ userId }));
+                }}
+              />
             </CardContent>
           </Card>
         )}

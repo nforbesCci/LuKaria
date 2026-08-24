@@ -50,6 +50,8 @@ class AppointmentRepository(private val client: HttpClient) {
         eventTypeUri: String,
         startTime: String,
         typeName: String? = null,
+        timezone: String? = null,
+        forUserId: String? = null,
     ): BookAppointmentResponse =
         client.postApi(
             "api/appointment/book",
@@ -57,6 +59,8 @@ class AppointmentRepository(private val client: HttpClient) {
                 put("eventTypeUri", eventTypeUri)
                 put("startTime", startTime)
                 if (typeName != null) put("typeName", typeName)
+                if (timezone != null) put("timezone", timezone)
+                if (!forUserId.isNullOrBlank()) put("forUserId", forUserId)
             },
         )
 }

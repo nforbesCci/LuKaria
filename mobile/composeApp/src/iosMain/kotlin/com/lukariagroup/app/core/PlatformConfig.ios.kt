@@ -19,5 +19,5 @@ actual object PlatformConfig {
     actual val carepatronBookingUrl: String =
         "https://book.carepatron.com/Svelte-by-LuKaria/Kadria?p=r9RnLSo5RHyHR3fgw8hd.Q&s=OxGL.h4Z&i=PRIJX0DU&e=i"
     actual val calendlyBookingUrl: String =
-        "https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation"
+        "https://calendly.com/kadriaf-lukariagroup/30min"
 }
