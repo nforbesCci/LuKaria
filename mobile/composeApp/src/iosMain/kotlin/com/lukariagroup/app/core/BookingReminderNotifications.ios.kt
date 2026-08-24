@@ -51,30 +51,6 @@ actual fun clearBookingReminderNotifications() {
         center.removeDeliveredNotificationsWithIdentifiers(ids)
     }
     defaults.removeObjectForKey(PREFS_IDS)
-
-    // Also sweep any leftover booking-reminder-* requests.
-    center.getPendingNotificationRequestsWithCompletionHandler { requests ->
-        val leftover = requests
-            ?.mapNotNull { req ->
-                val id = req.identifier
-                if (id.startsWith(ID_PREFIX)) id else null
-            }
-            .orEmpty()
-        if (leftover.isNotEmpty()) {
-            center.removePendingNotificationRequestsWithIdentifiers(leftover)
-        }
-    }
-    center.getDeliveredNotificationsWithCompletionHandler { delivered ->
-        val leftover = delivered
-            ?.mapNotNull { note ->
-                val id = note.request.identifier
-                if (id.startsWith(ID_PREFIX)) id else null
-            }
-            .orEmpty()
-        if (leftover.isNotEmpty()) {
-            center.removeDeliveredNotificationsWithIdentifiers(leftover)
-        }
-    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -116,14 +92,14 @@ actual fun scheduleBookingReminderNotifications(
             return@forEach
         }
 
-        val components = NSDateComponents().apply {
-            this.year = year.toLong()
-            this.month = month.toLong()
-            this.day = day.toLong()
-            this.hour = NOTIFY_HOUR
-            this.minute = NOTIFY_MINUTE
-            this.second = 0
-        }
+        val components = NSDateComponents()
+        components.year = year.toLong()
+        components.month = month.toLong()
+        components.day = day.toLong()
+        components.hour = NOTIFY_HOUR
+        components.minute = NOTIFY_MINUTE
+        components.second = 0
+
         val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
             dateComponents = components,
             repeats = false,
@@ -167,11 +143,12 @@ private fun addNotification(
     message: String,
     trigger: UNNotificationTrigger,
 ) {
-    val content = UNMutableNotificationContent().apply {
-        this.title = title
-        this.body = message
-        this.sound = UNNotificationSound.defaultSound
-    }
+    val content = UNMutableNotificationContent()
+    // Kotlin/Native imports these ObjC properties as read-only vals; set via KVC.
+    content.setValue(title, forKey = "title")
+    content.setValue(message, forKey = "body")
+    content.setValue(UNNotificationSound.defaultSound, forKey = "sound")
+
     val request = UNNotificationRequest.requestWithIdentifier(
         identifier = identifier,
         content = content,
@@ -187,31 +164,30 @@ private fun eachInclusiveDay(startIso: String, endIso: String): List<String> {
     if (startParts.size != 3 || endParts.size != 3) return emptyList()
 
     val calendar = NSCalendar.currentCalendar
-    val startComponents = NSDateComponents().apply {
-        year = startParts[0].toLong()
-        month = startParts[1].toLong()
-        day = startParts[2].toLong()
-        hour = 12
-        minute = 0
-        second = 0
-    }
-    val endComponents = NSDateComponents().apply {
-        year = endParts[0].toLong()
-        month = endParts[1].toLong()
-        day = endParts[2].toLong()
-        hour = 12
-        minute = 0
-        second = 0
-    }
+    val startComponents = NSDateComponents()
+    startComponents.year = startParts[0].toLong()
+    startComponents.month = startParts[1].toLong()
+    startComponents.day = startParts[2].toLong()
+    startComponents.hour = 12
+    startComponents.minute = 0
+    startComponents.second = 0
+
+    val endComponents = NSDateComponents()
+    endComponents.year = endParts[0].toLong()
+    endComponents.month = endParts[1].toLong()
+    endComponents.day = endParts[2].toLong()
+    endComponents.hour = 12
+    endComponents.minute = 0
+    endComponents.second = 0
+
     var cursor = calendar.dateFromComponents(startComponents) ?: return emptyList()
     val endDate = calendar.dateFromComponents(endComponents) ?: return emptyList()
     if (cursor.timeIntervalSince1970 > endDate.timeIntervalSince1970) return emptyList()
 
-    val formatter = NSDateFormatter().apply {
-        dateFormat = "yyyy-MM-dd"
-        locale = NSLocale.localeWithLocaleIdentifier("en_US_POSIX")
-        timeZone = calendar.timeZone
-    }
+    val formatter = NSDateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    formatter.locale = NSLocale.localeWithLocaleIdentifier("en_US_POSIX")
+    formatter.timeZone = calendar.timeZone
 
     val out = mutableListOf<String>()
     var guard = 0
