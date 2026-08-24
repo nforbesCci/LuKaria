@@ -52,14 +52,14 @@ actual fun isoDateToEpochMillis(iso: String): Long? {
 }
 
 actual fun deviceTimeZoneId(): String =
-    NSTimeZone.systemTimeZone.name
+    NSCalendar.currentCalendar.timeZone.name
 
 actual fun instantToLocalDateIso(instantIso: String): String {
     val instant = parseInstant(instantIso) ?: return instantIso.take(10)
     val formatter = NSDateFormatter().apply {
         dateFormat = "yyyy-MM-dd"
         locale = NSLocale.localeWithLocaleIdentifier("en_US_POSIX")
-        timeZone = NSTimeZone.systemTimeZone
+        timeZone = NSCalendar.currentCalendar.timeZone
     }
     return formatter.stringFromDate(instant)
 }
@@ -78,9 +78,7 @@ actual fun localDateStartInstantIso(dateIso: String): String {
         this.minute = 0
         this.second = 0
     }
-    val calendar = NSCalendar.currentCalendar.apply {
-        timeZone = NSTimeZone.systemTimeZone
-    }
+    val calendar = NSCalendar.currentCalendar
     val date = calendar.dateFromComponents(components) ?: return "${dateIso.trim()}T00:00:00.000Z"
     val formatter = NSDateFormatter().apply {
         dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
@@ -94,8 +92,8 @@ actual fun formatInstantLocalTime(instantIso: String): String {
     val instant = parseInstant(instantIso) ?: return instantIso
     val formatter = NSDateFormatter().apply {
         dateFormat = "h:mm a"
-        locale = NSLocale.autoupdatingCurrentLocale
-        timeZone = NSTimeZone.systemTimeZone
+        locale = NSLocale.localeWithLocaleIdentifier("en_US_POSIX")
+        timeZone = NSCalendar.currentCalendar.timeZone
     }
     return formatter.stringFromDate(instant)
 }
