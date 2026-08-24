@@ -4,6 +4,7 @@ import { getCalendarConfig, getBookableAppointmentTypes } from '../../../../lib/
 import { createInvitee, resolveCalendlyToken, calendlyDefaultTimezone } from '../../../../lib/calendly';
 import { getCollection } from '../../../../lib/mongodb';
 import { getManagementClient } from '../../../../lib/auth0-management';
+import { completeBookingRemindersForUser } from '../../../../lib/booking-reminders';
 
 export const dynamic = 'force-dynamic';
 
@@ -138,6 +139,16 @@ export async function POST(request) {
       { upsert: true },
     );
 
+    // Stop reminder alerts until the doctor schedules a new reminder window.
+    let reminderCompletion = null;
+    try {
+      reminderCompletion = await completeBookingRemindersForUser(userId, {
+        reason: 'appointment_booked',
+      });
+    } catch (reminderErr) {
+      console.error('Failed to complete booking reminders after book:', reminderErr);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Appointment booked',
@@ -150,6 +161,7 @@ export async function POST(request) {
         userId,
       },
       invitee,
+      reminderCompletion,
     });
   } catch (error) {
     console.error('Book appointment error:', error);

@@ -29,6 +29,8 @@ export async function GET(request) {
             endDate: reminder.endDate,
             active: Boolean(reminder.active),
             setAt: reminder.setAt,
+            completedAt: reminder.completedAt || null,
+            completedReason: reminder.completedReason || null,
           }
         : null,
     });

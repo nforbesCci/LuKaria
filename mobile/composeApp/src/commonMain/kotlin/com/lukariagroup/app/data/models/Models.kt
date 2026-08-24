@@ -434,8 +434,11 @@ data class AppNotification(
     val message: String? = null,
     val type: String? = null,
     val read: Boolean = false,
+    val completed: Boolean = false,
     val timestamp: String? = null,
     val reminderDay: String? = null,
+    val completedAt: String? = null,
+    val completedReason: String? = null,
 )
 
 @Serializable

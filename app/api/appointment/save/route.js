@@ -1,6 +1,7 @@
 import { getApiSession } from '../../../../lib/api-auth';
 import { NextResponse } from 'next/server';
 import { getCollection } from '../../../../lib/mongodb';
+import { completeBookingRemindersForUser } from '../../../../lib/booking-reminders';
 
 // POST /api/appointment/save - Save/update appointment to MongoDB
 export async function POST(request) {
@@ -83,6 +84,12 @@ export async function POST(request) {
       modified: result.modifiedCount,
       upserted: result.upsertedCount
     });
+
+    try {
+      await completeBookingRemindersForUser(userId, { reason: 'appointment_booked' });
+    } catch (reminderErr) {
+      console.error('Failed to complete booking reminders after save:', reminderErr);
+    }
 
     const responseData = {
       isScheduled: true,

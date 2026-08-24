@@ -71,10 +71,17 @@ fun NotificationsScreen(onBack: () -> Unit) {
 @Composable
 private fun NotificationCard(n: AppNotification) {
     val dateLabel = formatNotificationDate(n.timestamp, n.reminderDay)
+    val isDone = n.completed || n.read
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDone) {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDone) 0.dp else 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -94,7 +101,14 @@ private fun NotificationCard(n: AppNotification) {
                     modifier = Modifier.padding(top = 6.dp),
                 )
             }
-            if (!n.type.isNullOrBlank()) {
+            if (isDone) {
+                Text(
+                    "Completed",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            } else if (!n.type.isNullOrBlank()) {
                 Text(
                     n.type.replace('_', ' '),
                     style = MaterialTheme.typography.labelSmall,

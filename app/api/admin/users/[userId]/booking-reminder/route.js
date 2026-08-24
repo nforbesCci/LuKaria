@@ -3,6 +3,7 @@ import { getApiSession, hasAdminOrDoctorRole } from '../../../../../../lib/api-a
 import { getDatabase } from '../../../../../../lib/mongodb';
 import {
   buildReminderWindow,
+  completeBookingRemindersForUser,
   insertBookingReminderNotification,
   isDateInReminderWindow,
   todayIsoInClinicTz,
@@ -56,6 +57,8 @@ export async function POST(request, { params }) {
       setByName: auth.session.user.name || auth.session.user.email || null,
       setAt: new Date().toISOString(),
       lastNotifiedDate: null,
+      completedAt: null,
+      completedReason: null,
     };
 
     const db = await getDatabase();
@@ -107,17 +110,7 @@ export async function DELETE(request, { params }) {
     const auth = await requireDoctor(request);
     if (auth.error) return auth.error;
     const userId = params.userId;
-    const db = await getDatabase();
-    await db.collection('profiles').updateOne(
-      { userId },
-      {
-        $set: {
-          'nextBookingReminder.active': false,
-          updatedAt: new Date(),
-          updatedBy: auth.session.user.sub,
-        },
-      },
-    );
+    await completeBookingRemindersForUser(userId, { reason: 'cleared_by_staff' });
     return NextResponse.json({ success: true, message: 'Booking reminders cleared' });
   } catch (error) {
     console.error('Clear booking reminder error:', error);

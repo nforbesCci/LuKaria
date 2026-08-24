@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.lukariagroup.app.AppContainer
+import com.lukariagroup.app.core.clearBookingReminderNotifications
 import com.lukariagroup.app.core.deviceTimeZoneId
 import com.lukariagroup.app.core.formatInstantLocalTime
 import com.lukariagroup.app.core.instantToLocalDateIso
@@ -308,6 +309,7 @@ fun ScheduleScreen(
                                         forUserId = forUserId,
                                     )
                                 }.onSuccess {
+                                    clearBookingReminderNotifications()
                                     bookSuccess = true
                                     message = "Appointment booked"
                                     selectedSlot = null
