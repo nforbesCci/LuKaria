@@ -38,6 +38,8 @@ struct iOSApp: App {
         LookCameraBridge.install()
         // AVFoundation barcode scanner for meal / food lookup.
         BarcodeScannerBridge.install()
+        // Local Notification Center booking reminders for Kotlin.
+        BookingReminderBridge.install()
     }
 
     var body: some Scene {
