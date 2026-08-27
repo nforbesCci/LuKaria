@@ -14,6 +14,7 @@
 		A1LOOKCAM00000000000001 /* LookCameraBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1LOOKCAM00000000000002 /* LookCameraBridge.swift */; };
 		A1LOOKCAM00000000000003 /* LookCamera in Frameworks */ = {isa = PBXBuildFile; productRef = A1LOOKCAM00000000000004 /* LookCamera */; };
 		A1BARCODE00000000000001 /* BarcodeScannerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BARCODE00000000000002 /* BarcodeScannerBridge.swift */; };
+		A1BOOKREM00000000000001 /* BookingReminderBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BOOKREM00000000000002 /* BookingReminderBridge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,7 @@
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1LOOKCAM00000000000002 /* LookCameraBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookCameraBridge.swift; sourceTree = "<group>"; };
 		A1BARCODE00000000000002 /* BarcodeScannerBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodeScannerBridge.swift; sourceTree = "<group>"; };
+		A1BOOKREM00000000000002 /* BookingReminderBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookingReminderBridge.swift; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -197,6 +199,7 @@
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				A1LOOKCAM00000000000001 /* LookCameraBridge.swift in Sources */,
 				A1BARCODE00000000000001 /* BarcodeScannerBridge.swift in Sources */,
+				A1BOOKREM00000000000001 /* BookingReminderBridge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -13,8 +13,8 @@ import androidx.compose.material.icons.filled.Dining
 import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +30,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.lukariagroup.app.AppContainer
 import com.lukariagroup.app.auth.AuthViewModel
-import com.lukariagroup.app.data.models.AppNotification
+import com.lukariagroup.app.core.clearBookingReminderNotifications
+import com.lukariagroup.app.core.ensureNotificationPermission
+import com.lukariagroup.app.core.scheduleBookingReminderNotifications
 import com.lukariagroup.app.ui.components.BodyCopy
 import com.lukariagroup.app.ui.components.DashboardAppIcon
 import com.lukariagroup.app.ui.components.ErrorText
@@ -56,25 +58,29 @@ fun DashboardScreen(
 ) {
     val authState by authViewModel.uiState.collectAsState()
     val user = authState.user
-    var notifications by remember { mutableStateOf<List<AppNotification>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(authState.isLoggedIn) {
         if (!authState.isLoggedIn) return@LaunchedEffect
         error = null
-        runCatching { AppContainer.notificationRepository.fetch() }
-            .onSuccess { result ->
-                if (!result.success) {
-                    error = result.error ?: "Failed to load notifications"
+        ensureNotificationPermission()
+        // Schedule OS shade notifications for booking reminders (not shown on this screen).
+        runCatching { AppContainer.notificationRepository.myBookingReminder() }
+            .onSuccess { res ->
+                val rem = res.reminder
+                if (res.active && rem?.startDate != null && rem.endDate != null) {
+                    scheduleBookingReminderNotifications(
+                        startDateIso = rem.startDate,
+                        endDateIso = rem.endDate,
+                        title = "Book your next appointment",
+                        message = "Please book your next visit with Dr Kadria Fairclough. Open Schedule to choose a time.",
+                    )
                 } else {
-                    notifications = result.notifications
+                    clearBookingReminderNotifications()
                 }
             }
             .onFailure { err ->
-                val raw = err.message.orEmpty()
-                error = Regex(""""error"\s*:\s*"([^"]+)"""")
-                    .find(raw)?.groupValues?.getOrNull(1)
-                    ?: raw.ifBlank { "Request failed" }
+                error = err.message
             }
     }
 
@@ -82,6 +88,7 @@ fun DashboardScreen(
         DashboardLink("Profile", AppRoute.ProfileWizard.route, Icons.Filled.Person, LukariaGold),
         DashboardLink("Consents", AppRoute.ConsentForms.route, Icons.AutoMirrored.Filled.Assignment, Color(0xFF5B7C99)),
         DashboardLink("Schedule", AppRoute.Schedule.route, Icons.Filled.CalendarMonth, Color(0xFF3D7A5A)),
+        DashboardLink("Notifications", AppRoute.Notifications.route, Icons.Filled.Notifications, Color(0xFF877449)),
         DashboardLink("Weight", AppRoute.WeightLogging.route, Icons.Filled.MonitorWeight, Color(0xFF8B6B4A)),
         DashboardLink("Body scan", AppRoute.BodyScan.route, Icons.Filled.AccessibilityNew, Color(0xFF4A6B8B)),
         DashboardLink("Meds", AppRoute.MedicationTracker.route, Icons.Filled.Medication, Color(0xFF6B5B95)),
@@ -109,14 +116,6 @@ fun DashboardScreen(
                     containerColor = link.color,
                     onClick = { onNavigate(link.route) },
                 )
-            }
-        }
-
-        if (notifications.isNotEmpty()) {
-            SectionTitle("Notifications")
-            notifications.take(5).forEach { n ->
-                Text(n.title ?: "Notice", style = MaterialTheme.typography.titleSmall)
-                Text(n.message.orEmpty(), style = MaterialTheme.typography.bodyMedium)
             }
         }
 

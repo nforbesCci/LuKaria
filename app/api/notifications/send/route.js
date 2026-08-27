@@ -1,54 +1,40 @@
 import { NextResponse } from 'next/server';
-import { getApiSession } from '../../../../lib/api-auth';
-import clientPromise from '../../../../lib/mongodb';
+import { getApiSession, hasAdminOrDoctorRole } from '../../../../lib/api-auth';
+import { getDatabase } from '../../../../lib/mongodb';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   try {
-    console.log('📤 API: Received notification send request');
-    
-    // Get user session
     const session = await getApiSession(request);
-    
-    if (!session || !session.user) {
-      console.error('❌ API: User not authenticated');
-      return NextResponse.json(
-        { success: false, error: 'Not authenticated' },
-        { status: 401 }
-      );
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
     }
 
-    const userId = session.user.sub;
-    console.log('👤 API: User ID:', userId);
-
-    // Parse request body
     const notificationData = await request.json();
-    console.log('📥 API: Notification data received:', notificationData);
+    const isStaff = hasAdminOrDoctorRole(session.user);
+    const targetUserId =
+      isStaff && notificationData.userId ? String(notificationData.userId) : session.user.sub;
 
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db('lukaria');
+    const db = await getDatabase();
     const collection = db.collection('NotificationCollection');
 
-    // Prepare notification document
     const notification = {
-      userId,
-      userEmail: session.user.email || null,
-      userName: session.user.name || null,
+      userId: targetUserId,
+      userEmail: notificationData.userEmail || session.user.email || null,
+      userName: notificationData.userName || session.user.name || null,
       type: notificationData.type || 'general',
+      title: notificationData.title || null,
       details: notificationData.details || '',
       message: notificationData.message || '',
       timestamp: notificationData.timestamp || new Date().toISOString(),
       read: false,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdBy: session.user.sub,
     };
 
-    console.log('💾 API: Saving notification to database:', notification);
-
-    // Insert notification into database
     const result = await collection.insertOne(notification);
-
-    console.log('✅ API: Notification saved successfully with ID:', result.insertedId);
 
     return NextResponse.json({
       success: true,
@@ -57,13 +43,11 @@ export async function POST(request) {
         _id: result.insertedId,
       },
     });
-
   } catch (error) {
-    console.error('❌ API: Error sending notification:', error);
+    console.error('Notification send error:', error);
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to send notification' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

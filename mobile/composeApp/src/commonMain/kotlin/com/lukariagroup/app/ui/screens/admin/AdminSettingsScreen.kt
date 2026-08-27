@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.lukariagroup.app.AppContainer
+import com.lukariagroup.app.data.models.CalendarAppointmentType
 import com.lukariagroup.app.core.PlatformConfig
 import com.lukariagroup.app.core.openExternalUrl
 import com.lukariagroup.app.ui.components.BodyCopy
@@ -23,13 +24,24 @@ import com.lukariagroup.app.ui.components.LoadingBlock
 import com.lukariagroup.app.ui.components.LukariaScaffold
 import com.lukariagroup.app.ui.components.SectionTitle
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+
+/** Safe cast — JsonNull is not Kotlin null, so `.jsonObject` would throw. */
+private fun JsonElement?.asObjectOrNull(): JsonObject? = this as? JsonObject
+
+private fun JsonObject?.stringOrNull(key: String): String? =
+    (this?.get(key) as? JsonPrimitive)?.contentOrNull
+
+private fun JsonObject?.booleanOrFalse(key: String): Boolean =
+    (this?.get(key) as? JsonPrimitive)?.booleanOrNull == true
 
 @Composable
 fun AdminSettingsScreen(onBack: () -> Unit) {
@@ -52,25 +64,29 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
     var calendarBookingLabel by remember { mutableStateOf("Book an appointment") }
     var calendarApiToken by remember { mutableStateOf("") }
     var calendarHasApiToken by remember { mutableStateOf(false) }
+    var calendarCanListEventTypes by remember { mutableStateOf(false) }
+    var appointmentTypes by remember { mutableStateOf<List<CalendarAppointmentType>>(emptyList()) }
+    var importingTypes by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
     fun refresh() {
         scope.launch {
             loading = true
+            error = null
             runCatching { AppContainer.adminRepository.fetchAdminSettings() }
                 .onSuccess { data ->
                     status = data
-                    data["microsoft"]?.jsonObject?.get("config")?.jsonObject?.let { cfg ->
-                        msTenantId = cfg["tenantId"]?.jsonPrimitive?.contentOrNull ?: "common"
-                        msClientId = cfg["clientId"]?.jsonPrimitive?.contentOrNull.orEmpty()
-                        msClientSecret = cfg["clientSecret"]?.jsonPrimitive?.contentOrNull.orEmpty()
+                    // API returns config: null when mail isn't linked — never use .jsonObject here.
+                    data["microsoft"].asObjectOrNull()?.get("config").asObjectOrNull()?.let { cfg ->
+                        msTenantId = cfg.stringOrNull("tenantId") ?: "common"
+                        msClientId = cfg.stringOrNull("clientId").orEmpty()
+                        msClientSecret = cfg.stringOrNull("clientSecret").orEmpty()
                     }
-                    data["google"]?.jsonObject?.get("config")?.jsonObject?.let { cfg ->
-                        gClientId = cfg["clientId"]?.jsonPrimitive?.contentOrNull.orEmpty()
-                        gClientSecret = cfg["clientSecret"]?.jsonPrimitive?.contentOrNull.orEmpty()
+                    data["google"].asObjectOrNull()?.get("config").asObjectOrNull()?.let { cfg ->
+                        gClientId = cfg.stringOrNull("clientId").orEmpty()
+                        gClientSecret = cfg.stringOrNull("clientSecret").orEmpty()
                     }
-                    error = null
                 }
                 .onFailure { error = it.message }
             runCatching { AppContainer.adminRepository.fetchCalendarSettings() }
@@ -82,8 +98,13 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
                         calendarEventTypeUrl = cfg.eventTypeUrl.orEmpty()
                         calendarBookingLabel = cfg.bookingLabel ?: "Book an appointment"
                         calendarHasApiToken = cfg.hasApiToken
+                        calendarCanListEventTypes = cfg.canListEventTypes || cfg.hasApiToken || cfg.hasEnvToken
                         calendarApiToken = ""
+                        appointmentTypes = cfg.appointmentTypes
                     }
+                }
+                .onFailure { err ->
+                    if (error == null) error = err.message
                 }
             loading = false
         }
@@ -91,15 +112,15 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
 
     LaunchedEffect(Unit) { refresh() }
 
-    val microsoft = status?.get("microsoft")?.jsonObject
-    val google = status?.get("google")?.jsonObject
-    val connectUrls = status?.get("connectUrls")?.jsonObject
-    val msConnected = microsoft?.get("connected")?.jsonPrimitive?.booleanOrNull == true
-    val gConnected = google?.get("connected")?.jsonPrimitive?.booleanOrNull == true
-    val msEmail = microsoft?.get("email")?.jsonPrimitive?.contentOrNull
-    val gEmail = google?.get("email")?.jsonPrimitive?.contentOrNull
-    val msAuthUrl = connectUrls?.get("microsoftAuth")?.jsonPrimitive?.contentOrNull
-    val gAuthUrl = connectUrls?.get("googleAuth")?.jsonPrimitive?.contentOrNull
+    val microsoft = status?.get("microsoft").asObjectOrNull()
+    val google = status?.get("google").asObjectOrNull()
+    val connectUrls = status?.get("connectUrls").asObjectOrNull()
+    val msConnected = microsoft.booleanOrFalse("connected")
+    val gConnected = google.booleanOrFalse("connected")
+    val msEmail = microsoft.stringOrNull("email")
+    val gEmail = google.stringOrNull("email")
+    val msAuthUrl = connectUrls.stringOrNull("microsoftAuth")
+    val gAuthUrl = connectUrls.stringOrNull("googleAuth")
 
     LukariaScaffold(title = "System Settings", onBack = onBack) {
         if (loading) LoadingBlock()
@@ -110,7 +131,13 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
         SectionTitle("Calendar")
         BodyCopy("Public booking URL for marketing CTAs and the Schedule Calendly button.")
         Switch(checked = calendarEnabled, onCheckedChange = { calendarEnabled = it })
-        BodyCopy(if (calendarEnabled) "Site-wide booking link enabled" else "Using default fallback URL when disabled")
+        BodyCopy(
+            if (calendarEnabled) {
+                "Site-wide booking link enabled"
+            } else {
+                "Using default fallback URL when disabled"
+            },
+        )
         OutlinedTextField(
             calendarProvider,
             { calendarProvider = it },
@@ -164,6 +191,20 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
                                 put("bookingLabel", calendarBookingLabel.trim())
                                 put("enabled", calendarEnabled)
                                 put("apiToken", calendarApiToken)
+                                putJsonArray("appointmentTypes") {
+                                    appointmentTypes.forEach { type ->
+                                        add(
+                                            buildJsonObject {
+                                                put("id", type.id ?: "")
+                                                put("name", type.name ?: "")
+                                                put("durationMinutes", type.durationMinutes ?: 30)
+                                                put("eventTypeUrl", type.eventTypeUrl ?: "")
+                                                put("eventTypeUri", type.eventTypeUri ?: "")
+                                                put("enabled", type.enabled)
+                                            },
+                                        )
+                                    }
+                                }
                             },
                         )
                     }.onSuccess {
@@ -182,11 +223,157 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
             ) { Text("Open booking link") }
         }
 
+
+        SectionTitle("Appointment types (Dr Fairclough)")
+        BodyCopy(
+            "Patients can book these Calendly event types in Schedule. Import from Calendly, turn off any you do not want bookable, then Save Calendar Settings.",
+        )
+        OutlinedButton(
+            onClick = {
+                scope.launch {
+                    importingTypes = true
+                    runCatching { AppContainer.adminRepository.fetchCalendlyEventTypes() }
+                        .onSuccess { res ->
+                            val active = res.eventTypes.filter { it.active }
+                            if (active.isEmpty()) {
+                                error = "Calendly returned no active event types"
+                            } else {
+                                val byUri = appointmentTypes.mapNotNull { t ->
+                                    t.eventTypeUri?.let { it to t }
+                                }.toMap()
+                                val merged = appointmentTypes.toMutableList()
+                                active.forEach { et ->
+                                    val existing = et.uri?.let { byUri[it] }
+                                    if (existing != null) {
+                                        val idx = merged.indexOfFirst { it.id == existing.id }
+                                        if (idx >= 0) {
+                                            merged[idx] = existing.copy(
+                                                name = et.name ?: existing.name,
+                                                durationMinutes = et.duration ?: existing.durationMinutes,
+                                                eventTypeUrl = et.schedulingUrl ?: existing.eventTypeUrl,
+                                                eventTypeUri = et.uri ?: existing.eventTypeUri,
+                                                enabled = true,
+                                            )
+                                        }
+                                    } else {
+                                        merged.add(
+                                            CalendarAppointmentType(
+                                                id = et.uri ?: "type-${merged.size + 1}",
+                                                name = et.name ?: "Appointment",
+                                                durationMinutes = et.duration ?: 30,
+                                                eventTypeUrl = et.schedulingUrl,
+                                                eventTypeUri = et.uri,
+                                                enabled = true,
+                                            ),
+                                        )
+                                    }
+                                }
+                                appointmentTypes = merged
+                                message = "Loaded ${active.size} Calendly event type(s). Save to apply."
+                            }
+                        }
+                        .onFailure { error = it.message }
+                    importingTypes = false
+                }
+            },
+            enabled = !importingTypes && calendarCanListEventTypes,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(if (importingTypes) "Importing…" else "Import from Calendly")
+        }
+        OutlinedButton(
+            onClick = {
+                appointmentTypes = appointmentTypes + CalendarAppointmentType(
+                    id = "type-${appointmentTypes.size + 1}-${kotlin.random.Random.nextInt(100000, 999999)}",
+                    name = "",
+                    durationMinutes = 30,
+                    eventTypeUrl = calendarEventTypeUrl.ifBlank { calendarBookingUrl },
+                    eventTypeUri = "",
+                    enabled = true,
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) { Text("Add appointment type") }
+        appointmentTypes.forEachIndexed { index, type ->
+            SectionTitle("Type ${index + 1}")
+            Switch(
+                checked = type.enabled,
+                onCheckedChange = { enabled ->
+                    appointmentTypes = appointmentTypes.toMutableList().also {
+                        it[index] = type.copy(enabled = enabled)
+                    }
+                },
+            )
+            BodyCopy(if (type.enabled) "Bookable" else "Hidden from patients")
+            OutlinedTextField(
+                type.name.orEmpty(),
+                { value ->
+                    appointmentTypes = appointmentTypes.toMutableList().also {
+                        it[index] = type.copy(name = value)
+                    }
+                },
+                label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                (type.durationMinutes ?: 30).toString(),
+                { value ->
+                    appointmentTypes = appointmentTypes.toMutableList().also {
+                        it[index] = type.copy(durationMinutes = value.toIntOrNull() ?: 30)
+                    }
+                },
+                label = { Text("Duration (minutes)") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                type.eventTypeUrl.orEmpty(),
+                { value ->
+                    appointmentTypes = appointmentTypes.toMutableList().also {
+                        it[index] = type.copy(eventTypeUrl = value)
+                    }
+                },
+                label = { Text("Event type URL") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                type.eventTypeUri.orEmpty(),
+                { value ->
+                    appointmentTypes = appointmentTypes.toMutableList().also {
+                        it[index] = type.copy(eventTypeUri = value)
+                    }
+                },
+                label = { Text("Event Type API URI") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedButton(
+                onClick = {
+                    appointmentTypes = appointmentTypes.filterIndexed { i, _ -> i != index }
+                },
+                enabled = appointmentTypes.size > 1,
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("Remove type") }
+        }
+
         SectionTitle("Microsoft / M365")
         BodyCopy(if (msConnected) "Connected: ${msEmail ?: "—"}" else "Not linked")
-        OutlinedTextField(msTenantId, { msTenantId = it }, label = { Text("Tenant ID") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(msClientId, { msClientId = it }, label = { Text("Client ID") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(msClientSecret, { msClientSecret = it }, label = { Text("Client Secret") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            msTenantId,
+            { msTenantId = it },
+            label = { Text("Tenant ID") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            msClientId,
+            { msClientId = it },
+            label = { Text("Client ID") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            msClientSecret,
+            { msClientSecret = it },
+            label = { Text("Client Secret") },
+            modifier = Modifier.fillMaxWidth(),
+        )
         Button(
             onClick = {
                 scope.launch {
@@ -199,7 +386,7 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
                                 put("tenantId", msTenantId)
                                 put(
                                     "redirectUri",
-                                    "${com.lukariagroup.app.core.PlatformConfig.apiBaseUrl.trimEnd('/')}/api/admin/microsoft/callback",
+                                    "${PlatformConfig.apiBaseUrl.trimEnd('/')}/api/admin/microsoft/callback",
                                 )
                             },
                         )
@@ -219,7 +406,12 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
             ) { Text(if (msConnected) "Re-authorize Microsoft" else "Authorize Microsoft") }
         }
         if (msConnected) {
-            OutlinedTextField(testEmail, { testEmail = it }, label = { Text("Test recipient") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(
+                testEmail,
+                { testEmail = it },
+                label = { Text("Test recipient") },
+                modifier = Modifier.fillMaxWidth(),
+            )
             OutlinedButton(
                 onClick = {
                     scope.launch {
@@ -235,8 +427,18 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
 
         SectionTitle("Google / Gmail")
         BodyCopy(if (gConnected) "Connected: ${gEmail ?: "—"}" else "Not linked")
-        OutlinedTextField(gClientId, { gClientId = it }, label = { Text("Client ID") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(gClientSecret, { gClientSecret = it }, label = { Text("Client Secret") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            gClientId,
+            { gClientId = it },
+            label = { Text("Client ID") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            gClientSecret,
+            { gClientSecret = it },
+            label = { Text("Client Secret") },
+            modifier = Modifier.fillMaxWidth(),
+        )
         Button(
             onClick = {
                 scope.launch {
@@ -248,7 +450,7 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
                                 put("clientSecret", gClientSecret)
                                 put(
                                     "redirectUri",
-                                    "${com.lukariagroup.app.core.PlatformConfig.apiBaseUrl.trimEnd('/')}/api/admin/google/callback",
+                                    "${PlatformConfig.apiBaseUrl.trimEnd('/')}/api/admin/google/callback",
                                 )
                             },
                         )
@@ -268,7 +470,12 @@ fun AdminSettingsScreen(onBack: () -> Unit) {
             ) { Text(if (gConnected) "Re-authorize Google" else "Authorize Google") }
         }
         if (gConnected) {
-            OutlinedTextField(testEmail, { testEmail = it }, label = { Text("Test recipient") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(
+                testEmail,
+                { testEmail = it },
+                label = { Text("Test recipient") },
+                modifier = Modifier.fillMaxWidth(),
+            )
             OutlinedButton(
                 onClick = {
                     scope.launch {

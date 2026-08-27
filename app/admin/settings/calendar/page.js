@@ -25,7 +25,7 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import { Add, ArrowBack, ContentCopy, Delete } from '@mui/icons-material';
+import { Add, ArrowBack, CloudDownload, ContentCopy, Delete } from '@mui/icons-material';
 
 const gold = '#877449';
 const goldDark = '#6B5A35';
@@ -63,6 +63,8 @@ export default function CalendarSettingsPage() {
   const [hasWebhookSigningKey, setHasWebhookSigningKey] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState('');
   const [appointmentTypes, setAppointmentTypes] = useState([]);
+  const [importing, setImporting] = useState(false);
+  const [canListEventTypes, setCanListEventTypes] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -77,6 +79,7 @@ export default function CalendarSettingsPage() {
       setEnabled(data.config?.enabled !== false);
       setApiToken('');
       setHasApiToken(Boolean(data.config?.hasApiToken));
+      setCanListEventTypes(Boolean(data.config?.canListEventTypes || data.config?.hasApiToken || data.config?.hasEnvToken));
       setWebhookSigningKey('');
       setHasWebhookSigningKey(Boolean(data.config?.hasWebhookSigningKey));
       setWebhookUrl(data.config?.webhookUrl || '');
@@ -119,6 +122,88 @@ export default function CalendarSettingsPage() {
 
   const removeType = (id) => {
     setAppointmentTypes((list) => list.filter((t) => t.id !== id));
+  };
+
+
+  const importFromCalendly = async () => {
+    setImporting(true);
+    setFeedback(null);
+    try {
+      const { data } = await axios.get('/api/admin/settings/calendar/event-types');
+      const fromCalendly = Array.isArray(data.eventTypes) ? data.eventTypes : [];
+      const active = fromCalendly.filter((et) => et.active !== false);
+      if (!active.length) {
+        setFeedback({
+          type: 'warning',
+          message:
+            'Calendly returned no active event types. Check the token scopes (users:read) and organization.',
+        });
+        return;
+      }
+
+      setAppointmentTypes((existing) => {
+        const byUri = new Map(
+          existing.filter((t) => t.eventTypeUri).map((t) => [t.eventTypeUri, t]),
+        );
+        const byUrl = new Map(
+          existing
+            .filter((t) => t.eventTypeUrl)
+            .map((t) => [String(t.eventTypeUrl).toLowerCase().replace(/\/+$/, ''), t]),
+        );
+
+        const merged = existing.map((t) => ({ ...t }));
+
+        for (const et of active) {
+          const urlKey = String(et.schedulingUrl || '')
+            .toLowerCase()
+            .replace(/\/+$/, '');
+          const match =
+            (et.uri && byUri.get(et.uri)) || (urlKey ? byUrl.get(urlKey) : null);
+
+          if (match) {
+            const idx = merged.findIndex((t) => t.id === match.id);
+            if (idx >= 0) {
+              merged[idx] = {
+                ...merged[idx],
+                name: et.name || merged[idx].name,
+                durationMinutes: et.duration ?? merged[idx].durationMinutes,
+                eventTypeUrl: et.schedulingUrl || merged[idx].eventTypeUrl,
+                eventTypeUri: et.uri || merged[idx].eventTypeUri,
+                enabled: true,
+              };
+            }
+            continue;
+          }
+
+          merged.push(
+            newAppointmentType({
+              name: et.name,
+              durationMinutes: et.duration ?? 30,
+              eventTypeUrl: et.schedulingUrl || '',
+              eventTypeUri: et.uri || '',
+              enabled: true,
+            }),
+          );
+        }
+
+        return merged.length ? merged : existing;
+      });
+
+      setFeedback({
+        type: 'success',
+        message: `Loaded ${active.length} Calendly event type(s) for Dr Fairclough. Review which are bookable, then Save.`,
+      });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message:
+          err.response?.data?.error ||
+          err.message ||
+          'Failed to import from Calendly',
+      });
+    } finally {
+      setImporting(false);
+    }
   };
 
   const handleSave = async () => {
@@ -186,8 +271,7 @@ export default function CalendarSettingsPage() {
           Calendar
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 3 }}>
-          Organization booking link for marketing CTAs and the mobile Calendly button.
-          Authenticated patient scheduling still uses Carepatron.
+          Configure Dr Kadria Fairclough's Calendly for marketing CTAs and in-app patient booking. Enable appointment types below so patients can schedule on Schedule.
         </Typography>
 
         {feedback && (
@@ -357,23 +441,37 @@ export default function CalendarSettingsPage() {
                 Appointment types
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Optional types mapped to Calendly event URLs (stored for future in-app booking).
+                These are the types patients can book in Lukaria for Dr Fairclough. Use Import from Calendly to pull event types, disable any you do not want bookable, then Save.
               </Typography>
             </Box>
-            <Button
-              startIcon={<Add />}
-              onClick={() =>
-                setAppointmentTypes((list) => [
-                  ...list,
-                  newAppointmentType({
-                    eventTypeUrl: eventTypeUrl || bookingUrl,
-                  }),
-                ])
-              }
-              sx={{ textTransform: 'none', color: goldDark }}
-            >
-              Add type
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {provider === 'calendly' && (
+                <Button
+                  startIcon={
+                    importing ? <CircularProgress size={16} /> : <CloudDownload />
+                  }
+                  onClick={importFromCalendly}
+                  disabled={importing || !canListEventTypes}
+                  sx={{ textTransform: 'none', color: goldDark }}
+                >
+                  Import from Calendly
+                </Button>
+              )}
+              <Button
+                startIcon={<Add />}
+                onClick={() =>
+                  setAppointmentTypes((list) => [
+                    ...list,
+                    newAppointmentType({
+                      eventTypeUrl: eventTypeUrl || bookingUrl,
+                    }),
+                  ])
+                }
+                sx={{ textTransform: 'none', color: goldDark }}
+              >
+                Add type
+              </Button>
+            </Box>
           </Box>
 
           <Stack spacing={2} divider={<Divider flexItem />}>

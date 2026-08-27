@@ -1,10 +1,13 @@
 package com.lukariagroup.app.data.repository
 
 import com.lukariagroup.app.data.models.AdminQuestionsResponse
+import com.lukariagroup.app.data.models.AdminUserDetailResponse
 import com.lukariagroup.app.data.models.AdminUsersResponse
 import com.lukariagroup.app.data.models.ApiMessage
 import com.lukariagroup.app.data.models.BodyScanListResponse
+import com.lukariagroup.app.data.models.BookingReminderResponse
 import com.lukariagroup.app.data.models.CalendarAdminResponse
+import com.lukariagroup.app.data.models.CalendlyEventTypesResponse
 import com.lukariagroup.app.data.models.DbProfileResponse
 import com.lukariagroup.app.data.models.MealsResponse
 import com.lukariagroup.app.data.models.MeasurementsResponse
@@ -31,6 +34,9 @@ class AdminRepository(private val client: HttpClient) {
             parameter("per_page", perPage)
             if (search.isNotBlank()) parameter("search", search)
         }
+
+    suspend fun fetchAuth0User(userId: String): AdminUserDetailResponse =
+        client.getApi("api/admin/users/$userId")
 
     suspend fun fetchProfile(userId: String): ProfileResponse =
         client.getApi("api/admin/profile/$userId")
@@ -142,6 +148,9 @@ class AdminRepository(private val client: HttpClient) {
     suspend fun saveCalendarSettings(body: JsonObject): CalendarAdminResponse =
         client.putApi("api/admin/settings/calendar", body)
 
+    suspend fun fetchCalendlyEventTypes(): CalendlyEventTypesResponse =
+        client.getApi("api/admin/settings/calendar/event-types")
+
     suspend fun sendMicrosoftTestEmail(to: String): ApiMessage =
         client.postApi("api/admin/microsoft/test", buildJsonObject { put("to", to) })
 
@@ -164,4 +173,16 @@ class AdminRepository(private val client: HttpClient) {
                 if (complete != null) put("complete", complete)
             },
         )
+
+    suspend fun fetchBookingReminder(userId: String): BookingReminderResponse =
+        client.getApi("api/admin/users/$userId/booking-reminder")
+
+    suspend fun setBookingReminder(userId: String, startDate: String): BookingReminderResponse =
+        client.postApi(
+            "api/admin/users/$userId/booking-reminder",
+            buildJsonObject { put("startDate", startDate) },
+        )
+
+    suspend fun clearBookingReminder(userId: String): BookingReminderResponse =
+        client.deleteApi("api/admin/users/$userId/booking-reminder")
 }
