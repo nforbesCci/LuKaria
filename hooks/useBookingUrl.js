@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export const DEFAULT_BOOKING_URL =
-  'https://calendly.com/kadriaf-lukariagroup/30min';
+  'https://calendly.com/kadriaf-lukariagroup/weight-loss-consultation';
 export const DEFAULT_BOOKING_LABEL = 'Book an appointment';
 
 let cachedCalendar = null;
