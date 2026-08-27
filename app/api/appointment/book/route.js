@@ -1,27 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getApiSession, hasAdminOrDoctorRole } from '../../../../lib/api-auth';
-import { getCalendarConfig, resolveBookableAppointmentTypes } from '../../../../lib/calendar-config';
+import { getApiSession } from '../../../../lib/api-auth';
+import { getCalendarConfig } from '../../../../lib/calendar-config';
 import { createInvitee, resolveCalendlyToken, calendlyDefaultTimezone } from '../../../../lib/calendly';
 import { getCollection } from '../../../../lib/mongodb';
-import { getManagementClient } from '../../../../lib/auth0-management';
-import { completeBookingRemindersForUser } from '../../../../lib/booking-reminders';
 
 export const dynamic = 'force-dynamic';
-
-function decodeUserId(raw) {
-  if (!raw) return '';
-  let id = String(raw);
-  try {
-    while (id.includes('%')) {
-      const next = decodeURIComponent(id);
-      if (next === id) break;
-      id = next;
-    }
-  } catch {
-    // keep current
-  }
-  return id;
-}
 
 export async function POST(request) {
   try {
@@ -34,8 +17,6 @@ export async function POST(request) {
     const eventTypeUri = body.eventTypeUri;
     const startTime = body.startTime;
     const typeName = body.typeName || body.type || 'consultation';
-    const timezone = body.timezone || calendlyDefaultTimezone();
-    const forUserIdRaw = body.forUserId || body.userId || null;
     if (!eventTypeUri || !startTime) {
       return NextResponse.json(
         { error: 'eventTypeUri and startTime are required' },
@@ -43,31 +24,8 @@ export async function POST(request) {
       );
     }
 
-    let userId = session.user.sub;
-    let email = session.user.email;
-    let name = session.user.name || email;
-
-    const forUserId = decodeUserId(forUserIdRaw);
-    if (forUserId && forUserId !== session.user.sub) {
-      if (!hasAdminOrDoctorRole(session.user)) {
-        return NextResponse.json(
-          { error: 'Only clinic staff can book for another patient' },
-          { status: 403 },
-        );
-      }
-      const management = getManagementClient();
-      const auth0User = await management.users.get(forUserId);
-      const u = auth0User?.data || auth0User;
-      email = u?.email;
-      name = u?.name || u?.nickname || email;
-      userId = forUserId;
-      if (!email) {
-        return NextResponse.json(
-          { error: 'Patient account needs an email to book an appointment' },
-          { status: 400 },
-        );
-      }
-    } else if (!email) {
+    const email = session.user.email;
+    if (!email) {
       return NextResponse.json(
         { error: 'Your account needs an email to book an appointment' },
         { status: 400 },
@@ -75,8 +33,8 @@ export async function POST(request) {
     }
 
     const config = await getCalendarConfig();
-    const allowedType = (await resolveBookableAppointmentTypes(config)).find(
-      (t) => t.eventTypeUri === eventTypeUri,
+    const allowedType = (config.appointmentTypes || []).find(
+      (t) => t.enabled !== false && t.eventTypeUri === eventTypeUri,
     );
     if (!allowedType) {
       return NextResponse.json(
@@ -89,9 +47,9 @@ export async function POST(request) {
     const invitee = await createInvitee(token, {
       eventTypeUri,
       startTime,
-      name: name || email,
+      name: session.user.name || email,
       email,
-      timezone,
+      timezone: body.timezone || calendlyDefaultTimezone(),
     });
 
     const startDate = new Date(startTime);
@@ -99,6 +57,7 @@ export async function POST(request) {
     const endDate = new Date(startDate.getTime() + durationMin * 60 * 1000);
 
     const appointmentsCollection = await getCollection('appointments');
+    const userId = session.user.sub;
     const appointmentDocument = {
       userId,
       isScheduled: true,
@@ -124,10 +83,8 @@ export async function POST(request) {
       calendlyEventUri: invitee?.event || null,
       updatedAt: new Date().toISOString(),
       userEmail: email,
-      userName: name,
-      bookedByUserId: session.user.sub,
-      bookedByEmail: session.user.email || null,
-      rawData: { invitee, eventTypeUri, startTime, forUserId: forUserId || null },
+      userName: session.user.name,
+      rawData: { invitee, eventTypeUri, startTime },
     };
 
     await appointmentsCollection.updateOne(
@@ -139,16 +96,6 @@ export async function POST(request) {
       { upsert: true },
     );
 
-    // Stop reminder alerts until the doctor schedules a new reminder window.
-    let reminderCompletion = null;
-    try {
-      reminderCompletion = await completeBookingRemindersForUser(userId, {
-        reason: 'appointment_booked',
-      });
-    } catch (reminderErr) {
-      console.error('Failed to complete booking reminders after book:', reminderErr);
-    }
-
     return NextResponse.json({
       success: true,
       message: 'Appointment booked',
@@ -158,10 +105,8 @@ export async function POST(request) {
         type: appointmentDocument.type,
         date: appointmentDocument.date,
         time: appointmentDocument.time,
-        userId,
       },
       invitee,
-      reminderCompletion,
     });
   } catch (error) {
     console.error('Book appointment error:', error);

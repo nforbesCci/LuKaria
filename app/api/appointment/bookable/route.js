@@ -45,7 +45,7 @@ export async function GET(request) {
       ...(types.length === 0
         ? {
             message:
-              'No Calendly event types with API URIs are configured. Add a Calendly API token and import types in System Settings ΓåÆ Calendar.',
+              'No Calendly event types with API URIs are configured. Add a Calendly API token and import types in System Settings → Calendar.',
           }
         : {}),
     });
