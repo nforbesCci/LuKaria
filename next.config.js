@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@3dlook/camera-widget-react', 'preact'],
+  transpilePackages: ['@3dlook/camera-widget-react', 'preact', 'three'],
   experimental: {
     // Smaller server/client graphs; avoids flaky missing vendor-chunks like `@mui.js` after interrupted dev compiles
     optimizePackageImports: ['@mui/material', '@mui/icons-material', '@mui/x-date-pickers'],
