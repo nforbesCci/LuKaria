@@ -6,6 +6,38 @@ import { createMeasurement, sanitizeMeasurement } from '../../../../lib/fitxpres
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+function toNum(value) {
+  if (value == null || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Accept height as cm, or feet+inches, or inches. */
+function resolveHeightCm(body) {
+  const direct = toNum(body.height ?? body.heightCm);
+  if (direct != null) return direct;
+
+  const feet = toNum(body.heightFeet);
+  const inches = toNum(body.heightInches);
+  if (feet != null || inches != null) {
+    return (feet || 0) * 30.48 + (inches || 0) * 2.54;
+  }
+
+  const totalInches = toNum(body.heightIn);
+  if (totalInches != null) return totalInches * 2.54;
+
+  return null;
+}
+
+/** Accept weight as kg or lb. */
+function resolveWeightKg(body) {
+  const kg = toNum(body.weight ?? body.weightKg);
+  if (kg != null) return kg;
+  const lb = toNum(body.weightLb ?? body.weightLbs);
+  if (lb != null) return lb / 2.2046226218;
+  return null;
+}
+
 export async function POST(request) {
   try {
     const session = await getApiSession(request);
@@ -14,11 +46,14 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { height, weight, gender, age, frontPhoto, sidePhoto } = body || {};
+    const { gender, age, frontPhoto, sidePhoto } = body || {};
 
-    if (!height || !gender || !frontPhoto || !sidePhoto) {
+    if (!gender || !frontPhoto || !sidePhoto) {
       return NextResponse.json(
-        { error: 'height, gender, frontPhoto, and sidePhoto are required' },
+        {
+          error:
+            'gender, frontPhoto, and sidePhoto are required (also provide height / heightCm or heightFeet+heightInches)',
+        },
         { status: 400 },
       );
     }
@@ -31,23 +66,20 @@ export async function POST(request) {
       );
     }
 
-    const heightCm = Number(height);
-    if (!Number.isFinite(heightCm) || heightCm < 145 || heightCm > 220) {
+    const heightCm = resolveHeightCm(body || {});
+    if (heightCm == null || heightCm < 145 || heightCm > 220) {
       return NextResponse.json(
-        { error: 'height must be between 145 and 220 cm' },
+        { error: 'height must be between 145 and 220 cm (or equivalent imperial)' },
         { status: 400 },
       );
     }
 
-    let weightKg = null;
-    if (weight != null && weight !== '') {
-      weightKg = Number(weight);
-      if (!Number.isFinite(weightKg) || weightKg < 40 || weightKg > 200) {
-        return NextResponse.json(
-          { error: 'weight must be between 40 and 200 kg' },
-          { status: 400 },
-        );
-      }
+    const weightKg = resolveWeightKg(body || {});
+    if (weightKg != null && (weightKg < 40 || weightKg > 200)) {
+      return NextResponse.json(
+        { error: 'weight must be between 40 and 200 kg (or equivalent lb)' },
+        { status: 400 },
+      );
     }
 
     let ageNum = null;
@@ -74,6 +106,7 @@ export async function POST(request) {
     const userEmail = session.user.email;
     const db = await getDatabase();
     const now = new Date();
+    const sanitized = sanitizeMeasurement(measurement);
     const doc = {
       userId,
       userEmail,
@@ -83,7 +116,8 @@ export async function POST(request) {
       heightCm,
       weightKg,
       age: ageNum,
-      result: sanitizeMeasurement(measurement),
+      // Full FitXpress payload (photos stripped) — all circumference / linear / volume fields
+      result: sanitized,
       createdAt: now,
       updatedAt: now,
     };
@@ -95,7 +129,7 @@ export async function POST(request) {
         success: true,
         measurementId: measurement.id,
         status: measurement.status,
-        measurement: sanitizeMeasurement(measurement),
+        measurement: sanitized,
       },
       { status: 201 },
     );

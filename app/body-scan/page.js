@@ -13,6 +13,7 @@ import {
 } from '../../store/slices/bodyScanSlice';
 import Header from '../../components/Header';
 import PageTitle from '../../components/PageTitle';
+import BodyScanResults from '../../components/BodyScanResults';
 import {
   Container,
   Typography,
@@ -31,80 +32,32 @@ import {
   FormControlLabel,
   Switch,
 } from '@mui/material';
-import { AccessibilityNew, CloudUpload, PhotoCamera } from '@mui/icons-material';
+import { AccessibilityNew, PhotoCamera } from '@mui/icons-material';
 
 const LookCameraWidget = dynamic(() => import('../../components/LookCameraWidget'), {
   ssr: false,
 });
 
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+const EMPTY_HARD_VALIDATION = { front: null, side: null };
 
-function formatLabel(key) {
-  return String(key)
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function toFiniteNumber(value) {
-  if (value == null || value === '') return null;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
-
-/** Primary → estimated → weight × fat %. */
-function resolveBodyMassValues(measurement) {
-  const m = measurement || {};
-  let lean = toFiniteNumber(m.lean_body_mass ?? m.estimated_lean_body_mass);
-  let fat = toFiniteNumber(m.fat_body_mass ?? m.estimated_fat_body_mass);
-  if (lean == null || fat == null) {
-    const weight = toFiniteNumber(m.weight ?? m.estimated_weight);
-    const fatPct = toFiniteNumber(m.fat_percentage);
-    if (weight != null && fatPct != null) {
-      const derivedFat = (weight * fatPct) / 100;
-      const derivedLean = weight - derivedFat;
-      if (fat == null) fat = derivedFat;
-      if (lean == null) lean = derivedLean;
+/** Map FitXpress pose errors into LookCamera hardValidation for guided retakes. */
+function buildHardValidation(errors) {
+  const hv = { front: null, side: null };
+  if (!Array.isArray(errors) || errors.length === 0) return hv;
+  for (const err of errors) {
+    if (!err) continue;
+    const source = String(err.error_source || err.source || '').toLowerCase();
+    if (source === 'front_photo' || source === 'front') {
+      hv.front = err;
+    } else if (source === 'side_photo' || source === 'side') {
+      hv.side = err;
+    } else {
+      // Pose / detection errors without a side — guide both captures
+      hv.front = hv.front || err;
+      hv.side = hv.side || err;
     }
   }
-  return { lean, fat };
-}
-
-function resolveLeanMass(measurement) {
-  return resolveBodyMassValues(measurement).lean;
-}
-
-function resolveFatMass(measurement) {
-  return resolveBodyMassValues(measurement).fat;
-}
-
-function CircumferenceGrid({ params }) {
-  if (!params || typeof params !== 'object') return null;
-  const entries = Object.entries(params).filter(([, v]) => v != null && v !== '');
-  if (!entries.length) return null;
-  return (
-    <Grid container spacing={1.5} sx={{ mt: 1 }}>
-      {entries.map(([key, value]) => (
-        <Grid item xs={6} sm={4} md={3} key={key}>
-          <Box sx={{ p: 1.5, backgroundColor: 'rgba(135,116,73,0.12)', borderRadius: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-              {formatLabel(key)}
-            </Typography>
-            <Typography variant="body1" fontWeight={600}>
-              {typeof value === 'number' ? value : String(value)}
-              {key !== 'body_type' && !Number.isNaN(Number(value)) ? ' cm' : ''}
-            </Typography>
-          </Box>
-        </Grid>
-      ))}
-    </Grid>
-  );
+  return hv;
 }
 
 export default function BodyScanPage() {
@@ -123,7 +76,9 @@ export default function BodyScanPage() {
   const [sidePreview, setSidePreview] = useState('');
   const [localError, setLocalError] = useState(null);
   const [cameraType, setCameraType] = useState(null);
+  const [viewedScan, setViewedScan] = useState(null);
   const [isTableFlow, setIsTableFlow] = useState(true);
+  const [hardValidation, setHardValidation] = useState(EMPTY_HARD_VALIDATION);
 
   useEffect(() => {
     if (user) {
@@ -146,16 +101,11 @@ export default function BodyScanPage() {
     }
   }, []);
 
-  const onPickPhoto = async (which, file) => {
-    if (!file) return;
+  const openCamera = useCallback((which, validation = EMPTY_HARD_VALIDATION) => {
     setLocalError(null);
-    try {
-      const dataUrl = await fileToDataUrl(file);
-      applyPhoto(which, dataUrl);
-    } catch {
-      setLocalError('Could not read that image. Try another photo.');
-    }
-  };
+    setHardValidation(validation);
+    setCameraType(which);
+  }, []);
 
   const onSaveFront = useCallback(
     (image) => {
@@ -182,17 +132,18 @@ export default function BodyScanPage() {
   const onDisableTableFlow = useCallback(() => {
     setIsTableFlow(false);
     setLocalError(
-      'Motion sensors unavailable — switched to friend-assisted capture. Or upload photos instead.',
+      'Motion sensors unavailable — switched to friend-assisted capture with real-time pose guidance.',
     );
   }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
     setLocalError(null);
+    setViewedScan(null);
     dispatch(clearBodyScanError());
 
     if (!frontPhoto || !sidePhoto) {
-      setLocalError('Front and side photos are required.');
+      setLocalError('Use the AI camera to capture front and side photos (required for pose validation).');
       return;
     }
     const height = Number(heightCm);
@@ -215,13 +166,33 @@ export default function BodyScanPage() {
 
   const onNewScan = () => {
     dispatch(clearCurrentBodyScan());
+    setViewedScan(null);
     setFrontPhoto(null);
     setSidePhoto(null);
     setFrontPreview('');
     setSidePreview('');
     setLocalError(null);
     setCameraType(null);
+    setHardValidation(EMPTY_HARD_VALIDATION);
   };
+
+  const onRetakeWithPoseGuidance = () => {
+    const validation = buildHardValidation(measurement?.errors);
+    setHardValidation(validation);
+    setFrontPhoto(null);
+    setSidePhoto(null);
+    setFrontPreview('');
+    setSidePreview('');
+    setViewedScan(null);
+    dispatch(clearCurrentBodyScan());
+    openCamera(validation.front && !validation.side ? 'front' : 'front', validation);
+  };
+
+  const displayMeasurement = viewedScan?.measurement || measurement;
+  const displayStatus = viewedScan
+    ? viewedScan.status || viewedScan.measurement?.status
+    : status;
+  const displayScan = viewedScan || bodyScan.current;
 
   if (authLoading) {
     return (
@@ -240,15 +211,16 @@ export default function BodyScanPage() {
       <LookCameraWidget
         type={cameraType}
         isTableFlow={isTableFlow}
+        hardValidation={hardValidation}
         onSaveFront={onSaveFront}
         onSaveSide={onSaveSide}
         onTurnOff={onTurnOffCamera}
         onDisableTableFlow={onDisableTableFlow}
       />
-      <Container maxWidth="md" sx={{ mt: 4, mb: 6 }}>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
         <PageTitle
           title="Body Scan"
-          subtitle="Use the 3DLOOK AI camera for guided front and side photos, then submit for FitXpress measurements."
+          subtitle="AI camera with real-time pose validation guides your front and side photos, then FitXpress builds your measurements."
         />
 
         {(localError || bodyScan.error) && (
@@ -268,65 +240,34 @@ export default function BodyScanPage() {
           </Alert>
         )}
 
-        {status === 'successful' && measurement && (
-          <Card sx={{ mb: 3, backgroundColor: '#1a1a1a' }}>
-            <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="h6" sx={{ color: '#877449' }}>
-                  Scan results
-                </Typography>
-                <Chip label="Successful" color="success" size="small" />
-              </Stack>
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                {[
-                  ['BMI', measurement.bmi ?? measurement.estimated_bmi],
-                  ['Body fat %', measurement.fat_percentage],
-                  ['BMR', measurement.bmr ?? measurement.estimated_bmr],
-                  ['Weight (kg)', measurement.weight ?? measurement.estimated_weight],
-                  ['Lean mass (kg)', resolveLeanMass(measurement)],
-                  ['Fat mass (kg)', resolveFatMass(measurement)],
-                ].map(([label, value]) => (
-                  <Grid item xs={6} sm={4} key={label}>
-                    <Typography variant="caption" color="text.secondary">{label}</Typography>
-                    <Typography variant="h6">{value != null ? value : '—'}</Typography>
-                  </Grid>
-                ))}
-              </Grid>
-              <Typography variant="subtitle1" sx={{ color: '#877449' }}>
-                Circumferences
-              </Typography>
-              <CircumferenceGrid params={measurement.circumference_params} />
-              {measurement.model_3d_url && (
-                <Button
-                  href={measurement.model_3d_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ mt: 2 }}
-                  variant="outlined"
-                >
-                  Download 3D model
-                </Button>
-              )}
-              <Button onClick={onNewScan} sx={{ mt: 2, ml: 1 }} variant="contained">
-                New scan
-              </Button>
-            </CardContent>
-          </Card>
+        {displayStatus === 'successful' && displayMeasurement && (
+          <Box sx={{ mb: 3 }}>
+            <BodyScanResults
+              measurement={displayMeasurement}
+              scan={displayScan}
+              onNewScan={onNewScan}
+              showAvatar
+            />
+          </Box>
         )}
 
-        {status === 'failed' && (
+        {displayStatus === 'failed' && !viewedScan && (
           <Alert severity="error" sx={{ mb: 2 }}>
             Scan failed
             {measurement?.errors?.length
               ? `: ${measurement.errors.map((e) => e.detail || e.description).join('; ')}`
               : '. Check pose and lighting, then try again.'}
+            <Button size="small" onClick={onRetakeWithPoseGuidance} sx={{ ml: 1 }}>
+              Retake with pose guidance
+            </Button>
             <Button size="small" onClick={onNewScan} sx={{ ml: 1 }}>
-              Try again
+              Start over
             </Button>
           </Alert>
         )}
 
-        {(!status || status === 'pending' || status === 'in_progress') && (
+        {!viewedScan &&
+          (!status || status === 'pending' || status === 'in_progress' || status === 'failed') && (
           <Card sx={{ mb: 3, backgroundColor: '#1a1a1a' }}>
             <CardContent>
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
@@ -336,8 +277,9 @@ export default function BodyScanPage() {
                 </Typography>
               </Stack>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Wear form-fitting clothes. Prefer the AI camera for guided pose and lighting. Height is
-                required in centimeters.
+                Wear form-fitting clothes. The AI camera uses real-time pose validation (silhouette +
+                voice guidance) — gallery uploads are disabled so every scan gets a guided capture.
+                Height is required in centimeters.
               </Typography>
               <Box component="form" onSubmit={onSubmit}>
                 <Grid container spacing={2}>
@@ -399,10 +341,11 @@ export default function BodyScanPage() {
                           disabled={busy}
                         />
                       }
-                      label="Photograph myself (hands-free AI guide)"
+                      label="Photograph myself (hands-free AI guide + pose validation)"
                     />
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-                      Off = a friend takes your photos with the rear camera.
+                      On = gyro-assisted self capture. Off = a friend takes photos with the rear camera
+                      (still with real-time pose guidance).
                     </Typography>
                   </Grid>
 
@@ -413,12 +356,9 @@ export default function BodyScanPage() {
                       fullWidth
                       disabled={busy}
                       sx={{ minHeight: 56 }}
-                      onClick={() => {
-                        setLocalError(null);
-                        setCameraType('front');
-                      }}
+                      onClick={() => openCamera('front', hardValidation)}
                     >
-                      {frontPreview ? 'Retake front (AI camera)' : 'AI camera — front'}
+                      {frontPreview ? 'Retake front (pose-validated)' : 'AI camera — front'}
                     </Button>
                     {frontPreview && (
                       <Box
@@ -436,12 +376,9 @@ export default function BodyScanPage() {
                       fullWidth
                       disabled={busy}
                       sx={{ minHeight: 56 }}
-                      onClick={() => {
-                        setLocalError(null);
-                        setCameraType('side');
-                      }}
+                      onClick={() => openCamera('side', hardValidation)}
                     >
-                      {sidePreview ? 'Retake side (AI camera)' : 'AI camera — side'}
+                      {sidePreview ? 'Retake side (pose-validated)' : 'AI camera — side'}
                     </Button>
                     {sidePreview && (
                       <Box
@@ -451,48 +388,6 @@ export default function BodyScanPage() {
                         sx={{ mt: 1, width: '100%', maxHeight: 220, objectFit: 'contain', borderRadius: 1 }}
                       />
                     )}
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" sx={{ color: '#877449', mb: 1 }}>
-                      Or upload from gallery
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Button
-                      component="label"
-                      variant="outlined"
-                      startIcon={<CloudUpload />}
-                      fullWidth
-                      disabled={busy}
-                    >
-                      Upload front photo
-                      <input
-                        type="file"
-                        accept="image/*"
-                        hidden
-                        capture="environment"
-                        onChange={(e) => onPickPhoto('front', e.target.files?.[0])}
-                      />
-                    </Button>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Button
-                      component="label"
-                      variant="outlined"
-                      startIcon={<CloudUpload />}
-                      fullWidth
-                      disabled={busy}
-                    >
-                      Upload side photo
-                      <input
-                        type="file"
-                        accept="image/*"
-                        hidden
-                        capture="environment"
-                        onChange={(e) => onPickPhoto('side', e.target.files?.[0])}
-                      />
-                    </Button>
                   </Grid>
                 </Grid>
                 <Button
@@ -520,7 +415,25 @@ export default function BodyScanPage() {
             )}
             <Stack spacing={1.5} divider={<Divider flexItem />}>
               {bodyScan.scans.map((scan) => (
-                <Box key={scan.measurementId}>
+                <Box
+                  key={scan.measurementId}
+                  onClick={() => {
+                    if (scan.status === 'successful' && scan.measurement) {
+                      setViewedScan(scan);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  sx={{
+                    cursor:
+                      scan.status === 'successful' && scan.measurement
+                        ? 'pointer'
+                        : 'default',
+                    '&:hover':
+                      scan.status === 'successful' && scan.measurement
+                        ? { opacity: 0.85 }
+                        : undefined,
+                  }}
+                >
                   <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                     <Chip size="small" label={scan.status || 'unknown'} />
                     <Typography variant="body2">

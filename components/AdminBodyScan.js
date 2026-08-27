@@ -31,6 +31,7 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
 } from 'recharts';
+import BodyScanResults from './BodyScanResults';
 
 const METRICS = [
   { id: 'bmi', label: 'BMI' },
@@ -109,32 +110,6 @@ const metricUnit = (metric) => {
     default:
       return '';
   }
-};
-
-/** Resolve lean/fat mass: primary → estimated → weight × fat %. */
-const resolveBodyMass = (measurement, scanWeightKg) => {
-  const m = measurement || {};
-  const toNum = (v) => {
-    if (v == null || v === '') return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  };
-
-  let lean = toNum(m.lean_body_mass ?? m.estimated_lean_body_mass);
-  let fat = toNum(m.fat_body_mass ?? m.estimated_fat_body_mass);
-
-  if (lean == null || fat == null) {
-    const weight = toNum(m.weight ?? m.estimated_weight ?? scanWeightKg);
-    const fatPct = toNum(m.fat_percentage);
-    if (weight != null && fatPct != null) {
-      const derivedFat = (weight * fatPct) / 100;
-      const derivedLean = weight - derivedFat;
-      if (fat == null) fat = derivedFat;
-      if (lean == null) lean = derivedLean;
-    }
-  }
-
-  return { lean, fat };
 };
 
 const AdminBodyScan = ({
@@ -322,7 +297,7 @@ const AdminBodyScan = ({
         open={Boolean(selectedScan)}
         onClose={() => setSelectedScanId(null)}
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
       >
         {selectedScan && (
           <>
@@ -336,8 +311,23 @@ const AdminBodyScan = ({
                 <Close />
               </IconButton>
             </DialogTitle>
-            <DialogContent dividers>
-              <ScanDetailBody scan={selectedScan} formatDate={formatDate} />
+            <DialogContent dividers sx={{ backgroundColor: '#f5f6f8', p: 2 }}>
+              {(selectedScan.status || selectedScan.measurement?.status) === 'failed' &&
+                Array.isArray(selectedScan.measurement?.errors) &&
+                selectedScan.measurement.errors.length > 0 && (
+                  <Alert severity="warning" sx={{ mb: 2 }}>
+                    {selectedScan.measurement.errors
+                      .map((e) => e.detail || e.description)
+                      .filter(Boolean)
+                      .join('; ')}
+                  </Alert>
+                )}
+              <BodyScanResults
+                measurement={selectedScan.measurement}
+                scan={selectedScan}
+                showAvatar={isSuccessful(selectedScan)}
+                dense
+              />
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setSelectedScanId(null)}>Close</Button>
@@ -348,68 +338,5 @@ const AdminBodyScan = ({
     </Box>
   );
 };
-
-function ScanDetailBody({ scan, formatDate }) {
-  const result = scan.measurement || {};
-  const circ = result.circumference_params || {};
-  const failed = (scan.status || result.status) === 'failed';
-  const { lean, fat } = resolveBodyMass(result, scan.weightKg);
-
-  return (
-    <Stack spacing={1.5}>
-      <Stack direction="row" spacing={1} alignItems="center">
-        <Typography variant="subtitle1">
-          {formatWhen(scan.createdAt || scan.completedAt, formatDate)}
-        </Typography>
-        <Chip
-          size="small"
-          label={scan.status || result.status || 'unknown'}
-          color={
-            isSuccessful(scan) ? 'success' : failed ? 'error' : 'default'
-          }
-        />
-      </Stack>
-      <Typography variant="body2">Height: {formatValue(scan.heightCm ?? result.height, ' cm')}</Typography>
-      <Typography variant="body2">Gender: {scan.gender || result.gender || '—'}</Typography>
-      <Typography variant="body2">Age: {formatValue(scan.age ?? result.age)}</Typography>
-      <Typography variant="body2">BMI: {formatValue(result.bmi ?? result.estimated_bmi)}</Typography>
-      <Typography variant="body2">Body fat %: {formatValue(result.fat_percentage, '%')}</Typography>
-      <Typography variant="body2">
-        Weight:{' '}
-        {formatValue(result.weight ?? result.estimated_weight ?? scan.weightKg, ' kg')}
-      </Typography>
-      <Typography variant="body2">BMR: {formatValue(result.bmr ?? result.estimated_bmr)}</Typography>
-      <Typography variant="body2">Lean mass: {formatValue(lean, ' kg')}</Typography>
-      <Typography variant="body2">Fat mass: {formatValue(fat, ' kg')}</Typography>
-
-      {Object.keys(circ).length > 0 && (
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Circumference
-          </Typography>
-          <Grid container spacing={1}>
-            {Object.entries(circ).map(([key, value]) => (
-              <Grid item xs={12} sm={6} key={key}>
-                <Typography variant="caption" color="text.secondary">
-                  {key.replace(/_/g, ' ')}
-                </Typography>
-                <Typography variant="body2">{formatValue(value)}</Typography>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
-
-      {failed && Array.isArray(result.errors) && result.errors.length > 0 && (
-        <Alert severity="warning">
-          {result.errors
-            .map((e) => e.detail || e.description)
-            .filter(Boolean)
-            .join('; ')}
-        </Alert>
-      )}
-    </Stack>
-  );
-}
 
 export default AdminBodyScan;
