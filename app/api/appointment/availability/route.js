@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getApiSession } from '../../../../lib/api-auth';
-import { getCalendarConfig } from '../../../../lib/calendar-config';
+import {
+  getCalendarConfig,
+  resolveBookableAppointmentTypes,
+} from '../../../../lib/calendar-config';
 import { listAvailableTimes, resolveCalendlyToken } from '../../../../lib/calendly';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +27,8 @@ export async function GET(request) {
     }
 
     const config = await getCalendarConfig();
-    const allowed = (config.appointmentTypes || []).some(
+    const bookable = await resolveBookableAppointmentTypes(config);
+    const allowed = bookable.some(
       (t) => t.enabled !== false && t.eventTypeUri === eventTypeUri,
     );
     if (!allowed) {

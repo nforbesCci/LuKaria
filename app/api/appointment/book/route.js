@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getApiSession } from '../../../../lib/api-auth';
-import { getCalendarConfig } from '../../../../lib/calendar-config';
+import { getCalendarConfig, resolveBookableAppointmentTypes } from '../../../../lib/calendar-config';
 import { createInvitee, resolveCalendlyToken, calendlyDefaultTimezone } from '../../../../lib/calendly';
 import { getCollection } from '../../../../lib/mongodb';
 
@@ -33,7 +33,7 @@ export async function POST(request) {
     }
 
     const config = await getCalendarConfig();
-    const allowedType = (config.appointmentTypes || []).find(
+    const allowedType = (await resolveBookableAppointmentTypes(config)).find(
       (t) => t.enabled !== false && t.eventTypeUri === eventTypeUri,
     );
     if (!allowedType) {
