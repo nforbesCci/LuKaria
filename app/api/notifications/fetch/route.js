@@ -27,9 +27,16 @@ export async function GET(request) {
 
     console.log('🔍 API: Fetching notifications for user:', userId);
 
-    // Fetch notifications for the user, sorted by timestamp (newest first)
+    // Fetch notifications for the user, sorted by timestamp (newest first).
+    // Hide completed booking reminders (e.g. after patient schedules).
     const notifications = await collection
-      .find({ userId })
+      .find({
+        userId,
+        $or: [
+          { type: { $ne: 'book_next_appointment' } },
+          { type: 'book_next_appointment', completed: { $ne: true } },
+        ],
+      })
       .sort({ timestamp: -1 })
       .toArray();
 
