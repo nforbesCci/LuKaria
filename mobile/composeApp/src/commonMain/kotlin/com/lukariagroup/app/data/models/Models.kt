@@ -196,6 +196,7 @@ data class BookableTypesResponse(
     val success: Boolean = true,
     val enabled: Boolean = true,
     val types: List<BookableType> = emptyList(),
+    val providerName: String? = null,
     val bookingLabel: String? = null,
     val message: String? = null,
     val error: String? = null,
