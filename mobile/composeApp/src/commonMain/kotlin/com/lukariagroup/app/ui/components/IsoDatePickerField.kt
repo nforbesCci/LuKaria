@@ -49,7 +49,7 @@ fun IsoDatePickerField(
             .clickable(enabled = enabled) { showPicker = true },
         trailingIcon = {
             TextButton(onClick = { if (enabled) showPicker = true }, enabled = enabled) {
-                Text("Pick")
+                Text("Select")
             }
         },
     )
