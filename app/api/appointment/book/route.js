@@ -17,6 +17,8 @@ export async function POST(request) {
     const eventTypeUri = body.eventTypeUri;
     const startTime = body.startTime;
     const typeName = body.typeName || body.type || 'consultation';
+    const timezone = body.timezone || calendlyDefaultTimezone();
+    const userId = session.user.sub;
     if (!eventTypeUri || !startTime) {
       return NextResponse.json(
         { error: 'eventTypeUri and startTime are required' },
@@ -44,12 +46,33 @@ export async function POST(request) {
     }
 
     const token = await resolveCalendlyToken(config.apiToken);
+
+    let locationDetail =
+      body.locationDetail ||
+      body.location ||
+      body.phone ||
+      null;
+    if (!locationDetail) {
+      const profilesCollection = await getCollection('profiles');
+      const profile = await profilesCollection.findOne({ userId });
+      locationDetail =
+        profile?.preferredPhone ||
+        profile?.phone ||
+        profile?.nextOfKinPhone ||
+        null;
+    }
+
     const invitee = await createInvitee(token, {
       eventTypeUri,
       startTime,
       name: session.user.name || email,
       email,
+<<<<<<< HEAD
       timezone: body.timezone || calendlyDefaultTimezone(),
+=======
+      timezone,
+      locationDetail,
+>>>>>>> 0ef310b (Fix Calendly booking: send event-type location kind when creating invitee.)
     });
 
     const startDate = new Date(startTime);
