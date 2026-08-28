@@ -67,12 +67,8 @@ export async function POST(request) {
       startTime,
       name: session.user.name || email,
       email,
-<<<<<<< HEAD
-      timezone: body.timezone || calendlyDefaultTimezone(),
-=======
       timezone,
       locationDetail,
->>>>>>> 0ef310b (Fix Calendly booking: send event-type location kind when creating invitee.)
     });
 
     const startDate = new Date(startTime);
@@ -80,7 +76,6 @@ export async function POST(request) {
     const endDate = new Date(startDate.getTime() + durationMin * 60 * 1000);
 
     const appointmentsCollection = await getCollection('appointments');
-    const userId = session.user.sub;
     const appointmentDocument = {
       userId,
       isScheduled: true,
