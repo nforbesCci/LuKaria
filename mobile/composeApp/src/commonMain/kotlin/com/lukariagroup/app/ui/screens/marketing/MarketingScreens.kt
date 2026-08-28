@@ -38,8 +38,6 @@ fun FaqScreen(onBack: () -> Unit) {
     LukariaScaffold(title = "FAQ", onBack = onBack) {
         SectionTitle("Which medications are offered?")
         BodyCopy("Semaglutide (Ozempic/Wegovy), Tirzepatide (Mounjaro)")
-        SectionTitle("How do I join an appointment?")
-        BodyCopy("After booking, your dashboard shows join details and pre-visit tasks.")
         SectionTitle("Is my data secure?")
         BodyCopy("We use Auth0 authentication and encrypted transport. See Privacy & HIPAA notices.")
     }
