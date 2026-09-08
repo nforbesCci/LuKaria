@@ -29,8 +29,6 @@ import {
   Send,
   MedicalServices,
 } from '@mui/icons-material';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearPdfState } from '../../store/slices/pdfSlice';
 import { fetchAdminProfileAction } from '../../store/slices/adminSlice';
@@ -123,21 +121,23 @@ export default function LabRequisition() {
         #lab-requisition-content .pdf-header img { height: 50px !important; width: auto !important; margin-right: 8px !important; }
         #lab-requisition-content .pdf-header h4 { font-size: 1.8rem !important; color: #877449 !important; font-weight: bold !important; font-family: "Alex Brush", cursive !important; }
         #lab-requisition-content * { 
-          line-height: 0.6 !important; 
+          line-height: 1.05 !important; 
           margin: 0 !important; 
           background: white !important;
-          color: black !important;
+          color: #111 !important;
         }
-        #lab-requisition-content .MuiPaper-root { padding: 2px !important; margin: 0 !important; background: white !important; width: 100% !important; }
-        #lab-requisition-content .MuiCard-root { margin-bottom: 2px !important; background: white !important; }
-        #lab-requisition-content .MuiCardContent-root { padding: 2px 4px !important; background: white !important; }
-        #lab-requisition-content .MuiBox-root { margin-bottom: 2px !important; padding: 2px !important; background: white !important; }
-        #lab-requisition-content .MuiTypography-root { margin-bottom: 1px !important; line-height: 0.6 !important; font-size: 0.6rem !important; color: black !important; }
-        #lab-requisition-content .MuiFormControlLabel-root { margin: 0px !important; padding: 0 !important; padding-left: 9px !important; line-height: 0.6 !important; color: black !important; }
-        #lab-requisition-content .MuiGrid-item { padding: 1px !important; }
+        #lab-requisition-content .pdf-header h4,
+        #lab-requisition-content .pdf-header .MuiTypography-root { color: #877449 !important; }
+        #lab-requisition-content .MuiPaper-root { padding: 4px !important; margin: 0 !important; background: white !important; width: 100% !important; }
+        #lab-requisition-content .MuiCard-root { margin-bottom: 4px !important; background: white !important; }
+        #lab-requisition-content .MuiCardContent-root { padding: 4px 6px !important; background: white !important; }
+        #lab-requisition-content .MuiBox-root { margin-bottom: 4px !important; padding: 4px !important; background: white !important; }
+        #lab-requisition-content .MuiTypography-root { margin-bottom: 2px !important; line-height: 1.05 !important; font-size: 0.8rem !important; color: #111 !important; }
+        #lab-requisition-content .MuiFormControlLabel-root { margin: 1px 0 !important; padding: 0 !important; padding-left: 9px !important; line-height: 1.05 !important; color: #111 !important; }
+        #lab-requisition-content .MuiGrid-item { padding: 2px !important; }
         #lab-requisition-content .MuiTextField-root { margin: 0 !important; }
-        #lab-requisition-content .MuiFormControlLabel-root .MuiButtonBase-root.MuiCheckbox-root { padding: 0 !important; color: black !important; }
-        #lab-requisition-content .MuiSvgIcon-root { color: black !important; }
+        #lab-requisition-content .MuiFormControlLabel-root .MuiButtonBase-root.MuiCheckbox-root { padding: 0 !important; color: #111 !important; }
+        #lab-requisition-content .MuiSvgIcon-root { color: #111 !important; }
       }
     `;
     document.head.appendChild(styleElement);
@@ -615,49 +615,10 @@ export default function LabRequisition() {
 
   const generatePDF = async () => {
     try {
-      // Get the form content element
       const element = document.getElementById('lab-requisition-content');
       if (!element) return;
-
-      // Create canvas from HTML content
-      const canvas = await html2canvas(element, {
-        scale: 1.5,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: element.scrollWidth,
-        height: element.scrollHeight,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
-      });
-
-      // Calculate dimensions for letter size
-      const imgWidth = 210; // A4 width in mm (close to letter)
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Create PDF with compression
-      const pdf = new jsPDF({
-        orientation: 'p',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
-
-      // If content is too tall, scale it down to fit one page while maintaining aspect ratio
-      if (imgHeight > pageHeight) {
-        const scaleFactor = pageHeight / imgHeight;
-        const scaledWidth = imgWidth * scaleFactor;
-        const scaledHeight = pageHeight;
-        const xOffset = (imgWidth - scaledWidth) / 2;
-        
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, 0, scaledWidth, scaledHeight);
-      } else {
-        // Content fits on one page
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
-      }
-
-      // Save the PDF
+      const { captureLabRequisitionPdf } = await import('../../lib/lab-requisition-pdf');
+      const pdf = await captureLabRequisitionPdf(element);
       pdf.save('lab-requisition.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -766,7 +727,7 @@ export default function LabRequisition() {
         mt: 0, 
         mb: 0, 
         pt: 0,
-        maxWidth: 'calc(1280px + 100px)', // lg breakpoint + 100px
+        maxWidth: '900px', // closer to letter printable width; reduces side gutters
         width: '100%',
         backgroundColor: 'white',
         '@media print': {
@@ -904,32 +865,34 @@ export default function LabRequisition() {
         )}
         
         <Paper elevation={2} sx={{ 
-          p: 0.5, 
+          p: 0.75, 
           backgroundColor: 'white',
-          lineHeight: 0.8, 
-          '& *': { lineHeight: 0.8, color: 'black' }, 
-          '& .MuiInputBase-input': { fontSize: '0.875rem' }, 
-          '& .MuiFormControlLabel-root': { fontSize: '0.75rem', lineHeight: 0.84, my: '1px', p: 0, pl: '9px' }, 
-          '& .MuiFormControlLabel-root .MuiFormControlLabel-label': { fontSize: '0.75rem', lineHeight: 0.84 }, 
-          '& .MuiFormControlLabel-root .MuiTypography-root': { fontSize: '0.75rem', lineHeight: 0.84 }, 
-          '& .MuiFormControlLabel-root .MuiButtonBase-root.MuiCheckbox-root': { p: 0 },
-          '& .MuiTypography-root': { lineHeight: 0.8 },
+          lineHeight: 1.1, 
+          '& *': { lineHeight: 1.1, color: '#111' }, 
+          '& .MuiInputBase-input': { fontSize: '0.9rem', color: '#111' }, 
+          '& .MuiInputLabel-root': { color: '#111', fontSize: '0.85rem' },
+          '& .MuiFormControlLabel-root': { fontSize: '0.875rem', lineHeight: 1.15, my: '2px', p: 0, pl: '9px' }, 
+          '& .MuiFormControlLabel-root .MuiFormControlLabel-label': { fontSize: '0.875rem', lineHeight: 1.15, color: '#111' }, 
+          '& .MuiFormControlLabel-root .MuiTypography-root': { fontSize: '0.875rem', lineHeight: 1.15, color: '#111' }, 
+          '& .MuiFormControlLabel-root .MuiButtonBase-root.MuiCheckbox-root': { p: 0, color: '#111' },
+          '& .MuiTypography-root': { lineHeight: 1.15, color: '#111' },
+          '& .MuiSvgIcon-root': { color: '#111' },
           '@media print': {
-            p: '2px',
+            p: '4px',
             background: 'white !important',
             '& *': { 
-              lineHeight: '0.6 !important', 
-              fontSize: '0.6rem !important',
+              lineHeight: '1.05 !important', 
+              fontSize: '0.8rem !important',
               background: 'white !important',
-              color: 'black !important'
+              color: '#111 !important'
             },
-            '& .MuiCard-root': { mb: '2px !important', background: 'white !important' },
-            '& .MuiCardContent-root': { p: '2px 4px !important', background: 'white !important' },
-            '& .MuiBox-root': { mb: '2px !important', p: '2px !important', background: 'white !important' },
-            '& .MuiFormControlLabel-root': { my: '0px !important', p: '0 !important', pl: '9px !important', color: 'black !important' },
+            '& .MuiCard-root': { mb: '4px !important', background: 'white !important' },
+            '& .MuiCardContent-root': { p: '4px 6px !important', background: 'white !important' },
+            '& .MuiBox-root': { mb: '4px !important', p: '4px !important', background: 'white !important' },
+            '& .MuiFormControlLabel-root': { my: '1px !important', p: '0 !important', pl: '9px !important', color: '#111 !important' },
             '& .MuiFormControlLabel-root .MuiButtonBase-root.MuiCheckbox-root': { p: '0 !important' },
-            '& .MuiTypography-root': { color: 'black !important' },
-            '& .MuiSvgIcon-root': { color: 'black !important' },
+            '& .MuiTypography-root': { color: '#111 !important' },
+            '& .MuiSvgIcon-root': { color: '#111 !important' },
           }
         }}>
           {/* Patient Information - Full Width Row */}
@@ -1050,27 +1013,33 @@ export default function LabRequisition() {
                     </Grid>
                   </Grid>
                   <Box sx={{ mt: 2, textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                    <Typography variant="body2" sx={{ mb: 0.5, color: '#111', fontWeight: 500 }}>
                       Signature
                     </Typography>
                     <Box
                       sx={{
-                        border: '1px dashed #ccc',
-                        height: 60,
+                        border: '1px dashed #999',
+                        minHeight: 100,
+                        py: 1.5,
+                        px: 1,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: '#f9f9f9'
+                        backgroundColor: '#fff',
+                        overflow: 'visible',
                       }}
                     >
                       <Image
                         src="/images/signature.webp"
                         alt="Doctor's Signature"
-                        width={120}
-                        height={40}
+                        width={180}
+                        height={72}
                         style={{
                           objectFit: 'contain',
-                          maxHeight: '40px'
+                          maxHeight: '72px',
+                          width: 'auto',
+                          paddingTop: '8px',
+                          paddingBottom: '8px',
                         }}
                       />
                     </Box>

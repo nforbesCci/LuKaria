@@ -7,8 +7,7 @@ import {
   sendPdfSuccess,
   sendPdfFailure,
 } from '../slices/pdfSlice';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { captureLabRequisitionPdfBase64 } from '../../lib/lab-requisition-pdf';
 
 // Generate PDF from HTML content
 function* generatePdfSaga(action) {
@@ -21,47 +20,7 @@ function* generatePdfSaga(action) {
       throw new Error('Form element not found');
     }
 
-    // Create canvas from HTML content
-    const canvas = yield call(html2canvas, element, {
-      scale: 1.5,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      width: element.scrollWidth,
-      height: element.scrollHeight,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
-    });
-
-    // Calculate dimensions for letter size
-    const imgWidth = 210; // A4 width in mm (close to letter)
-    const pageHeight = 297; // A4 height in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    // Create PDF with compression
-    const pdf = new jsPDF({
-      orientation: 'p',
-      unit: 'mm',
-      format: 'a4',
-      compress: true
-    });
-
-    // If content is too tall, scale it down to fit one page while maintaining aspect ratio
-    if (imgHeight > pageHeight) {
-      const scaleFactor = pageHeight / imgHeight;
-      const scaledWidth = imgWidth * scaleFactor;
-      const scaledHeight = pageHeight;
-      const xOffset = (imgWidth - scaledWidth) / 2;
-      
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, 0, scaledWidth, scaledHeight);
-    } else {
-      // Content fits on one page
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
-    }
-
-    // Convert PDF to base64
-    const pdfOutput = pdf.output('datauristring');
-    const base64Data = pdfOutput.split(',')[1];
+    const base64Data = yield call(captureLabRequisitionPdfBase64, element);
     
     yield put(generatePdfSuccess({ base64Data }));
   } catch (error) {
