@@ -54,9 +54,10 @@ fun LabRequisitionScreen(
                 email = (p?.userEmail ?: p?.email).orEmpty()
                 dob = p?.dateOfBirth.orEmpty()
                 sex = (p?.sex ?: p?.gender).orEmpty()
-                phone = p?.phone.orEmpty()
-                address = listOfNotNull(p?.address, p?.city, p?.parish, p?.state, p?.zip)
+                phone = (p?.preferredPhone ?: p?.phone).orEmpty()
+                address = listOfNotNull(p?.homeAddress, p?.address, p?.city, p?.parish, p?.state, p?.zip)
                     .filter { it.isNotBlank() }
+                    .distinct()
                     .joinToString(", ")
                 error = null
             }

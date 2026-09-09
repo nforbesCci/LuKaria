@@ -4,7 +4,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { enableUserAccountAction, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminBodyScansAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction } from '../../../../store/slices/adminSlice';
+import { enableUserAccountAction, fetchAdminMealsAction, fetchAdminConsentFormsAction, updateAdminConsentFormAction, fetchAdminProfileAction, fetchAdminMedicationsAction, fetchAdminMeasurementsAction, fetchAdminBodyScansAction, fetchAdminSideEffectsAction, updateAdminSideEffectAction, fetchAdminQuestionsAction, deleteAdminQuestionAction, fetchAdminPreAppointmentTasksAction, updateAdminPreAppointmentTaskAction, setSelectedUser } from '../../../../store/slices/adminSlice';
 import AdminConsentForms from '../../../../components/AdminConsentForms';
 import ConsentFormViewer from '../../../../components/ConsentFormViewer';
 import AdminQuestions from '../../../../components/AdminQuestions';
@@ -1118,7 +1118,20 @@ export default function UserDetailPage() {
   };
 
   const generateLabRequisition = () => {
-    // Navigate to lab requisition page
+    const id = userId || userData?.user_id;
+    if (id) {
+      dispatch(
+        setSelectedUser({
+          ...(userData || {}),
+          user_id: id,
+          userId: id,
+          name: userData?.name,
+          email: userData?.email,
+        }),
+      );
+      router.push(`/lab-requisition?userId=${encodeURIComponent(id)}`);
+      return;
+    }
     router.push('/lab-requisition');
   };
 

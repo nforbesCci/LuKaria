@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, Suspense } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAdminAccess } from '../../hooks/useAccessControl';
 import Header from '../../components/Header';
@@ -29,13 +29,74 @@ import {
   MedicalServices,
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'next/navigation';
 import { clearPdfState } from '../../store/slices/pdfSlice';
-import { fetchAdminProfileAction } from '../../store/slices/adminSlice';
+import { fetchAdminProfileAction, setSelectedUser } from '../../store/slices/adminSlice';
 
-export default function LabRequisition() {
+function pickPatientFields(profileDoc, authUser) {
+  const p = profileDoc || {};
+  const meta = p.user_metadata || {};
+  const authMeta = authUser?.user_metadata || {};
+  return {
+    name:
+      p.name ||
+      authUser?.name ||
+      authUser?.nickname ||
+      meta.name ||
+      '',
+    dateOfBirth:
+      p.dateOfBirth ||
+      meta.birthdate ||
+      authUser?.birthdate ||
+      authMeta.birthdate ||
+      '',
+    sex:
+      p.sex ||
+      meta.gender ||
+      authUser?.gender ||
+      authMeta.gender ||
+      '',
+    phone:
+      p.preferredPhone ||
+      p.phone ||
+      meta.phone_number ||
+      authUser?.phone_number ||
+      authMeta.phone_number ||
+      '',
+    address: (() => {
+      const line = p.homeAddress || p.address || meta.address || authMeta.address || '';
+      const parish = p.parish || '';
+      return [line, parish].filter(Boolean).join(line && parish ? ', ' : '') || '';
+    })(),
+  };
+}
+
+export default function LabRequisitionPage() {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <Header />
+          <Container maxWidth="lg" sx={{ mt: 4, textAlign: 'center' }}>
+            <CircularProgress />
+            <Typography variant="h6" sx={{ mt: 1 }}>
+              Loading...
+            </Typography>
+          </Container>
+        </>
+      }
+    >
+      <LabRequisition />
+    </Suspense>
+  );
+}
+
+function LabRequisition() {
   const { user, isLoading, error } = useUser();
   const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const queryUserId = searchParams?.get('userId') || '';
   
   // Access control - only Admin and Doctor can access
   useAdminAccess();
@@ -44,7 +105,13 @@ export default function LabRequisition() {
   const selectedUser = useSelector((state) => state.admin.selectedUser);
   const profile = useSelector((state) => state.admin.adminProfile);
   const profileLoading = useSelector((state) => state.admin.adminProfileLoading);
-    
+
+  const patientUserId =
+    queryUserId ||
+    selectedUser?.user_id ||
+    selectedUser?.userId ||
+    profile?.userId ||
+    '';
 
   // Check user roles for lab requisition access
   const userRoles = user?.['https://lukariagroup.com/roles'] || [];
@@ -58,7 +125,9 @@ export default function LabRequisition() {
     return isAdmin || isDoctor || isDoctorGroup || isAdminGroup;
   });
 
-
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Clear PDF state after success/error
   useEffect(() => {
@@ -79,29 +148,37 @@ export default function LabRequisition() {
     address: '',
   });
 
-  // Fetch profile data when component loads or selected user changes
+  // Keep Redux selectedUser in sync when opened via ?userId=
   useEffect(() => {
-    if (mounted && selectedUser) {
-      // Refetch if no profile or if the selected user has changed
-      if (!profile || profile.userId !== selectedUser.user_id) {
-        console.log('🔄 Lab Requisition: Fetching admin profile data for selected user:', selectedUser.user_id);
-        dispatch(fetchAdminProfileAction({ userId: selectedUser.user_id }));
-      }
-    }
-  }, [mounted, selectedUser, profile, dispatch]);
+    if (!patientUserId) return;
+    const currentId = selectedUser?.user_id || selectedUser?.userId;
+    if (currentId === patientUserId) return;
+    dispatch(
+      setSelectedUser({
+        ...(selectedUser || {}),
+        user_id: patientUserId,
+        userId: patientUserId,
+      }),
+    );
+  }, [patientUserId, selectedUser, dispatch]);
 
-  // Prefill patient fields whenever the loaded profile matches the selected user
+  // Fetch profile for the patient being requisitioned
   useEffect(() => {
-    if (!profile?.profile || !selectedUser) return;
-    if (profile.userId !== selectedUser.user_id) return;
-    setPatientInfo({
-      name: profile.profile.name || '',
-      dateOfBirth: profile.profile.dateOfBirth || '',
-      sex: profile.profile.sex || '',
-      phone: profile.profile.preferredPhone || '',
-      address: profile.profile.homeAddress || '',
-    });
-  }, [profile, selectedUser]);
+    if (!mounted || !patientUserId) return;
+    if (profile?.userId === patientUserId) return;
+    dispatch(fetchAdminProfileAction({ userId: patientUserId }));
+  }, [mounted, patientUserId, profile?.userId, dispatch]);
+
+  // Prefill patient fields from Mongo profile (+ Auth0 user fallbacks)
+  useEffect(() => {
+    if (!patientUserId) return;
+    if (profile?.userId && profile.userId !== patientUserId) return;
+    // Wait until the matching profile fetch finished (null profile is OK)
+    if (profileLoading) return;
+    if (profile == null && !selectedUser) return;
+
+    setPatientInfo(pickPatientFields(profile?.profile, selectedUser));
+  }, [profile, selectedUser, patientUserId, profileLoading]);
 
   const updatePatientInfo = (field) => (event) => {
     setPatientInfo((prev) => ({ ...prev, [field]: event.target.value }));
@@ -426,10 +503,6 @@ export default function LabRequisition() {
   });
 
   const [urgency, setUrgency] = useState('');
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleHematologyTestChange = (testName) => {
     setHematologyTests(prev => ({
