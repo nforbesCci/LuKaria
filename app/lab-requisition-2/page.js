@@ -106,9 +106,17 @@ function Sub({ title, children }) {
   );
 }
 
-function Line({ label, value, onChange, wide, narrow }) {
+function Line({ label, value, onChange, wide, narrow, grow, compact }) {
   const text = value || '';
-  const sizeClass = wide ? 'lrf-line-wide' : narrow ? 'lrf-line-narrow' : '';
+  const sizeClass = wide
+    ? 'lrf-line-wide'
+    : narrow
+      ? 'lrf-line-narrow'
+      : grow
+        ? 'lrf-line-grow'
+        : compact
+          ? 'lrf-line-compact'
+          : '';
   return (
     <label className={`lrf-line ${sizeClass}`.trim()}>
       <span className="lrf-line-label">{label}</span>
@@ -503,14 +511,16 @@ function LabRequisition2() {
                   narrow
                 />
                 <Line
-                  label="Registration #"
+                  label="Reg. #"
                   value={physician.registration}
                   onChange={(v) => setPhysician((p) => ({ ...p, registration: v }))}
+                  grow
                 />
                 <Line
                   label="Date"
                   value={physician.date}
                   onChange={(v) => setPhysician((p) => ({ ...p, date: v }))}
+                  compact
                 />
               </div>
               <div className="lrf-sig">
@@ -948,11 +958,23 @@ const LRF01_CSS = `
 }
 .lrf-line-wide { width: 100%; }
 .lrf-line-narrow {
-  flex: 0 1 88px;
-  max-width: 110px;
-  min-width: 72px;
+  flex: 0 0 52px;
+  max-width: 52px;
+  min-width: 44px;
 }
-.lrf-row { display: flex; gap: 6px; flex-wrap: nowrap; }
+.lrf-line-narrow .lrf-line-label {
+  font-size: 6pt;
+}
+.lrf-line-grow {
+  flex: 1.8 1 130px;
+  min-width: 110px;
+}
+.lrf-line-compact {
+  flex: 0.7 1 72px;
+  max-width: 110px;
+  min-width: 64px;
+}
+.lrf-row { display: flex; gap: 6px; flex-wrap: nowrap; align-items: baseline; }
 .lrf-results-email {
   margin-top: 4px;
   font-size: 7.5pt;
