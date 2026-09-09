@@ -1135,6 +1135,24 @@ export default function UserDetailPage() {
     router.push('/lab-requisition');
   };
 
+  const generateLabRequisition2 = () => {
+    const id = userId || userData?.user_id;
+    if (id) {
+      dispatch(
+        setSelectedUser({
+          ...(userData || {}),
+          user_id: id,
+          userId: id,
+          name: userData?.name,
+          email: userData?.email,
+        }),
+      );
+      router.push(`/lab-requisition-2?userId=${encodeURIComponent(id)}`);
+      return;
+    }
+    router.push('/lab-requisition-2');
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -1603,6 +1621,14 @@ export default function UserDetailPage() {
                 sx={{ textTransform: 'none' }}
               >
                 Lab Requisition
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Assignment />}
+                onClick={generateLabRequisition2}
+                sx={{ textTransform: 'none', borderColor: '#877449', color: '#877449' }}
+              >
+                Lab Requisition 2
               </Button>
               {canManageRoles && (
                 <Button

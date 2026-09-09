@@ -12,7 +12,7 @@ import { captureLabRequisitionPdfBase64 } from '../../lib/lab-requisition-pdf';
 // Generate PDF from HTML content
 function* generatePdfSaga(action) {
   try {
-    const { elementId } = action.payload;
+    const { elementId, captureOptions } = action.payload;
     
     // Get the form content element
     const element = document.getElementById(elementId);
@@ -20,7 +20,7 @@ function* generatePdfSaga(action) {
       throw new Error('Form element not found');
     }
 
-    const base64Data = yield call(captureLabRequisitionPdfBase64, element);
+    const base64Data = yield call(captureLabRequisitionPdfBase64, element, captureOptions || {});
     
     yield put(generatePdfSuccess({ base64Data }));
   } catch (error) {
@@ -66,10 +66,10 @@ function* sendPdfSaga(action) {
 // Combined saga for generating and sending PDF
 function* generateAndSendPdfSaga(action) {
   try {
-    const { elementId, fileName, userInfo } = action.payload;
+    const { elementId, fileName, userInfo, captureOptions } = action.payload;
     
     // First generate the PDF
-    yield put(generatePdfStart({ elementId }));
+    yield put(generatePdfStart({ elementId, captureOptions }));
     
     // Wait for PDF generation to complete
     const generateAction = yield take('pdf/generatePdfSuccess');
