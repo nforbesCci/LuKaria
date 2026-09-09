@@ -4,7 +4,6 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAdminAccess } from '../../hooks/useAccessControl';
 import Header from '../../components/Header';
-import Image from 'next/image';
 import {
   Container,
   Typography,
@@ -1042,11 +1041,12 @@ export default function LabRequisition() {
                       Signature
                     </Typography>
                     <Box
+                      className="lab-signature-box"
                       sx={{
                         border: '1px dashed #999',
-                        minHeight: 100,
-                        py: 1.5,
-                        px: 1,
+                        minHeight: 120,
+                        py: 2,
+                        px: 2,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -1054,17 +1054,19 @@ export default function LabRequisition() {
                         overflow: 'visible',
                       }}
                     >
-                      <Image
+                      {/* Plain img avoids Next/Image overflow clipping of signature strokes */}
+                      <Box
+                        component="img"
+                        className="lab-signature-img"
                         src="/images/signature.webp"
                         alt="Doctor's Signature"
-                        width={180}
-                        height={72}
-                        style={{
-                          objectFit: 'contain',
-                          maxHeight: '72px',
+                        sx={{
+                          display: 'block',
                           width: 'auto',
-                          paddingTop: '8px',
-                          paddingBottom: '8px',
+                          maxWidth: '100%',
+                          height: 'auto',
+                          maxHeight: 88,
+                          objectFit: 'contain',
                         }}
                       />
                     </Box>
@@ -1236,8 +1238,8 @@ export default function LabRequisition() {
 
                     </Grid>
 
-                    {/* Right Column - Coagulation Tests (70%) */}
-                    <Grid item xs={12} md={8.4}>
+                    {/* Coagulation Tests */}
+                    <Grid item xs={12}>
                       <Box sx={{ mb: 0.625, border: '1px solid #000000', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'black' }}>
                           Coagulation Tests
