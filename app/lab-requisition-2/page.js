@@ -68,9 +68,12 @@ function pickProfile(profileDoc, authUser) {
 
 function Tick({ label, checked, onChange }) {
   return (
-    <label className="lrf-tick">
+    <label className={`lrf-tick${checked ? ' lrf-tick-on' : ''}`}>
       <input type="checkbox" checked={!!checked} onChange={onChange} />
-      <span>{label}</span>
+      <span className="lrf-tick-box" aria-hidden>
+        {checked ? '✓' : ''}
+      </span>
+      <span className="lrf-tick-label">{label}</span>
     </label>
   );
 }
@@ -240,6 +243,7 @@ function LabRequisition2() {
   const [phleb, setPhleb] = useState(mapFromKeys(LRF01_PHLEB_TUBES));
   const [phlebInitials, setPhlebInitials] = useState('');
   const [phlebDateTime, setPhlebDateTime] = useState('');
+  const [executiveProfile, setExecutiveProfile] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -414,6 +418,13 @@ function LabRequisition2() {
             sx={{ textTransform: 'none' }}
           >
             Weight Loss Tests
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setExecutiveProfile(true)}
+            sx={{ textTransform: 'none' }}
+          >
+            Executive Profile
           </Button>
           <Button
             variant="contained"
@@ -712,16 +723,25 @@ function LabRequisition2() {
                           <td>{row}</td>
                           {LRF01_VIROLOGY_GRID_COLS.map((col) => (
                             <td key={col}>
-                              <input
-                                type="checkbox"
-                                checked={!!viroGrid[row][col]}
-                                onChange={() =>
-                                  setViroGrid((prev) => ({
-                                    ...prev,
-                                    [row]: { ...prev[row], [col]: !prev[row][col] },
-                                  }))
-                                }
-                              />
+                              <label
+                                className={`lrf-tick lrf-tick-cell${
+                                  viroGrid[row][col] ? ' lrf-tick-on' : ''
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={!!viroGrid[row][col]}
+                                  onChange={() =>
+                                    setViroGrid((prev) => ({
+                                      ...prev,
+                                      [row]: { ...prev[row], [col]: !prev[row][col] },
+                                    }))
+                                  }
+                                />
+                                <span className="lrf-tick-box" aria-hidden>
+                                  {viroGrid[row][col] ? '✓' : ''}
+                                </span>
+                              </label>
                             </td>
                           ))}
                         </tr>
@@ -731,6 +751,14 @@ function LabRequisition2() {
                 </Sub>
               </div>
             </div>
+          </Section>
+
+          <Section title="PROFILES / PANELS">
+            <Tick
+              label="Executive Profile"
+              checked={executiveProfile}
+              onChange={() => setExecutiveProfile((v) => !v)}
+            />
           </Section>
 
           <Section title="TO BE COMPLETED BY THE PHLEBOTOMIST">
@@ -817,16 +845,59 @@ const LRF01_CSS = `
   text-decoration: none;
 }
 .lrf-d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.lrf-ticks { display: flex; flex-wrap: wrap; gap: 1px 6px; }
+.lrf-ticks { display: flex; flex-wrap: wrap; gap: 2px 6px; }
 .lrf-tick {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   font-size: 6.5pt;
   white-space: nowrap;
   margin: 0;
+  padding: 1px 3px 1px 1px;
+  border-radius: 2px;
+  cursor: pointer;
 }
-.lrf-tick input { width: 9px; height: 9px; margin: 0; }
+.lrf-tick input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+.lrf-tick-box {
+  width: 11px;
+  height: 11px;
+  border: 1.75px solid #000;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  background: #fff;
+  color: #000;
+  flex-shrink: 0;
+}
+.lrf-tick-on {
+  background: #ffe566;
+  outline: 1px solid #c9a227;
+}
+.lrf-tick-on .lrf-tick-box {
+  background: #000;
+  border-color: #000;
+  color: #ffe566;
+}
+.lrf-tick-on .lrf-tick-label {
+  font-weight: 800;
+  color: #000;
+}
+.lrf-tick-cell {
+  justify-content: center;
+  padding: 2px;
+  width: 100%;
+}
 .lrf-line {
   display: flex;
   align-items: baseline;
