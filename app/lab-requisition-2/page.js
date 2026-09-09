@@ -104,10 +104,19 @@ function Sub({ title, children }) {
 }
 
 function Line({ label, value, onChange, wide }) {
+  const text = value || '';
   return (
     <label className={`lrf-line ${wide ? 'lrf-line-wide' : ''}`}>
-      <span>{label}</span>
-      <input value={value || ''} onChange={(e) => onChange(e.target.value)} />
+      <span className="lrf-line-label">{label}</span>
+      <span className="lrf-line-field">
+        {/* Visible text is what html2canvas / print capture; input stays for editing */}
+        <span className="lrf-line-text">{text || '\u00a0'}</span>
+        <input
+          value={text}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={label}
+        />
+      </span>
     </label>
   );
 }
@@ -826,19 +835,44 @@ const LRF01_CSS = `
   flex: 1;
   min-width: 0;
 }
-.lrf-line span { white-space: nowrap; font-size: 6.5pt; }
-.lrf-line input {
+.lrf-line-label { white-space: nowrap; font-size: 6.5pt; color: #000; }
+.lrf-line-field {
+  position: relative;
   flex: 1;
-  border: none;
-  border-bottom: 1px solid #000;
-  font-size: 7pt;
-  padding: 0 2px;
   min-width: 0;
+  border-bottom: 1px solid #000;
+  min-height: 11px;
+}
+.lrf-line-text {
+  display: block;
+  color: #000 !important;
+  font-size: 7.5pt;
+  font-weight: 600;
+  line-height: 1.2;
+  min-height: 11px;
+  padding: 0 2px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  pointer-events: none;
+}
+.lrf-line-field input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0 2px;
+  margin: 0;
   background: transparent;
+  color: transparent;
+  caret-color: #000;
+  font-size: 7.5pt;
+  outline: none;
+  z-index: 1;
 }
 .lrf-line-wide { width: 100%; }
 .lrf-row { display: flex; gap: 6px; flex-wrap: wrap; }
-.lrf-sex { display: inline-flex; align-items: center; gap: 6px; font-size: 6.5pt; }
+.lrf-sex { display: inline-flex; align-items: center; gap: 6px; font-size: 6.5pt; color: #000; }
 .lrf-sig {
   display: flex;
   align-items: center;
