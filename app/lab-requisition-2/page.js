@@ -304,7 +304,7 @@ function LabRequisition2() {
       if (!element) return;
       const { captureLabRequisitionPdf } = await import('../../lib/lab-requisition-pdf');
       const pdf = await captureLabRequisitionPdf(element, { mode: 'letterFit' });
-      pdf.save('lab-requisition-lrf01.pdf');
+      pdf.save('lab-requisition.pdf');
     } catch (err) {
       console.error(err);
       alert('Error generating PDF. Please try again.');
@@ -312,7 +312,7 @@ function LabRequisition2() {
   };
 
   const sendPDF = () => {
-    const fileName = `Lab-Requisition-LRF01-${displayName.replace(/\s+/g, '-')}-${new Date()
+    const fileName = `Lab-Requisition-${displayName.replace(/\s+/g, '-')}-${new Date()
       .toISOString()
       .slice(0, 10)}.pdf`;
     dispatch({
@@ -441,21 +441,19 @@ function LabRequisition2() {
         <div id="lab-requisition-content" className="lrf01-page">
           <style>{LRF01_CSS}</style>
 
-          <header className="lrf-header">
-            <div className="lrf-header-left">
-              <strong>The University of the West Indies</strong>
-              <div>Depts. of Pathology and Microbiology</div>
-              <div>Faculty of Medical Sciences, Mona</div>
-              <div>Ph: (876) 927-1620-9 &nbsp; Fax: (876) 977-1811</div>
-            </div>
-            <div className="lrf-header-right">
-              <div className="lrf-form-code">FORM LRF01</div>
-              <div className="lrf-title">Laboratory Requisition Form</div>
-              <div className="lrf-note">
-                Please complete sections A, B and C then select tests from section D.
-              </div>
+          <header className="lrf-header pdf-header">
+            <img
+              src="/images/Lukaria_logo_background_removed_small.webp"
+              alt="LuKaria Logo"
+              className="lrf-logo"
+            />
+            <div className="lrf-brand">
+              Svelte <span className="lrf-brand-sub">by LuKaria</span>
             </div>
           </header>
+          <div className="lrf-note">
+            Please complete sections A, B and C then select tests from section D.
+          </div>
 
           <div className="lrf-ab">
             <Section title="SECTION A – Requesting Physician">
@@ -763,23 +761,52 @@ const LRF01_CSS = `
 }
 .lrf-header {
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   border-bottom: 2px solid #000;
-  padding-bottom: 4px;
+  padding: 4px 0 6px;
+  margin-bottom: 2px;
+}
+.lrf-logo {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+.lrf-brand {
+  font-family: "Alex Brush", cursive;
+  font-size: 22pt;
+  font-weight: 700;
+  color: #877449;
+  line-height: 1;
+}
+.lrf-brand-sub {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.45em;
+  font-weight: 400;
+  vertical-align: sub;
+  color: #877449;
+}
+.lrf-note {
+  font-size: 6.5pt;
+  text-align: center;
   margin-bottom: 4px;
 }
-.lrf-header-left { font-size: 7pt; }
-.lrf-title { font-size: 11pt; font-weight: 700; text-align: right; }
-.lrf-form-code { font-size: 8pt; font-weight: 700; text-align: right; }
-.lrf-note { font-size: 6.5pt; text-align: right; }
 .lrf-note-small { font-size: 6pt; font-style: italic; margin: 1px 0 2px; }
 .lrf-ab { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 .lrf-section { border: 1px solid #000; padding: 3px 4px; margin-bottom: 3px; }
 .lrf-section-title { font-weight: 700; font-size: 7.5pt; margin-bottom: 2px; background: #eee; padding: 1px 3px; }
-.lrf-col-head { font-weight: 700; font-size: 8pt; margin: 3px 0 1px; border-bottom: 1px solid #000; }
-.lrf-sub { margin-bottom: 2px; }
-.lrf-sub-title { font-weight: 600; font-size: 6.5pt; }
+.lrf-col-head { font-weight: 700; font-size: 8pt; margin: 4px 0 2px; border-bottom: 1px solid #000; padding-bottom: 1px; }
+.lrf-sub { margin-bottom: 3px; }
+.lrf-sub-title {
+  font-weight: 700;
+  font-size: 7.5pt;
+  margin: 3px 0 2px;
+  padding: 1px 3px;
+  background: #f3f3f3;
+  border-left: 3px solid #877449;
+  text-decoration: none;
+}
 .lrf-d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .lrf-ticks { display: flex; flex-wrap: wrap; gap: 1px 6px; }
 .lrf-tick {
