@@ -941,9 +941,15 @@ function LabRequisition() {
           backgroundColor: 'white',
           lineHeight: 1.15, 
           '& *': { lineHeight: 1.15, color: '#111' }, 
-          '& .MuiInputBase-input': { fontSize: '0.875rem', color: '#111' }, 
+          '& .MuiInputBase-input': {
+            fontSize: '0.875rem',
+            color: '#111',
+            textOverflow: 'clip',
+            overflow: 'visible',
+          },
+          '& .MuiInputBase-root': { overflow: 'visible' },
           '& .MuiInputLabel-root': { color: '#111', fontSize: '0.8rem' },
-          '& .MuiGrid-item': { minWidth: 0, overflow: 'hidden' },
+          '& .MuiGrid-item': { minWidth: 0 },
           '& .MuiFormControlLabel-root': {
             fontSize: '0.8rem',
             lineHeight: 1.2,
@@ -955,6 +961,7 @@ function LabRequisition() {
             width: '100%',
             maxWidth: '100%',
             alignItems: 'flex-start',
+            overflow: 'hidden',
           },
           '& .MuiFormControlLabel-root .MuiFormControlLabel-label': {
             fontSize: '0.8rem',
@@ -1058,15 +1065,16 @@ function LabRequisition() {
                     A. Requesting Physician
                   </Typography>
                   <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid item xs={12} sm={8} md={6}>
                       <TextField
                         fullWidth
                         label="Doctor's Name"
                         variant="standard"
                         defaultValue="Dr. Kadria Fairclough"
+                        inputProps={{ style: { overflow: 'visible' } }}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid item xs={12} sm={4} md={3}>
                       <TextField
                         fullWidth
                         label="Telephone Number"
@@ -1089,7 +1097,7 @@ function LabRequisition() {
                         defaultValue="84608"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6} md={6}>
+                    <Grid item xs={12} sm={6} md={5}>
                       <TextField
                         fullWidth
                         label="Address"
@@ -1098,7 +1106,7 @@ function LabRequisition() {
                         variant="standard"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6} md={6}>
+                    <Grid item xs={12} sm={6} md={4}>
                       <TextField
                         fullWidth
                         label="Date"
