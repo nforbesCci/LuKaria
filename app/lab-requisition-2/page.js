@@ -106,10 +106,11 @@ function Sub({ title, children }) {
   );
 }
 
-function Line({ label, value, onChange, wide }) {
+function Line({ label, value, onChange, wide, narrow }) {
   const text = value || '';
+  const sizeClass = wide ? 'lrf-line-wide' : narrow ? 'lrf-line-narrow' : '';
   return (
-    <label className={`lrf-line ${wide ? 'lrf-line-wide' : ''}`}>
+    <label className={`lrf-line ${sizeClass}`.trim()}>
       <span className="lrf-line-label">{label}</span>
       <span className="lrf-line-field">
         {/* Visible text is what html2canvas / print capture; input stays for editing */}
@@ -499,6 +500,7 @@ function LabRequisition2() {
                   label="Fax"
                   value={physician.fax}
                   onChange={(v) => setPhysician((p) => ({ ...p, fax: v }))}
+                  narrow
                 />
                 <Line
                   label="Registration #"
@@ -537,6 +539,9 @@ function LabRequisition2() {
                 wide
               />
               <Line label="WARD/CLINIC" value={wardClinic} onChange={setWardClinic} wide />
+              <div className="lrf-results-email">
+                SEND ALL RESULTS TO EMAIL: kadriaf@lukariagroup.com
+              </div>
             </Section>
           </div>
 
@@ -942,7 +947,19 @@ const LRF01_CSS = `
   z-index: 1;
 }
 .lrf-line-wide { width: 100%; }
-.lrf-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.lrf-line-narrow {
+  flex: 0 1 88px;
+  max-width: 110px;
+  min-width: 72px;
+}
+.lrf-row { display: flex; gap: 6px; flex-wrap: nowrap; }
+.lrf-results-email {
+  margin-top: 4px;
+  font-size: 7.5pt;
+  font-weight: 800;
+  color: #000;
+  letter-spacing: 0.01em;
+}
 .lrf-sex { display: inline-flex; align-items: center; gap: 6px; font-size: 6.5pt; color: #000; }
 .lrf-sig {
   display: flex;
