@@ -727,7 +727,7 @@ export default function LabRequisition() {
         mt: 0, 
         mb: 0, 
         pt: 0,
-        maxWidth: '900px', // closer to letter printable width; reduces side gutters
+        maxWidth: '1100px', // printable-ish width without crushing dense checkbox grids
         width: '100%',
         backgroundColor: 'white',
         '@media print': {
@@ -867,15 +867,40 @@ export default function LabRequisition() {
         <Paper elevation={2} sx={{ 
           p: 0.75, 
           backgroundColor: 'white',
-          lineHeight: 1.1, 
-          '& *': { lineHeight: 1.1, color: '#111' }, 
-          '& .MuiInputBase-input': { fontSize: '0.9rem', color: '#111' }, 
-          '& .MuiInputLabel-root': { color: '#111', fontSize: '0.85rem' },
-          '& .MuiFormControlLabel-root': { fontSize: '0.875rem', lineHeight: 1.15, my: '2px', p: 0, pl: '9px' }, 
-          '& .MuiFormControlLabel-root .MuiFormControlLabel-label': { fontSize: '0.875rem', lineHeight: 1.15, color: '#111' }, 
-          '& .MuiFormControlLabel-root .MuiTypography-root': { fontSize: '0.875rem', lineHeight: 1.15, color: '#111' }, 
-          '& .MuiFormControlLabel-root .MuiButtonBase-root.MuiCheckbox-root': { p: 0, color: '#111' },
-          '& .MuiTypography-root': { lineHeight: 1.15, color: '#111' },
+          lineHeight: 1.15, 
+          '& *': { lineHeight: 1.15, color: '#111' }, 
+          '& .MuiInputBase-input': { fontSize: '0.875rem', color: '#111' }, 
+          '& .MuiInputLabel-root': { color: '#111', fontSize: '0.8rem' },
+          '& .MuiGrid-item': { minWidth: 0, overflow: 'hidden' },
+          '& .MuiFormControlLabel-root': {
+            fontSize: '0.8rem',
+            lineHeight: 1.2,
+            my: '2px',
+            mx: 0,
+            p: 0,
+            ml: 0,
+            mr: 0,
+            width: '100%',
+            maxWidth: '100%',
+            alignItems: 'flex-start',
+          },
+          '& .MuiFormControlLabel-root .MuiFormControlLabel-label': {
+            fontSize: '0.8rem',
+            lineHeight: 1.2,
+            color: '#111',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+            whiteSpace: 'normal',
+          },
+          '& .MuiFormControlLabel-root .MuiTypography-root': {
+            fontSize: '0.8rem',
+            lineHeight: 1.2,
+            color: '#111',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+          },
+          '& .MuiFormControlLabel-root .MuiButtonBase-root.MuiCheckbox-root': { p: '2px', color: '#111' },
+          '& .MuiTypography-root': { lineHeight: 1.2, color: '#111' },
           '& .MuiSvgIcon-root': { color: '#111' },
           '@media print': {
             p: '4px',
@@ -1119,16 +1144,15 @@ export default function LabRequisition() {
                 Hematology
               </Typography>
                   <Grid container spacing={1}>
-                    {/* Left Column - Routine Tests (30%) */}
-                    <Grid item xs={12} md={3.6}>
-                      {/* Routine Tests */}
+                    {/* Routine Tests */}
+                    <Grid item xs={12}>
                       <Box sx={{ mb: 0.625, border: '1px solid #000000', borderRadius: 1, p: 1.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.625, color: 'black' }}>
                           Routine
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
-                            <Grid item xs={12} sm={4}>
+                          <Grid container spacing={1}>
+                            <Grid item xs={6} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1141,7 +1165,7 @@ export default function LabRequisition() {
                                 label="CBC"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={6} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1154,7 +1178,7 @@ export default function LabRequisition() {
                                 label="RETIC"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={6} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1167,7 +1191,7 @@ export default function LabRequisition() {
                                 label="ESR"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={6} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1180,7 +1204,7 @@ export default function LabRequisition() {
                                 label="Info Mono"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={6} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1193,7 +1217,7 @@ export default function LabRequisition() {
                                 label="CSF/Fluid"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={6} sm={4}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1203,7 +1227,7 @@ export default function LabRequisition() {
                                     color="primary"
                                   />
                                 }
-                                label="Hb Electrophonesis"
+                                label="Hb Electrophoresis"
                               />
                             </Grid>
                           </Grid>
@@ -1219,8 +1243,8 @@ export default function LabRequisition() {
                           Coagulation Tests
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
-                            <Grid item xs={12} sm={12/7}>
+                          <Grid container spacing={1}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1233,7 +1257,7 @@ export default function LabRequisition() {
                                 label="PT"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1246,7 +1270,7 @@ export default function LabRequisition() {
                                 label="PTT"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1259,7 +1283,7 @@ export default function LabRequisition() {
                                 label="INR"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1272,7 +1296,7 @@ export default function LabRequisition() {
                                 label="Fibrinogen"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1285,7 +1309,7 @@ export default function LabRequisition() {
                                 label="Thrombin Time"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1298,7 +1322,7 @@ export default function LabRequisition() {
                                 label="Bleeding Time"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1311,7 +1335,7 @@ export default function LabRequisition() {
                                 label="Ristocetin"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1324,7 +1348,7 @@ export default function LabRequisition() {
                                 label="FDP"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1337,7 +1361,7 @@ export default function LabRequisition() {
                                 label="Mixing Studies"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1350,7 +1374,7 @@ export default function LabRequisition() {
                                 label="Lupus Anticoagulant"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1363,7 +1387,7 @@ export default function LabRequisition() {
                                 label="Platelet Aggregation"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1376,7 +1400,7 @@ export default function LabRequisition() {
                                 label="Factor Assay XIII"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1389,7 +1413,7 @@ export default function LabRequisition() {
                                 label="Factor Assay IX"
                               />
                             </Grid>
-                            <Grid item xs={12} sm={12/7}>
+                            <Grid item xs={6} sm={4} md={3}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1425,7 +1449,7 @@ export default function LabRequisition() {
                           Electrolytes and Renal Function Tests
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                         <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
@@ -1581,7 +1605,7 @@ export default function LabRequisition() {
                           Blood Sugar
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -1657,7 +1681,7 @@ name="2h PPG"
                           Tumor Markers
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -1739,7 +1763,7 @@ name="2h PPG"
                           Serum Protein and Lipids
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -1867,7 +1891,7 @@ name="2h PPG"
                           Hormones
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -2062,7 +2086,7 @@ name="2h PPG"
                           Urine
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -2294,7 +2318,7 @@ name="2h PPG"
                           Cardiac and Liver Function Test
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={12/5}>
                               <FormControlLabel
                                 control={
@@ -2675,7 +2699,7 @@ name="Amylase"
                           Serology
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -2751,7 +2775,7 @@ name="2h PPG"
                           Serum Protein Concentrate
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={2}>
                               <FormControlLabel
                                 control={
@@ -2850,7 +2874,7 @@ name="2h PPG"
                           Autoantibodies
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -3025,7 +3049,7 @@ name="2h PPG"
                           Lymphocyte Enumeration
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={2}>
                               <FormControlLabel
                                 control={
@@ -3116,7 +3140,7 @@ name="2h PPG"
                           Other Tests
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={6}>
                               <FormControlLabel
                                 control={
@@ -3183,7 +3207,7 @@ name="2h PPG"
                           Fever and Rash
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={2.4}>
                               <FormControlLabel
                                 control={
@@ -3261,7 +3285,7 @@ name="2h PPG"
                           Hepatitis Screening
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={2}>
                               <FormControlLabel
                                 control={
@@ -3359,7 +3383,7 @@ name="2h PPG"
                           Vaccine Status
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -3409,7 +3433,7 @@ name="2h PPG"
                           STI Screening
                         </Typography>
                         <FormGroup>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             <Grid item xs={12} sm={6} md={3}>
                               <FormControlLabel
                                 control={
@@ -3474,7 +3498,7 @@ name="2h PPG"
                           Advanced Virology Testing
                         </Typography>
                         <Paper elevation={1} sx={{ p: 0.5, backgroundColor: 'white', flex: 1 }}>
-                          <Grid container spacing={0.25}>
+                          <Grid container spacing={1}>
                             {/* Header Row */}
                             <Grid item xs={3}>
                               <Typography variant="body2" sx={{ fontWeight: 600, textAlign: 'center', color: 'black', fontSize: '0.7rem', py: 0.25 }}>
@@ -3573,7 +3597,7 @@ name="CMV"
                     </Typography>
                     <FormGroup>
                       <Grid container spacing={1}>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3586,7 +3610,7 @@ name="Amylase"
                             label="CMV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3599,7 +3623,7 @@ name="Amylase"
                             label="EBV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3612,7 +3636,7 @@ name="Amylase"
                             label="TORCH"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3625,7 +3649,7 @@ name="Amylase"
                             label="Viral Culture"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3638,7 +3662,7 @@ name="Amylase"
                             label="HTLV"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3651,7 +3675,7 @@ name="Amylase"
                             label="Western Blot"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3664,7 +3688,7 @@ name="Amylase"
                             label="Toxoplasma gondii"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3677,7 +3701,7 @@ name="Amylase"
                             label="Stool Rotavirus"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3690,7 +3714,7 @@ name="Amylase"
                             label="Mumps"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -3703,7 +3727,7 @@ name="Amylase"
                             label="Influenza"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={12/7}>
+                        <Grid item xs={12} sm={6} md={3}>
                           <FormControlLabel
                             control={
                               <Checkbox
