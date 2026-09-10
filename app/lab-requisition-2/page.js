@@ -496,36 +496,34 @@ function LabRequisition2() {
                 onChange={(v) => setPhysician((p) => ({ ...p, name: v }))}
                 wide
               />
-              <Line
-                label="Address"
-                value={physician.address}
-                onChange={(v) => setPhysician((p) => ({ ...p, address: v }))}
-                wide
-              />
-              <div className="lrf-row">
+              <div className="lrf-row lrf-row-address">
                 <Line
-                  label="Tel."
-                  value={physician.tel}
-                  onChange={(v) => setPhysician((p) => ({ ...p, tel: v }))}
-                  phone
+                  label="Address"
+                  value={physician.address}
+                  onChange={(v) => setPhysician((p) => ({ ...p, address: v }))}
                 />
                 <Line
                   label="Fax"
                   value={physician.fax}
                   onChange={(v) => setPhysician((p) => ({ ...p, fax: v }))}
-                  narrow
+                  compact
+                />
+              </div>
+              <div className="lrf-row lrf-row-contact">
+                <Line
+                  label="Tel."
+                  value={physician.tel}
+                  onChange={(v) => setPhysician((p) => ({ ...p, tel: v }))}
                 />
                 <Line
                   label="Reg. #"
                   value={physician.registration}
                   onChange={(v) => setPhysician((p) => ({ ...p, registration: v }))}
-                  grow
                 />
                 <Line
                   label="Date"
                   value={physician.date}
                   onChange={(v) => setPhysician((p) => ({ ...p, date: v }))}
-                  compact
                 />
               </div>
               <div className="lrf-sig">
@@ -1016,11 +1014,28 @@ const LRF01_CSS = `
   min-width: 110px;
 }
 .lrf-line-compact {
-  flex: 0.7 1 72px;
-  max-width: 110px;
-  min-width: 64px;
+  flex: 0 1 90px;
+  max-width: 100px;
+  min-width: 70px;
 }
 .lrf-row { display: flex; gap: 6px; flex-wrap: nowrap; align-items: baseline; }
+.lrf-row-address .lrf-line:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.lrf-row-contact {
+  gap: 8px;
+}
+.lrf-row-contact .lrf-line {
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: baseline;
+}
+.lrf-row-contact .lrf-line-text {
+  white-space: nowrap;
+  word-break: normal;
+  overflow: hidden;
+}
 .lrf-results-email {
   margin-top: 4px;
   font-size: 7.5pt;
