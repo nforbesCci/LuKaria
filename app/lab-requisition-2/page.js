@@ -1011,10 +1011,6 @@ const LRF01_CSS = `
   min-width: 70px;
 }
 .lrf-row { display: flex; gap: 6px; flex-wrap: nowrap; align-items: baseline; }
-.lrf-row-address .lrf-line:first-child {
-  flex: 1 1 auto;
-  min-width: 0;
-}
 .lrf-row-contact {
   gap: 8px;
 }
