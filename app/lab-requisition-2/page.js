@@ -106,17 +106,19 @@ function Sub({ title, children }) {
   );
 }
 
-function Line({ label, value, onChange, wide, narrow, grow, compact }) {
+function Line({ label, value, onChange, wide, narrow, grow, compact, phone }) {
   const text = value || '';
   const sizeClass = wide
     ? 'lrf-line-wide'
     : narrow
       ? 'lrf-line-narrow'
-      : grow
-        ? 'lrf-line-grow'
-        : compact
-          ? 'lrf-line-compact'
-          : '';
+      : phone
+        ? 'lrf-line-phone'
+        : grow
+          ? 'lrf-line-grow'
+          : compact
+            ? 'lrf-line-compact'
+            : '';
   return (
     <label className={`lrf-line ${sizeClass}`.trim()}>
       <span className="lrf-line-label">{label}</span>
@@ -503,6 +505,7 @@ function LabRequisition2() {
                   label="Tel."
                   value={physician.tel}
                   onChange={(v) => setPhysician((p) => ({ ...p, tel: v }))}
+                  phone
                 />
                 <Line
                   label="Fax"
@@ -957,13 +960,23 @@ const LRF01_CSS = `
   z-index: 1;
 }
 .lrf-line-wide { width: 100%; }
+.lrf-line-phone {
+  flex: 1.35 1 118px;
+  min-width: 112px;
+}
 .lrf-line-narrow {
-  flex: 0 0 52px;
-  max-width: 52px;
-  min-width: 44px;
+  flex: 0 0 30px;
+  max-width: 30px;
+  min-width: 28px;
+  gap: 1px;
 }
 .lrf-line-narrow .lrf-line-label {
-  font-size: 6pt;
+  font-size: 5.5pt;
+}
+.lrf-line-narrow .lrf-line-field {
+  flex: 1;
+  min-width: 0;
+  max-width: 14px;
 }
 .lrf-line-grow {
   flex: 1.8 1 130px;
