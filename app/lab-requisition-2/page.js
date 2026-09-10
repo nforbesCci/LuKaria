@@ -255,6 +255,8 @@ function LabRequisition2() {
   const [phlebInitials, setPhlebInitials] = useState('');
   const [phlebDateTime, setPhlebDateTime] = useState('');
   const [executiveProfile, setExecutiveProfile] = useState(false);
+  const [otherTestOn, setOtherTestOn] = useState(false);
+  const [otherTestText, setOtherTestText] = useState('');
 
   useEffect(() => setMounted(true), []);
 
@@ -704,7 +706,16 @@ function LabRequisition2() {
                 </Sub>
                 <Sub title="Other">
                   <TickRow map={chemOther} onToggle={toggleMap(setChemOther)} />
-                  <Line label="Other specify" value={otherSpecify} onChange={setOtherSpecify} wide />
+                  {chemOther['Other'] && (
+                    <div className="lrf-other-specify">
+                      <Line
+                        label="Specify other test"
+                        value={otherSpecify}
+                        onChange={setOtherSpecify}
+                        wide
+                      />
+                    </div>
+                  )}
                 </Sub>
 
                 <div className="lrf-col-head">VIROLOGY</div>
@@ -772,11 +783,33 @@ function LabRequisition2() {
           </Section>
 
           <Section title="PROFILES / PANELS">
-            <Tick
-              label="Executive Profile"
-              checked={executiveProfile}
-              onChange={() => setExecutiveProfile((v) => !v)}
-            />
+            <div className="lrf-ticks">
+              <Tick
+                label="Executive Profile"
+                checked={executiveProfile}
+                onChange={() => setExecutiveProfile((v) => !v)}
+              />
+              <Tick
+                label="Other tests"
+                checked={otherTestOn}
+                onChange={() =>
+                  setOtherTestOn((v) => {
+                    if (v) setOtherTestText('');
+                    return !v;
+                  })
+                }
+              />
+            </div>
+            {otherTestOn && (
+              <div className="lrf-other-specify">
+                <Line
+                  label="Specify other test"
+                  value={otherTestText}
+                  onChange={setOtherTestText}
+                  wide
+                />
+              </div>
+            )}
           </Section>
 
           <Section title="TO BE COMPLETED BY THE PHLEBOTOMIST">
@@ -994,6 +1027,12 @@ const LRF01_CSS = `
   font-weight: 800;
   color: #000;
   letter-spacing: 0.01em;
+}
+.lrf-other-specify {
+  margin-top: 3px;
+  padding: 2px 4px;
+  background: #fff8d6;
+  border: 1px solid #c9a227;
 }
 .lrf-sex { display: inline-flex; align-items: center; gap: 6px; font-size: 6.5pt; color: #000; }
 .lrf-sig {
