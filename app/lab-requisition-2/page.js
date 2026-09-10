@@ -772,7 +772,7 @@ function LabRequisition2() {
             </div>
           </Section>
 
-          <Section title="PROFILES / PANELS">
+          <Section title="OTHER TESTS">
             <div className="lrf-ticks">
               <Tick
                 label="Executive Profile"
@@ -780,7 +780,7 @@ function LabRequisition2() {
                 onChange={() => setExecutiveProfile((v) => !v)}
               />
               <Tick
-                label="Other tests"
+                label="Other"
                 checked={otherTestOn}
                 onChange={() =>
                   setOtherTestOn((v) => {
