@@ -1026,10 +1026,14 @@ const LRF01_CSS = `
 }
 .lrf-results-email {
   margin-top: 4px;
+  padding: 3px 5px;
   font-size: 7.5pt;
   font-weight: 800;
   color: #000;
   letter-spacing: 0.01em;
+  background: #ffe566;
+  outline: 1px solid #c9a227;
+  border-radius: 2px;
 }
 .lrf-other-specify {
   margin-top: 3px;
