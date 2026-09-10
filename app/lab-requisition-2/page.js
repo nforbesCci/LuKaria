@@ -545,7 +545,7 @@ function LabRequisition2() {
               />
               <Line label="WARD/CLINIC" value={wardClinic} onChange={setWardClinic} wide />
               <div className="lrf-results-email">
-                SEND ALL RESULTS TO EMAIL: kadriaf@lukariagroup.com
+                PLEASE SEND ALL RESULTS BY EMAIL TO: kadriaf@lukariagroup.com
               </div>
             </Section>
           </div>
