@@ -207,7 +207,6 @@ function LabRequisition2() {
     name: 'Dr. Kadria Fairclough',
     address: '',
     tel: '18762903659',
-    fax: '',
     registration: '84608',
     date: new Date().toISOString().slice(0, 10),
   });
@@ -496,19 +495,12 @@ function LabRequisition2() {
                 onChange={(v) => setPhysician((p) => ({ ...p, name: v }))}
                 wide
               />
-              <div className="lrf-row lrf-row-address">
-                <Line
-                  label="Address"
-                  value={physician.address}
-                  onChange={(v) => setPhysician((p) => ({ ...p, address: v }))}
-                />
-                <Line
-                  label="Fax"
-                  value={physician.fax}
-                  onChange={(v) => setPhysician((p) => ({ ...p, fax: v }))}
-                  compact
-                />
-              </div>
+              <Line
+                label="Address"
+                value={physician.address}
+                onChange={(v) => setPhysician((p) => ({ ...p, address: v }))}
+                wide
+              />
               <div className="lrf-row lrf-row-contact">
                 <Line
                   label="Tel."
