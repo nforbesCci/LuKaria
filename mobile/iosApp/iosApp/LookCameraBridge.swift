@@ -11,6 +11,11 @@ enum LookCameraBridge {
     }
 
     private final class Presenter: LookCameraPresenter {
+        // Keep in sync with Android JpegDataUrl.kt — two base64 photos must stay
+        // under Vercel's ~4.5MB request body limit for /api/body-scan/create.
+        private static let maxSide: CGFloat = 2048
+        private static let jpegQuality: CGFloat = 0.92
+
         // K/N exports the parameter as onComplete_ for Swift protocol conformance.
         func present(onComplete_ onComplete: LookCameraCompletion) {
             DispatchQueue.main.async {
@@ -25,12 +30,28 @@ enum LookCameraBridge {
         private static func jpegDataUrl(from url: URL?) -> String? {
             guard let url else { return nil }
             guard let data = try? Data(contentsOf: url) else { return nil }
-            // Re-encode as JPEG so FitXpress always receives a compact data URL.
-            if let image = UIImage(data: data),
-               let jpeg = image.jpegData(compressionQuality: 0.92) {
-                return "data:image/jpeg;base64," + jpeg.base64EncodedString()
+            guard let image = UIImage(data: data) else {
+                return "data:image/jpeg;base64," + data.base64EncodedString()
             }
-            return "data:image/jpeg;base64," + data.base64EncodedString()
+            let scaled = downscale(image, maxSide: maxSide)
+            guard let jpeg = scaled.jpegData(compressionQuality: jpegQuality) else {
+                return "data:image/jpeg;base64," + data.base64EncodedString()
+            }
+            return "data:image/jpeg;base64," + jpeg.base64EncodedString()
+        }
+
+        private static func downscale(_ image: UIImage, maxSide: CGFloat) -> UIImage {
+            let size = image.size
+            let longest = max(size.width, size.height)
+            guard longest > maxSide, longest > 0 else { return image }
+            let ratio = maxSide / longest
+            let newSize = CGSize(width: size.width * ratio, height: size.height * ratio)
+            let format = UIGraphicsImageRendererFormat.default()
+            format.scale = 1
+            let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
+            return renderer.image { _ in
+                image.draw(in: CGRect(origin: .zero, size: newSize))
+            }
         }
     }
 }
