@@ -124,6 +124,8 @@ Auth0 URL scheme `lukaria` is registered in `Info.plist`. Production API base UR
 | `APP_STORE_CONNECT_API_KEY_ID` | ASC API key id (already set) |
 | `APP_STORE_CONNECT_API_KEY_P8` | ASC `.p8` private key contents (already set) |
 | `APPLE_TEAM_ID` | Apple Developer Team ID (**required for deploy**) |
+| `IOS_DISTRIBUTION_CERT_P12_BASE64` | Optional. Base64 `.p12` of Apple Distribution cert. If set to a **revoked** cert, uploads fail — clear this secret so CI can create a fresh cert via the ASC API. |
+| `IOS_DISTRIBUTION_CERT_PASSWORD` | Password for the optional `.p12` above |
 
 The ASC API key user must have access to create/manage profiles and upload builds for **Svelte by Lukaria** (`com.lukaria.svelte`).
 

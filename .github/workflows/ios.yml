@@ -127,9 +127,10 @@ jobs:
             ~/Library/Keychains/lukaria-ci.keychain-db-shm
             ~/Library/Keychains/lukaria-ci.keychain-db-wal
             ~/Library/MobileDevice/Provisioning Profiles
-          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v3
+          # v4: do not restore keychains that still contain the revoked Distribution cert.
+          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v4
           restore-keys: |
-            ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-
+            ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v4-
 
       - name: Build IPA + upload TestFlight (Fastlane)
         env:
@@ -151,7 +152,7 @@ jobs:
             ~/Library/Keychains/lukaria-ci.keychain-db-shm
             ~/Library/Keychains/lukaria-ci.keychain-db-wal
             ~/Library/MobileDevice/Provisioning Profiles
-          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v3-${{ github.run_id }}
+          key: ios-dist-keychain-${{ secrets.APPLE_TEAM_ID }}-v4-${{ github.run_id }}
 
       - name: Upload IPA artifact
         if: always()

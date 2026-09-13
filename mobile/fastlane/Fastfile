@@ -8,6 +8,22 @@ def distribution_identity_in_keychain?(keychain_path)
   !output.strip.empty?
 end
 
+# Drop every Apple Distribution identity from the CI keychain so a revoked
+# cached cert cannot keep signing builds after Apple revokes it.
+def delete_apple_distribution_identities!(keychain_path)
+  output = sh(
+    "security find-identity -v -p codesigning '#{keychain_path}' || true",
+    log: false
+  )
+  output.each_line do |line|
+    next unless line.include?("Apple Distribution")
+    hash = line[/\b([0-9A-Fa-f]{40})\b/]
+    next unless hash
+    UI.important("Removing Apple Distribution identity #{hash} from CI keychain")
+    sh("security delete-identity -Z #{hash} '#{keychain_path}' || true", log: false)
+  end
+end
+
 def import_distribution_p12!(keychain_name:, keychain_password:)
   p12_b64 = ENV["IOS_DISTRIBUTION_CERT_P12_BASE64"]
   return if p12_b64.nil? || p12_b64.strip.empty?
@@ -112,20 +128,27 @@ platform :ios do
       )
     end
 
+    # Never trust a restored CI keychain identity — it may be revoked on Apple's side.
+    delete_apple_distribution_identities!(keychain_path)
+
     import_distribution_p12!(
       keychain_name: keychain_name,
       keychain_password: keychain_password
     )
 
     if distribution_identity_in_keychain?(keychain_path)
-      UI.success("Using Apple Distribution identity from CI keychain")
+      UI.success("Using Apple Distribution identity from IOS_DISTRIBUTION_CERT_P12_BASE64")
     else
-      UI.important("No Distribution identity in keychain; creating one via App Store Connect API")
+      UI.important("Creating a fresh Apple Distribution certificate via App Store Connect API")
       ensure_distribution_cert!(
         api_key: api_key,
         keychain_path: keychain_path,
         keychain_password: keychain_password
       )
+    end
+
+    unless distribution_identity_in_keychain?(keychain_path)
+      UI.user_error!("No Apple Distribution identity available after cert setup")
     end
 
     profile_uuid = sigh(
