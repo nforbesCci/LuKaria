@@ -85,6 +85,7 @@ private fun kgFromLb(lb: Double?): Int? =
 private fun format1(value: Double): String =
     ((value * 10.0).roundToInt() / 10.0).toString().trimEnd('0').trimEnd('.')
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BodyScanScreen(onBack: () -> Unit) {
     var units by remember { mutableStateOf(BodyScanUnits.Imperial) }
