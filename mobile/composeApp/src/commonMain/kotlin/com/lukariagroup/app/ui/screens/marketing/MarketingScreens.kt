@@ -1,7 +1,11 @@
 package com.lukariagroup.app.ui.screens.marketing
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.lukariagroup.app.core.openExternalUrl
 import com.lukariagroup.app.ui.components.BodyCopy
 import com.lukariagroup.app.ui.components.LukariaScaffold
 import com.lukariagroup.app.ui.components.SectionTitle
