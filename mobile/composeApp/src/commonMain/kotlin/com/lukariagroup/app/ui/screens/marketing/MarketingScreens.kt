@@ -52,7 +52,14 @@ fun ContactScreen(onBack: () -> Unit) {
     LukariaScaffold(title = "Contact", onBack = onBack) {
         SectionTitle("Get in touch")
         BodyCopy("Email: info@lukariagroup.com")
+        BodyCopy("Phone: 876-290-3659")
         BodyCopy("Web: https://www.lukariagroup.com/contact")
+        OutlinedButton(
+            onClick = { openExternalUrl("tel:+18762903659") },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Call Us 876-290-3659")
+        }
         BodyCopy(
             "For clinical emergencies, call your local emergency number — " +
                 "head to your nearest emergency room or urgent care center. " +
