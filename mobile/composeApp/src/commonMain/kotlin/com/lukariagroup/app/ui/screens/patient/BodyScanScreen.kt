@@ -1,7 +1,13 @@
 package com.lukariagroup.app.ui.screens.patient
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -13,11 +19,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.lukariagroup.app.AppContainer
 import com.lukariagroup.app.core.PlatformConfig
+import com.lukariagroup.app.core.todayIsoDate
 import com.lukariagroup.app.data.models.BodyScanCreateRequest
 import com.lukariagroup.app.data.models.BodyScanListItem
 import com.lukariagroup.app.data.models.BodyScanMeasurement
+import com.lukariagroup.app.data.models.PatientProfile
 import com.lukariagroup.app.data.models.resolveBodyMass
 import com.lukariagroup.app.ui.components.BodyCopy
 import com.lukariagroup.app.ui.components.ErrorText
@@ -28,14 +40,59 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import kotlin.math.roundToInt
+
+private enum class BodyScanUnits { Metric, Imperial }
 
 private fun apiErrorMessage(throwable: Throwable): String =
     "${throwable.message ?: "Request failed"} (API: ${PlatformConfig.apiBaseUrl})"
 
+private fun normalizeGender(sex: String?, gender: String?): String {
+    val raw = (gender ?: sex).orEmpty().trim().lowercase()
+    return when {
+        raw.startsWith("m") -> "male"
+        raw.startsWith("f") -> "female"
+        else -> "female"
+    }
+}
+
+private fun ageYearsFromDob(dob: String?): Int? {
+    val parts = dob?.trim()?.take(10)?.split("-").orEmpty()
+    if (parts.size != 3) return null
+    val y = parts[0].toIntOrNull() ?: return null
+    val m = parts[1].toIntOrNull() ?: return null
+    val d = parts[2].toIntOrNull() ?: return null
+    val today = todayIsoDate().split("-")
+    if (today.size != 3) return null
+    val ty = today[0].toIntOrNull() ?: return null
+    val tm = today[1].toIntOrNull() ?: return null
+    val td = today[2].toIntOrNull() ?: return null
+    var age = ty - y
+    if (tm < m || (tm == m && td < d)) age -= 1
+    return age.takeIf { it in 16..120 }
+}
+
+private fun heightCmFromImperial(feet: Int?, inches: Double?): Int? {
+    if (feet == null && inches == null) return null
+    val totalInches = (feet ?: 0) * 12.0 + (inches ?: 0.0)
+    if (totalInches <= 0) return null
+    return (totalInches * 2.54).roundToInt()
+}
+
+private fun kgFromLb(lb: Double?): Int? =
+    lb?.takeIf { it > 0 }?.div(2.2046226218)?.roundToInt()
+
+private fun format1(value: Double): String =
+    ((value * 10.0).roundToInt() / 10.0).toString().trimEnd('0').trimEnd('.')
+
 @Composable
 fun BodyScanScreen(onBack: () -> Unit) {
+    var units by remember { mutableStateOf(BodyScanUnits.Imperial) }
     var heightCm by remember { mutableStateOf("") }
+    var heightFeet by remember { mutableStateOf("") }
+    var heightInches by remember { mutableStateOf("") }
     var weightKg by remember { mutableStateOf("") }
+    var weightLb by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("female") }
     var frontPhoto by remember { mutableStateOf<String?>(null) }
@@ -48,7 +105,61 @@ fun BodyScanScreen(onBack: () -> Unit) {
     var submitting by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
+    var prefilled by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+
+    val resolvedHeightCm = when (units) {
+        BodyScanUnits.Metric -> heightCm.toDoubleOrNull()?.roundToInt()
+        BodyScanUnits.Imperial -> heightCmFromImperial(
+            heightFeet.toIntOrNull(),
+            heightInches.toDoubleOrNull(),
+        )
+    }
+    val heightValid = resolvedHeightCm != null && resolvedHeightCm in 145..220
+    val photosReady = frontPhoto != null && sidePhoto != null
+    val canStart = photosReady && heightValid
+
+    fun applyProfilePrefill(profile: PatientProfile?, latestWeightLbs: Double?) {
+        if (prefilled) return
+        prefilled = true
+        units = BodyScanUnits.Imperial
+        profile?.heightFeet?.let { heightFeet = it.toString() }
+        profile?.heightInches?.let { heightInches = it.toString() }
+        val cm = heightCmFromImperial(profile?.heightFeet, profile?.heightInches?.toDouble())
+        if (cm != null) heightCm = cm.toString()
+
+        val lbs = latestWeightLbs ?: profile?.startingWeight
+        if (lbs != null && lbs > 0) {
+            weightLb = format1(lbs)
+            weightKg = kgFromLb(lbs)?.toString().orEmpty()
+        }
+
+        ageYearsFromDob(profile?.dateOfBirth)?.let { age = it.toString() }
+        gender = normalizeGender(profile?.sex, profile?.gender)
+    }
+
+    fun switchUnits(next: BodyScanUnits) {
+        if (next == units) return
+        if (next == BodyScanUnits.Metric) {
+            heightCmFromImperial(heightFeet.toIntOrNull(), heightInches.toDoubleOrNull())
+                ?.let { heightCm = it.toString() }
+            kgFromLb(weightLb.toDoubleOrNull())?.let { weightKg = it.toString() }
+        } else {
+            val cm = heightCm.toDoubleOrNull()
+            if (cm != null && cm > 0) {
+                val totalIn = cm / 2.54
+                val feet = (totalIn / 12.0).toInt()
+                val inches = totalIn - feet * 12.0
+                heightFeet = feet.toString()
+                heightInches = format1(inches)
+            }
+            weightKg.toDoubleOrNull()?.let { kg ->
+                weightLb = format1(kg * 2.2046226218)
+            }
+        }
+        units = next
+    }
 
     val launchLookCamera = rememberLookCameraLauncher { capture ->
         if (capture.frontDataUrl == null && capture.sideDataUrl == null) {
@@ -92,11 +203,20 @@ fun BodyScanScreen(onBack: () -> Unit) {
         }
     }
 
-    LaunchedEffect(Unit) { refreshHistory() }
+    LaunchedEffect(Unit) {
+        refreshHistory()
+        val profile = runCatching { AppContainer.profileRepository.fetch().profile }.getOrNull()
+        val latestLbs = runCatching {
+            AppContainer.measurementRepository.fetchAll().measurements
+                .firstOrNull { it.weight != null }
+                ?.weight
+        }.getOrNull()
+        applyProfilePrefill(profile, latestLbs)
+    }
 
     LukariaScaffold(title = "Body scan", onBack = onBack) {
         BodyCopy(
-            "Use the 3DLOOK AI camera for guided front and side photos, then submit for FitXpress measurements. Height is in cm.",
+            "Use the 3DLOOK AI camera for guided front and side photos, then submit for FitXpress measurements.",
         )
         BodyCopy(
             "Tips: form-fitting clothes, plain background, full body head-to-toe, arms slightly away from sides, good lighting.",
@@ -165,39 +285,119 @@ fun BodyScanScreen(onBack: () -> Unit) {
             ) { Text("Try again") }
         } else if (!submitting) {
             SectionTitle("New scan")
-            OutlinedTextField(
-                value = heightCm,
-                onValueChange = { heightCm = it },
-                label = { Text("Height (cm)") },
+
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-            )
-            OutlinedTextField(
-                value = weightKg,
-                onValueChange = { weightKg = it },
-                label = { Text("Weight (kg, optional)") },
-                modifier = Modifier.fillMaxWidth(),
-            )
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                FilterChip(
+                    selected = units == BodyScanUnits.Imperial,
+                    onClick = { switchUnits(BodyScanUnits.Imperial) },
+                    label = { Text("Imperial (ft/in, lb)") },
+                )
+                FilterChip(
+                    selected = units == BodyScanUnits.Metric,
+                    onClick = { switchUnits(BodyScanUnits.Metric) },
+                    label = { Text("Metric (cm, kg)") },
+                )
+            }
+
+            if (units == BodyScanUnits.Metric) {
+                OutlinedTextField(
+                    value = heightCm,
+                    onValueChange = { heightCm = it },
+                    label = { Text("Height (cm)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next,
+                    ),
+                )
+                OutlinedTextField(
+                    value = weightKg,
+                    onValueChange = { weightKg = it },
+                    label = { Text("Weight (kg, optional)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next,
+                    ),
+                )
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedTextField(
+                        value = heightFeet,
+                        onValueChange = { heightFeet = it },
+                        label = { Text("Height (ft)") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next,
+                        ),
+                    )
+                    OutlinedTextField(
+                        value = heightInches,
+                        onValueChange = { heightInches = it },
+                        label = { Text("Inches") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Next,
+                        ),
+                    )
+                }
+                OutlinedTextField(
+                    value = weightLb,
+                    onValueChange = { weightLb = it },
+                    label = { Text("Weight (lb, optional)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next,
+                    ),
+                )
+            }
+
             OutlinedTextField(
                 value = age,
                 onValueChange = { age = it },
                 label = { Text("Age (optional)") },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             OutlinedButton(
                 onClick = { gender = if (gender == "female") "male" else "female" },
                 modifier = Modifier.fillMaxWidth(),
             ) { Text("Gender: $gender (tap to switch)") }
 
+            if (!heightValid && (heightCm.isNotBlank() || heightFeet.isNotBlank() || heightInches.isNotBlank())) {
+                ErrorText("Height must be between 145–220 cm (about 4'9\"–7'3\").")
+            }
+
             Button(
                 onClick = {
                     error = null
+                    focusManager.clearFocus()
                     launchLookCamera()
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
                     when {
-                        frontPhoto != null && sidePhoto != null -> "Retake with AI camera"
+                        photosReady -> "Retake with AI camera"
                         else -> "Open AI camera capture"
                     },
                 )
@@ -207,6 +407,9 @@ fun BodyScanScreen(onBack: () -> Unit) {
                 "Photos: front=${if (frontPhoto != null) "ready" else "missing"} · " +
                     "side=${if (sidePhoto != null) "ready" else "missing"}",
             )
+            if (!photosReady) {
+                BodyCopy("Capture front and side photos to enable Start body scan.")
+            }
 
             SectionTitle("Or pick from gallery")
             OutlinedButton(
@@ -227,16 +430,21 @@ fun BodyScanScreen(onBack: () -> Unit) {
 
             Button(
                 onClick = {
-                    val height = heightCm.toIntOrNull()
+                    focusManager.clearFocus()
+                    val height = resolvedHeightCm
                     val front = frontPhoto
                     val side = sidePhoto
-                    if (height == null || height < 145 || height > 220) {
-                        error = "Height must be between 145 and 220 cm"
+                    if (height == null || height !in 145..220) {
+                        error = "Height must be between 145 and 220 cm (or equivalent imperial)"
                         return@Button
                     }
                     if (front == null || side == null) {
                         error = "Front and side photos are required"
                         return@Button
+                    }
+                    val weightForApi = when (units) {
+                        BodyScanUnits.Metric -> weightKg.toDoubleOrNull()?.roundToInt()
+                        BodyScanUnits.Imperial -> kgFromLb(weightLb.toDoubleOrNull())
                     }
                     scope.launch {
                         submitting = true
@@ -246,7 +454,7 @@ fun BodyScanScreen(onBack: () -> Unit) {
                             val created = AppContainer.bodyScanRepository.create(
                                 BodyScanCreateRequest(
                                     height = height,
-                                    weight = weightKg.toIntOrNull(),
+                                    weight = weightForApi,
                                     gender = gender,
                                     age = age.toIntOrNull(),
                                     frontPhoto = front,
@@ -286,7 +494,7 @@ fun BodyScanScreen(onBack: () -> Unit) {
                         }
                     }
                 },
-                enabled = frontPhoto != null && sidePhoto != null && heightCm.toIntOrNull() != null,
+                enabled = canStart,
                 modifier = Modifier.fillMaxWidth(),
             ) { Text("Start body scan") }
         }
