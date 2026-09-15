@@ -58,6 +58,8 @@ export default function MedicationTracker() {
   const [isAddingEntry, setIsAddingEntry] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
   const [medicationHistory, setMedicationHistory] = useState([]);
+  const [formulary, setFormulary] = useState([]);
+  const [formularyError, setFormularyError] = useState(null);
   const [newEntry, setNewEntry] = useState({
     date: new Date().toISOString().split('T')[0],
     time: new Date().toTimeString().slice(0, 5),
@@ -66,17 +68,35 @@ export default function MedicationTracker() {
     notes: ''
   });
 
-  // Common medications list
-  const commonMedications = [
-    'Mounjaro',
-    'Tirzepatide',
-    'Semaglutide',
-    'Other'
-  ];
+  const selectedFormularyMed = formulary.find((m) => m.name === newEntry.medicationName);
+  const availableDoses = selectedFormularyMed?.doses || [];
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!user || !mounted) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/medications/allowed');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load medications');
+        if (!cancelled) {
+          setFormulary(Array.isArray(data.medications) ? data.medications : []);
+          setFormularyError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setFormularyError(err.message || 'Failed to load medications');
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, mounted]);
 
   // Load medications from database when component mounts
   useEffect(() => {
@@ -430,25 +450,43 @@ export default function MedicationTracker() {
                   <InputLabel>Medication Name</InputLabel>
                   <Select
                     value={newEntry.medicationName}
-                    onChange={(e) => setNewEntry({...newEntry, medicationName: e.target.value})}
+                    onChange={(e) => {
+                      const medicationName = e.target.value;
+                      const med = formulary.find((m) => m.name === medicationName);
+                      setNewEntry({
+                        ...newEntry,
+                        medicationName,
+                        dosage: med?.doses?.[0] || '',
+                      });
+                    }}
                     label="Medication Name"
                   >
-                    {commonMedications.map((medication) => (
-                      <MenuItem key={medication} value={medication}>
-                        {medication}
+                    {formulary.map((medication) => (
+                      <MenuItem key={medication.name} value={medication.name}>
+                        {medication.name}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
+
+                {formularyError && (
+                  <Alert severity="warning">{formularyError}</Alert>
+                )}
                 
-                <TextField
-                  fullWidth
-                  required
-                  label="Dosage in mg"
-                  value={newEntry.dosage}
-                  onChange={(e) => setNewEntry({...newEntry, dosage: e.target.value})}
-                  placeholder="e.g., 500, 1000"
-                />
+                <FormControl fullWidth required disabled={!availableDoses.length}>
+                  <InputLabel>Dosage</InputLabel>
+                  <Select
+                    value={newEntry.dosage}
+                    onChange={(e) => setNewEntry({...newEntry, dosage: e.target.value})}
+                    label="Dosage"
+                  >
+                    {availableDoses.map((dose) => (
+                      <MenuItem key={dose} value={dose}>
+                        {dose}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
                 
                 <TextField
                   fullWidth
@@ -520,7 +558,7 @@ export default function MedicationTracker() {
                           </Typography>
                           <Box sx={{ mt: 1 }}>
                             <Chip 
-                              label={`Dosage: ${entry.dosage} mg`} 
+                              label={`Dosage: ${entry.dosage}`} 
                               color="primary"
                               size="small"
                               sx={{ mr: 1 }}
