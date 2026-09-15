@@ -20,9 +20,15 @@ enum LookCameraBridge {
         func present(onComplete_ onComplete: LookCameraCompletion) {
             DispatchQueue.main.async {
                 LookCameraSDK.shared.presentSDKView(mode: .startFromTutorial) { result in
-                    let front = Self.jpegDataUrl(from: result.frontPhoto)
-                    let side = Self.jpegDataUrl(from: result.sidePhoto)
-                    onComplete.onComplete(frontDataUrl: front, sideDataUrl: side)
+                    // Encode/downscale off the main thread — large JPEGs on main can
+                    // freeze or contribute to post-capture instability.
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        let front = Self.jpegDataUrl(from: result.frontPhoto)
+                        let side = Self.jpegDataUrl(from: result.sidePhoto)
+                        DispatchQueue.main.async {
+                            onComplete.onComplete(frontDataUrl: front, sideDataUrl: side)
+                        }
+                    }
                 }
             }
         }

@@ -242,8 +242,8 @@ fun BodyScanScreen(onBack: () -> Unit) {
                         submitting = true
                         error = null
                         message = null
-                        runCatching {
-                            AppContainer.bodyScanRepository.create(
+                        try {
+                            val created = AppContainer.bodyScanRepository.create(
                                 BodyScanCreateRequest(
                                     height = height,
                                     weight = weightKg.toIntOrNull(),
@@ -253,7 +253,6 @@ fun BodyScanScreen(onBack: () -> Unit) {
                                     sidePhoto = side,
                                 ),
                             )
-                        }.onSuccess { created ->
                             status = created.status
                             current = created.measurement
                             val id = created.measurementId
@@ -262,7 +261,12 @@ fun BodyScanScreen(onBack: () -> Unit) {
                                 var finished = false
                                 repeat(45) {
                                     delay(4000)
-                                    val polled = AppContainer.bodyScanRepository.status(id)
+                                    val polled = runCatching {
+                                        AppContainer.bodyScanRepository.status(id)
+                                    }.getOrElse { pollError ->
+                                        error = apiErrorMessage(pollError)
+                                        return@repeat
+                                    }
                                     status = polled.status
                                     current = polled.measurement
                                     if (polled.status == "successful" || polled.status == "failed") {
@@ -270,13 +274,16 @@ fun BodyScanScreen(onBack: () -> Unit) {
                                         return@repeat
                                     }
                                 }
-                                if (!finished) {
+                                if (!finished && error == null) {
                                     error = "Timed out waiting for scan results"
                                 }
                             }
                             refreshHistory()
-                        }.onFailure { error = apiErrorMessage(it) }
-                        submitting = false
+                        } catch (t: Throwable) {
+                            error = apiErrorMessage(t)
+                        } finally {
+                            submitting = false
+                        }
                     }
                 },
                 enabled = frontPhoto != null && sidePhoto != null && heightCm.toIntOrNull() != null,
