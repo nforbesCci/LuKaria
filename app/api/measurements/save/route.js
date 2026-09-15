@@ -83,7 +83,9 @@ export async function POST(request) {
       success: true,
       message: existingMeasurement ? 'Measurement updated successfully' : 'Measurement saved successfully',
       measurementsId: result.insertedId || existingMeasurement?._id,
-      measurements: document
+      // Mobile clients decode `measurements` as an array; also expose singular `measurement`.
+      measurement: document,
+      measurements: [document],
     });
 
   } catch (error) {

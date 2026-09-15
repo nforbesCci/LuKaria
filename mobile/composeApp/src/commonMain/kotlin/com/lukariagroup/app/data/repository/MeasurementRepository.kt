@@ -2,6 +2,7 @@ package com.lukariagroup.app.data.repository
 
 import com.lukariagroup.app.data.models.MeasurementEntry
 import com.lukariagroup.app.data.models.MeasurementsResponse
+import com.lukariagroup.app.data.models.MeasurementsSaveResponse
 import io.ktor.client.HttpClient
 
 class MeasurementRepository(private val client: HttpClient) {
@@ -11,6 +12,14 @@ class MeasurementRepository(private val client: HttpClient) {
     suspend fun fetchAll(): MeasurementsResponse =
         client.getApi("api/measurements/fetchAll")
 
-    suspend fun save(entry: MeasurementEntry): MeasurementsResponse =
-        client.postApi("api/measurements/save", entry)
+    suspend fun save(entry: MeasurementEntry): MeasurementsResponse {
+        val saved: MeasurementsSaveResponse = client.postApi("api/measurements/save", entry)
+        return MeasurementsResponse(
+            success = saved.success,
+            message = saved.message,
+            error = saved.error,
+            measurement = saved.measurement,
+            measurements = listOfNotNull(saved.measurement),
+        )
+    }
 }

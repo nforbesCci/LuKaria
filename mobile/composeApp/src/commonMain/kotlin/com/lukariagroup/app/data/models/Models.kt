@@ -249,6 +249,15 @@ data class MeasurementsResponse(
     val error: String? = null,
 )
 
+/** Save endpoint historically returned `measurements` as a single object; ignore that shape. */
+@Serializable
+data class MeasurementsSaveResponse(
+    val success: Boolean = true,
+    val measurement: MeasurementEntry? = null,
+    val message: String? = null,
+    val error: String? = null,
+)
+
 @Serializable
 data class MedicationEntry(
     val date: String? = null,
