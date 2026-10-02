@@ -1,5 +1,6 @@
 package com.lukariagroup.app.data.repository
 
+import com.lukariagroup.app.data.models.ApiMessage
 import com.lukariagroup.app.data.models.PatientProfile
 import com.lukariagroup.app.data.models.ProfileResponse
 import io.ktor.client.HttpClient
@@ -14,4 +15,7 @@ class ProfileRepository(private val client: HttpClient) {
 
     suspend fun save(profile: JsonObject): ProfileResponse =
         client.postApi("api/profile/save", profile)
+
+    suspend fun deleteAccount(): ApiMessage =
+        client.deleteApi("api/account/delete")
 }

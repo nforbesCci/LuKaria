@@ -14,15 +14,18 @@ import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +41,7 @@ import com.lukariagroup.app.ui.components.LukariaScaffold
 import com.lukariagroup.app.ui.components.SectionTitle
 import com.lukariagroup.app.ui.navigation.AppRoute
 import com.lukariagroup.app.ui.theme.LukariaGold
+import kotlinx.coroutines.launch
 
 private data class DashboardLink(
     val label: String,
@@ -58,6 +62,9 @@ fun DashboardScreen(
     val user = authState.user
     var notifications by remember { mutableStateOf<List<AppNotification>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(authState.isLoggedIn) {
         if (!authState.isLoggedIn) return@LaunchedEffect
@@ -123,5 +130,58 @@ fun DashboardScreen(
         OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) {
             Text("Sign out")
         }
+
+        TextButton(
+            onClick = { showDeleteDialog = true },
+            enabled = !deleting,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                if (deleting) "Deleting account…" else "Delete account",
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete your account?") },
+            text = {
+                Text(
+                    "This permanently deletes your login, profile, weight, meal, medication, body scan " +
+                        "and appointment data. Signed consent forms and side-effect reports are kept " +
+                        "as part of your medical record, as required by law. This cannot be undone.",
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        deleting = true
+                        error = null
+                        scope.launch {
+                            try {
+                                val result = AppContainer.profileRepository.deleteAccount()
+                                if (result.success) {
+                                    onLogout()
+                                } else {
+                                    error = result.error ?: "Could not delete account"
+                                }
+                            } catch (e: Exception) {
+                                error = e.message ?: "Could not delete account"
+                            } finally {
+                                deleting = false
+                            }
+                        }
+                    },
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+            },
+        )
     }
 }
