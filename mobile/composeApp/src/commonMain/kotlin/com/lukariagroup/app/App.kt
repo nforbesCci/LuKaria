@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.savedstate.read
+import com.lukariagroup.app.core.LaunchOverrides
 import com.lukariagroup.app.core.SessionExpiredHandler
 import com.lukariagroup.app.ui.navigation.AppRoute
 import com.lukariagroup.app.ui.screens.admin.AdminBodyScanScreen
@@ -71,7 +72,19 @@ fun App() {
         var sessionExpiredMessage by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) {
-            AppContainer.authRepository.restoreSession()
+            val overrideToken = LaunchOverrides.accessToken?.takeIf { it.isNotBlank() }
+            if (overrideToken != null) {
+                AppContainer.authRepository.loginWithAccessToken(overrideToken)
+            } else {
+                AppContainer.authRepository.restoreSession()
+            }
+            val startRoute = LaunchOverrides.startRoute?.takeIf { it.isNotBlank() && it != AppRoute.Home.route }
+            if (startRoute != null) {
+                if (startRoute.startsWith("patient/") && startRoute != AppRoute.Dashboard.route) {
+                    navController.navigate(AppRoute.Dashboard.route)
+                }
+                navController.navigate(startRoute)
+            }
         }
 
         LaunchedEffect(navController, authViewModel) {
