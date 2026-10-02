@@ -7,7 +7,7 @@ set -euo pipefail
 APP_PATH="$1"
 OUT_DIR="$2"
 BUNDLE_ID="com.lukaria.svelte"
-ROUTES=(home patient/dashboard patient/weight patient/medications patient/body-scan contact)
+ROUTES=(home patient/dashboard patient/weight patient/medications patient/body-scan patient/schedule blog contact)
 
 mkdir -p "$OUT_DIR"
 
@@ -16,12 +16,16 @@ import json, sys
 rs = [r for r in json.load(sys.stdin)["runtimes"] if r["platform"] == "iOS" and r["isAvailable"]]
 print(sorted(rs, key=lambda r: [int(x) for x in r["version"].split(".")])[-1]["identifier"])')
 
+# Newest model matching the pattern, ranked by the numbers in its name (e.g. "iPhone 17 Pro Max", "iPad Pro 13-inch (M5)").
 device_type() {
   xcrun simctl list devicetypes -j | python3 -c '
 import json, re, sys
 pattern = re.compile(sys.argv[1])
 types = [t for t in json.load(sys.stdin)["devicetypes"] if pattern.search(t["name"])]
-print(types[-1]["identifier"])' "$1"
+rank = lambda t: [int(n) for n in re.findall(r"\d+", t["name"])]
+best = max(types, key=rank)
+print(best["name"], file=sys.stderr)
+print(best["identifier"])' "$1"
 }
 
 capture() {

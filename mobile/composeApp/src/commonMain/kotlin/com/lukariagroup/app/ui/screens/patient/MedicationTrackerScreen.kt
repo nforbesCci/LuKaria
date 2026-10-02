@@ -158,7 +158,8 @@ fun MedicationTrackerScreen(onBack: () -> Unit) {
 
         SectionTitle("History")
         history.take(20).forEach {
-            Text("${it.date}: ${it.medicationName} ${it.dosage ?: it.dose} taken=${it.taken}")
+            val status = if (it.taken) "Taken" else "Missed"
+            Text("${it.date}: ${it.medicationName} ${it.dosage ?: it.dose} · $status")
         }
     }
 }

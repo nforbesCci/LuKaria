@@ -157,8 +157,8 @@ fun WeightLoggingScreen(onBack: () -> Unit) {
         SectionTitle("History")
         history.take(20).forEach { entry ->
             Text(
-                "${entry.displayDate ?: "—"}: ${entry.weight ?: "—"} lbs  " +
-                    "waist=${entry.displayWaist ?: "—"}",
+                "${entry.displayDate ?: "—"}: ${entry.weight ?: "—"} lbs" +
+                    (entry.displayWaist?.let { " · waist $it in" } ?: ""),
             )
         }
     }
