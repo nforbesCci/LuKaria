@@ -8,6 +8,8 @@ struct iOSApp: App {
         LookCameraBridge.install()
         // AVFoundation barcode scanner for meal / food lookup.
         BarcodeScannerBridge.install()
+        // Camera + photo library for meal photos and body scan gallery.
+        ImagePickerBridge.install()
     }
 
     var body: some Scene {
