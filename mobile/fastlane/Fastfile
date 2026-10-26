@@ -165,7 +165,7 @@ platform :ios do
       project: "iosApp/iosApp.xcodeproj",
       scheme: "iosApp",
       configuration: "Release",
-      clean: false,
+      clean: true,
       export_method: "app-store",
       output_directory: output_dir,
       output_name: "Svelte",
@@ -174,7 +174,9 @@ platform :ios do
         "DEVELOPMENT_TEAM=#{team_id}",
         "CODE_SIGN_STYLE=Manual",
         "CODE_SIGN_IDENTITY='Apple Distribution'",
-        "PROVISIONING_PROFILE=#{profile_uuid}"
+        "CODE_SIGN_ENTITLEMENTS=iosApp/iosApp.entitlements",
+        "PROVISIONING_PROFILE=#{profile_uuid}",
+        "PROVISIONING_PROFILE_SPECIFIER='Svelte App Store'"
       ].join(" "),
       export_options: {
         method: "app-store",
@@ -187,6 +189,34 @@ platform :ios do
         manageAppVersionAndBuildNumber: false
       }
     )
+
+    ipa_path = File.join(output_dir, "Svelte.ipa")
+    verify_dir = File.join(output_dir, "ipa-verify")
+    sh("rm -rf '#{verify_dir}' && mkdir -p '#{verify_dir}' && unzip -qo '#{ipa_path}' -d '#{verify_dir}'")
+    app_path = File.join(verify_dir, "Payload/Svelte.app")
+    UI.user_error!("Unpacked app missing at #{app_path}") unless File.directory?(app_path)
+    identity = sh("codesign -dv --verbose=2 '#{app_path}' 2>&1 | tr -d '\\r'", log: true)
+    unless identity.include?("Authority=Apple Distribution")
+      UI.user_error!("IPA is not signed with Apple Distribution:\n#{identity}")
+    end
+    verify = sh("codesign --verify --deep --strict --verbose=2 '#{app_path}' 2>&1 || true", log: true)
+    if verify.include?("does not satisfy")
+      UI.important("Re-signing with a team-ID designated requirement (avoids Unicode CN mismatch)")
+      sh(
+        "codesign --force --sign 'Apple Distribution' --identifier #{bundle_id} " \
+        "--generate-entitlement-der " \
+        "--requirements '=designated => anchor apple generic and identifier \"#{bundle_id}\" " \
+        "and certificate leaf[subject.OU] = \"#{team_id}\" " \
+        "and certificate 1[field.1.2.840.113635.100.6.2.1] exists' " \
+        "'#{app_path}'"
+      )
+      sh("codesign --verify --deep --strict --verbose=2 '#{app_path}'")
+      sh("cd '#{verify_dir}' && zip -qry '#{ipa_path}' Payload")
+    elsif verify.downcase.include?("invalid") || verify.include?("failed")
+      UI.user_error!("codesign --verify failed:\n#{verify}")
+    else
+      UI.success("codesign --verify --deep --strict passed")
+    end
 
     upload_to_testflight(
       api_key: api_key,
