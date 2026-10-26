@@ -97,23 +97,26 @@ fun BodyScanResultsPanel(
 
     val additionalCirc = remember(circ) {
         circ?.entries
-            ?.filter { (k, v) ->
-                k !in CoreCircKeys &&
-                    k != "body_type" &&
-                    (v.jsonNumber() != null || !v.jsonString().isNullOrBlank())
+            ?.filter { entry ->
+                entry.key !in CoreCircKeys &&
+                    entry.key != "body_type" &&
+                    (entry.value.jsonNumber() != null || !entry.value.jsonString().isNullOrBlank())
             }
             ?: emptyList()
     }
     val additionalLinear = remember(m) {
         buildList {
-            m?.front_linear_params?.forEach { (k, v) ->
-                if (v.jsonNumber() != null || v.jsonString() != null) add(Triple("front_$k", v, "cm"))
+            m?.front_linear_params?.entries?.forEach { entry ->
+                val v = entry.value
+                if (v.jsonNumber() != null || v.jsonString() != null) add(Triple("front_${entry.key}", v, "cm"))
             }
-            m?.side_linear_params?.forEach { (k, v) ->
-                if (v.jsonNumber() != null || v.jsonString() != null) add(Triple("side_$k", v, "cm"))
+            m?.side_linear_params?.entries?.forEach { entry ->
+                val v = entry.value
+                if (v.jsonNumber() != null || v.jsonString() != null) add(Triple("side_${entry.key}", v, "cm"))
             }
-            m?.volume_params?.forEach { (k, v) ->
-                if (v.jsonNumber() != null || v.jsonString() != null) add(Triple(k, v, ""))
+            m?.volume_params?.entries?.forEach { entry ->
+                val v = entry.value
+                if (v.jsonNumber() != null || v.jsonString() != null) add(Triple(entry.key, v, ""))
             }
         }
     }
@@ -257,12 +260,12 @@ fun BodyScanResultsPanel(
                             modifier = Modifier.padding(bottom = 8.dp),
                         )
                         FieldGrid(
-                            additionalCirc.map { (key, value) ->
-                                formatLabel(key) to
-                                    if (key == "body_type") {
-                                        formatLabel(value.jsonString() ?: value.toString())
+                            additionalCirc.map { entry ->
+                                formatLabel(entry.key) to
+                                    if (entry.key == "body_type") {
+                                        formatLabel(entry.value.jsonString() ?: entry.value.toString())
                                     } else {
-                                        formatLength(value.jsonNumber(), units)
+                                        formatLength(entry.value.jsonNumber(), units)
                                     }
                             },
                         )
@@ -275,12 +278,12 @@ fun BodyScanResultsPanel(
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                         )
                         FieldGrid(
-                            additionalLinear.map { (key, value, kind) ->
-                                formatLabel(key.removePrefix("front_").removePrefix("side_")) to
-                                    if (kind == "cm") {
-                                        formatLength(value.jsonNumber(), units)
+                            additionalLinear.map { row ->
+                                formatLabel(row.first.removePrefix("front_").removePrefix("side_")) to
+                                    if (row.third == "cm") {
+                                        formatLength(row.second.jsonNumber(), units)
                                     } else {
-                                        formatPlain(value.jsonNumber() ?: value.jsonString())
+                                        formatPlain(row.second.jsonNumber() ?: row.second.jsonString())
                                     }
                             },
                         )
