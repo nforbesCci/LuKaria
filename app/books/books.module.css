@@ -1,0 +1,22 @@
+.carouselWrap {
+  width: min(100%, 520px);
+  margin: 0 auto;
+}
+
+.cta {
+  display: inline-block;
+  margin-top: 1.25rem;
+  background-color: #877449;
+  color: #000;
+  font-weight: 600;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.12);
+}
+
+.cta:hover {
+  background-color: #b8941f;
+}

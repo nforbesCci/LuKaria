@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import HomePageChrome from './HomePageChrome';
 import HomeHeroBackdropStatic from '../components/home/HomeHeroBackdropStatic';
+import HomeBookPromo from '../components/home/HomeBookPromo';
 import HomeHeroStatic from '../components/home/HomeHeroStatic';
 import HomeMeetDoctorStatic from '../components/home/HomeMeetDoctorStatic';
 import HomeVirtualIntroStatic from '../components/home/HomeVirtualIntroStatic';
@@ -30,6 +31,7 @@ export default function HomePage() {
   return (
     <HomePageChrome>
       <HomeHeroBackdropStatic />
+      <HomeBookPromo />
       <HomeHeroStatic />
       <HomeMeetDoctorStatic />
       <HomeBelowFold />

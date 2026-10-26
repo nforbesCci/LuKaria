@@ -60,6 +60,7 @@ module.exports = {
       '/faq': { priority: 0.85, changefreq: 'monthly' },
       '/about': { priority: 0.85, changefreq: 'monthly' },
       '/testimonials': { priority: 0.8, changefreq: 'monthly' },
+      '/books': { priority: 0.8, changefreq: 'monthly' },
       '/contact': { priority: 0.8, changefreq: 'monthly' },
       '/blog': { priority: 0.75, changefreq: 'weekly' },
       '/privacy-policy': { priority: 0.3, changefreq: 'yearly' },

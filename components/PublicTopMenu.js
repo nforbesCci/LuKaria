@@ -31,6 +31,7 @@ const MENU_ITEMS = [
   { label: 'FAQ', href: '/faq' },
   { label: 'Contact', href: '/contact' },
   { label: 'About Us', href: '/about' },
+  { label: 'Books', href: '/books' },
   { label: 'Blog', href: '/blog' },
 ];
 
@@ -77,7 +78,7 @@ export default function PublicTopMenu({ currentPath = '' }) {
           sx={{
             display: { xs: 'none', md: 'flex' },
             alignItems: 'center',
-            gap: 4,
+            gap: { md: 2.5, lg: 4 },
           }}
         >
           {MENU_ITEMS.map((item) =>

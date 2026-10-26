@@ -45,6 +45,7 @@ export default function Footer() {
           <h4 className={styles.colTitle}>Company</h4>
           <nav className={styles.linkList}>
             <Link href="/about" className={styles.footerLink}>About Dr. Fairclough</Link>
+            <Link href="/books" className={styles.footerLink}>Books</Link>
             <Link href="/contact" className={styles.footerLink}>Contact Us</Link>
             <Link href="/privacy-policy" className={styles.footerLink}>Privacy Policy</Link>
             <Link href="/terms" className={styles.footerLink}>Terms of Service</Link>
