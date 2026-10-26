@@ -15,7 +15,6 @@
 		A1LOOKCAM00000000000003 /* LookCamera in Frameworks */ = {isa = PBXBuildFile; productRef = A1LOOKCAM00000000000004 /* LookCamera */; };
 		A1BARCODE00000000000001 /* BarcodeScannerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BARCODE00000000000002 /* BarcodeScannerBridge.swift */; };
 		A1IMGPICK00000000000001 /* ImagePickerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1IMGPICK00000000000002 /* ImagePickerBridge.swift */; };
-		A1LOOKCAM00000000000006 /* LookCamera in Embed Frameworks */ = {isa = PBXBuildFile; productRef = A1LOOKCAM00000000000004 /* LookCamera */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,20 +41,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		A1LOOKCAM00000000000007 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				A1LOOKCAM00000000000006 /* LookCamera in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXGroup section */
 		058557D7273AAEEB004C7B11 /* Preview Content */ = {
@@ -126,7 +111,6 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF79242A565900829871 /* Resources */,
 				F85CB1118929364A9C6EFABC /* Frameworks */,
-				A1LOOKCAM00000000000007 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
